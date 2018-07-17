@@ -8,8 +8,9 @@
     <application
             android:icon="@drawable/ub__ic_launcher"
             android:label="Motif Sample"
-            android:theme="@style/Theme.AppCompat.Light">
-        <activity android:name="com.uber.motif.sample.RootActivity">
+            android:theme="@style/Theme.AppCompat.Light"
+            android:name=".application.Application">
+        <activity android:name="com.uber.motif.sample.root.RootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

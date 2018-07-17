@@ -48,6 +48,10 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
         return resolveParent(setOf(), scopeType)!!
     }
 
+    // TODO Currently, dynamic dependencies are public by default. This is due to the fact that a child doesn't know
+    // whether its external dependencies are provided "normally" or via a dynamic dependency. This is convenient in
+    // order to support multiple parents each passing different dynamic dependencies to the child. Ideally, dynamic
+    // dependencies would only be public if listed explicitly on the Objects class as public.
     private fun resolveParent(visited: Set<TypeElement>, scopeType: TypeElement): ResolvedParent? {
         // Circular scope dependencies are allowed. Stop recursion when we hit a cycle.
         if (scopeType in visited) return null
