@@ -1,12 +1,12 @@
-package com.uber.motif.sample.root;
+package com.uber.motif.sample.app.root;
 
 import android.content.Context;
 import android.view.ViewGroup;
 import com.uber.controller.Controller;
 import com.uber.motif.sample.R;
-import com.uber.motif.sample.filelist.FileListView;
-import com.uber.motif.sample.filerow.FileClickListener;
-import com.uber.motif.sample.filerow.FileLongClickListener;
+import com.uber.motif.sample.app.filelist.FileListView;
+import com.uber.motif.sample.app.filerow.FileClickListener;
+import com.uber.motif.sample.app.filerow.FileLongClickListener;
 import com.uber.motif.sample.model.RootDir;
 
 import java.io.File;

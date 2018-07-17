@@ -1,4 +1,4 @@
-package com.uber.motif.sample.filelist;
+package com.uber.motif.sample.app.filelist;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;

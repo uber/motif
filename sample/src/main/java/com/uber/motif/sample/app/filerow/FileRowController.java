@@ -1,11 +1,11 @@
-package com.uber.motif.sample.filerow;
+package com.uber.motif.sample.app.filerow;
 
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.uber.controller.Controller;
 import com.uber.motif.sample.R;
-import com.uber.motif.sample.fileactions.FileActionsView;
+import com.uber.motif.sample.app.fileactions.FileActionsView;
 
 import java.io.File;
 

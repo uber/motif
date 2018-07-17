@@ -1,4 +1,4 @@
-package com.uber.motif.sample.fileactions;
+package com.uber.motif.sample.app.fileactions;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

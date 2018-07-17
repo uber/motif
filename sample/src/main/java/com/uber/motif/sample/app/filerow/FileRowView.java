@@ -1,4 +1,4 @@
-package com.uber.motif.sample.filerow;
+package com.uber.motif.sample.app.filerow;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

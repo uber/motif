@@ -1,4 +1,4 @@
-package com.uber.motif.sample.application;
+package com.uber.motif.sample.app.application;
 
 import com.facebook.stetho.Stetho;
 

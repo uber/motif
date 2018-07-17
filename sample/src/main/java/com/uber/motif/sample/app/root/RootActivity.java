@@ -1,4 +1,4 @@
-package com.uber.motif.sample.root;
+package com.uber.motif.sample.app.root;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,9 +1,9 @@
-package com.uber.motif.sample.filelist;
+package com.uber.motif.sample.app.filelist;
 
 import com.uber.motif.Scope;
-import com.uber.motif.sample.filerow.FileRowScope;
-import com.uber.motif.sample.filerow.FileRowView;
-import com.uber.motif.sample.filerow.FileTouches;
+import com.uber.motif.sample.app.filerow.FileRowScope;
+import com.uber.motif.sample.app.filerow.FileRowView;
+import com.uber.motif.sample.app.filerow.FileTouches;
 
 import java.io.File;
 

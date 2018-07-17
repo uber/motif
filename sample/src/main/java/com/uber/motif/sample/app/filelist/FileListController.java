@@ -1,4 +1,4 @@
-package com.uber.motif.sample.filelist;
+package com.uber.motif.sample.app.filelist;
 
 import android.content.Context;
 import android.view.ViewGroup;

@@ -1,4 +1,4 @@
-package com.uber.motif.sample.filerow;
+package com.uber.motif.sample.app.filerow;
 
 import java.io.File;
 

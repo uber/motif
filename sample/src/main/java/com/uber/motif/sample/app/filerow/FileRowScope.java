@@ -1,8 +1,8 @@
-package com.uber.motif.sample.filerow;
+package com.uber.motif.sample.app.filerow;
 
 import android.view.ViewGroup;
 import com.uber.motif.Scope;
-import com.uber.motif.sample.fileactions.FileActionsScope;
+import com.uber.motif.sample.app.fileactions.FileActionsScope;
 
 @Scope
 public interface FileRowScope {
