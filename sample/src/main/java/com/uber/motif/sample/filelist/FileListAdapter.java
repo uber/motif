@@ -39,11 +39,6 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
     }
 
     @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        holder.unbind();
-    }
-
-    @Override
     public int getItemCount() {
         return files.size();
     }
@@ -62,6 +57,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
         void bind(int position) {
             unbind();
             controller = scope.fileRow(view, files.get(position)).controller();
+            controller.attach();
         }
 
         void unbind() {

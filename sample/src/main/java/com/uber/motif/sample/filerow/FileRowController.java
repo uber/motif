@@ -1,6 +1,5 @@
 package com.uber.motif.sample.filerow;
 
-import android.view.View;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +25,7 @@ public class FileRowController extends Controller<FileRowView> {
             File file,
             FileClickListener fileClickListener,
             FileLongClickListener fileLongClickListener) {
-        super(view);
+        super(view, false);
         this.scope = scope;
         this.fileClickListener = fileClickListener;
         this.fileLongClickListener = fileLongClickListener;
@@ -37,21 +36,12 @@ public class FileRowController extends Controller<FileRowView> {
     @Override
     protected void onAttach() {
         nameView.setText(file.toString());
-        // TODO Switch to rx view clicks so we can easily clean up click listeners when we recycle.
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fileClickListener.onClick(file);
-            }
-        });
-        view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                fileLongClickListener.onLongClick(file);
-                FileActionsView actionsView = scope.actions(getView()).view();
-                getView().setOverlay(actionsView);
-                return true;
-            }
+        clicks(view, v -> fileClickListener.onClick(file));
+        longClicks(view, v -> {
+            fileLongClickListener.onLongClick(file);
+            FileActionsView actionsView = scope.actions(getView()).view();
+            getView().setOverlay(actionsView);
+            return true;
         });
     }
 }
