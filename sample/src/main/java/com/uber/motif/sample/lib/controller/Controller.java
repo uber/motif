@@ -1,4 +1,4 @@
-package com.uber.controller;
+package com.uber.motif.sample.lib.controller;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;

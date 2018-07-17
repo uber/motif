@@ -1,4 +1,4 @@
-package com.uber.motif.sample.app.filerow;
+package com.uber.motif.sample.app.photorow;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -9,20 +9,20 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.uber.motif.sample.R;
 
-public class FileRowView extends FrameLayout {
+public class PhotoRowView extends FrameLayout {
 
     @Nullable
     private View overlayView;
 
-    public FileRowView(Context context) {
+    public PhotoRowView(Context context) {
         super(context);
     }
 
-    public FileRowView(Context context, @Nullable AttributeSet attrs) {
+    public PhotoRowView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public FileRowView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PhotoRowView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -37,7 +37,7 @@ public class FileRowView extends FrameLayout {
         this.overlayView = null;
     }
 
-    public static FileRowView create(Context context, ViewGroup parent) {
-        return (FileRowView) LayoutInflater.from(context).inflate(R.layout.filerow, parent, false);
+    public static PhotoRowView create(Context context, ViewGroup parent) {
+        return (PhotoRowView) LayoutInflater.from(context).inflate(R.layout.photorow, parent, false);
     }
 }

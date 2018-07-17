@@ -13,10 +13,8 @@ class ConstructorProviderMethod(
 
         fun fromMethod(method: ExecutableElement): ConstructorProviderMethod {
             val providedDependency = Dependency.providedByReturn(method)
-            val constructor = providedDependency.element.constructors().apply {
-                // TODO Handle this better. Require @Inject if multiple constructor exist? Require @Inject always?
-                if (size > 1) throw RuntimeException("Multiple constructors found for type $providedDependency provided by $method")
-            }[0]
+            // TODO Handle this better. Require @Inject if multiple constructor exist? Require @Inject always?
+            val constructor = providedDependency.element.constructors()[0]
 
             val requiredDependencies = Dependency.requiredByParams(constructor)
             return ConstructorProviderMethod(constructor, method, providedDependency, requiredDependencies)

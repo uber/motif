@@ -37,6 +37,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
         val validatedScopes = scopes.map { (key, scope) ->
             val parent: ResolvedParent = resolveParent(key)
             val children: List<ResolvedChild> = scope.childMethods.map { childMethod ->
+                // TODO Seen this fail at least once. Recompiling did not repro - Race condition?
                 val childParent: ResolvedParent = resolvedParents[childMethod.scopeType]!!
                 ResolvedChild(childMethod, childParent)
             }

@@ -2,41 +2,44 @@ package com.uber.motif.sample.app.root;
 
 import android.content.Context;
 import android.view.ViewGroup;
-import com.uber.controller.Controller;
 import com.uber.motif.sample.R;
-import com.uber.motif.sample.app.filelist.FileListView;
-import com.uber.motif.sample.app.filerow.FileClickListener;
-import com.uber.motif.sample.app.filerow.FileLongClickListener;
-import com.uber.motif.sample.model.RootDir;
+import com.uber.motif.sample.app.photolist.PhotoListView;
+import com.uber.motif.sample.app.photorow.PhotoClickListener;
+import com.uber.motif.sample.app.photorow.PhotoLongClickListener;
+import com.uber.motif.sample.lib.controller.Controller;
+import com.uber.motif.sample.lib.db.Database;
+import com.uber.motif.sample.lib.db.Photo;
 
-import java.io.File;
-
-class RootController extends Controller<ViewGroup> implements FileClickListener, FileLongClickListener {
+class RootController extends Controller<ViewGroup> implements PhotoClickListener, PhotoLongClickListener {
 
     private final RootScope scope;
     private final Context context;
-    private final RootDir rootDir;
+    private Database database;
 
-    RootController(RootScope scope, Context context, RootDir rootDir) {
+    RootController(RootScope scope, Context context, Database database) {
         super(context, null, R.layout.root);
         this.scope = scope;
         this.context = context;
-        this.rootDir = rootDir;
+        this.database = database;
     }
 
     @Override
-    public void onClick(File file) {
-        System.out.println("Click: " + file);
+    public void onClick(Photo photo) {
+        System.out.println("Click: " + photo);
     }
 
     @Override
-    public void onLongClick(File file) {
-        System.out.println("Long Click: " + file);
+    public void onLongClick(Photo photo) {
+        System.out.println("Long Click: " + photo);
     }
 
     @Override
     protected void onAttach() {
-        FileListView fileListView = scope.fileList(getView()).view();
-        getView().addView(fileListView);
+        database.populateIfNecessary()
+                .as(autoDispose())
+                .subscribe(() -> {
+                    PhotoListView photoListView = scope.photoList(getView()).view();
+                    getView().addView(photoListView);
+                });
     }
 }

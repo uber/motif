@@ -29,9 +29,12 @@ android {
 }
 
 dependencies {
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     annotationProcessor project(':compiler')
     implementation project(':lib')
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    implementation "android.arch.persistence.room:rxjava2:1.1.1"
     implementation 'com.uber.autodispose:autodispose:0.8.0'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'

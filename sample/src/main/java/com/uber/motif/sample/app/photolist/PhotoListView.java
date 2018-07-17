@@ -1,21 +1,21 @@
-package com.uber.motif.sample.app.filelist;
+package com.uber.motif.sample.app.photolist;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
-public class FileListView extends RecyclerView {
+public class PhotoListView extends RecyclerView {
 
-    public FileListView(Context context) {
+    public PhotoListView(Context context) {
         this(context, null, 0);
     }
 
-    public FileListView(Context context, AttributeSet attrs) {
+    public PhotoListView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FileListView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PhotoListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setLayoutManager(new LinearLayoutManager(context));
     }
