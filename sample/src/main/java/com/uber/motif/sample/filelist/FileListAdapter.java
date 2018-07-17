@@ -3,17 +3,24 @@ package com.uber.motif.sample.filelist;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
+import com.jakewharton.rxrelay2.PublishRelay;
+import com.jakewharton.rxrelay2.Relay;
 import com.uber.motif.sample.filerow.FileRowController;
 import com.uber.motif.sample.filerow.FileRowView;
+import com.uber.motif.sample.filerow.FileTouches;
+import io.reactivex.Observable;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> {
+public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> implements FileTouches {
 
     private final FileListScope scope;
+    private final Relay<File> fileTouches = PublishRelay.create();
 
     private List<File> files = new ArrayList<>();
 
@@ -24,6 +31,11 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
     public void setFiles(List<File> files) {
         this.files = files;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public Observable<File> touches() {
+        return fileTouches;
     }
 
     @NonNull
@@ -47,16 +59,25 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
 
         private final FileRowView view;
 
+        @Nullable private File file;
         @Nullable private FileRowController controller;
 
         ViewHolder(FileRowView view) {
             super(view);
             this.view = view;
+
+            view.setOnTouchListener((v, event) -> {
+                if (file != null) {
+                    fileTouches.accept(file);
+                }
+                return false;
+            });
         }
 
         void bind(int position) {
             unbind();
-            controller = scope.fileRow(view, files.get(position)).controller();
+            file = files.get(position);
+            controller = scope.fileRow(view, file).controller();
             controller.attach();
         }
 
@@ -64,6 +85,9 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
             if (controller != null) {
                 controller.detach();
             }
+
+            file = null;
+            controller = null;
         }
     }
 }

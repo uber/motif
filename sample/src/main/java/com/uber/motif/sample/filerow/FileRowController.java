@@ -16,6 +16,7 @@ public class FileRowController extends Controller<FileRowView> {
 
     private final FileRowScope scope;
     private final File file;
+    private final FileTouches fileTouches;
     private final FileClickListener fileClickListener;
     private final FileLongClickListener fileLongClickListener;
 
@@ -23,25 +24,34 @@ public class FileRowController extends Controller<FileRowView> {
             FileRowScope scope,
             FileRowView view,
             File file,
+            FileTouches fileTouches,
             FileClickListener fileClickListener,
             FileLongClickListener fileLongClickListener) {
         super(view, false);
         this.scope = scope;
+        this.file = file;
+        this.fileTouches = fileTouches;
         this.fileClickListener = fileClickListener;
         this.fileLongClickListener = fileLongClickListener;
-        this.file = file;
         ButterKnife.bind(this, view);
     }
 
     @Override
     protected void onAttach() {
         nameView.setText(file.toString());
+
         clicks(view, v -> fileClickListener.onClick(file));
+
         longClicks(view, v -> {
             fileLongClickListener.onLongClick(file);
             FileActionsView actionsView = scope.actions(getView()).view();
             getView().setOverlay(actionsView);
             return true;
         });
+
+        fileTouches.touches()
+                .filter(touchedFile -> !touchedFile.equals(file))
+                .as(autoDispose())
+                .subscribe(touchedFile -> getView().clearOverlay());
     }
 }

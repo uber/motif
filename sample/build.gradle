@@ -34,6 +34,7 @@ dependencies {
     implementation project(':lib')
     implementation 'com.uber.autodispose:autodispose:0.8.0'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+    implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
