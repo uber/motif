@@ -1,6 +1,34 @@
+pluginManagement {
+    apply from: file('gradle/dependencies.gradle')
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case 'com.android.application':
+                    useModule(deps.build.gradlePlugins.android)
+                    break
+                case 'com.android.library':
+                    useModule(deps.build.gradlePlugins.android)
+                    break
+                case 'org.jetbrains.kotlin.jvm':
+                    useModule(deps.build.gradlePlugins.kotlin)
+                    break
+                case 'org.jetbrains.kotlin.android':
+                    useModule(deps.build.gradlePlugins.kotlin)
+                    break
+            }
+        }
+    }
+    repositories {
+        jcenter()
+        google()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'motif'
 include 'lib'
 include 'compiler'
-include 'sample'
-include 'sample-library'
 
+if (System.getenv("ANDROID_HOME") != null) {
+    include 'sample'
+}

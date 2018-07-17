@@ -1,1 +1,2 @@
 com.uber.motif.compiler.AnnotationProcessor
+dagger.internal.codegen.ComponentProcessor

@@ -1,23 +1,30 @@
 plugins {
-    id 'net.ltgt.apt-idea' version "0.15"
+    id 'com.android.application'
 }
 
-apply plugin: 'java'
-apply plugin: 'application'
+android {
+    compileSdkVersion deps.build.compileSdkVersion
+    buildToolsVersion deps.build.buildToolsVersion
 
-sourceCompatibility = 1.8
+    defaultConfig {
+        minSdkVersion deps.build.minSdkVersion
+        targetSdkVersion deps.build.targetSdkVersion
+    }
 
-mainClassName = "com.uber.di.sample.Sample"
+    defaultConfig {
+        minSdkVersion deps.build.minSdkVersion
+        targetSdkVersion deps.build.targetSdkVersion
+    }
 
-repositories {
-    mavenCentral()
+    // No need for lint. This is just a tutorial.
+    lintOptions {
+        abortOnError false
+        quiet true
+    }
 }
 
 dependencies {
     annotationProcessor project(':compiler')
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
-
-    compile project(':lib')
-    compile project(':sample-library')
-    compile 'com.google.dagger:dagger:2.16'
+    implementation project(':lib')
+    implementation 'com.android.support:appcompat-v7:27.0.2'
 }
