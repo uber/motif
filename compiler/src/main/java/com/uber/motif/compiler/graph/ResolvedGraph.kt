@@ -1,6 +1,7 @@
 package com.uber.motif.compiler.graph
 
 import com.uber.motif.compiler.model.Dependency
+import com.uber.motif.compiler.model.ParentInterfaceMethod
 import com.uber.motif.compiler.model.ScopeClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
@@ -69,21 +70,30 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
             val newVisited = visited + scopeType
 
             // Collect child dependencies.
-            val childExternalDependencies: Set<Dependency> = scope.childMethods.flatMap {
-                val dependencies: List<Dependency> = resolveParent(newVisited, it.scopeType)?.methods?.map { it.dependency } ?: listOf()
-                dependencies - it.dynamicDependencies
+            val childDependencies: Set<Dependency> = scope.childMethods.flatMap {
+                val parentInterfaceMethods: List<ParentInterfaceMethod> = resolveParent(newVisited, it.scopeType)?.methods ?: listOf()
+                val dependencies: List<Dependency> = parentInterfaceMethods.map { it.dependency }
+                val transitiveDependencies: List<Dependency> = parentInterfaceMethods.filter { it.isTransitive }.map { it.dependency }
+                val nonTransitiveDependencies: List<Dependency> = dependencies - transitiveDependencies
+                // To make dynamic dependencies internal by default, we only allow dynamic dependencies to cover
+                // non-transitive dependencies here.
+                nonTransitiveDependencies - it.dynamicDependencies + transitiveDependencies
             }.toSet()
 
-            val requiredFromParentBySelf = scope.dependenciesRequiredBySelf - scope.providedDependencies
+            val selfDependencies = scope.dependenciesRequiredBySelf - scope.providedDependencies
             // We can only pass public dependencies to children so use scope.providedPublicDependencies here.
-            val requiredFromParentByChildren = childExternalDependencies - scope.providedPublicDependencies
-            val externalDependencies = requiredFromParentBySelf + requiredFromParentByChildren
+            val transitiveDependencies = childDependencies - scope.providedPublicDependencies
+
+            // We want to prioritize the Dependency.metaDesc stored at highest level so the following is not
+            // equivalent to (selfDependencies + transitiveDependencies):
+            val externalDependencies = (selfDependencies - transitiveDependencies) + transitiveDependencies
 
             // If developer defined a parent interface explicitly, ensure that the dependencies declared on the parent
             // interface cover what this scope requires from its parent. If this scope requires more from its parent
             // than what's defined on the parent interface, throw a missing dependencies error.
             scope.parentInterface?.let { explicitParentInterface ->
                 val expectedDependenciesProvidedByParent = explicitParentInterface.methods.map { it.dependency }.toSet()
+
                 val missingDependencies = externalDependencies - expectedDependenciesProvidedByParent
                 if (missingDependencies.isNotEmpty()) {
                     throw RuntimeException("Scope $scopeType is missing dependencies: $missingDependencies")
@@ -92,7 +102,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
                 return@computeIfAbsent ResolvedParent.fromExplicit(explicitParentInterface)
             }
 
-            ResolvedParent.fromCalculated(scopeType, externalDependencies)
+            ResolvedParent.fromCalculated(scopeType, externalDependencies, transitiveDependencies)
         }
     }
 }

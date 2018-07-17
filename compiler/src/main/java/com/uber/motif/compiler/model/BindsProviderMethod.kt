@@ -13,8 +13,8 @@ class BindsProviderMethod(
     companion object {
 
         fun fromMethod(env: ProcessingEnvironment, method: ExecutableElement): BindsProviderMethod {
-            val providedDependency = Dependency.fromReturnType(method)
-            val requiredDependency = Dependency.fromParams(method)[0]
+            val providedDependency = Dependency.providedByReturn(method)
+            val requiredDependency = Dependency.requiredByParams(method)[0]
             if (!env.typeUtils.isAssignable(requiredDependency.element.asType(), providedDependency.element.asType())) {
                 throw RuntimeException("Type ${requiredDependency.element} bound by $method is not assignable to ${providedDependency.element}")
             }

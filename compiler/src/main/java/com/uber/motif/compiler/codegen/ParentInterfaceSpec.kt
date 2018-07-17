@@ -5,6 +5,7 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import com.uber.motif.compiler.graph.ResolvedScope
 import com.uber.motif.compiler.model.ParentInterface
+import com.uber.motif.internal.Transitive
 import javax.lang.model.element.Modifier
 
 interface ParentInterfaceSpec {
@@ -26,6 +27,7 @@ interface ParentInterfaceSpec {
                     MethodSpec.methodBuilder(method.name).apply {
                         returns(method.dependency.className)
                         method.dependency.qualifierSpec?.let { addAnnotation(it) }
+                        if (method.isTransitive) addAnnotation(Transitive::class.java)
                         addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     }.build()
                 }

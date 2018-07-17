@@ -10,7 +10,7 @@ class ExposerMethod(val element: ExecutableElement, val dependency: Dependency) 
             if (method.parameters.isNotEmpty()) {
                 throw RuntimeException("Exposer method cannot take any parameters: $method")
             }
-            val dependency = Dependency.fromReturnType(method)
+            val dependency = Dependency.requiredByReturn(method)
             return ExposerMethod(method, dependency)
         }
     }

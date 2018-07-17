@@ -10,8 +10,8 @@ class BasicProviderMethod(
     companion object {
 
         fun fromMethod(method: ExecutableElement): BasicProviderMethod {
-            val providedDependency = Dependency.fromReturnType(method)
-            val requiredDependencies = Dependency.fromParams(method)
+            val providedDependency = Dependency.providedByReturn(method)
+            val requiredDependencies = Dependency.requiredByParams(method)
             return BasicProviderMethod(method, providedDependency, requiredDependencies)
         }
     }

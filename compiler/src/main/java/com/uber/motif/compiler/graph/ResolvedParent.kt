@@ -18,10 +18,14 @@ class ResolvedParent(
 
     companion object {
 
-        fun fromCalculated(scopeType: TypeElement, externalDependencies: Iterable<Dependency>): ResolvedParent {
+        fun fromCalculated(
+                scopeType: TypeElement,
+                externalDependencies: Set<Dependency>,
+                transitiveDependencies: Set<Dependency>): ResolvedParent {
             val methodNames = UniqueNameSet()
             val methods: List<ParentInterfaceMethod> = externalDependencies.map { dependency ->
-                ParentInterfaceMethod(methodNames.unique(dependency.preferredName), dependency)
+                val transitive = dependency in transitiveDependencies
+                ParentInterfaceMethod(methodNames.unique(dependency.preferredName), transitive, dependency)
             }
             val className = ClassNames.generatedParentInterface(scopeType)
             return ResolvedParent(className, methods)

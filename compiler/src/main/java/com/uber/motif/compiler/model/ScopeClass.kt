@@ -20,7 +20,7 @@ class ScopeClass(
 
     val exposedDependencies: Set<Dependency> = exposerMethods.map { it.dependency }.toSet()
 
-    val providedDependencies: Set<Dependency> = (objectsClass?.providedDependencies ?: setOf()) + Dependency.fromType(type)
+    val providedDependencies: Set<Dependency> = (objectsClass?.providedDependencies ?: setOf()) + Dependency.providedByType(type)
 
     val providedPublicDependencies: Set<Dependency> by lazy {
         val objectsClass = objectsClass ?: return@lazy setOf<Dependency>()

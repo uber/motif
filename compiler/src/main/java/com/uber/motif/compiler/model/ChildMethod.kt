@@ -13,7 +13,7 @@ class ChildMethod(
 
         fun fromMethod(method: ExecutableElement): ChildMethod {
             val scopeType = method.returnType.asTypeElement()
-            val dynamicDependencies = Dependency.fromParams(method)
+            val dynamicDependencies = Dependency.requiredByParams(method)
             return ChildMethod(method, scopeType, dynamicDependencies)
         }
     }
