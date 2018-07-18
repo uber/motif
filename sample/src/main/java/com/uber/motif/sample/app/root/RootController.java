@@ -1,36 +1,29 @@
 package com.uber.motif.sample.app.root;
 
 import android.content.Context;
-import android.view.ViewGroup;
+
 import com.uber.motif.sample.R;
-import com.uber.motif.sample.app.photolist.PhotoListView;
-import com.uber.motif.sample.app.photorow.PhotoClickListener;
-import com.uber.motif.sample.app.photorow.PhotoLongClickListener;
+import com.uber.motif.sample.app.photo_grid.PhotoGridView;
+import com.uber.motif.sample.app.bottom_sheet.BottomSheetView;
 import com.uber.motif.sample.lib.controller.Controller;
 import com.uber.motif.sample.lib.db.Database;
-import com.uber.motif.sample.lib.db.Photo;
+import com.uber.motif.sample.lib.multiselect.MultiSelector;
 
-class RootController extends Controller<ViewGroup> implements PhotoClickListener, PhotoLongClickListener {
+class RootController extends Controller<RootView> {
 
     private final RootScope scope;
-    private final Context context;
-    private Database database;
+    private final Database database;
+    private final MultiSelector multiSelector;
 
-    RootController(RootScope scope, Context context, Database database) {
-        super(context, null, R.layout.root);
+    RootController(
+            RootScope scope,
+            Context context,
+            Database database,
+            MultiSelector multiSelector) {
+        super(context, R.layout.root);
         this.scope = scope;
-        this.context = context;
         this.database = database;
-    }
-
-    @Override
-    public void onClick(Photo photo) {
-        System.out.println("Click: " + photo);
-    }
-
-    @Override
-    public void onLongClick(Photo photo) {
-        System.out.println("Long Click: " + photo);
+        this.multiSelector = multiSelector;
     }
 
     @Override
@@ -38,8 +31,19 @@ class RootController extends Controller<ViewGroup> implements PhotoClickListener
         database.populateIfNecessary()
                 .as(autoDispose())
                 .subscribe(() -> {
-                    PhotoListView photoListView = scope.photoList(getView()).view();
-                    getView().addView(photoListView);
+                    PhotoGridView photoGridView = scope.photoList(view).view();
+                    view.showPhotos(photoGridView);
+                });
+
+        multiSelector.selected()
+                .as(autoDispose())
+                .subscribe(photos -> {
+                    if (photos.isEmpty()) {
+                        view.clearBottomSheet();
+                    } else if (!view.isSectionViewShowing()) {
+                        BottomSheetView bottomSheetView = scope.bottomSheet(this.view).view();
+                        view.showBottomSheet(bottomSheetView);
+                    }
                 });
     }
 }

@@ -28,7 +28,4 @@ pluginManagement {
 rootProject.name = 'motif'
 include 'lib'
 include 'compiler'
-
-if (System.getenv("ANDROID_HOME") != null) {
-    include 'sample'
-}
+include 'sample'

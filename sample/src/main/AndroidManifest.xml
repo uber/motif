@@ -5,6 +5,7 @@
 
     <uses-feature android:required="true" android:glEsVersion='0x00020000'/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:icon="@drawable/ub__ic_launcher"

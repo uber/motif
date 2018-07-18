@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.jakewharton.rxbinding2.view.RxView;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.AutoDisposeConverter;
 import io.reactivex.subjects.MaybeSubject;
@@ -34,6 +33,18 @@ public class Controller<V extends View> {
     private State state = State.UNATTACHED;
 
     public Controller(
+            ViewGroup parent,
+            @LayoutRes int layout) {
+        this(Controller.inflate(parent.getContext(), parent, layout), true);
+    }
+
+    public Controller(
+            Context context,
+            @LayoutRes int layout) {
+        this(Controller.inflate(context, null, layout), true);
+    }
+
+    private Controller(
             Context context,
             @Nullable ViewGroup parent,
             @LayoutRes int layout) {
@@ -54,14 +65,6 @@ public class Controller<V extends View> {
     protected void onAttach() {}
 
     protected void onDetach() {}
-
-    protected void clicks(View view, View.OnClickListener listener) {
-        RxView.clicks(view).as(autoDispose()).subscribe(o -> listener.onClick(view));
-    }
-
-    protected void longClicks(View view, View.OnLongClickListener listener) {
-        RxView.longClicks(view).as(autoDispose()).subscribe(o -> listener.onLongClick(view));
-    }
 
     public void attach() {
         if (state != State.UNATTACHED) return;

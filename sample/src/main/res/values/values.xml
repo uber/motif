@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="header_height">50dp</dimen>
+    <dimen name="photo_list_height">100dp</dimen>
+    <dimen name="photo_list_item_width">175dp</dimen>
+    <dimen name="peek_height">150dp</dimen>
+</resources>

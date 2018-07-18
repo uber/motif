@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.uber.motif.sample.app.photo_list_item.PhotoListItemView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/photo_list_item_width"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/image"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</com.uber.motif.sample.app.photo_list_item.PhotoListItemView>

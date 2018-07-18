@@ -38,6 +38,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
             val parent: ResolvedParent = resolveParent(key)
             val children: List<ResolvedChild> = scope.childMethods.map { childMethod ->
                 // TODO Seen this fail at least once. Recompiling did not repro - Race condition?
+                // Something to do with Intellij refactoring generated classes?
                 val childParent: ResolvedParent = resolvedParents[childMethod.scopeType]!!
                 ResolvedChild(childMethod, childParent)
             }
@@ -87,7 +88,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
 
             // We want to prioritize the Dependency.metaDesc stored at highest level so the following is not
             // equivalent to (selfDependencies + transitiveDependencies):
-            val externalDependencies = (selfDependencies - transitiveDependencies) + transitiveDependencies
+            val externalDependencies = selfDependencies + (transitiveDependencies - selfDependencies)
 
             // If developer defined a parent interface explicitly, ensure that the dependencies declared on the parent
             // interface cover what this scope requires from its parent. If this scope requires more from its parent
