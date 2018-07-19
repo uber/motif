@@ -2,8 +2,8 @@ package com.uber.motif.compiler.graph
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import com.uber.motif.compiler.codegen.className
-import com.uber.motif.compiler.model.*
+import com.uber.motif.compiler.codegen.typeName
+import com.uber.motif.compiler.model.ScopeClass
 
 /**
  * After recursively calculating the dependencies required from the parent of a scope, we consider the scope resolved.
@@ -14,7 +14,7 @@ class ResolvedScope(
         val scope: ScopeClass,
         val parent: ResolvedParent,
         val children: List<ResolvedChild>) {
-    val scopeName: ClassName = scope.type.className
+    val scopeName: TypeName = scope.type.typeName
     val scopeImplName: ClassName = ClassNames.scopeImpl(scope.type)
     val packageName: String = scopeImplName.packageName()
 }

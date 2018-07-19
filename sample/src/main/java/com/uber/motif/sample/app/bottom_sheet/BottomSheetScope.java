@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import com.uber.motif.Scope;
 import com.uber.motif.sample.app.bottom_header.BottomHeaderScope;
 import com.uber.motif.sample.app.photo_list.PhotoListScope;
+import com.uber.motif.sample.lib.controller.ControllerObjects;
 
 @Scope
 public interface BottomSheetScope {
@@ -15,12 +16,5 @@ public interface BottomSheetScope {
 
     PhotoListScope photoList(ViewGroup parent);
 
-    abstract class Objects {
-
-        abstract BottomSheetController controller();
-
-        BottomSheetView view(BottomSheetController controller) {
-            return controller.getView();
-        }
-    }
+    abstract class Objects extends ControllerObjects<BottomSheetController, BottomSheetView> {}
 }

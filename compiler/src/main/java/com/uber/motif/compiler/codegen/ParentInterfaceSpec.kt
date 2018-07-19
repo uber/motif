@@ -41,7 +41,7 @@ interface ParentInterfaceSpec {
 
         private fun createExplicit(parentInterface: ParentInterface): ParentInterfaceSpec {
             return object: ParentInterfaceSpec {
-                override val className: ClassName = ClassName.get(parentInterface.type)
+                override val className: ClassName = parentInterface.type.className
                 override val spec: TypeSpec? = null
             }
         }

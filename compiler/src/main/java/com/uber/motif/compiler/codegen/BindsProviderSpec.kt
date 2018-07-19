@@ -4,13 +4,13 @@ import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.uber.motif.compiler.graph.ResolvedScope
-import com.uber.motif.compiler.model.BindsProviderMethod
+import com.uber.motif.compiler.model.ProviderMethod
 
 class BindsProviderSpec(
         resolvedScope: ResolvedScope,
         daggerScope: DaggerScopeSpec,
         internalQualifier: InternalQualifierSpec,
-        providerMethod: BindsProviderMethod,
+        providerMethod: ProviderMethod,
         name: String)
     : ProviderSpec(resolvedScope, daggerScope, internalQualifier, providerMethod, name) {
 

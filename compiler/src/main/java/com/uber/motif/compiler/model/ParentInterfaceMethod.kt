@@ -3,6 +3,8 @@ package com.uber.motif.compiler.model
 import com.uber.motif.compiler.hasAnnotation
 import com.uber.motif.internal.Transitive
 import javax.lang.model.element.ExecutableElement
+import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.ExecutableType
 
 class ParentInterfaceMethod(
         val name: String,
@@ -11,9 +13,12 @@ class ParentInterfaceMethod(
 
     companion object {
 
-        fun fromMethod(method: ExecutableElement): ParentInterfaceMethod {
+        fun fromMethod(
+                owner: DeclaredType,
+                method: ExecutableElement,
+                methodType: ExecutableType): ParentInterfaceMethod {
             if (method.parameters.size > 0) throw RuntimeException("Parent interface method must not take any parameters: $method")
-            val dependency = Dependency.requiredByReturn(method)
+            val dependency = Dependency.requiredByReturn(owner, method, methodType)
             val methodName = method.simpleName.toString()
             val transitive = method.hasAnnotation(Transitive::class)
             return ParentInterfaceMethod(methodName, transitive, dependency)

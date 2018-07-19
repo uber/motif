@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName
 import com.uber.motif.compiler.codegen.className
 import com.uber.motif.compiler.model.ChildMethod
 import com.uber.motif.compiler.model.Dependency
+import com.uber.motif.compiler.simpleName
 
 class ResolvedChild(
         val method: ChildMethod,
@@ -12,5 +13,5 @@ class ResolvedChild(
     val externalDependencies: List<Dependency> = resolvedParent.methods.map { it.dependency } - method.dynamicDependencies
     val scopeName: ClassName = method.scopeType.className
     val scopeImplName: ClassName = ClassNames.scopeImpl(method.scopeType)
-    val baseName: String = method.scopeType.simpleName.toString().removeSuffix("Scope")
+    val baseName: String = method.scopeType.simpleName.removeSuffix("Scope")
 }

@@ -22,8 +22,20 @@ private object ObjectMethods {
     }
 }
 
+fun DeclaredType.asTypeElement(): TypeElement {
+    return asElement() as TypeElement
+}
+
 fun TypeMirror.asTypeElement(): TypeElement {
-    return (this as DeclaredType).asElement() as TypeElement
+    return (this as DeclaredType).asTypeElement()
+}
+
+fun TypeElement.asDeclaredType(): DeclaredType {
+    return asType() as DeclaredType
+}
+
+fun DeclaredType.methods(env: ProcessingEnvironment): List<ExecutableElement> {
+    return asTypeElement().methods(env)
 }
 
 fun TypeElement.methods(env: ProcessingEnvironment): List<ExecutableElement> {
@@ -32,17 +44,32 @@ fun TypeElement.methods(env: ProcessingEnvironment): List<ExecutableElement> {
     return allMethods - objectMethods
 }
 
+fun TypeElement.isObject(): Boolean {
+    return qualifiedName.toString() == "java.lang.Object"
+}
+
 fun TypeElement.constructors(): List<ExecutableElement> {
     return ElementFilter.constructorsIn(enclosedElements)
 }
 
-fun TypeElement.innerClasses(): List<TypeElement> {
-    return enclosedElements.filter { it.kind == ElementKind.CLASS }.map { it as TypeElement }
+fun DeclaredType.constructors(): List<ExecutableElement> {
+    return asTypeElement().constructors()
 }
 
-fun TypeElement.innerInterfaces(): List<TypeElement> {
-    return enclosedElements.filter { it.kind == ElementKind.INTERFACE }.map { it as TypeElement }
+fun DeclaredType.innerClasses(): List<DeclaredType> {
+    return asTypeElement().enclosedElements
+            .filter { it.kind == ElementKind.CLASS }
+            .map { it.asType() as DeclaredType }
 }
+
+fun DeclaredType.innerInterfaces(): List<DeclaredType> {
+    return asTypeElement().enclosedElements
+            .filter { it.kind == ElementKind.INTERFACE }
+            .map { it.asType() as DeclaredType }
+}
+
+val DeclaredType.simpleName: String
+    get() = asElement().simpleName.toString()
 
 val Element.isAbstract: Boolean
     get() = Modifier.ABSTRACT in modifiers

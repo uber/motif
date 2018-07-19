@@ -1,27 +1,31 @@
 package com.uber.motif.compiler.model
 
 import com.google.auto.common.AnnotationMirrors
-import com.google.auto.common.MoreElements
+import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
+import com.uber.motif.compiler.asTypeElement
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.ExecutableType
+import javax.lang.model.type.TypeMirror
 
+
+private typealias TypeKey = Equivalence.Wrapper<TypeMirror>
 private typealias QualifierKey = Equivalence.Wrapper<AnnotationMirror>
 
 data class Dependency private constructor(
-        val element: TypeElement,
+        val type: TypeMirror,
         val qualifier: AnnotationMirror?,
         // TODO Hacky way of storing information about where a dependency is required / provided.
         var metaDesc: String) : Comparable<Dependency> {
 
     private val key: DependencyKey by lazy { DependencyKey.create(this) }
-    private val compStr: String by lazy { element.toString() + qualifier?.toString() }
+    private val compStr: String by lazy { type.toString() + qualifier?.toString() }
 
-    val preferredName: String = element.simpleName.toString().decapitalize()
+    val preferredName: String = type.asTypeElement().simpleName.toString().decapitalize()
 
     override fun compareTo(other: Dependency): Int {
         return compStr.compareTo(other.compStr)
@@ -41,38 +45,40 @@ data class Dependency private constructor(
 
     companion object {
 
-        fun providedByType(type: TypeElement): Dependency {
+        fun providedByType(type: TypeMirror): Dependency {
             return Dependency(type, null, metaDesc = "IMPLICIT")
         }
 
-        fun requiredByParams(method: ExecutableElement): List<Dependency> {
+        fun requiredByParams(owner: DeclaredType, method: ExecutableElement, methodType: ExecutableType): List<Dependency> {
+            val parameterTypes = methodType.parameterTypes
             return method.parameters
-                    .map {
-                        val type: TypeElement = (it.asType() as DeclaredType).asElement() as TypeElement
+                    .mapIndexed { i, it ->
                         val qualifier: AnnotationMirror? = it.qualifierAnnotation()
-                        val owner: TypeElement = method.enclosingElement as TypeElement
                         val metaDesc = "REQUIRED_BY($owner.$method)"
+                        val type = parameterTypes[i]
                         Dependency(type, qualifier, metaDesc)
                     }
         }
 
-        fun requiredByReturn(method: ExecutableElement): Dependency {
-            return fromReturnType(method, provided = false)
+        fun requiredByReturn(owner: DeclaredType, method: ExecutableElement, methodType: ExecutableType): Dependency {
+            return fromReturnType(owner, method, methodType, provided = false)
         }
 
-        fun providedByReturn(method: ExecutableElement): Dependency {
-            return fromReturnType(method, provided = true)
+        fun providedByReturn(owner: DeclaredType, method: ExecutableElement, methodType: ExecutableType): Dependency {
+            return fromReturnType(owner, method, methodType, provided = true)
         }
 
-        private fun fromReturnType(method: ExecutableElement, provided: Boolean): Dependency {
-            val returnType = (method.returnType as DeclaredType).asElement() as TypeElement
+        private fun fromReturnType(
+                owner: DeclaredType,
+                method: ExecutableElement,
+                methodType: ExecutableType,
+                provided: Boolean): Dependency {
             val qualifier = method.qualifierAnnotation()
-            val owner: TypeElement = method.enclosingElement as TypeElement
             val metaDescSuffix = "_BY($owner.$method)"
             return if (provided) {
-                Dependency(returnType, qualifier, "PROVIDED$metaDescSuffix")
+                Dependency(methodType.returnType, qualifier, "PROVIDED$metaDescSuffix")
             } else {
-                Dependency(returnType, qualifier, "REQUIRED$metaDescSuffix")
+                Dependency(methodType.returnType, qualifier, "REQUIRED$metaDescSuffix")
             }
         }
 
@@ -89,7 +95,7 @@ data class Dependency private constructor(
     }
 }
 
-private data class DependencyKey(val className: String, val qualifierKey: QualifierKey?) {
+private data class DependencyKey(val typeKey: TypeKey, val qualifierKey: QualifierKey?) {
 
     companion object {
         fun create(dependency: Dependency): DependencyKey {
@@ -98,8 +104,9 @@ private data class DependencyKey(val className: String, val qualifierKey: Qualif
             } else {
                 AnnotationMirrors.equivalence().wrap(dependency.qualifier)
             }
+            val typeKey = MoreTypes.equivalence().wrap(dependency.type)
             return DependencyKey(
-                    dependency.element.qualifiedName.toString(),
+                    typeKey,
                     qualifierKey)
         }
     }

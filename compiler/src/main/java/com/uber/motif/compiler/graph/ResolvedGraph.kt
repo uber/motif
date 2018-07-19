@@ -1,10 +1,13 @@
 package com.uber.motif.compiler.graph
 
+import com.uber.motif.compiler.asDeclaredType
+import com.uber.motif.compiler.asTypeElement
 import com.uber.motif.compiler.model.Dependency
 import com.uber.motif.compiler.model.ParentInterfaceMethod
 import com.uber.motif.compiler.model.ScopeClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 
 class ResolvedGraph(val resolvedScopes: Set<ResolvedScope>) {
 
@@ -28,8 +31,8 @@ class ResolvedGraph(val resolvedScopes: Set<ResolvedScope>) {
 private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: List<TypeElement>) {
 
     private val scopes: Map<TypeElement, ScopeClass> = scopeTypes
-            .map { ScopeClass.fromClass(env, it) }
-            .associateBy { it.type }
+            .map { ScopeClass.fromClass(env, it.asDeclaredType()) }
+            .associateBy { it.type.asTypeElement() }
 
     private val resolvedParents: MutableMap<TypeElement, ResolvedParent> = mutableMapOf()
 
@@ -39,7 +42,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
             val children: List<ResolvedChild> = scope.childMethods.map { childMethod ->
                 // TODO Seen this fail at least once. Recompiling did not repro - Race condition?
                 // Something to do with Intellij refactoring generated classes?
-                val childParent: ResolvedParent = resolvedParents[childMethod.scopeType]!!
+                val childParent: ResolvedParent = resolvedParents[childMethod.scopeType.asTypeElement()]!!
                 ResolvedChild(childMethod, childParent)
             }
             ResolvedScope(scope, parent, children)
@@ -73,7 +76,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
 
             // Collect child dependencies.
             val childDependencies: Set<Dependency> = scope.childMethods.flatMap {
-                val parentInterfaceMethods: List<ParentInterfaceMethod> = resolveParent(newVisited, it.scopeType)?.methods ?: listOf()
+                val parentInterfaceMethods: List<ParentInterfaceMethod> = resolveParent(newVisited, it.scopeType.asTypeElement())?.methods ?: listOf()
                 val dependencies: List<Dependency> = parentInterfaceMethods.map { it.dependency }
                 val transitiveDependencies: List<Dependency> = parentInterfaceMethods.filter { it.isTransitive }.map { it.dependency }
                 val nonTransitiveDependencies: List<Dependency> = dependencies - transitiveDependencies
@@ -94,7 +97,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
             // interface cover what this scope requires from its parent. If this scope requires more from its parent
             // than what's defined on the parent interface, throw a missing dependencies error.
             scope.parentInterface?.let { explicitParentInterface ->
-                val expectedDependenciesProvidedByParent = explicitParentInterface.methods.map { it.dependency }.toSet()
+                val expectedDependenciesProvidedByParent = explicitParentInterface.dependencies
 
                 val missingDependencies = externalDependencies - expectedDependenciesProvidedByParent
                 if (missingDependencies.isNotEmpty()) {

@@ -2,18 +2,23 @@ package com.uber.motif.compiler.model
 
 import com.uber.motif.compiler.isAbstract
 import com.uber.motif.compiler.methods
-import com.uber.motif.compiler.returnsVoid
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 
 class ObjectsClass(
-        val type: TypeElement,
-        val constructorProviderMethods: List<ConstructorProviderMethod>,
-        val bindsProviderMethods: List<BindsProviderMethod>,
-        val basicProviderMethods: List<BasicProviderMethod>) {
+        val type: DeclaredType,
+        val providerMethods: List<ProviderMethod>) {
 
-    val providerMethods: List<ProviderMethod> by lazy {
-        constructorProviderMethods + bindsProviderMethods + basicProviderMethods
+    val basicProviderMethods: List<ProviderMethod> by lazy {
+        providerMethods.filter { it.type == ProviderMethodType.BASIC }
+    }
+
+    val bindsProviderMethods: List<ProviderMethod> by lazy {
+        providerMethods.filter { it.type == ProviderMethodType.BINDS }
+    }
+
+    val constructorProviderMethods: List<ProviderMethod> by lazy {
+        providerMethods.filter { it.type == ProviderMethodType.CONSTRUCTOR }
     }
 
     val abstractProviderMethods: List<ProviderMethod> by lazy {
@@ -30,27 +35,9 @@ class ObjectsClass(
 
     companion object {
 
-        fun fromClass(env: ProcessingEnvironment, type: TypeElement): ObjectsClass {
-            val constructorProviderMethods = mutableListOf<ConstructorProviderMethod>()
-            val bindsProviderMethods = mutableListOf<BindsProviderMethod>()
-            val basicProviderMethods = mutableListOf<BasicProviderMethod>()
-
-            type.methods(env).forEach { method ->
-                if (method.returnsVoid) {
-                    throw RuntimeException("Provider method cannot return void: $method")
-                }
-                if (method.isAbstract) {
-                    when (method.parameters.size) {
-                        0 -> constructorProviderMethods.add(ConstructorProviderMethod.fromMethod(method))
-                        1 -> bindsProviderMethods.add(BindsProviderMethod.fromMethod(env, method))
-                        else -> throw RuntimeException("Abstract provider methods must have 0 or 1 parameter.")
-                    }
-                } else {
-                    basicProviderMethods.add(BasicProviderMethod.fromMethod(method))
-                }
-            }
-
-            return ObjectsClass(type, constructorProviderMethods, bindsProviderMethods, basicProviderMethods)
+        fun fromClass(env: ProcessingEnvironment, type: DeclaredType): ObjectsClass {
+            val methods = type.methods(env).map { ProviderMethod.create(env, type, it) }
+            return ObjectsClass(type, methods)
         }
     }
 }
