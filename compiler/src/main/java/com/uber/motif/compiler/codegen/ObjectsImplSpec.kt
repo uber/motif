@@ -1,7 +1,6 @@
 package com.uber.motif.compiler.codegen
 
 import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import com.uber.motif.compiler.graph.ResolvedScope
 import com.uber.motif.compiler.names.Names
@@ -14,7 +13,7 @@ class ObjectsImplSpec(
         TypeSpec.classBuilder(className).apply {
             superclass(objectsClass.className)
             objectsClass.abstractProviderMethods.map {
-                MethodSpec.overriding(it.method, it.owner, it.env.typeUtils)
+                it.override()
                         .addStatement("throw new \$T()", UnsupportedOperationException::class.java)
                         .build()
             }.forEach { addMethod(it) }

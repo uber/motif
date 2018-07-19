@@ -48,11 +48,11 @@ class ScopeClass(
                 }
                 val methodType: ExecutableType = env.typeUtils.asMemberOf(type, method) as ExecutableType
 
-                val returnType = method.returnType.asTypeElement()
+                val returnType = methodType.returnType.asTypeElement()
                 if (returnType.hasAnnotation(Scope::class)) {
-                    childMethods.add(ChildMethod.fromMethod(type, method, methodType))
+                    childMethods.add(ChildMethod.fromMethod(env, type, method, methodType))
                 } else {
-                    exposerMethods.add(ExposerMethod.fromMethod(type, method, methodType))
+                    exposerMethods.add(ExposerMethod.fromMethod(env, type, method, methodType))
                 }
             }
 

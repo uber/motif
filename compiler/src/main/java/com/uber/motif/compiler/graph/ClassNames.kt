@@ -22,7 +22,7 @@ object ClassNames {
         return scopeType.className.peerClass("${simpleName}Impl")
     }
 
-    fun generatedParentInterface(scopeType: TypeElement): ClassName {
+    fun generatedParentInterface(scopeType: DeclaredType): ClassName {
         return scopeImpl(scopeType).nestedClass(Names.PARENT_INTERFACE_NAME)
     }
 }

@@ -2,9 +2,11 @@ package com.uber.motif.compiler.codegen
 
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.uber.motif.compiler.asTypeElement
 import com.uber.motif.compiler.model.Dependency
+import com.uber.motif.compiler.model.Method
 import com.uber.motif.compiler.model.ObjectsClass
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
@@ -27,3 +29,7 @@ val Dependency.className: ClassName
 
 val Dependency.qualifierSpec: AnnotationSpec?
     get() = qualifier?.let { AnnotationSpec.get(qualifier) }
+
+fun Method.override(): MethodSpec.Builder {
+    return MethodSpec.overriding(method, owner, env.typeUtils)
+}

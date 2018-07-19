@@ -12,7 +12,6 @@ import com.uber.motif.compiler.names.Names
 import com.uber.motif.compiler.names.UniqueNameSet
 import com.uber.motif.compiler.simpleName
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 
@@ -23,7 +22,7 @@ class ResolvedParent(
     companion object {
 
         fun fromCalculated(
-                scopeType: TypeElement,
+                scopeType: DeclaredType,
                 externalDependencies: Set<Dependency>,
                 transitiveDependencies: Set<Dependency>): ResolvedParent {
             val methodNames = UniqueNameSet()
@@ -42,8 +41,7 @@ class ResolvedParent(
         /**
          * Return the ParentInterface for this scope if the implementation is already generated. Otherwise, return null.
          */
-        fun fromGenerated(env: ProcessingEnvironment, scopeElement: TypeElement): ResolvedParent? {
-            val scopeType = scopeElement.asDeclaredType()
+        fun fromGenerated(env: ProcessingEnvironment, scopeType: DeclaredType): ResolvedParent? {
             val scopeImplType = findScopeImpl(env, scopeType) ?: return null
             val parentInterfaceType: DeclaredType = findParentInterface(scopeType, scopeImplType)
             val methods = parentInterfaceType.methods(env).map {

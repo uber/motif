@@ -1,9 +1,10 @@
 package com.uber.motif.compiler.model
 
 import com.google.auto.common.AnnotationMirrors
-import com.google.auto.common.MoreTypes
-import com.google.common.base.Equivalence
+import com.uber.motif.compiler.AnnotationId
+import com.uber.motif.compiler.TypeId
 import com.uber.motif.compiler.asTypeElement
+import com.uber.motif.compiler.id
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
@@ -12,17 +13,13 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeMirror
 
-
-private typealias TypeKey = Equivalence.Wrapper<TypeMirror>
-private typealias QualifierKey = Equivalence.Wrapper<AnnotationMirror>
-
 data class Dependency private constructor(
         val type: TypeMirror,
         val qualifier: AnnotationMirror?,
         // TODO Hacky way of storing information about where a dependency is required / provided.
         var metaDesc: String) : Comparable<Dependency> {
 
-    private val key: DependencyKey by lazy { DependencyKey.create(this) }
+    private val key: DependencyKey by lazy { DependencyKey(type.id, qualifier?.id) }
     private val compStr: String by lazy { type.toString() + qualifier?.toString() }
 
     val preferredName: String = type.asTypeElement().simpleName.toString().decapitalize()
@@ -95,19 +92,4 @@ data class Dependency private constructor(
     }
 }
 
-private data class DependencyKey(val typeKey: TypeKey, val qualifierKey: QualifierKey?) {
-
-    companion object {
-        fun create(dependency: Dependency): DependencyKey {
-            val qualifierKey = if (dependency.qualifier == null) {
-                null
-            } else {
-                AnnotationMirrors.equivalence().wrap(dependency.qualifier)
-            }
-            val typeKey = MoreTypes.equivalence().wrap(dependency.type)
-            return DependencyKey(
-                    typeKey,
-                    qualifierKey)
-        }
-    }
-}
+private data class DependencyKey(val typeId: TypeId, val qualifierId: AnnotationId?)

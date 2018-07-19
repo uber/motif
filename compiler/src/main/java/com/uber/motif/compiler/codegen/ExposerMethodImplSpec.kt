@@ -8,7 +8,7 @@ class ExposerMethodImplSpec(
         componentFieldSpec: ComponentFieldSpec,
         exposerMethod: ExposerMethod) {
 
-    val spec: MethodSpec = MethodSpec.overriding(exposerMethod.element)
+    val spec: MethodSpec = exposerMethod.override()
             .addStatement("return \$N.\$N()", componentFieldSpec.spec, componentSpec.provisionMethods[exposerMethod.dependency])
             .build()
 }

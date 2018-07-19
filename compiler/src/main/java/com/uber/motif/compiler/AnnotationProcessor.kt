@@ -8,6 +8,7 @@ import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 
 class AnnotationProcessor : AbstractProcessor() {
 
@@ -20,7 +21,9 @@ class AnnotationProcessor : AbstractProcessor() {
     }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        val scopes = roundEnv.getElementsAnnotatedWith(Scope::class.java).map { it as TypeElement }
+        val scopes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
+                .map { it as TypeElement }
+                .map { it.asType() as DeclaredType }
         val graph = ResolvedGraph.resolve(processingEnv, scopes)
         graph.resolvedScopes.forEach {
             val scopeImpl = ScopeImplSpec(it)

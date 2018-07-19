@@ -7,7 +7,7 @@ class DirectChildMethodImplSpec(
         componentFieldSpec: ComponentFieldSpec,
         child: ResolvedChild) : ChildMethodImplSpec {
 
-    override val spec: MethodSpec = MethodSpec.overriding(child.method.method)
+    override val spec: MethodSpec = child.method.override()
             .addStatement("return new \$T(\$N)", child.scopeImplName, componentFieldSpec.spec)
             .build()
 }

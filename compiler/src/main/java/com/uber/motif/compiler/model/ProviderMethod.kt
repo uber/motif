@@ -8,13 +8,13 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 
 class ProviderMethod(
-    val env: ProcessingEnvironment, // Hold on the env
-    val owner: DeclaredType,
-    val method: ExecutableElement,
-    val methodType: ExecutableType,
+    override val env: ProcessingEnvironment, // Hack until https://github.com/square/javapoet/issues/656 is resolved
+    override val owner: DeclaredType,
+    override val method: ExecutableElement,
+    override val methodType: ExecutableType,
     val providedDependency: Dependency,
     val requiredDependencies: List<Dependency>,
-    val type: ProviderMethodType) {
+    val type: ProviderMethodType) : Method {
 
     companion object {
 
@@ -75,10 +75,9 @@ class ProviderMethod(
                 method: ExecutableElement,
                 methodType: ExecutableType): Dependencies {
             val provided = Dependency.providedByReturn(owner, method, methodType)
+            val providedType = provided.type as DeclaredType
             // TODO Handle this better. Require @Inject if multiple constructor exist? Require @Inject always?
-            val providedElement = provided.type.asTypeElement()
-            val providedType = providedElement.asDeclaredType()
-            val constructor = providedElement.constructors()[0]
+            val constructor = providedType.constructors()[0]
             val constructorType = env.typeUtils.asMemberOf(providedType, constructor) as ExecutableType
 
             val required = Dependency.requiredByParams(owner, constructor, constructorType)

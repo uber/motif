@@ -15,7 +15,7 @@ class BridgeChildMethodImplSpec(
 
     private val callString: String = dynamicParameters.joinToString(", ") { "\$N" }
 
-    override val spec: MethodSpec = MethodSpec.overriding(child.method.method)
+    override val spec: MethodSpec = child.method.override()
             .addStatement(
                     "return \$T.\$N(\$N, $callString)",
                     bridgeSpec.className,
