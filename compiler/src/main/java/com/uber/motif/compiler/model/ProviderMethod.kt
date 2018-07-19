@@ -1,7 +1,9 @@
 package com.uber.motif.compiler.model
 
-import com.google.auto.common.MoreTypes
-import com.uber.motif.compiler.*
+import com.uber.motif.compiler.constructors
+import com.uber.motif.compiler.isAbstract
+import com.uber.motif.compiler.methodType
+import com.uber.motif.compiler.returnsVoid
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.type.DeclaredType
@@ -23,7 +25,7 @@ class ProviderMethod(
                 owner: DeclaredType,
                 method: ExecutableElement): ProviderMethod {
             val type = type(method)
-            val methodType: ExecutableType = MoreTypes.asExecutable(env.typeUtils.asMemberOf(owner, method))
+            val methodType: ExecutableType = owner.methodType(env, method)
             val dependencies: Dependencies = when (type) {
                 ProviderMethodType.BASIC -> basic(owner, method, methodType)
                 ProviderMethodType.BINDS -> binds(env, owner, method, methodType)
@@ -78,7 +80,7 @@ class ProviderMethod(
             val providedType = provided.type as DeclaredType
             // TODO Handle this better. Require @Inject if multiple constructor exist? Require @Inject always?
             val constructor = providedType.constructors()[0]
-            val constructorType = env.typeUtils.asMemberOf(providedType, constructor) as ExecutableType
+            val constructorType = providedType.methodType(env, constructor)
 
             val required = Dependency.requiredByParams(owner, constructor, constructorType)
             return Dependencies(provided, required)

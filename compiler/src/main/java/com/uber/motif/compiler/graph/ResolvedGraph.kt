@@ -1,14 +1,11 @@
 package com.uber.motif.compiler.graph
 
 import com.uber.motif.compiler.TypeId
-import com.uber.motif.compiler.asDeclaredType
-import com.uber.motif.compiler.asTypeElement
 import com.uber.motif.compiler.id
 import com.uber.motif.compiler.model.Dependency
 import com.uber.motif.compiler.model.ParentInterfaceMethod
 import com.uber.motif.compiler.model.ScopeClass
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
 class ResolvedGraph(val resolvedScopes: Set<ResolvedScope>) {

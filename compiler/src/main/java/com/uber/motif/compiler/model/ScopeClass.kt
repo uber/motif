@@ -46,7 +46,7 @@ class ScopeClass(
                 if (method.returnType.kind == TypeKind.VOID) {
                     throw RuntimeException("Invalid scope method: $method")
                 }
-                val methodType: ExecutableType = env.typeUtils.asMemberOf(type, method) as ExecutableType
+                val methodType: ExecutableType = type.methodType(env, method)
 
                 val returnType = methodType.returnType.asTypeElement()
                 if (returnType.hasAnnotation(Scope::class)) {

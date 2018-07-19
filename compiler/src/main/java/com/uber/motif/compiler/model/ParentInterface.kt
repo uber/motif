@@ -1,5 +1,6 @@
 package com.uber.motif.compiler.model
 
+import com.uber.motif.compiler.methodType
 import com.uber.motif.compiler.methods
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
@@ -17,7 +18,7 @@ class ParentInterface(
 
         fun create(env: ProcessingEnvironment, type: DeclaredType): ParentInterface {
             val methods = type.methods(env).map { method ->
-                val methodType: ExecutableType = env.typeUtils.asMemberOf(type, method) as ExecutableType
+                val methodType: ExecutableType = type.methodType(env, method)
                 ParentInterfaceMethod.fromMethod(type, method, methodType)
             }
             return ParentInterface(type, methods)

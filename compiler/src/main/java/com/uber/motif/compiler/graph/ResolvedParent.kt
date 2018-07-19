@@ -4,7 +4,6 @@ import com.squareup.javapoet.ClassName
 import com.uber.motif.compiler.asDeclaredType
 import com.uber.motif.compiler.codegen.className
 import com.uber.motif.compiler.innerInterfaces
-import com.uber.motif.compiler.methods
 import com.uber.motif.compiler.model.Dependency
 import com.uber.motif.compiler.model.ParentInterface
 import com.uber.motif.compiler.model.ParentInterfaceMethod
@@ -13,7 +12,6 @@ import com.uber.motif.compiler.names.UniqueNameSet
 import com.uber.motif.compiler.simpleName
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.ExecutableType
 
 class ResolvedParent(
         val className: ClassName,
@@ -44,11 +42,8 @@ class ResolvedParent(
         fun fromGenerated(env: ProcessingEnvironment, scopeType: DeclaredType): ResolvedParent? {
             val scopeImplType = findScopeImpl(env, scopeType) ?: return null
             val parentInterfaceType: DeclaredType = findParentInterface(scopeType, scopeImplType)
-            val methods = parentInterfaceType.methods(env).map {
-                val methodType: ExecutableType = env.typeUtils.asMemberOf(parentInterfaceType, it) as ExecutableType
-                ParentInterfaceMethod.fromMethod(parentInterfaceType, it, methodType)
-            }
-            return ResolvedParent(parentInterfaceType.className, methods)
+            val parentInterface = ParentInterface.create(env, parentInterfaceType)
+            return ResolvedParent(parentInterfaceType.className, parentInterface.methods)
         }
 
         private fun findParentInterface(scopeType: DeclaredType, scopeImplType: DeclaredType): DeclaredType {

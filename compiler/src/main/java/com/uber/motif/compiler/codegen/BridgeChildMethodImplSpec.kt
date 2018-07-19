@@ -1,7 +1,6 @@
 package com.uber.motif.compiler.codegen
 
 import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
 import com.uber.motif.compiler.graph.ResolvedChild
 
 class BridgeChildMethodImplSpec(
@@ -9,11 +8,11 @@ class BridgeChildMethodImplSpec(
         child: ResolvedChild,
         bridgeSpec: BridgeSpec) : ChildMethodImplSpec {
 
-    private val dynamicParameters: List<ParameterSpec> = child.method.method.parameters.map {
-        ParameterSpec.get(it)
+    private val dynamicParameterNames: List<String> = child.method.method.parameters.map {
+        it.simpleName.toString()
     }
 
-    private val callString: String = dynamicParameters.joinToString(", ") { "\$N" }
+    private val callString: String = dynamicParameterNames.joinToString(", ") { "\$L" }
 
     override val spec: MethodSpec = child.method.override()
             .addStatement(
@@ -21,6 +20,6 @@ class BridgeChildMethodImplSpec(
                     bridgeSpec.className,
                     bridgeSpec.method.spec,
                     componentFieldSpec.spec,
-                    *dynamicParameters.toTypedArray())
+                    *dynamicParameterNames.toTypedArray())
             .build()
 }

@@ -7,6 +7,7 @@ import com.google.common.base.Equivalence
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
@@ -32,6 +33,10 @@ private object ObjectMethods {
         this.objectMethods = objectMethods
         return objectMethods
     }
+}
+
+fun DeclaredType.methodType(env: ProcessingEnvironment, method: ExecutableElement): ExecutableType {
+    return env.typeUtils.asMemberOf(this, method) as ExecutableType
 }
 
 fun DeclaredType.asTypeElement(): TypeElement {
