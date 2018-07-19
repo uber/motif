@@ -35,7 +35,7 @@ class ObjectsClass(
             val bindsProviderMethods = mutableListOf<BindsProviderMethod>()
             val basicProviderMethods = mutableListOf<BasicProviderMethod>()
 
-            type.methods().forEach { method ->
+            type.methods(env).forEach { method ->
                 if (method.returnsVoid) {
                     throw RuntimeException("Provider method cannot return void: $method")
                 }

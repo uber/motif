@@ -41,7 +41,7 @@ class ScopeClass(
             val exposerMethods = mutableListOf<ExposerMethod>()
             val childMethods = mutableListOf<ChildMethod>()
 
-            type.methods().forEach { method ->
+            type.methods(env).forEach { method ->
                 if (method.returnType.kind == TypeKind.VOID) {
                     throw RuntimeException("Invalid scope method: $method")
                 }
@@ -60,7 +60,7 @@ class ScopeClass(
 
             val parentInterface = type.innerInterfaces()
                     .find { it.simpleName.toString() == Names.PARENT_INTERFACE_NAME }
-                    ?.let { ParentInterface.create(it) }
+                    ?.let { ParentInterface.create(env, it) }
 
             return ScopeClass(type, objectsClass, parentInterface, exposerMethods, childMethods)
         }

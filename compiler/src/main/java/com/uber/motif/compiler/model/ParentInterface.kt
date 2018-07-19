@@ -1,6 +1,7 @@
 package com.uber.motif.compiler.model
 
 import com.uber.motif.compiler.methods
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
 
 class ParentInterface(
@@ -13,8 +14,8 @@ class ParentInterface(
 
     companion object {
 
-        fun create(type: TypeElement): ParentInterface {
-            val methods = type.methods().map { ParentInterfaceMethod.fromMethod(it) }
+        fun create(env: ProcessingEnvironment, type: TypeElement): ParentInterface {
+            val methods = type.methods(env).map { ParentInterfaceMethod.fromMethod(it) }
             return ParentInterface(type, methods)
         }
     }

@@ -41,7 +41,7 @@ class ResolvedParent(
         fun fromGenerated(env: ProcessingEnvironment, scopeType: TypeElement): ResolvedParent? {
             val scopeImplType = findScopeImpl(env, scopeType) ?: return null
             val parentInterfaceType: TypeElement = findParentInterface(scopeType, scopeImplType)
-            val methods = parentInterfaceType.methods().map { ParentInterfaceMethod.fromMethod(it) }
+            val methods = parentInterfaceType.methods(env).map { ParentInterfaceMethod.fromMethod(it) }
             return ResolvedParent(parentInterfaceType.className, methods)
         }
 

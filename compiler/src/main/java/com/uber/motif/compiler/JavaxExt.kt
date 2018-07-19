@@ -1,5 +1,7 @@
 package com.uber.motif.compiler
 
+import com.google.auto.common.MoreElements
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
@@ -7,12 +9,27 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
 import kotlin.reflect.KClass
 
+private object ObjectMethods {
+
+    private var objectMethods: List<ExecutableElement>? = null
+
+    fun get(env: ProcessingEnvironment): List<ExecutableElement> {
+        objectMethods?.let { return it }
+        val objectType = env.elementUtils.getTypeElement(Object::class.java.name)
+        val objectMethods = ElementFilter.methodsIn(objectType.enclosedElements)
+        this.objectMethods = objectMethods
+        return objectMethods
+    }
+}
+
 fun TypeMirror.asTypeElement(): TypeElement {
     return (this as DeclaredType).asElement() as TypeElement
 }
 
-fun TypeElement.methods(): List<ExecutableElement> {
-    return ElementFilter.methodsIn(enclosedElements)
+fun TypeElement.methods(env: ProcessingEnvironment): List<ExecutableElement> {
+    val objectMethods = ObjectMethods.get(env)
+    val allMethods = MoreElements.getLocalAndInheritedMethods(this, env.typeUtils, env.elementUtils).asList()
+    return allMethods - objectMethods
 }
 
 fun TypeElement.constructors(): List<ExecutableElement> {

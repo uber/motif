@@ -7,8 +7,9 @@ public interface PhotoListItemScope {
 
     PhotoListItemController controller();
 
-    abstract class Objects {
+    abstract class Objects extends ObjectsParent {}
 
+    abstract class ObjectsParent {
         abstract PhotoListItemController controller();
     }
 }
