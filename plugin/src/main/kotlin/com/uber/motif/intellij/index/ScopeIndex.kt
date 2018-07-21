@@ -9,6 +9,11 @@ import com.intellij.util.indexing.*
 import com.intellij.util.io.BooleanDataDescriptor
 import java.util.*
 
+/**
+ * Invoked during IntelliJ's indexing phase. The DataIndexer marks which files contain a Motif Scope. Once indexed,
+ * other parts of the plugin can retrieve all Scope files by invoking ScopeIndex.getScopeFiles(). Note that the files
+ * returned from this method will be a superset of files containing a Motif Scope.
+ */
 class ScopeIndex : ScalarIndexExtension<Boolean>() {
 
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
