@@ -11,7 +11,7 @@ import java.util.*
 
 /**
  * Invoked during IntelliJ's indexing phase. The DataIndexer marks which files contain a Motif Scope. Once indexed,
- * other parts of the plugin can retrieve all Scope files by invoking ScopeIndex.getScopeFiles().
+ * other parts of the plugin can retrieve all Scope files by invoking ScopeIndex.getScopeFileSuperset().
  */
 class ScopeIndex : ScalarIndexExtension<Boolean>() {
 
@@ -41,7 +41,10 @@ class ScopeIndex : ScalarIndexExtension<Boolean>() {
 
         private val ID: ID<Boolean, Void> = com.intellij.util.indexing.ID.create("ScopeIndex")
 
-        fun getScopeFiles(project: Project): Set<VirtualFile> {
+        /**
+         * Returns a superset of all files that contain a Motif Scope. See ScopeDetector for details.
+         */
+        fun getScopeFileSuperset(project: Project): Set<VirtualFile> {
             val scopeFiles = mutableSetOf<VirtualFile>()
             val projectScopeBuilder = ProjectScopeBuilder.getInstance(project)
             FileBasedIndex.getInstance().getFilesWithKey(ID, setOf(true), {

@@ -7,6 +7,6 @@ import com.uber.motif.intellij.index.ScopeIndex
 class HelloAction : AnAction("Hello") {
 
     override fun actionPerformed(event: AnActionEvent) {
-        println(ScopeIndex.getScopeFiles(event.project!!))
+        println(ScopeIndex.getScopeFileSuperset(event.project!!))
     }
 }
