@@ -1,17 +1,10 @@
 package com.uber.motif.intellij.index
 
 import com.intellij.ide.highlighter.JavaFileType
-import com.intellij.lang.LighterAST
-import com.intellij.lang.LighterASTNode
-import com.intellij.lang.LighterASTTokenNode
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.JavaTokenType
 import com.intellij.psi.impl.source.JavaFileElementType
-import com.intellij.psi.impl.source.tree.JavaElementType
-import com.intellij.psi.impl.source.tree.LightTreeUtil
 import com.intellij.psi.search.ProjectScopeBuilder
-import com.intellij.psi.tree.IElementType
 import com.intellij.util.indexing.*
 import com.intellij.util.io.BooleanDataDescriptor
 import java.util.*
@@ -19,8 +12,7 @@ import java.util.*
 class ScopeIndex : ScalarIndexExtension<Boolean>() {
 
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
-        val tree: LighterAST = (fileContent as FileContentImpl).lighterASTForPsiDependentIndex
-        if (ScopeDetector(tree).hasScope()) {
+        if (ScopeDetector.hasScope(fileContent)) {
             mapOf(true to null)
         } else {
             mapOf()
@@ -40,24 +32,6 @@ class ScopeIndex : ScalarIndexExtension<Boolean>() {
     override fun getName() = ID
     override fun dependsOnFileContent() = true
     override fun getKeyDescriptor() = BooleanDataDescriptor.INSTANCE!!
-
-    private class ScopeDetector(private val tree: LighterAST) {
-
-        fun hasScope(): Boolean {
-            val root: LighterASTNode = tree.root
-            val annotationId: LighterASTTokenNode = root.firstChild(JavaElementType.CLASS)
-                    ?.firstChild(JavaElementType.MODIFIER_LIST)
-                    ?.firstChild(JavaElementType.ANNOTATION)
-                    ?.firstChild(JavaElementType.JAVA_CODE_REFERENCE)
-                    ?.firstChild(JavaTokenType.IDENTIFIER) as LighterASTTokenNode? ?: return false
-            val name = tree.charTable.intern(annotationId.text).toString()
-            return name == "Scope"
-        }
-
-        private fun LighterASTNode.firstChild(type: IElementType): LighterASTNode? {
-            return LightTreeUtil.firstChildOfType(tree, this, type)
-        }
-    }
 
     companion object {
 
