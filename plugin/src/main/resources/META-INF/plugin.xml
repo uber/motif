@@ -22,8 +22,15 @@
     <depends>com.intellij.modules.lang</depends>
     -->
 
+    <project-components>
+        <component>
+            <implementation-class>com.uber.motif.intellij.MotifManager</implementation-class>
+        </component>
+    </project-components>
+
     <extensions defaultExtensionNs="com.intellij">
         <fileBasedIndex implementation="com.uber.motif.intellij.index.ScopeIndex"/>
+        <projectService serviceImplementation="com.uber.motif.intellij.MotifManager"/>
     </extensions>
 
     <actions>

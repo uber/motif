@@ -3,12 +3,11 @@ package com.uber.motif.intellij.index
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.impl.source.JavaFileElementType
 import com.intellij.psi.search.ProjectScopeBuilder
 import com.intellij.util.indexing.*
 import com.intellij.util.io.BooleanDataDescriptor
+import com.uber.motif.intellij.psi.isMaybeScopeFile
 import java.util.*
 
 /**
@@ -18,9 +17,9 @@ import java.util.*
 class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
 
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
-        val psiJavaFile = fileContent.psiFile as PsiJavaFile
-        val isScopeFile = psiJavaFile.classes.find{ it.isScope() } != null
-        if (isScopeFile) println("$psiJavaFile")
+        val psiFile = fileContent.psiFile
+        val isScopeFile = psiFile.isMaybeScopeFile()
+        if (isScopeFile) println("$psiFile")
         mapOf(isScopeFile to null)
     }
 
@@ -38,22 +37,23 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
     override fun dependsOnFileContent() = true
     override fun getKeyDescriptor() = BooleanDataDescriptor.INSTANCE!!
 
-    /**
-     * Returns true for all Motif Scope files, but also returns a false positive if the @Scope annotation is not a
-     * Motif Scope. This is due to the fact that we can't result annotations' qualified names before indexing has
-     * finished.
-     */
-    private fun PsiClass.isScope(): Boolean {
-        return annotations.mapNotNull { it?.nameReferenceElement?.referenceName }
-                .find { it == "Scope" || it == "com.uber.motif.Scope" } != null
-    }
-
     companion object {
 
         private val ID: ID<Boolean, Void> = com.intellij.util.indexing.ID.create("ScopeIndex")
 
+        fun refreshFile(project: Project, file: VirtualFile) {
+            val projectScopeBuilder = ProjectScopeBuilder.getInstance(project)
+            // processValues forces the file to be reindexed
+            FileBasedIndex.getInstance().processValues(
+                    ID,
+                    true,
+                    file,
+                    { _, _ -> true },
+                    projectScopeBuilder.buildProjectScope())
+        }
+
         /**
-         * Returns a superset of all files that contain a Motif Scope. See ScopeIndex.isScope() for details.
+         * Returns a superset of all files that contain a Motif Scope.
          */
         fun getScopeFileSuperset(project: Project): Set<VirtualFile> {
             val scopeFiles = mutableSetOf<VirtualFile>()

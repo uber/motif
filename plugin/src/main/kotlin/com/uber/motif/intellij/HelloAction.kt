@@ -9,4 +9,8 @@ class HelloAction : AnAction("Hello") {
     override fun actionPerformed(event: AnActionEvent) {
         Playground.run(event.project!!)
     }
+
+    override fun beforeActionPerformedUpdate(e: AnActionEvent) {
+        println(e)
+    }
 }
