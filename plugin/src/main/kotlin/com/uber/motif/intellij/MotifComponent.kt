@@ -9,7 +9,7 @@ import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.PsiTreeChangeAdapter
 import com.uber.motif.intellij.psi.isMaybeScopeFile
 
-class MotifManager(private val project: Project) : ProjectComponent {
+class MotifComponent(private val project: Project) : ProjectComponent {
 
     override fun projectOpened() {
         PsiManager.getInstance(project).addPsiTreeChangeListener(object : PsiTreeChangeAdapter() {
@@ -25,8 +25,8 @@ class MotifManager(private val project: Project) : ProjectComponent {
 
     companion object {
 
-        fun get(project: Project): MotifManager {
-            return project.getComponent(MotifManager::class.java)
+        fun get(project: Project): MotifComponent {
+            return project.getComponent(MotifComponent::class.java)
         }
     }
 }

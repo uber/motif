@@ -24,13 +24,13 @@
 
     <project-components>
         <component>
-            <implementation-class>com.uber.motif.intellij.MotifManager</implementation-class>
+            <implementation-class>com.uber.motif.intellij.MotifComponent</implementation-class>
         </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileBasedIndex implementation="com.uber.motif.intellij.index.ScopeIndex"/>
-        <projectService serviceImplementation="com.uber.motif.intellij.MotifManager"/>
+        <projectService serviceImplementation="com.uber.motif.intellij.MotifComponent"/>
     </extensions>
 
     <actions>

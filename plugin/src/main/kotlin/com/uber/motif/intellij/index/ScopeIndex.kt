@@ -19,7 +19,7 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
         val psiFile = fileContent.psiFile
         val isScopeFile = psiFile.isMaybeScopeFile()
-        if (isScopeFile) println("$psiFile")
+        if (isScopeFile) println("INDEX UPDATE: $psiFile${Thread.currentThread()}")
         mapOf(isScopeFile to null)
     }
 
