@@ -2,6 +2,7 @@ package com.uber.motif.intellij
 
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiTreeChangeEvent
@@ -27,6 +28,10 @@ class MotifComponent(private val project: Project) : ProjectComponent {
                 }
             }
         })
+    }
+
+    fun isScopeClass(element: PsiElement): Boolean {
+        return graphProcessor.isScopeClass(element)
     }
 
     companion object {

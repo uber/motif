@@ -2,6 +2,7 @@ package com.uber.motif.intellij.graph
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.getScopeClasses
@@ -13,6 +14,8 @@ class GraphProcessor(private val project: Project) {
     private val psiManager = PsiManager.getInstance(project)
     private val index = ScopeIndex.getInstance()
     private val retryScheduler = RetryScheduler(project)
+
+    private var scopeClasses: List<PsiClass> = listOf()
 
     private val isDirty = AtomicBoolean()
 
@@ -35,8 +38,12 @@ class GraphProcessor(private val project: Project) {
         }
     }
 
+    fun isScopeClass(element: PsiElement): Boolean {
+        return element in scopeClasses
+    }
+
     private fun refresh() {
-        val scopeClasses: List<PsiClass> = getScopeClasses()
+        this.scopeClasses = getScopeClasses()
         println(scopeClasses)
     }
 
