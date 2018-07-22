@@ -1,9 +1,7 @@
 package com.uber.motif.intellij.thread
 
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -17,8 +15,7 @@ import java.util.concurrent.ScheduledExecutorService
  * If a ProcessedCancelledException is thrown during execution, the work is automatically rescheduled.
  *
  * Note: It's possible that indexes are not available if runWithRetry is executed when we already have read access (See
- * DumbService.runReadActionInSmartMode for details). In this case, we catch the IndexNotReadyException internally and
- * reschedule the work like we do for ProcessedCancelledExceptions.
+ * DumbService.runReadActionInSmartMode for details). In this case, an IndexNotReadyException is thrown.
  */
 class RetryScheduler(project: Project) {
 
@@ -33,11 +30,7 @@ class RetryScheduler(project: Project) {
             override fun run() {
                 dumbService.runReadActionInSmartMode {
                     val success = progressManager.runInReadActionWithWriteActionPriority({
-                        try {
-                            context.run()
-                        } catch (ignore : IndexNotReadyException) {
-                            throw ProcessCanceledException()
-                        }
+                        context.run()
                     }, null)
                     if (!success) {
                         scheduler.submit(this)
