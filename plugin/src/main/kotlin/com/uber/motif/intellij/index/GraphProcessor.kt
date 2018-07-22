@@ -1,11 +1,10 @@
 package com.uber.motif.intellij.index
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.uber.motif.intellij.thread.RetryScheduler
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ProjectScopeIndex(private val project: Project) {
+class GraphProcessor(private val project: Project) {
 
     private val index = ScopeIndex.getInstance()
     private val retryScheduler = RetryScheduler(project)
@@ -23,13 +22,8 @@ class ProjectScopeIndex(private val project: Project) {
         }
     }
 
-    fun refreshFile(file: VirtualFile) {
-        index.refreshFile(project, file)
-    }
-
     private fun refresh(context: RetryScheduler.Context) {
-        index.processScopeFileSuperset(project) {
-            println(it)
-        }
+        val snapshot: ScopeIndexSnapshot = index.getSnapshot(project)
+        println(snapshot)
     }
 }
