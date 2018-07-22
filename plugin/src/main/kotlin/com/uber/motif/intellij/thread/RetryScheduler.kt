@@ -7,12 +7,12 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 /**
- * Single-threaded scheduler that executes the given work when the following is true:
+ * Single-threaded scheduler that executes the given Job when the following is true:
  *
  * 1) Indexes are available.
  * 2) Read access is allowed.
  *
- * If a ProcessedCancelledException is thrown during execution, the work is automatically rescheduled.
+ * If a ProcessedCancelledException is thrown during execution, the Job is automatically rescheduled.
  *
  * Note: It's possible that indexes are not available if runWithRetry is executed when we already have read access (See
  * DumbService.runReadActionInSmartMode for details). In this case, an IndexNotReadyException is thrown.
@@ -22,17 +22,17 @@ class RetryScheduler(project: Project) {
     private val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     private val dumbService: DumbService = DumbService.getInstance(project)
     private val progressManager: ProgressManager = ProgressManager.getInstance()
-    private val context: Context = Context()
 
-    fun runWithRetry(run: Context.() -> Unit) {
+    fun runWithRetry(job: Job) {
         scheduler.submit(object: Runnable {
 
             override fun run() {
                 dumbService.runReadActionInSmartMode {
                     val success = progressManager.runInReadActionWithWriteActionPriority({
-                        context.run()
+                        job.run()
                     }, null)
                     if (!success) {
+                        job.onRetry()
                         scheduler.submit(this)
                     }
                 }
@@ -40,10 +40,8 @@ class RetryScheduler(project: Project) {
         })
     }
 
-    inner class Context {
-
-        fun checkCancelled() {
-            progressManager.progressIndicator?.checkCanceled()
-        }
+    interface Job {
+        fun run()
+        fun onRetry()
     }
 }
