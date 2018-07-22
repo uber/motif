@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiTreeChangeEvent
-import com.uber.motif.intellij.index.GraphProcessor
+import com.uber.motif.intellij.graph.GraphProcessor
 import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.PsiTreeChangeAdapter
 import com.uber.motif.intellij.psi.isMaybeScopeFile

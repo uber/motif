@@ -1,8 +1,9 @@
-package com.uber.motif.intellij.index
+package com.uber.motif.intellij.graph
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiManager
+import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.getScopeClasses
 import com.uber.motif.intellij.thread.RetryScheduler
 import java.util.concurrent.atomic.AtomicBoolean

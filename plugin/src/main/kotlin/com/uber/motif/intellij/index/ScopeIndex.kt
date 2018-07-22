@@ -21,9 +21,9 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
 
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
         val isScopeFile = fileContent.psiFile.isMaybeScopeFile()
-        // Since this method is triggered by DataIndexer.map, it fires before the index has been updated. Invoke
-        // listeners asynchronously to ensure that they are called after the index is updated. Unclear whether this
-        // is guaranteed by Application.invokeLater, but don't know of any better strategy.
+        // Since this is executing in DataIndexer.map, it fires before the index has been updated. Invoke listeners
+        // asynchronously to ensure that they are called after the index is updated. Unclear whether this is guaranteed
+        // by Application.invokeLater, but don't know of any better strategy.
         ApplicationManager.getApplication().invokeLater {
             notifyListeners()
         }
