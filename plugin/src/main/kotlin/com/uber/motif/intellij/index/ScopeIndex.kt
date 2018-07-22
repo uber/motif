@@ -1,6 +1,7 @@
 package com.uber.motif.intellij.index
 
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.source.JavaFileElementType
@@ -17,12 +18,15 @@ import java.util.*
 class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
 
     private val listeners: MutableSet<() -> Unit> = mutableSetOf()
-    private val modificationStamps: MutableMap<String, Long> = mutableMapOf()
 
     override fun getIndexer() = DataIndexer<Boolean, Void?, FileContent> { fileContent ->
         val isScopeFile = fileContent.psiFile.isMaybeScopeFile()
-        putModificationStamp(fileContent.file.name, fileContent.file.modificationStamp)
-        notifyListeners()
+        // Since this method is triggered by DataIndexer.map, it fires before the index has been updated. Invoke
+        // listeners asynchronously to ensure that they are called after the index is updated. Unclear whether this
+        // is guaranteed by Application.invokeLater, but don't know of any better strategy.
+        ApplicationManager.getApplication().invokeLater {
+            notifyListeners()
+        }
         mapOf(isScopeFile to null)
     }
 
@@ -51,11 +55,6 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
         listeners.forEach { it() }
     }
 
-    @Synchronized
-    private fun putModificationStamp(name: String, timestamp: Long): Boolean {
-        return timestamp != modificationStamps.put(name, timestamp)
-    }
-
     /**
      * Returns a superset of all files that contain a Motif Scope.
      */
@@ -68,10 +67,6 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
     }
 
     fun refreshFile(project: Project, file: VirtualFile) {
-        if (!putModificationStamp(file.name, file.modificationStamp)) {
-            return
-        }
-
         val projectScopeBuilder = ProjectScopeBuilder.getInstance(project)
         // processValues forces the file to be reindexed
         FileBasedIndex.getInstance().processValues(
