@@ -9,7 +9,8 @@ import com.intellij.psi.PsiElement
 class HelloLineMarkerProvider : LineMarkerProvider {
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        return if (MotifComponent.get(element.project).isScopeClass(element)) {
+        val component = MotifComponent.get(element.project)
+        return if (element in component.graphProcessor.scopeClasses()) {
             NavigationGutterIconBuilder.create(AllIcons.Mac.Tree_white_down_arrow)
                     .setTarget(element)
                     .createLineMarkerInfo(element)

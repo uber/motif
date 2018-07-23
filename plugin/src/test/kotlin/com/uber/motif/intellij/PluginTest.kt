@@ -1,6 +1,5 @@
 package com.uber.motif.intellij
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.builders.EmptyModuleFixtureBuilder
@@ -22,7 +21,7 @@ class PluginTest : UsefulTestCase() {
 
         CodeInsightTestFixtureImpl.ensureIndexesUpToDate(fixture.project)
 
-        println(component.scopeClasses())
+        println(component.graphProcessor.scopeClasses())
     }
 
     override fun setUp() {

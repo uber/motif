@@ -10,8 +10,9 @@ import com.uber.motif.intellij.psi.isMaybeScopeFile
 
 class MotifComponent(private val project: Project) : ProjectComponent {
 
+    val graphProcessor = GraphProcessor(project)
+
     private val scopeIndex = ScopeIndex.getInstance()
-    private val graphProcessor = GraphProcessor(project)
 
     override fun projectOpened() {
         graphProcessor.start()
@@ -25,14 +26,6 @@ class MotifComponent(private val project: Project) : ProjectComponent {
                 }
             }
         })
-    }
-
-    fun isScopeClass(element: PsiElement): Boolean {
-        return graphProcessor.isScopeClass(element)
-    }
-
-    fun scopeClasses(): List<PsiClass> {
-        return graphProcessor.scopeClasses()
     }
 
     companion object {

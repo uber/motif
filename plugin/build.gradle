@@ -14,6 +14,8 @@ version '0.0.1' // Plugin version
 
 dependencies {
     compile project(':lib')
+    compile deps.rx.java
+    compile 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
 
     testCompile deps.test.junit
 }
