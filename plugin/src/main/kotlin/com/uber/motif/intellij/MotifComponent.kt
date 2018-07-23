@@ -2,7 +2,9 @@ package com.uber.motif.intellij
 
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
-import com.intellij.psi.*
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiTreeChangeEvent
 import com.uber.motif.intellij.graph.GraphProcessor
 import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.PsiTreeChangeAdapter
@@ -15,8 +17,6 @@ class MotifComponent(private val project: Project) : ProjectComponent {
     private val scopeIndex = ScopeIndex.getInstance()
 
     override fun projectOpened() {
-        graphProcessor.start()
-
         PsiManager.getInstance(project).addPsiTreeChangeListener(object : PsiTreeChangeAdapter() {
 
             override fun onChange(event: PsiTreeChangeEvent) {

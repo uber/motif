@@ -1,4 +1,4 @@
-package com.uber.motif.intellij.test;
+package a;
 
 import com.uber.motif.Scope;
 
