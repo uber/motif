@@ -3,8 +3,8 @@ package com.uber.motif.intellij.thread
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
+import org.jetbrains.annotations.TestOnly
+import java.util.concurrent.*
 
 /**
  * Single-threaded scheduler that executes the given Job when the following is true:
@@ -23,21 +23,27 @@ class RetryScheduler(project: Project) {
     private val dumbService: DumbService = DumbService.getInstance(project)
     private val progressManager: ProgressManager = ProgressManager.getInstance()
 
-    fun runWithRetry(job: Job) {
-        scheduler.submit(object: Runnable {
+    private val futures: ConcurrentLinkedQueue<Future<*>> = ConcurrentLinkedQueue()
 
-            override fun run() {
-                dumbService.runReadActionInSmartMode {
-                    val success = progressManager.runInReadActionWithWriteActionPriority({
-                        job.run()
-                    }, null)
-                    if (!success) {
-                        job.onRetry()
-                        scheduler.submit(this)
-                    }
+    fun runWithRetry(job: Job) {
+        val future = scheduler.submit {
+            dumbService.runReadActionInSmartMode {
+                val success = progressManager.runInReadActionWithWriteActionPriority({
+                    job.run()
+                }, null)
+                if (!success) {
+                    job.onRetry()
+                    runWithRetry(job)
                 }
             }
-        })
+        }
+        futures.add(future)
+    }
+
+    fun waitForCompletion() {
+        while (futures.isNotEmpty()) {
+            futures.poll()?.get()
+        }
     }
 
     interface Job {

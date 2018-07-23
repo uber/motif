@@ -7,6 +7,7 @@ import com.intellij.psi.PsiManager
 import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.getScopeClasses
 import com.uber.motif.intellij.thread.RetryScheduler
+import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.atomic.AtomicBoolean
 
 class GraphProcessor(private val project: Project) {
@@ -42,9 +43,13 @@ class GraphProcessor(private val project: Project) {
         return element in scopeClasses
     }
 
+    fun scopeClasses(): List<PsiClass> {
+        retryScheduler.waitForCompletion()
+        return scopeClasses
+    }
+
     private fun refresh() {
         this.scopeClasses = getScopeClasses()
-        println(scopeClasses)
     }
 
     private fun getScopeClasses(): List<PsiClass> {

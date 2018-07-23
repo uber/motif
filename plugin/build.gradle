@@ -5,7 +5,7 @@ plugins {
 
 intellij {
     version 'IC-2018.1'
-    plugins = ['android']
+    plugins = []
     pluginName 'MyPlugin'
 }
 
@@ -14,4 +14,6 @@ version '0.0.1' // Plugin version
 
 dependencies {
     compile project(':lib')
+
+    testCompile deps.test.junit
 }
