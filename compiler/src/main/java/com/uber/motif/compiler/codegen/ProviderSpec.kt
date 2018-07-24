@@ -29,7 +29,7 @@ abstract class ProviderSpec(
             }
             addAnnotation(Provides::class.java)
             addAnnotation(daggerScope.className)
-            providerMethod.providedDependency.qualifier?.let { addAnnotation(AnnotationSpec.get(it)) }
+            providerMethod.providedDependency.qualifierSpec?.let { addAnnotation(it) }
             addParameters(parameterSpecs)
             returns(dependencyName)
             val callParams: String = parameters.joinToString(", ") { "\$N" }
