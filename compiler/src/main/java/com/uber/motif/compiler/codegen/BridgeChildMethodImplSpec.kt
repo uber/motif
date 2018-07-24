@@ -16,7 +16,7 @@ class BridgeChildMethodImplSpec(
 
     override val spec: MethodSpec = child.method.override()
             .addStatement(
-                    "return \$T.\$N(\$N, $callString)",
+                    "return \$T.\$N(this.\$N, $callString)",
                     bridgeSpec.className,
                     bridgeSpec.method.spec,
                     componentFieldSpec.spec,

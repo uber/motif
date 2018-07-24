@@ -14,7 +14,9 @@ class BridgeParentImplMethodSpec(
     val dependency: Dependency = parentMethod.dependency
 
     val returnStatement: CodeBlock = bridgeParameters[dependency]?.let { parameter ->
-        CodeBlock.of("return \$N", parameter)
+        parameter.spreadMethodName?.let {
+            CodeBlock.of("return \$N.\$N()", parameter.spec, it)
+        } ?: CodeBlock.of("return \$N", parameter.spec)
     } ?: parent.provisionMethods[dependency]?.let { parentMethod ->
         CodeBlock.of("return \$N.\$N()", bridgeParameters.parentParameter, parentMethod)
     } ?: throw RuntimeException("Dependency should always be provided by either parameters or parent.")

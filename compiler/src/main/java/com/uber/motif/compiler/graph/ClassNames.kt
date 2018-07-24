@@ -18,8 +18,9 @@ object ClassNames {
     }
 
     fun scopeImpl(scopeType: TypeElement): ClassName {
-        val simpleName = scopeType.simpleName.toString()
-        return scopeType.className.peerClass("${simpleName}Impl")
+        val scopeClassName = scopeType.className
+        val prefix = scopeClassName.simpleNames().joinToString("_")
+        return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
     }
 
     fun generatedParentInterface(scopeType: DeclaredType): ClassName {

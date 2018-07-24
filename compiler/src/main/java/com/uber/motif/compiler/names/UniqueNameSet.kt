@@ -12,4 +12,8 @@ class UniqueNameSet {
         }
         return name
     }
+
+    fun claim(name: String) {
+        used.add(name)
+    }
 }
