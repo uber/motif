@@ -13,13 +13,15 @@ repositories {
 }
 
 dependencies {
+    compile 'com.squareup:javapoet:1.11.1'
     compile deps.kotlin.stdlib
     compile deps.misc.dagger
     compile project(':lib')
     compile 'com.google.auto:auto-common:0.10'
-    compile 'com.google.dagger:dagger-compiler:2.16'
+    compile('com.google.dagger:dagger-compiler:2.16') {
+        exclude group: 'com.squareup:javapoet'
+    }
     compile 'com.google.dagger:dagger:2.16'
-    compile 'com.squareup:javapoet:1.11.1'
 }
 
 publishing {
