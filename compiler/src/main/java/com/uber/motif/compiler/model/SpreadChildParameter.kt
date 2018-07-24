@@ -8,6 +8,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
 
+// TODO implement @Spread on provider methods.
 class SpreadChildParameter(
         override val element: VariableElement,
         override val type: DeclaredType,
