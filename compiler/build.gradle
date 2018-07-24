@@ -1,4 +1,8 @@
 plugins {
+    id 'maven-publish'
+}
+
+plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -16,4 +20,16 @@ dependencies {
     compile 'com.google.dagger:dagger-compiler:2.16'
     compile 'com.google.dagger:dagger:2.16'
     compile 'com.squareup:javapoet:1.11.1'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.uber.motif'
+            artifactId = 'motif-compiler'
+            version = '0.0.1-LOCAL'
+
+            from components.java
+        }
+    }
 }

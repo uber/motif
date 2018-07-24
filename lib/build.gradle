@@ -1,7 +1,23 @@
+plugins {
+    id 'maven-publish'
+}
+
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
 dependencies {
     compile deps.misc.dagger
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.uber.motif'
+            artifactId = 'motif'
+            version = '0.0.1-LOCAL'
+
+            from components.java
+        }
+    }
 }
