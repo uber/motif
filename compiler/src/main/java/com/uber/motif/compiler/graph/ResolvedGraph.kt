@@ -39,9 +39,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
         val validatedScopes = scopes.map { (_, scope) ->
             val parent: ResolvedParent = resolveParent(scope.type)
             val children: List<ResolvedChild> = scope.childMethods.map { childMethod ->
-                // TODO Seen this fail at least once. Recompiling did not repro - Race condition?
-                // Something to do with Intellij refactoring generated classes?
-                val childParent: ResolvedParent = resolvedParents[childMethod.scopeType.id]!!
+                val childParent: ResolvedParent = resolveParent(childMethod.scopeType)
                 ResolvedChild(childMethod, childParent)
             }
             ResolvedScope(scope, parent, children)
@@ -50,7 +48,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
     }
 
     private fun resolveParent(scopeType: DeclaredType): ResolvedParent {
-        return resolveParent(setOf(), scopeType)!!
+        return resolveParent(setOf(), scopeType) ?: throw IllegalStateException()
     }
 
     // TODO Currently, dynamic dependencies are public by default. This is due to the fact that a child doesn't know

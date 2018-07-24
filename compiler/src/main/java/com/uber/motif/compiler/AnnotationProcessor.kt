@@ -29,6 +29,6 @@ class AnnotationProcessor : AbstractProcessor() {
             val scopeImpl = ScopeImplSpec(it)
             JavaFile.builder(it.packageName, scopeImpl.spec).build().writeTo(processingEnv.filer)
         }
-        return false
+        return true
     }
 }
