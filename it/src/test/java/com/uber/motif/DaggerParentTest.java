@@ -9,12 +9,12 @@ import javax.inject.Named;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class DaggerParent {
+public class DaggerParentTest {
 
     @Test
     public void daggerParent() {
-        DaggerComponent daggerComponent = DaggerDaggerParent_DaggerComponent.create();
-        MotifScope motifScope = new DaggerParent_MotifScopeImpl(daggerComponent);
+        DaggerComponent daggerComponent = DaggerDaggerParentTest_DaggerComponent.create();
+        MotifScope motifScope = new DaggerParentTest_MotifScopeImpl(daggerComponent);
         String string = motifScope.string();
         assertThat(string).isEqualTo("DaggerMotif");
     }
@@ -33,7 +33,7 @@ public class DaggerParent {
     }
 
     @Component(modules = DaggerModule.class)
-    interface DaggerComponent extends DaggerParent_MotifScopeImpl.Parent {}
+    interface DaggerComponent extends DaggerParentTest_MotifScopeImpl.Parent {}
 
     @Module
     static class DaggerModule {

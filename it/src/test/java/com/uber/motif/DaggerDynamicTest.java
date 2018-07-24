@@ -9,12 +9,12 @@ import javax.inject.Named;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class DaggerDynamic {
+public class DaggerDynamicTest {
 
     @Test
     public void daggerDynamic() {
-        DaggerComponent daggerComponent = DaggerDaggerDynamic_DaggerComponent.create();
-        MotifScope motifScope = new DaggerDynamic_MotifScopeImpl();
+        DaggerComponent daggerComponent = DaggerDaggerDynamicTest_DaggerComponent.create();
+        MotifScope motifScope = new DaggerDynamicTest_MotifScopeImpl();
         MotifChild motifChild = motifScope.child(daggerComponent);
         assertThat(motifChild.string()).isEqualTo("DaggerMotif");
     }
