@@ -22,19 +22,6 @@ val TypeMirror.id: TypeId
 val AnnotationMirror.id: AnnotationId
     get() = AnnotationMirrors.equivalence().wrap(this)
 
-private object ObjectMethods {
-
-    private var objectMethods: List<ExecutableElement>? = null
-
-    fun get(env: ProcessingEnvironment): List<ExecutableElement> {
-        objectMethods?.let { return it }
-        val objectType = env.elementUtils.getTypeElement(Object::class.java.name)
-        val objectMethods = ElementFilter.methodsIn(objectType.enclosedElements)
-        this.objectMethods = objectMethods
-        return objectMethods
-    }
-}
-
 fun DeclaredType.methodType(env: ProcessingEnvironment, method: ExecutableElement): ExecutableType {
     return env.typeUtils.asMemberOf(this, method) as ExecutableType
 }
@@ -56,9 +43,8 @@ fun DeclaredType.methods(env: ProcessingEnvironment): List<ExecutableElement> {
 }
 
 private fun TypeElement.methods(env: ProcessingEnvironment): List<ExecutableElement> {
-    val objectMethods = ObjectMethods.get(env)
-    val allMethods = MoreElements.getLocalAndInheritedMethods(this, env.typeUtils, env.elementUtils).asList()
-    return allMethods - objectMethods
+    return MoreElements.getLocalAndInheritedMethods(this, env.typeUtils, env.elementUtils)
+            .filter { it.enclosingElement.toString() != "java.lang.Object" }
 }
 
 fun DeclaredType.constructors(): List<ExecutableElement> {
