@@ -26,7 +26,7 @@ class ObjectsClass(
     }
 
     val providedDependencies: Set<Dependency> by lazy {
-        providerMethods.map{ it.providedDependency }.toSet()
+        providerMethods.flatMap { it.providedDependencies }.toSet()
     }
 
     val requiredDependencies: Set<Dependency> by lazy {

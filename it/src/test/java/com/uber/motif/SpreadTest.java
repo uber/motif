@@ -10,14 +10,16 @@ public class SpreadTest {
 
     @Test
     public void spread() {
-        Scope scope = new SpreadTest_FactoryImpl().scope(new Spreadable());
-        assertThat(scope.string()).isEqualTo("AB");
+        Scope scope = new SpreadTest_FactoryImpl().scope(new Spreadable1());
+        assertThat(scope.string()).isEqualTo("ABCD");
     }
 
     @com.uber.motif.Scope
     interface Factory {
 
-        Scope scope(@Spread Spreadable spreadable);
+        Scope scope(@Spread Spreadable1 spreadable);
+
+        interface Parent {}
     }
 
     @com.uber.motif.Scope
@@ -25,24 +27,44 @@ public class SpreadTest {
 
         String string();
 
-        class Objects {
+        abstract class Objects {
 
-            String string(@Named("A") String a, @Named("B") String b) {
-                return a + b;
+            @Spread
+            abstract Spreadable2 spreadable2();
+
+            String string(
+                    @Named("A") String a,
+                    @Named("B") String b,
+                    @Named("C") String c,
+                    @Named("D") String d) {
+                return a + b + c + d;
             }
         }
     }
 
-    class Spreadable {
+    static class Spreadable1 {
 
         @Named("A")
-        String a() {
+        public String a() {
             return "A";
         }
 
         @Named("B")
-        String b() {
+        public String b() {
             return "B";
+        }
+    }
+
+    static class Spreadable2 {
+
+        @Named("C")
+        public String c() {
+            return "C";
+        }
+
+        @Named("D")
+        public String d() {
+            return "D";
         }
     }
 }

@@ -44,11 +44,15 @@ class ModuleSpec(
                 methodNames.unique(it.providedDependency.preferredName))
     }
     private val providers: List<ProviderSpec> = constructorProviders + bindsProviders + basicProviders
+    private val spreadProviders: List<SpreadProviderSpec> = resolvedScope.scope.providerMethods.map {
+        SpreadProviderSpec(methodNames, resolvedScope, daggerScope, internalQualifier, it)
+    }
 
     val spec: TypeSpec = TypeSpec.classBuilder(className).apply {
         addAnnotation(dagger.Module::class.java)
         objectsField.spec?.let { addField(it) }
         addMethod(scopeProvider.spec)
         providers.forEach { addMethod(it.spec) }
+        spreadProviders.flatMap { it.specs }.forEach { addMethod(it)}
     }.build()
 }

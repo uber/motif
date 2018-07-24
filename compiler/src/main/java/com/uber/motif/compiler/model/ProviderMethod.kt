@@ -1,9 +1,7 @@
 package com.uber.motif.compiler.model
 
-import com.uber.motif.compiler.constructors
-import com.uber.motif.compiler.isAbstract
-import com.uber.motif.compiler.methodType
-import com.uber.motif.compiler.returnsVoid
+import com.uber.motif.Spread
+import com.uber.motif.compiler.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.type.DeclaredType
@@ -15,8 +13,11 @@ class ProviderMethod(
     override val method: ExecutableElement,
     override val methodType: ExecutableType,
     val providedDependency: Dependency,
+    val spreadDependencies: Map<Dependency, ExecutableElement>,
     val requiredDependencies: List<Dependency>,
     val type: ProviderMethodType) : Method {
+
+    val providedDependencies: List<Dependency> = spreadDependencies.keys.toList() + providedDependency
 
     companion object {
 
@@ -27,11 +28,19 @@ class ProviderMethod(
             val type = type(method)
             val methodType: ExecutableType = owner.methodType(env, method)
             val dependencies: Dependencies = when (type) {
-                ProviderMethodType.BASIC -> basic(owner, method, methodType)
+                ProviderMethodType.BASIC -> basic(env, owner, method, methodType)
                 ProviderMethodType.BINDS -> binds(env, owner, method, methodType)
                 ProviderMethodType.CONSTRUCTOR -> constructor(env, owner, method, methodType)
             }
-            return ProviderMethod(env, owner, method, methodType, dependencies.provided, dependencies.requiredDependencies, type)
+            return ProviderMethod(
+                    env,
+                    owner,
+                    method,
+                    methodType,
+                    dependencies.providedDependency,
+                    dependencies.spreadDependencies,
+                    dependencies.requiredDependencies,
+                    type)
         }
 
         private fun type(method: ExecutableElement): ProviderMethodType {
@@ -50,12 +59,14 @@ class ProviderMethod(
         }
 
         private fun basic(
+                env: ProcessingEnvironment,
                 owner: DeclaredType,
                 method: ExecutableElement,
                 methodType: ExecutableType): Dependencies {
             val provided = Dependency.providedByReturn(owner, method, methodType)
+            val spread = spreadDependencies(env, method, methodType)
             val required = Dependency.requiredByParams(owner, method, methodType)
-            return Dependencies(provided, required)
+            return Dependencies(provided, spread, required)
         }
 
         private fun binds(
@@ -68,7 +79,8 @@ class ProviderMethod(
             if (!env.typeUtils.isAssignable(required.type, provided.type)) {
                 throw RuntimeException("Type ${required.type} bound by $method is not assignable to ${provided.type}")
             }
-            return Dependencies(provided, listOf(required))
+            val spread = spreadDependencies(env, method, methodType)
+            return Dependencies(provided, spread, listOf(required))
         }
 
         private fun constructor(
@@ -83,10 +95,22 @@ class ProviderMethod(
             val constructorType = providedType.methodType(env, constructor)
 
             val required = Dependency.requiredByParams(owner, constructor, constructorType)
-            return Dependencies(provided, required)
+            val spread = spreadDependencies(env, method, methodType)
+            return Dependencies(provided, spread, required)
         }
 
-        private data class Dependencies(val provided: Dependency, val requiredDependencies: List<Dependency>)
+        private fun spreadDependencies(
+                env: ProcessingEnvironment,
+                method: ExecutableElement,
+                methodType: ExecutableType): Map<Dependency, ExecutableElement> {
+            if (!method.hasAnnotation(Spread::class)) return mapOf()
+            return SpreadUtil.spreadMethods(env, methodType.returnType as DeclaredType)
+        }
+
+        private data class Dependencies(
+                val providedDependency: Dependency,
+                val spreadDependencies: Map<Dependency, ExecutableElement>,
+                val requiredDependencies: List<Dependency>)
     }
 }
 

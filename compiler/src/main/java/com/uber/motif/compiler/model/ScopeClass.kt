@@ -15,6 +15,7 @@ class ScopeClass(
         val exposerMethods: List<ExposerMethod>,
         val childMethods: List<ChildMethod>) {
 
+    val providerMethods: List<ProviderMethod> = objectsClass?.providerMethods ?: listOf()
     val constructorProviderMethods: List<ProviderMethod> = objectsClass?.constructorProviderMethods ?: listOf()
     val bindsProviderMethods: List<ProviderMethod> = objectsClass?.bindsProviderMethods ?: listOf()
     val basicProviderMethods: List<ProviderMethod> = objectsClass?.basicProviderMethods ?: listOf()
@@ -25,7 +26,7 @@ class ScopeClass(
 
     val providedPublicDependencies: Set<Dependency> by lazy {
         val objectsClass = objectsClass ?: return@lazy setOf<Dependency>()
-        objectsClass.providerMethods.filter { it.method.isPublic }.map{ it.providedDependency }.toSet()
+        objectsClass.providerMethods.filter { it.method.isPublic }.flatMap { it.providedDependencies }.toSet()
     }
 
     val providedPrivateDependencies: Set<Dependency> = providedDependencies - providedPublicDependencies
