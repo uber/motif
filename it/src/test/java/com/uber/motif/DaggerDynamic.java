@@ -1,14 +1,23 @@
-package com.uber.motif.sample;
+package com.uber.motif;
 
-import com.uber.motif.Scope;
-import com.uber.motif.Spread;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
+import org.junit.Test;
 
 import javax.inject.Named;
 
-class DaggerDynamic {
+import static com.google.common.truth.Truth.assertThat;
+
+public class DaggerDynamic {
+
+    @Test
+    public void daggerDynamic() {
+        DaggerComponent daggerComponent = DaggerDaggerDynamic_DaggerComponent.create();
+        MotifScope motifScope = new DaggerDynamic_MotifScopeImpl();
+        MotifChild motifChild = motifScope.child(daggerComponent);
+        assertThat(motifChild.string()).isEqualTo("DaggerMotif");
+    }
 
     @Scope
     interface MotifScope {

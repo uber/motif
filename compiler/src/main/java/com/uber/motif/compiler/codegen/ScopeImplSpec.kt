@@ -26,6 +26,7 @@ class ScopeImplSpec(val resolvedScope: ResolvedScope) {
         addModifiers(Modifier.PUBLIC)
         addField(componentField.spec)
         addMethod(scopeConstructor.spec)
+        scopeConstructor.altSpec?.let { addMethod(it) }
         exposerMethodImpls.forEach { addMethod(it.spec) }
         childMethodImpls.forEach { addMethod(it.spec) }
         addType(daggerScope.spec)

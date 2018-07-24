@@ -10,6 +10,7 @@ import javax.lang.model.element.Modifier
 
 interface ParentInterfaceSpec {
 
+    val isEmpty: Boolean
     val className: ClassName
     val spec: TypeSpec?
 
@@ -23,6 +24,7 @@ interface ParentInterfaceSpec {
 
         private fun createGenerated(resolvedScope: ResolvedScope): ParentInterfaceSpec {
             return object: ParentInterfaceSpec {
+                override val isEmpty: Boolean = resolvedScope.parent.methods.isEmpty()
                 private val methodSpecs: List<MethodSpec> = resolvedScope.parent.methods.map { method ->
                     MethodSpec.methodBuilder(method.name).apply {
                         returns(method.dependency.className)
@@ -41,6 +43,7 @@ interface ParentInterfaceSpec {
 
         private fun createExplicit(parentInterface: ParentInterface): ParentInterfaceSpec {
             return object: ParentInterfaceSpec {
+                override val isEmpty: Boolean = parentInterface.methods.isEmpty()
                 override val className: ClassName = parentInterface.type.className
                 override val spec: TypeSpec? = null
             }
