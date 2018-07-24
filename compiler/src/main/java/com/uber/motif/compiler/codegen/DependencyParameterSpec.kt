@@ -12,10 +12,8 @@ class DependencyParameterSpec(
         name: String) {
 
     val spec: ParameterSpec = ParameterSpec.builder(dependency.className, name).apply {
-        if (dependency in resolvedScope.scope.providedPrivateDependencies) {
-            addAnnotation(internalQualifier.className)
-        }
-        dependency.qualifierSpec?.let { addAnnotation(it) }
+        val isInternal = dependency in resolvedScope.scope.providedPrivateDependencies
+        internalQualifier.annotationSpec(dependency, isInternal)?.let { addAnnotation(it) }
     }.build()
 
     companion object {

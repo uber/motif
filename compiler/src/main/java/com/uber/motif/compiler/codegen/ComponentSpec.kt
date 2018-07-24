@@ -18,9 +18,8 @@ class ComponentSpec(
     val daggerClassName: ClassName = daggerComponentName(className)
 
     val provisionMethods = ProvisionMethodsSpec(resolvedScope.scope.exposedDependencies) { dependency ->
-        if (dependency in resolvedScope.scope.providedPrivateDependencies) {
-            addAnnotation(internalQualifier.className)
-        }
+        val isInternal = dependency in resolvedScope.scope.providedPrivateDependencies
+        internalQualifier.annotationSpec(dependency, isInternal)?.let { addAnnotation(it) }
     }
     val spec: TypeSpec = TypeSpec.interfaceBuilder(className).apply {
         addAnnotation(daggerScope.className)

@@ -21,7 +21,6 @@ class BridgeParentImplMethodSpec(
 
     val spec: MethodSpec = MethodSpec.methodBuilder(parentMethod.name).apply {
         addAnnotation(Override::class.java)
-        dependency.qualifierSpec?.let { addAnnotation(it) }
         addModifiers(Modifier.PUBLIC)
         returns(dependency.className)
         addStatement(returnStatement)

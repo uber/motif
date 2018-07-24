@@ -11,7 +11,6 @@ class ProvisionMethodsSpec(dependencies: Iterable<Dependency>, edit: MethodSpec.
     private val specMap: Map<Dependency, MethodSpec> = dependencies.associateBy({ it }) { dependency ->
         MethodSpec.methodBuilder(names.unique(dependency.preferredName)).apply {
             returns(dependency.className)
-            dependency.qualifierSpec?.let { addAnnotation(it) }
             addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
             edit(dependency)
         }.build()

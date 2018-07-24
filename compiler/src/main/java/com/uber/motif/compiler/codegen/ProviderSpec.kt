@@ -24,12 +24,10 @@ abstract class ProviderSpec(
     val spec: MethodSpec by lazy {
         val parameterSpecs: List<ParameterSpec> = parameters.map { it.spec }
         MethodSpec.methodBuilder(name).apply {
-            if (!providerMethod.method.isPublic) {
-                addAnnotation(internalQualifier.className)
-            }
+            val isInternal = !providerMethod.method.isPublic
+            internalQualifier.annotationSpec(providerMethod.providedDependency, isInternal)?.let { addAnnotation(it) }
             addAnnotation(Provides::class.java)
             addAnnotation(daggerScope.className)
-            providerMethod.providedDependency.qualifierSpec?.let { addAnnotation(it) }
             addParameters(parameterSpecs)
             returns(dependencyName)
             val callParams: String = parameters.joinToString(", ") { "\$N" }
