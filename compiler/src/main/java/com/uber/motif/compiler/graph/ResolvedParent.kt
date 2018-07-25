@@ -26,7 +26,9 @@ class ResolvedParent(
             val methodNames = UniqueNameSet()
             val methods: List<ParentInterfaceMethod> = externalDependencies.map { dependency ->
                 val transitive = dependency in transitiveDependencies
-                ParentInterfaceMethod(methodNames.unique(dependency.preferredName), transitive, dependency)
+                // Use qualified name to avoid collisions when implementing multiple Parent interfaces.
+                val preferredName = dependency.className.qualifiedName().replace(".", "_")
+                ParentInterfaceMethod(methodNames.unique(preferredName), transitive, dependency)
             }
             val className = ClassNames.generatedParentInterface(scopeType)
             return ResolvedParent(className, methods)
