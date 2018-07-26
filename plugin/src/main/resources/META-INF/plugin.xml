@@ -1,5 +1,5 @@
 <idea-plugin>
-    com.uber.motif</id>
+    <id>com.uber.motif</id>
     <name>Motif Plugin</name>
     <version>0.0.1</version>
     <vendor email="leland@uber.com" url="https://www.uber.com/">Uber</vendor>
