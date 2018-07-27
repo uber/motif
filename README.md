@@ -9,7 +9,9 @@ A Motif Scope is analogous to a Dagger `@Component`.
 </details>
 
 ```java
-@motif.Scope
+import com.uber.motif.Scope;
+
+@Scope
 interface MainScope {}
 ```
 
@@ -20,7 +22,7 @@ The nested `Objects` class is just like a Dagger `@Module` except Motif only all
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     class Objects {}
@@ -34,7 +36,7 @@ To tell Motif how to create a `Controller` class, declare a factory method insid
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     class Objects {
@@ -53,7 +55,7 @@ Similar to Dagger `@Modules`, you can accept any type provided by a factory meth
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     class Objects {
@@ -72,7 +74,7 @@ interface MainScope {
 Maybe your `Controller` needs a `Database` too. Declare it like you declared the `View` and pass it in as a second parameter to the `Controller` factory method:
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     class Objects {
@@ -109,7 +111,7 @@ The `MainScope.controller()` method below is analogous to a Dagger `@Component` 
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     Controller controller();
@@ -143,14 +145,14 @@ Controller controller = mainScope.controller();
 Most applications will benefit from organizing their dependencies into multiple Scopes. Let's define a new Scope called `ChildScope`:
 
 ```java
-@motif.Scope
+@Scope
 interface ChildScope {}
 ```
 
 Similarly to `MainScope`, your new `ChildScope` defines objects it can create on its nested `Objects` class and exposes a top-level `ChildScope.controller()` method to instantiate a `ChildController`:
 
 ```java
-@motif.Scope
+@Scope
 interface ChildScope {
 
     ChildController controller();
@@ -178,14 +180,14 @@ And just like `MainScope` if you compile this code, Motif will generate a `Child
 ChildScope childScope = new ChildScopeImpl();
 ```
 
-But instead of instantiating `ChildScopeImpl` directly, let's define an API that allows `MainScope` to create an instance of `ChildScope`. To do this, add a method to the `MainScope` interface with return type `ChildScope`. Motif understands that this is a child method because it returns a type that is annotated with `@motif.Scope`:
+But instead of instantiating `ChildScopeImpl` directly, let's define an API that allows `MainScope` to create an instance of `ChildScope`. To do this, add a method to the `MainScope` interface with return type `ChildScope`:
 <details>
 <summary>Notes for Dagger users...</summary>
 This is similar to a Dagger `@Subcomponent` [factory method](https://google.github.io/dagger/api/2.14/dagger/Component.html#subcomponents) on a parent `@Component`.
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     ChildScope child();
@@ -193,7 +195,7 @@ interface MainScope {
     // ...
 }
 ```
-In the following, we create an instance of `ChildScope`. Behind the scenes, `MainScopeImpl` instantiates an instance of `ChildScopeImpl` - just as we would manually - and returns it via `mainScope.child()`:
+In the following, we receive an instance of `ChildScope`. Behind the scenes, `MainScopeImpl` instantiates an instance of `ChildScopeImpl` - just as we would manually - and returns it via `mainScope.child()`. Motif knows to do this because it sees that the `ChildScope` class is annotated with `@Scope`:
 
 ```java
 MainScope mainScope = new MainScopeImpl();
@@ -224,7 +226,7 @@ assert(mainController.database == childController.database) // Fails!
 To solve this, we can allow `ChildScope` to share `MainScope`'s `Database` instance instead of creating its own. This is possible because we've defined `ChildScope` as a child of `MainScope`. Remove the `Database` factory method in `ChildScope` to achieve this behavior:
 
 ```java
-@motif.Scope
+@Scope
 interface ChildScope {
 
     ChildController controller();
@@ -251,7 +253,7 @@ Motif considers depedencies private to the declaring Scope unless explicitly mar
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     ChildScope child();
@@ -297,7 +299,7 @@ This feature is similar to Dagger's `@Inject` constructor injection, but it does
 </details>
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     Controller controller();
@@ -320,7 +322,7 @@ interface MainScope {
 The code above is equivalent to the previous version. Motif simply looks at the `Controller`'s constructor to determine its dependencies and how to instantiate it. You can do the same for `View` and `Database`:
 
 ```java
-@motif.Scope
+@Scope
 interface MainScope {
 
     Controller controller();
