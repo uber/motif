@@ -140,7 +140,7 @@ Controller controller = mainScope.controller();
 
 ## Child Scopes
 
-It will make sense to break down most applications into multiple Motif Scopes. Let's first define a new Scope called `ChildScope`:
+Most applications will benefit from organizing their dependencies into multiple Scopes. Let's define a new Scope called `ChildScope`:
 
 ```java
 @motif.Scope
@@ -172,10 +172,16 @@ interface ChildScope {
 }
 ```
 
-There's an issue here though. It makes more sense to reuse the `Database` instance created at `MainScope` if `Database` instantiation is an expensive operation, for instance. In order to gain access to the objects declared at `MainScope`, declare `ChildScope` as a child of `MainScope`:
+And just like `MainScope` if you compile this code, Motif will generate a `ChildScopeImpl` class that implements the `ChildScope` interface, so it's possible to instantiate a `ChildScope` like this:
+
+```java
+ChildScope childScope = new ChildScopeImpl();
+```
+
+But instead of instantiating `ChildScopeImpl` directly, let's define an API that allows `MainScope` to create an instance of `ChildScope`. To do this, add a method to the `MainScope` interface with return type `ChildScope`. Motif understands that this is a child method because it returns a type that is annotated with `@motif.Scope`:
 <details>
 <summary>Notes for Dagger users...</summary>
-This is similar to a Dagger `@Subcomponent` factory method on a parent `@Component`.
+This is similar to a Dagger `@Subcomponent` [factory method](https://google.github.io/dagger/api/2.14/dagger/Component.html#subcomponents) on a parent `@Component`.
 </details>
 
 ```java
@@ -187,8 +193,35 @@ interface MainScope {
     // ...
 }
 ```
+In the following, we create an instance of `ChildScope`. Behind the scenes, `MainScopeImpl` instantiates an instance of `ChildScopeImpl` - just as we would manually - and returns it via `mainScope.child()`:
 
-We can now remove the redeclaration of the `Database` factory method in `ChildScope`:
+```java
+MainScope mainScope = new MainScopeImpl();
+ChildScope childScope = mainScope.child();
+```
+To get an instance of a `MainController` and a `ChildController` you can write this:
+
+```java
+MainScope mainScope = new MainScopeImpl();
+MainController mainController = mainScope.controller();
+
+ChildScope childScope = mainScope.child();
+ChildController childController = childScope.controller();
+```
+
+There's an issue here though. `MainScope` and `ChildScope` both define their own factory method for `Database` which means that the `MainController` and `ChildController` instances above each hold on to separate instances of `Database`. This is problematic if `Database` is meant to be a singleton or if instantiating a `Database` object is expensive, for example.
+
+```java
+MainScope mainScope = new MainScopeImpl();
+MainController mainController = mainScope.controller();
+
+ChildScope childScope = mainScope.child();
+ChildController childController = childScope.controller();
+
+assert(mainController.database == childController.database) // Fails!
+```
+
+To solve this, we can allow `ChildScope` to share `MainScope`'s `Database` instance instead of creating its own. This is possible because we've defined `ChildScope` as a child of `MainScope`. Remove the `Database` factory method in `ChildScope` to achieve this behavior:
 
 ```java
 @motif.Scope
@@ -201,6 +234,8 @@ interface ChildScope {
         ChildView view() {
             return new ChildView();
         }
+        
+        // Database factory method removed
 
         ChildController controller(ChildView view, Database database) {
             return new ChildController(view, database);
@@ -209,7 +244,7 @@ interface ChildScope {
 }
 ```
 
-The last step is to mark `MainScope`'s `Database` factory as public to indicate to Motif that it should be visible to child Scopes:
+To allow `ChildScope` access to `MainScope`'s `Database` instance we also need to mark `MainScope`'s `Database` factory as public to indicate to Motif that the dependency should be visible to descendant Scopes:
 <details>
 <summary>Notes for Dagger users...</summary>
 Motif considers depedencies private to the declaring Scope unless explicitly marked as `public`. This is different from Dagger's `@Subcomponents` which don't provide any built-in access control and expose all parent dependencies to descendant scopes by default.
@@ -236,14 +271,16 @@ interface MainScope {
 }
 ```
 
-Now you can write the following and both `MainController` and `ChildController` will be holding on to the same `Database` instance:
+Now, in the following code, `MainController` and `ChildController` share the same instance of `Database`:
 
-```
+```java
 MainScope mainScope = new MainScopeImpl();
 MainController mainController = mainScope.controller();
 
 ChildScope childScope = mainScope.child();
 ChildController childController = childScope.controller();
+
+assert(mainController.database == childController.database) // Passes!
 ```
 
 
