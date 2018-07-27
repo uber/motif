@@ -32,7 +32,7 @@ interface MainScope {
 To tell Motif how to create a `Controller` class, declare a factory method inside the `Objects` class:
 <details>
 <summary>Notes for Dagger users...</summary>
-`Objects` factory methods are roughly the same as Dagger `@Provides` methods.
+`Objects` factory methods are roughly the same as Dagger `@Provides` methods. No need to annotate the method - Motif uses all methods on the `Objects` class.
 </details>
 
 ```java
