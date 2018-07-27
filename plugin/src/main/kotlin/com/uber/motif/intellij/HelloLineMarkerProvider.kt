@@ -3,10 +3,10 @@ package com.uber.motif.intellij
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
-import com.intellij.icons.AllIcons
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
+import com.uber.motif.intellij.icons.Icons
 
 class HelloLineMarkerProvider : LineMarkerProvider {
 
@@ -18,7 +18,7 @@ class HelloLineMarkerProvider : LineMarkerProvider {
 
         val scopeClasses = component.graphProcessor.scopeClasses()
         return if (parent in scopeClasses) {
-            NavigationGutterIconBuilder.create(AllIcons.Mac.Tree_white_down_arrow)
+            NavigationGutterIconBuilder.create(Icons.CHILD_SCOPE)
                     .setTarget(element)
                     .createLineMarkerInfo(element)
         } else {
