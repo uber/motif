@@ -1,10 +1,7 @@
 package com.uber.motif.intellij.graph
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiType
+import com.intellij.psi.*
 import com.uber.motif.intellij.index.ScopeIndex
 import com.uber.motif.intellij.psi.getScopeClasses
 
@@ -19,27 +16,21 @@ class GraphProcessor(private val project: Project) {
      */
     fun scopeClassesMap(): Map<PsiClass, List<PsiClass>> {
 
-        val returnMap : MutableMap<PsiClass, MutableList<PsiClass>> = mutableMapOf()
-
-        val scopedClasses: List<PsiClass> = scopeClasses()
-
         // get a mapping of scopeClass -> scopesDeclared
-
-        scopedClasses
-                .map {
-                    for (classMethod in it.methods) {
-                        val psiClass : PsiClass = getClass(classMethod.returnType as PsiType)
-                        if (psiClass in scopedClasses) {
-                            if (psiClass in returnMap.keys) {
-                                returnMap[psiClass]?.add(it)
-                            } else {
-                                returnMap[psiClass] =  mutableListOf(it)
-                            }
-                        }
-                    }
+        val scopeClasses = scopeClasses()
+        return scopeClasses
+                .flatMap { scopeClass ->
+                    scopeClass.methods
+                            .filter { it.returnType != null }
+                            .map { ScopeMethod(scopeClass, getClass(it.returnType!!)) }
                 }
-        return returnMap
+                .filter { it.childReturnType in scopeClasses }
+                .groupBy({ it.childReturnType }) {
+                    it.scopeClass
+                }
     }
+
+    private data class ScopeMethod(val scopeClass: PsiClass, val childReturnType: PsiClass)
 
     /**
      * Return a list of PsiClasses that are Motif Scopes.
@@ -55,6 +46,6 @@ class GraphProcessor(private val project: Project) {
      */
     private fun getClass(psiType: PsiType): PsiClass {
         val psiClassType = psiType as PsiClassType
-        return psiClassType.resolve() as PsiClass
+        return psiClassType.resolve()!!
     }
 }
