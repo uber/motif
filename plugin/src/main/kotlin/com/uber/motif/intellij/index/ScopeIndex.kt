@@ -1,7 +1,6 @@
 package com.uber.motif.intellij.index
 
 import com.intellij.ide.highlighter.JavaFileType
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.source.JavaFileElementType
@@ -9,7 +8,7 @@ import com.intellij.psi.search.ProjectScopeBuilder
 import com.intellij.util.indexing.*
 import com.intellij.util.io.BooleanDataDescriptor
 import com.uber.motif.intellij.psi.isMaybeScopeFile
-import java.util.*
+import java.util.Random
 
 /**
  * Invoked during IntelliJ's indexing phase. The DataIndexer marks which files contain a Motif Scope. Once indexed,

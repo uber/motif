@@ -1,30 +1,32 @@
 package com.uber.motif.intellij
 
-import com.intellij.codeInsight.daemon.LineMarkerInfo
-import com.intellij.codeInsight.daemon.LineMarkerProvider
+import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo
+import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.uber.motif.intellij.icons.Icons
 
-class HelloLineMarkerProvider : LineMarkerProvider {
 
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        if (element !is PsiIdentifier) return null
 
-        val parent: PsiClass = element.parent as? PsiClass ?: return null
+class HelloLineMarkerProvider : RelatedItemLineMarkerProvider() {
+
+    override fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in RelatedItemLineMarkerInfo<PsiElement>>) {
+        if (element !is PsiIdentifier) return
+
+        val scopeClass = element.parent as? PsiClass ?: return
         val component = MotifComponent.get(element.project)
+        val scopeClassesMap = component.graphProcessor.scopeClassesMap()
 
-        val scopeClasses = component.graphProcessor.scopeClasses()
-        return if (parent in scopeClasses) {
-            NavigationGutterIconBuilder.create(Icons.CHILD_SCOPE)
-                    .setTarget(element)
-                    .createLineMarkerInfo(element)
-        } else {
-            null
-        }
+        scopeClassesMap.entries
+                .find { it.key == scopeClass }
+                ?.let { (_, parentScopeClasses) ->
+                    val builder: NavigationGutterIconBuilder<PsiElement> =
+                            NavigationGutterIconBuilder
+                                    .create(Icons.PARENT_SCOPES)
+                                    .setTargets(parentScopeClasses)
+                    result.add(builder.createLineMarkerInfo(element))
+                }
     }
-
-    override fun collectSlowLineMarkers(elements: MutableList<PsiElement>, result: MutableCollection<LineMarkerInfo<PsiElement>>) {}
 }

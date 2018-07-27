@@ -29,7 +29,7 @@ class PluginTest : UsefulTestCase() {
                 "src/com/uber/motif/Scope.java")[0]
         val testDocument: Document = psiDocumentManager.getDocument(testPsiFile)!!
 
-        println(component.graphProcessor.scopeClasses())
+        println(component.graphProcessor.scopeClassesMap())
 
         fixture.doHighlighting()
 
