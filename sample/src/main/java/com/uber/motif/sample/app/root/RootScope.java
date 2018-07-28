@@ -8,7 +8,6 @@ import com.uber.motif.sample.app.bottom_sheet.BottomSheetScope;
 import com.uber.motif.sample.app.photo_grid.PhotoGridScope;
 import com.uber.motif.sample.lib.controller.ControllerObjects;
 import com.uber.motif.sample.lib.db.Database;
-import com.uber.motif.sample.lib.db.RootDir;
 import com.uber.motif.sample.lib.multiselect.MultiSelector;
 
 @Scope
@@ -23,7 +22,6 @@ public interface RootScope {
     abstract class Objects extends ControllerObjects<RootController, RootView> {
 
         public abstract Database database();
-        public abstract RootDir rootDir();
         public abstract MultiSelector multiSelector();
     }
 
