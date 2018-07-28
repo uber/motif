@@ -11,7 +11,7 @@ import com.uber.motif.intellij.icons.Icons
 
 
 
-class HelloLineMarkerProvider : RelatedItemLineMarkerProvider() {
+class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
 
     override fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in RelatedItemLineMarkerInfo<PsiElement>>) {
 

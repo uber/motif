@@ -31,7 +31,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileBasedIndex implementation="com.uber.motif.intellij.index.ScopeIndex"/>
         <projectService serviceImplementation="com.uber.motif.intellij.MotifComponent"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.uber.motif.intellij.HelloLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.uber.motif.intellij.MotifScopeLineMarkerProvider"/>
     </extensions>
 
     <actions>
