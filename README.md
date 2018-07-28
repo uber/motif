@@ -3,6 +3,7 @@
 ## The Basics
 
 This is a Motif Scope. It serves as a container for objects that can be created by this Scope:
+
 <details>
 <summary>Notes for Dagger users...</summary>
 A Motif Scope is analogous to a Dagger `@Component`.
@@ -16,6 +17,7 @@ interface MainScope {}
 ```
 
 A specially named `Objects` class holds factory methods, which tell Motif how to create objects.
+
 <details>
 <summary>Notes for Dagger users...</summary>
 The nested `Objects` class is just like a Dagger `@Module` except Motif only allows you to define one `Objects` class per Scope. Factory methods are analogous to `@Provides` methods.
@@ -97,6 +99,7 @@ Controller controller = mainScope.controller();
 ## Child Scopes
 
 Motif allows you to define a Scope as a child of another Scope by declaring a child method on the parent Scope interface:
+
 <details>
 <summary>Notes for Dagger users...</summary>
 This is similar to a Dagger `@Subcomponent` [factory method](https://google.github.io/dagger/api/2.14/dagger/Component.html#subcomponents) on a parent `@Component`.
@@ -113,6 +116,11 @@ interface MainScope {
 ```
 
 Child Scopes can use objects declared on parent's `Objects` classes as long as they are marked public:
+
+<details>
+<summary>Notes for Dagger users...</summary>
+Unlike Dagger `@Subcomponents` which expose all objects down the graph by default, Motif Scopes consider objects internal to the Scope unless explicitly marked as public.
+</details>
 
 ```java
 @Scope
@@ -152,7 +160,7 @@ interface ChildScope {
 }
 ```
 
-You can create an instance of a Child scope by calling the parent's child method:
+You can create an instance of a child Scope by calling the parent's child method:
 
 ```java
 MainScope mainScope = new MainScopeImpl();
@@ -164,6 +172,7 @@ ChildScope childScope = mainScope.child();
 ## Convenience APIs
 
 Factory methods that pass parameters through to a constructor without modification can be converted to parameterless abstract methods:
+
 <details>
 <summary>Notes for Dagger users...</summary>
 This feature is similar to Dagger's `@Inject` constructor injection, but it doesn't require annotating the class' constructor, and it scopes the object to the enclosing Motif Scope.
