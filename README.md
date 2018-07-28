@@ -87,7 +87,7 @@ interface MainScope {
 }
 ```
 
-Finally, Motif generates an implementation class for each scope, allowing access to the Scope's objects:
+At build time, Motif generates an implementation class for each scope:
 
 ```java
 MainScope mainScope = new MainScopeImpl();
