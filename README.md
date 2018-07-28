@@ -96,7 +96,7 @@ Controller controller = mainScope.controller();
 
 ## Child Scopes
 
-Motif allows you to define a Scope as a child of another Scope:
+Motif allows you to define a Scope as a child of another Scope by declaring a child method on the parent Scope interface:
 <details>
 <summary>Notes for Dagger users...</summary>
 This is similar to a Dagger `@Subcomponent` [factory method](https://google.github.io/dagger/api/2.14/dagger/Component.html#subcomponents) on a parent `@Component`.
@@ -152,16 +152,11 @@ interface ChildScope {
 }
 ```
 
-With the above Scope definitions, the following passes:
+You can create an instance of a Child scope by calling the parent's child method:
 
 ```java
 MainScope mainScope = new MainScopeImpl();
-MainController mainController = mainScope.controller();
-
 ChildScope childScope = mainScope.child();
-ChildController childController = childScope.controller();
-
-assert(mainController.database == childController.database)
 ```
 
 ## Missing Dependencies
