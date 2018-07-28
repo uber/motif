@@ -159,7 +159,7 @@ MainScope mainScope = new MainScopeImpl();
 ChildScope childScope = mainScope.child();
 ```
 
-## Missing Dependencies
+## Scope Dependencies
 
 ## Convenience APIs
 
