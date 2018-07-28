@@ -38,13 +38,13 @@ class GraphProcessor(private val project: Project) {
     private fun scopeClasses(): List<PsiClass> {
         return index.getSnapshot(project).files
                 .mapNotNull { psiManager.findFile(it) }
-                .flatMap { it.getScopeClasses() }
+                .flatMap(PsiFile::getScopeClasses)
     }
 
     /**
      * Get a PsiClass from a PsiType
      */
-    private fun getClass(psiType: PsiType): PsiClass {
+    fun getClass(psiType: PsiType): PsiClass {
         val psiClassType = psiType as PsiClassType
         return psiClassType.resolve()!!
     }
