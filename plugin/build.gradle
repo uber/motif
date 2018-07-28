@@ -4,7 +4,7 @@ plugins {
 }
 
 intellij {
-    version 'IC-2018.1'
+    version 'IC-2018.2'
     plugins = []
     pluginName 'MyPlugin'
 }
