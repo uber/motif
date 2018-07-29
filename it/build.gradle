@@ -9,6 +9,7 @@ sourceCompatibility = 1.8
 dependencies {
     annotationProcessor project(':it-compiler')
     compile project(':lib')
+    compile 'com.google.truth:truth:0.42'
 
     testAnnotationProcessor project(':compiler')
     testCompile deps.misc.dagger
