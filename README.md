@@ -6,6 +6,7 @@ This is a Motif Scope. It serves as a container for objects that can be created 
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 A Motif Scope is analogous to a Dagger `@Component`.
 </details>
 
@@ -20,6 +21,7 @@ A specially named `Objects` class holds factory methods, which tell Motif how to
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 The nested `Objects` class is just like a Dagger `@Module` except Motif only allows you to define one `Objects` class per Scope. Factory methods are analogous to `@Provides` methods.
 </details>
 
@@ -63,6 +65,7 @@ To retrieve objects from your Scope, define an access method on your Scope inter
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 Access methods are analogous to a Dagger `@Component` [provision methods](https://google.github.io/dagger/api/2.14/dagger/Component.html#provision-methods).
 </details>
 
@@ -102,6 +105,7 @@ Motif allows you to define a Scope as a child of another Scope by declaring a ch
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 This is similar to a Dagger `@Subcomponent` [factory method](https://google.github.io/dagger/api/2.14/dagger/Component.html#subcomponents) on a parent `@Component`.
 </details>
 
@@ -119,6 +123,7 @@ Child Scopes can use objects declared on parent's `Objects` classes as long as t
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 Unlike Dagger `@Subcomponents` which expose all objects down the graph by default, Motif Scopes consider objects internal to the Scope unless explicitly marked as public.
 </details>
 
@@ -175,6 +180,7 @@ Factory methods that pass parameters through to a constructor without modificati
 
 <details>
 <summary>Notes for Dagger users...</summary>
+
 This feature is similar to Dagger's `@Inject` constructor injection, but it doesn't require annotating the class' constructor, and it scopes the object to the enclosing Motif Scope.
 </details>
 
