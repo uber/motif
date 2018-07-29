@@ -1,6 +1,7 @@
 package com.uber.motif.compiler.graph
 
 import com.uber.motif.compiler.TypeId
+import com.uber.motif.compiler.error
 import com.uber.motif.compiler.id
 import com.uber.motif.compiler.model.Dependency
 import com.uber.motif.compiler.model.ParentInterfaceMethod
@@ -66,7 +67,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
             val scope = scopes[scopeType.id]
             // Child scope isn't being processed by the annotation processor and its implementation hasn't been
             // generated yet. This can happen if a child Gradle module didn't run this annotation processor.
-                    ?: throw RuntimeException("Scope implementation not found for $scopeType. This can happen if a child " +
+                    ?: env.error("Scope implementation not found for $scopeType. This can happen if a child " +
                             "Gradle module didn't the Motif annotation processor.")
 
             val newVisited = visited + scopeType.id
@@ -98,7 +99,7 @@ private class GraphResolver(private val env: ProcessingEnvironment, scopeTypes: 
 
                 val missingDependencies = externalDependencies - expectedDependenciesProvidedByParent
                 if (missingDependencies.isNotEmpty()) {
-                    throw RuntimeException("Scope $scopeType is missing dependencies: $missingDependencies")
+                    env.error("Scope $scopeType is missing dependencies: $missingDependencies")
                 }
                 // Make sure to use the explicitly declared external dependencies instead of calculated ones.
                 return@computeIfAbsent ResolvedParent.fromExplicit(explicitParentInterface)

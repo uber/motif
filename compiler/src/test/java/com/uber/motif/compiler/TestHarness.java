@@ -46,17 +46,13 @@ public class TestHarness {
     }
 
     private final File testCaseDir;
-    private final String testName;
     private final File errorFile;
-    private final File outputFile;
     private final String testClassName;
 
     @SuppressWarnings("unused")
     public TestHarness(File testCaseDir, String testName) {
         this.testCaseDir = testCaseDir;
-        this.testName = testName;
         this.errorFile = new File(testCaseDir, "ERROR.txt");
-        this.outputFile = new File(testCaseDir, "OUTPUT.txt");
         this.testClassName = "testcases." + testName + ".Test";
     }
 

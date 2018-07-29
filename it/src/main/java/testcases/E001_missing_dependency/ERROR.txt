@@ -1,0 +1,1 @@
+Scope testcases.E001_missing_dependency.Scope is missing dependencies: [Dependency(type=java.lang.String, qualifier=null, metaDesc=REQUIRED_BY(testcases.E001_missing_dependency.Scope.string()))]

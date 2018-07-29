@@ -24,7 +24,11 @@ class AnnotationProcessor : AbstractProcessor() {
         val scopes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
                 .map { it as TypeElement }
                 .map { it.asType() as DeclaredType }
-        val graph = ResolvedGraph.resolve(processingEnv, scopes)
+        val graph = try {
+            ResolvedGraph.resolve(processingEnv, scopes)
+        } catch (e: AbortCompilation) {
+            return true
+        }
         graph.resolvedScopes.forEach {
             val scopeImpl = ScopeImplSpec(it)
             JavaFile.builder(it.packageName, scopeImpl.spec).build().writeTo(processingEnv.filer)

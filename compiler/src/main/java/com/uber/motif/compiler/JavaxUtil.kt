@@ -11,6 +11,7 @@ import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
+import javax.tools.Diagnostic
 import kotlin.reflect.KClass
 
 typealias TypeId = Equivalence.Wrapper<TypeMirror>
@@ -82,3 +83,10 @@ val Element.isPublic: Boolean
 fun Element.hasAnnotation(annotationClass: KClass<out Annotation>): Boolean {
     return getAnnotation(annotationClass.java) != null
 }
+
+fun ProcessingEnvironment.error(message: String): Nothing {
+    messager.printMessage(Diagnostic.Kind.ERROR, message)
+    throw AbortCompilation()
+}
+
+class AbortCompilation : RuntimeException()
