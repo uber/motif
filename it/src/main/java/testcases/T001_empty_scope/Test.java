@@ -2,7 +2,7 @@ package testcases.T001_empty_scope;
 
 public class Test {
 
-    void run() {
+    public static void run() {
         Scope scope = new ScopeImpl();
     }
 }
