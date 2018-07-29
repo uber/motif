@@ -1,7 +1,6 @@
 package com.uber.motif.compiler;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -14,9 +13,8 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 @RunWith(Parameterized.class)
 public class TestHarness {
@@ -34,11 +31,18 @@ public class TestHarness {
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data() {
         File testCaseRoot = new File("../it/src/main/java/testcases");
-        File[] testCaseDirs = testCaseRoot.listFiles((dir, name) -> dir.isDirectory() && name.startsWith("T"));
+        File[] testCaseDirs = testCaseRoot.listFiles(TestHarness::isTestDir);
         if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + testCaseRoot);
         return Arrays.stream(testCaseDirs)
                 .map(file -> new Object[]{file.getAbsoluteFile(), file.getName()})
                 .collect(Collectors.toList());
+    }
+
+    private static boolean isTestDir(File file) {
+        String filename = file.getName();
+        return file.isDirectory()
+                && file.listFiles().length > 0
+                && (filename.startsWith("T") || filename.startsWith("E"));
     }
 
     private final File testCaseDir;
@@ -58,8 +62,6 @@ public class TestHarness {
 
     @Test
     public void test() throws Throwable {
-        Truth.assertThat(outputFile.exists());
-
         JavaFileObject[] files = Files.walk(testCaseDir.toPath())
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
