@@ -7,6 +7,9 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 
 dependencies {
+    annotationProcessor project(':it-compiler')
+    compile project(':lib')
+
     testAnnotationProcessor project(':compiler')
     testCompile deps.misc.dagger
     testCompile project(':lib')

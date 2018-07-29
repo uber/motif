@@ -1,0 +1,16 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.auto:auto-common:0.10'
+    compile deps.kotlin.stdlib
+    compile 'com.squareup:javapoet:1.11.1'
+    compile project(':compiler')
+}
