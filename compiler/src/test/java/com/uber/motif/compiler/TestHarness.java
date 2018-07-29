@@ -87,15 +87,13 @@ public class TestHarness {
             Truth.assertThat(error.getMessage(Locale.getDefault())).isEqualTo(expectedErrorString);
         } else {
             assertThat(compilation).succeeded();
-        }
-
-
-        ClassLoader classLoader = new CompilationClassLoader(compilation);
-        Class<?> testClass = classLoader.loadClass(testClassName);
-        try {
-            testClass.getMethod("run").invoke(null);
-        } catch (InvocationTargetException e) {
-            throw e.getCause();
+            ClassLoader classLoader = new CompilationClassLoader(compilation);
+            Class<?> testClass = classLoader.loadClass(testClassName);
+            try {
+                testClass.getMethod("run").invoke(null);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
         }
     }
 
