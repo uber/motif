@@ -46,7 +46,7 @@ class Processor : AbstractProcessor() {
 
         scopeElement.methods(processingEnv)
                 .forEach { method: ExecutableElement ->
-                    val methodSpec: MethodSpec = MethodSpec.overriding(method)
+                    val methodSpec: MethodSpec = MethodSpec.overriding(method, scopeElement, processingEnv.typeUtils)
                             .addStatement("throw new \$T()", IllegalStateException::class.java)
                             .build()
                     builder.addMethod(methodSpec)

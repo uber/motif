@@ -17,7 +17,7 @@ public interface Scope {
         }
 
         @Named("a")
-        String integer() {
+        String a() {
             return "a";
         }
     }

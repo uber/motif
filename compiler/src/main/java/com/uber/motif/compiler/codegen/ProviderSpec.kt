@@ -27,7 +27,9 @@ abstract class ProviderSpec(
             val isInternal = !providerMethod.method.isPublic
             internalQualifier.annotationSpec(providerMethod.providedDependency, isInternal)?.let { addAnnotation(it) }
             addAnnotation(Provides::class.java)
-            addAnnotation(daggerScope.className)
+            if (providerMethod.cache) {
+                addAnnotation(daggerScope.className)
+            }
             addParameters(parameterSpecs)
             returns(dependencyName)
             val callParams: String = parameters.joinToString(", ") { "\$N" }

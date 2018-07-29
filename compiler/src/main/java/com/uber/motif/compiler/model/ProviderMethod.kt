@@ -1,5 +1,6 @@
 package com.uber.motif.compiler.model
 
+import com.uber.motif.DoNotCache
 import com.uber.motif.Spread
 import com.uber.motif.compiler.*
 import javax.annotation.processing.ProcessingEnvironment
@@ -15,6 +16,7 @@ class ProviderMethod(
     val providedDependency: Dependency,
     val spreadDependencies: Map<Dependency, ExecutableElement>,
     val requiredDependencies: List<Dependency>,
+    val cache: Boolean,
     val type: ProviderMethodType) : Method {
 
     val providedDependencies: List<Dependency> = spreadDependencies.keys.toList() + providedDependency
@@ -40,6 +42,7 @@ class ProviderMethod(
                     dependencies.providedDependency,
                     dependencies.spreadDependencies,
                     dependencies.requiredDependencies,
+                    !method.hasAnnotation(DoNotCache::class),
                     type)
         }
 
