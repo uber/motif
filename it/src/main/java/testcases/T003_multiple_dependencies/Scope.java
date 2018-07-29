@@ -8,7 +8,7 @@ public interface Scope {
     class Objects {
 
         String string(Integer i) {
-            return "s:" + i;
+            return "s" + i;
         }
 
         Integer integer() {
