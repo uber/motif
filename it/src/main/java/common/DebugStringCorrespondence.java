@@ -14,6 +14,13 @@ public class DebugStringCorrespondence extends Correspondence<Dependency, String
         return actual.getDebugString().equals(expected);
     }
 
+    @NullableDecl
+    @Override
+    public String formatDiff(@NullableDecl Dependency actual, @NullableDecl String expected) {
+        String actualString = actual == null ? "null" : actual.getDebugString();
+        return actualString + " != " + expected;
+    }
+
     @Override
     public String toString() {
         return "has debug string";

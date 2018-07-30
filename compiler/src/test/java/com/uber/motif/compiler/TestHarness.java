@@ -1,6 +1,5 @@
 package com.uber.motif.compiler;
 
-import com.google.common.collect.Streams;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
@@ -18,7 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
@@ -60,7 +61,8 @@ public class TestHarness {
 
     @Test
     public void test() throws Throwable {
-        JavaFileObject[] files = Streams.concat(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
+        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
+                .flatMap(Function.identity())
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
                 .map(file -> {
