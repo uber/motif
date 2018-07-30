@@ -6,6 +6,7 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import com.uber.motif.compiler.graph.ResolvedScope
 import com.uber.motif.compiler.model.Dependency
+import com.uber.motif.compiler.serialize
 import java.lang.annotation.RetentionPolicy
 import java.util.*
 import javax.inject.Qualifier
@@ -33,19 +34,13 @@ class InternalQualifierSpec(resolvedScope: ResolvedScope) {
         return if (isInternal) {
             AnnotationSpec.builder(className).apply {
                 dependency.qualifier?.let {
-                    addMember("value", "\"${serializeAnnotation(it)}\"")
+                    // Since Dagger doesn't allow multiple qualifiers, merge internal qualifier and user defined
+                    // qualifier by serializing the user defined annotation into @Internal's value,
+                    addMember("value", "\"${it.serialize()}\"")
                 }
             }.build()
         } else {
             dependency.qualifier?.let { AnnotationSpec.get(it) }
         }
-    }
-
-    /**
-     * Since Dagger doesn't allow multiple qualifiers, merge internal qualifier and user defined qualifier by
-     * serializing the user defined annotation into @Internal's value,
-     */
-    private fun serializeAnnotation(mirror: AnnotationMirror): String {
-        return Base64.getEncoder().encodeToString(mirror.toString().toByteArray())
     }
 }

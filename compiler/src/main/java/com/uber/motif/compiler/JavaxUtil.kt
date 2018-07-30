@@ -4,6 +4,8 @@ import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
+import org.apache.commons.codec.binary.Base32
+import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
 import javax.lang.model.type.DeclaredType
@@ -90,3 +92,9 @@ fun ProcessingEnvironment.error(message: String): Nothing {
 }
 
 class AbortCompilation : RuntimeException()
+
+private val base32 = Base32()
+
+fun AnnotationMirror.serialize(): String {
+    return base32.encodeToString(toString().toByteArray()).trimEnd('=')
+}

@@ -5,7 +5,6 @@ The tests in this module are run from the test harness in the ``:compiler` modul
 
 #### Basic
 
-- Nested classes
 - Naming collisions
 
 #### Child Scopes

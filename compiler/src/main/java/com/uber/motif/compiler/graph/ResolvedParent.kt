@@ -9,6 +9,7 @@ import com.uber.motif.compiler.model.ParentInterface
 import com.uber.motif.compiler.model.ParentInterfaceMethod
 import com.uber.motif.compiler.names.Names
 import com.uber.motif.compiler.names.UniqueNameSet
+import com.uber.motif.compiler.serialize
 import com.uber.motif.compiler.simpleName
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
@@ -27,8 +28,11 @@ class ResolvedParent(
             val methods: List<ParentInterfaceMethod> = externalDependencies.map { dependency ->
                 val transitive = dependency in transitiveDependencies
                 // Use qualified name to avoid collisions when implementing multiple Parent interfaces.
+                val qualifierSafeName = dependency.qualifier?.let {
+                    "_${it.serialize()}"
+                } ?: ""
                 val preferredName = dependency.className.qualifiedName().replace(".", "_")
-                ParentInterfaceMethod(methodNames.unique(preferredName), transitive, dependency)
+                ParentInterfaceMethod(methodNames.unique("$preferredName$qualifierSafeName"), transitive, dependency)
             }
             val className = ClassNames.generatedParentInterface(scopeType)
             return ResolvedParent(className, methods)
