@@ -86,12 +86,10 @@ fun Element.hasAnnotation(annotationClass: KClass<out Annotation>): Boolean {
     return getAnnotation(annotationClass.java) != null
 }
 
-fun ProcessingEnvironment.error(message: String): Nothing {
-    messager.printMessage(Diagnostic.Kind.ERROR, message)
-    throw AbortCompilation()
-}
+abstract class CompilationError : RuntimeException() {
 
-class AbortCompilation : RuntimeException()
+    abstract override val message: String
+}
 
 private val base32 = Base32()
 

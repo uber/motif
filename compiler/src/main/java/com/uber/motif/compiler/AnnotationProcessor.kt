@@ -9,8 +9,11 @@ import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import javax.tools.Diagnostic
 
-class AnnotationProcessor : AbstractProcessor() {
+class AnnotationProcessor(private val errorListener: ErrorListener?) : AbstractProcessor() {
+
+    constructor() : this(null)
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -26,7 +29,9 @@ class AnnotationProcessor : AbstractProcessor() {
                 .map { it.asType() as DeclaredType }
         val graph = try {
             ResolvedGraph.resolve(processingEnv, scopes)
-        } catch (e: AbortCompilation) {
+        } catch (e: CompilationError) {
+            errorListener?.onError(e)
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, e.message)
             return true
         }
         graph.resolvedScopes.forEach {
@@ -34,5 +39,10 @@ class AnnotationProcessor : AbstractProcessor() {
             JavaFile.builder(it.packageName, scopeImpl.spec).build().writeTo(processingEnv.filer)
         }
         return true
+    }
+
+    interface ErrorListener {
+
+        fun onError(error: CompilationError)
     }
 }

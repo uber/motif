@@ -1,7 +1,6 @@
 package com.uber.motif.compiler;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.truth.Truth;
+import com.google.common.collect.Streams;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
@@ -9,17 +8,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.tools.Diagnostic;
+import javax.annotation.Nullable;
 import javax.tools.JavaFileObject;
 import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
@@ -28,13 +26,15 @@ import static com.google.testing.compile.Compiler.javac;
 @RunWith(Parameterized.class)
 public class TestHarness {
 
-    @Parameterized.Parameters(name = "{1}")
+    @Parameterized.Parameters(name = "{2}")
     public static Collection<Object[]> data() {
-        File testCaseRoot = new File("../it/src/main/java/testcases");
+        File sourceRoot = new File("../it/src/main/java/");
+        File testCaseRoot = new File(sourceRoot, "testcases");
+        File commonDir = new File(sourceRoot, "common");
         File[] testCaseDirs = testCaseRoot.listFiles(TestHarness::isTestDir);
         if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + testCaseRoot);
         return Arrays.stream(testCaseDirs)
-                .map(file -> new Object[]{file.getAbsoluteFile(), file.getName()})
+                .map(file -> new Object[]{commonDir, file.getAbsoluteFile(), file.getName()})
                 .collect(Collectors.toList());
     }
 
@@ -46,19 +46,21 @@ public class TestHarness {
     }
 
     private final File testCaseDir;
-    private final File errorFile;
+    private final File commonDir;
     private final String testClassName;
 
+    @Nullable private CompilationError error;
+
     @SuppressWarnings("unused")
-    public TestHarness(File testCaseDir, String testName) {
+    public TestHarness(File commonDir, File testCaseDir, String testName) {
+        this.commonDir = commonDir;
         this.testCaseDir = testCaseDir;
-        this.errorFile = new File(testCaseDir, "ERROR.txt");
         this.testClassName = "testcases." + testName + ".Test";
     }
 
     @Test
     public void test() throws Throwable {
-        JavaFileObject[] files = Files.walk(testCaseDir.toPath())
+        JavaFileObject[] files = Streams.concat(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
                 .map(file -> {
@@ -71,31 +73,25 @@ public class TestHarness {
                 .toArray(JavaFileObject[]::new);
 
         Compilation compilation = javac().withProcessors(
-                new AnnotationProcessor(),
+                new AnnotationProcessor(error -> this.error = error),
                 new ComponentProcessor()).compile(files);
 
-        if (errorFile.exists()) {
-            String expectedErrorString = readString(errorFile);
-
-            ImmutableList<Diagnostic<? extends JavaFileObject>> errors = compilation.errors();
-            Truth.assertThat(errors).hasSize(1);
-
-            Diagnostic<? extends JavaFileObject> error = errors.iterator().next();
-
-            Truth.assertThat(error.getMessage(Locale.getDefault())).isEqualTo(expectedErrorString);
-        } else {
-            assertThat(compilation).succeeded();
-            ClassLoader classLoader = new CompilationClassLoader(compilation);
-            Class<?> testClass = classLoader.loadClass(testClassName);
-            try {
-                testClass.getMethod("run").invoke(null);
-            } catch (InvocationTargetException e) {
-                throw e.getCause();
-            }
+        if (compilation.status() == Compilation.Status.FAILURE) {
+            compilation = javac().withProcessors(new ComponentProcessor()).compile(files);
         }
-    }
 
-    private static String readString(File file) throws IOException {
-        return new String(Files.readAllBytes(file.toPath()));
+        assertThat(compilation).succeeded();
+        ClassLoader classLoader = new CompilationClassLoader(compilation);
+        Class<?> testClass = classLoader.loadClass(testClassName);
+        try {
+            Field expectedException = testClass.getField("expectedException");
+            expectedException.set(null, error);
+        } catch (NoSuchFieldException ignore) {}
+
+        try {
+            testClass.getMethod("run").invoke(null);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 }

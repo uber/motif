@@ -25,6 +25,10 @@ data class Dependency private constructor(
     private val compStr: String by lazy { type.toString() + qualifier?.toString() }
 
     val preferredName: String = type.asTypeElement().simpleName.toString().decapitalize()
+    val debugString: String by lazy {
+        val qualifierPrefix = qualifier?.let { "$it " } ?: ""
+        "$qualifierPrefix$type"
+    }
 
     override fun compareTo(other: Dependency): Int {
         return compStr.compareTo(other.compStr)
