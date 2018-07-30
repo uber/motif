@@ -57,7 +57,7 @@ class ScopeClass(
                 }
             }
 
-            val objectsClass = type.innerClasses()
+            val objectsClass = type.innerTypes()
                     .find { it.simpleName == Names.OBJECTS_CLASS_NAME }
                     ?.let { ObjectsClass.fromClass(env, it) }
 

@@ -8,7 +8,7 @@ public class Test {
         Scope scope = new ScopeImpl();
         assertThat(scope.parent()).isEqualTo("parent");
         assertThat(scope.grandparent()).isEqualTo("grandparent");
-        assertThat(scope.a()).isInstanceOf(A.class);
-        assertThat(scope.b()).isInstanceOf(B.class);
+        assertThat(scope.a()).isNotNull();
+        assertThat(scope.b()).isNotNull();
     }
 }

@@ -6,6 +6,6 @@ public class Test {
 
     public static void run() {
         Scope scope = new ScopeImpl();
-        assertThat(scope.a()).isInstanceOf(A.class);
+        assertThat(scope.a()).isNotNull();
     }
 }

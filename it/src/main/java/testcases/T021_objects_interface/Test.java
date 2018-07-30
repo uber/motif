@@ -1,4 +1,4 @@
-package testcases.T014_override_objects;
+package testcases.T021_objects_interface;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -6,6 +6,6 @@ public class Test {
 
     public static void run() {
         Scope scope = new ScopeImpl();
-        assertThat(scope.a()).isNotNull();
+        assertThat(scope.dependency()).isNotNull();
     }
 }

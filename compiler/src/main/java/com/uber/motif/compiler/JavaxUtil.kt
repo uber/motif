@@ -58,9 +58,9 @@ private fun TypeElement.constructors(): List<ExecutableElement> {
     return ElementFilter.constructorsIn(enclosedElements)
 }
 
-fun DeclaredType.innerClasses(): List<DeclaredType> {
+fun DeclaredType.innerTypes(): List<DeclaredType> {
     return asTypeElement().enclosedElements
-            .filter { it.kind == ElementKind.CLASS }
+            .filter { it.kind == ElementKind.CLASS || it.kind == ElementKind.INTERFACE}
             .map { it.asType() as DeclaredType }
 }
 
