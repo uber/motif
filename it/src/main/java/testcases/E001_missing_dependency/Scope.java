@@ -5,5 +5,6 @@ public interface Scope {
 
     String string();
 
-    interface Parent {}
+    @motif.Dependencies
+    interface Dependencies {}
 }

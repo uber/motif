@@ -8,5 +8,6 @@ public interface BottomHeaderScope {
 
     BottomHeaderView view();
 
+    @motif.Objects
     abstract class Objects extends ControllerObjects<BottomHeaderController, BottomHeaderView> {}
 }

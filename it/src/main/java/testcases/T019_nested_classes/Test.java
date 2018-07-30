@@ -14,6 +14,7 @@ public class Test {
 
         String string();
 
+        @motif.Objects
         abstract class Objects {
 
             String string() {

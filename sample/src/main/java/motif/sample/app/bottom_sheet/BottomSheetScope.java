@@ -16,5 +16,6 @@ public interface BottomSheetScope {
 
     PhotoListScope photoList(ViewGroup parent);
 
+    @motif.Objects
     abstract class Objects extends ControllerObjects<BottomSheetController, BottomSheetView> {}
 }

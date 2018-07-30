@@ -5,6 +5,7 @@ import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
 import motif.compiler.AnnotationProcessor;
 import motif.compiler.CompilationError;
+import motif.stubcompiler.StubProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -80,17 +81,22 @@ public class TestHarness {
                 new AnnotationProcessor(error -> this.error = error),
                 new ComponentProcessor()).compile(files);
 
+        Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
-            compilation = javac().withProcessors(new ComponentProcessor()).compile(files);
+            Compilation noProcessorCompilation = javac().withProcessors(
+                    new StubProcessor(),
+                    new ComponentProcessor()).compile(files);
+            testClass = new CompilationClassLoader(noProcessorCompilation).loadClass(testClassName);
+            try {
+                Field expectedException = testClass.getField("expectedException");
+                expectedException.set(null, error);
+            } catch (NoSuchFieldException ignore) {
+                assertThat(compilation).succeeded();
+            }
+        } else {
+            ClassLoader classLoader = new CompilationClassLoader(compilation);
+            testClass = classLoader.loadClass(testClassName);
         }
-
-        assertThat(compilation).succeeded();
-        ClassLoader classLoader = new CompilationClassLoader(compilation);
-        Class<?> testClass = classLoader.loadClass(testClassName);
-        try {
-            Field expectedException = testClass.getField("expectedException");
-            expectedException.set(null, error);
-        } catch (NoSuchFieldException ignore) {}
 
         try {
             testClass.getMethod("run").invoke(null);

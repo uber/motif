@@ -8,11 +8,11 @@ There are 3 ways to integrate Dagger components with Motif Scopes:
 
 ## Dagger Component as parent of Motif Scope
 
-For every Scope, Motif generates a `*ScopeImpl.Parent` interface, which declares the Scope's dependencies. The parent interface uses the same syntax as Dagger's Component [provision methods](https://google.github.io/dagger/api/2.14/dagger/Component.html#provision-methods) so a Dagger Component simply needs to implement the `*ScopeImpl.Parent` interface:
+For every Scope, Motif generates a `*ScopeImpl.Dependencies` interface, which declares the Scope's dependencies. The dependencies interface uses the same syntax as Dagger's Component [provision methods](https://google.github.io/dagger/api/2.14/dagger/Component.html#provision-methods) so a Dagger Component simply needs to implement the `*ScopeImpl.Dependencies` interface:
 
 ```java
 @dagger.Component
-interface Component extends MyScopeImpl.Parent {}
+interface Component extends MyScopeImpl.Dependencies {}
 
 Component component = ...;
 MyScope myScope = new MyScope(component);
@@ -23,11 +23,8 @@ MyScope myScope = new MyScope(component);
 Since Motif access methods share the same syntax as Dagger Component provision methods, a Motif Scope can be declared as a Component dependency:
 
 ```java
-@motif.Scope
-interface MyScope { ... }
-
 @dagger.Component(dependencies = MyScope.class)
-interface Component extends MyScopeImpl.Parent {}
+interface Component {}
 
 MyScope myScope = ...;
 Component component = DaggerComponent.builder()

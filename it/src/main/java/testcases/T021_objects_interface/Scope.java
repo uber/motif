@@ -5,6 +5,7 @@ public interface Scope {
 
     Dependency dependency();
 
+    @motif.Objects
     interface Objects {
 
         Dependency dependency();

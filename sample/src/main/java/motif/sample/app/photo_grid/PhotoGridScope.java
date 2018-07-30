@@ -13,6 +13,7 @@ public interface PhotoGridScope {
 
     PhotoGridItemScope photoRow(PhotoGridItemView view, Photo photo);
 
+    @motif.Objects
     abstract class Objects extends ControllerObjects<PhotoGridController, PhotoGridView> {
 
         abstract PhotoGridAdapter adapter();

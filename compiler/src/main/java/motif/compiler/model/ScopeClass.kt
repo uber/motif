@@ -1,5 +1,7 @@
 package motif.compiler.model
 
+import motif.Dependencies
+import motif.Objects
 import motif.Scope
 import motif.compiler.*
 import motif.compiler.names.Names
@@ -58,11 +60,11 @@ class ScopeClass(
             }
 
             val objectsClass = type.innerTypes()
-                    .find { it.simpleName == Names.OBJECTS_CLASS_NAME }
+                    .find { it.asElement().hasAnnotation(Objects::class) }
                     ?.let { ObjectsClass.fromClass(env, it) }
 
             val parentInterface = type.innerInterfaces()
-                    .find { it.simpleName == Names.PARENT_INTERFACE_NAME }
+                    .find { it.asElement().hasAnnotation(Dependencies::class) }
                     ?.let { ParentInterface.create(env, it) }
 
             return ScopeClass(type, objectsClass, parentInterface, exposerMethods, childMethods)

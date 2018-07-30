@@ -3,6 +3,7 @@ package testcases.T011_inheritence_scope;
 @motif.Scope
 public interface Scope extends ScopeParent<String, Integer> {
 
+    @motif.Objects
     class Objects {
 
         String string() {

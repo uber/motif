@@ -7,6 +7,7 @@ public interface Scope {
 
     Child child();
 
+    @motif.Objects
     class Objects {
 
         @Named("p")

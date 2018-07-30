@@ -7,6 +7,7 @@ public interface Scope {
 
     String string();
 
+    @motif.Objects
     class Objects {
 
         int i = 0;

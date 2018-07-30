@@ -8,5 +8,6 @@ public interface PhotoGridItemScope {
 
     PhotoGridItemController controller();
 
+    @motif.Objects
     abstract class Objects extends ViewlessControllerObjects<PhotoGridItemController> {}
 }

@@ -14,5 +14,6 @@ public interface Scope {
     @Named("grandparent")
     String grandparent();
 
+    @motif.Objects
     abstract class Objects extends ObjectsParent<A, B> {}
 }

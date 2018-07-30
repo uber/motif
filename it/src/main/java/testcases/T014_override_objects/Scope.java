@@ -5,6 +5,7 @@ public interface Scope {
 
     A a();
 
+    @motif.Objects
     abstract class Objects extends ObjectsParent {
 
         abstract A b();
