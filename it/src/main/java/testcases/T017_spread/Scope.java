@@ -13,6 +13,7 @@ public interface Scope {
     @Named("b")
     String b();
 
+    @motif.Objects
     abstract class Objects {
 
         @Spread

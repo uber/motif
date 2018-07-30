@@ -5,6 +5,7 @@ public interface Scope {
 
     B b();
 
+    @motif.Objects
     abstract class Objects {
         abstract A a();
 

@@ -13,6 +13,7 @@ public interface PhotoListScope {
 
     PhotoListItemScope item(PhotoListItemView view, Photo photo);
 
+    @motif.Objects
     abstract class Objects extends ControllerObjects<PhotoListController, PhotoListView> {
 
         abstract PhotoListAdapter adapter();

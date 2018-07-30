@@ -7,6 +7,7 @@ public interface Child {
 
     String string();
 
+    @motif.Objects
     class Objects {
 
         String string() {

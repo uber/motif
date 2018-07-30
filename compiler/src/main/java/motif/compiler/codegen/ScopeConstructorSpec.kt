@@ -16,11 +16,12 @@ class ScopeConstructorSpec(
             .addModifiers(Modifier.PUBLIC)
             .addParameter(parentParameter)
             .addStatement("this.\$N = \$T.builder()\n" +
-                    ".parent(\$N)\n" +
+                    ".\$N(\$N)\n" +
                     ".module(new \$T())\n" +
                     ".build()",
                     componentField.spec,
                     component.daggerClassName,
+                    parentInterface.className.simpleName().decapitalize(),
                     parentParameter,
                     module.className)
             .build()

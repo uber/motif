@@ -6,6 +6,7 @@ public interface Scope extends ScopeParent {
     @Override
     String o();
 
+    @motif.Objects
     class Objects {
 
         String string() {

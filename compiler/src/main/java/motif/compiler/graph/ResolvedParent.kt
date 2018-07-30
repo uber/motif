@@ -1,16 +1,14 @@
 package motif.compiler.graph
 
 import com.squareup.javapoet.ClassName
-import motif.compiler.asDeclaredType
+import motif.Dependencies
+import motif.compiler.*
 import motif.compiler.codegen.className
-import motif.compiler.innerInterfaces
 import motif.compiler.model.Dependency
 import motif.compiler.model.ParentInterface
 import motif.compiler.model.ParentInterfaceMethod
 import motif.compiler.names.Names
 import motif.compiler.names.UniqueNameSet
-import motif.compiler.serialize
-import motif.compiler.simpleName
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
 
@@ -66,7 +64,7 @@ class ResolvedParent(
         }
 
         private fun DeclaredType.getParentInterface(): DeclaredType? {
-            return innerInterfaces().find { it.simpleName == Names.PARENT_INTERFACE_NAME }
+            return innerInterfaces().find { it.asElement().hasAnnotation(Dependencies::class) }
         }
     }
 }

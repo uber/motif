@@ -7,6 +7,7 @@ public interface Scope {
 
     String string();
 
+    @motif.Objects
     class Objects {
 
         String s(@Named("a") String a, @Named("b") String b) {

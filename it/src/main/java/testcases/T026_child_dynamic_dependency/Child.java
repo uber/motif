@@ -10,6 +10,7 @@ public interface Child {
     @Named("c")
     String string();
 
+    @motif.Objects
     class Objects {
 
         @Named("c")

@@ -10,6 +10,7 @@ public interface Scope {
     @Named("a")
     String a();
 
+    @motif.Objects
     class Objects {
 
         String string(Scope scope) {

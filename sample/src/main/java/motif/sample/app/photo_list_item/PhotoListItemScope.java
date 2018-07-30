@@ -8,5 +8,6 @@ public interface PhotoListItemScope {
 
     PhotoListItemController controller();
 
+    @motif.Objects
     abstract class Objects extends ViewlessControllerObjects<PhotoListItemController> {}
 }

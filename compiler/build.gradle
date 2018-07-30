@@ -24,6 +24,7 @@ dependencies {
     compile 'com.google.dagger:dagger:2.16'
     compile 'commons-codec:commons-codec:1.11'
 
+    testCompile project(':stub-compiler')
     testCompile 'com.google.truth:truth:0.42'
     testCompile 'com.google.testing.compile:compile-testing:0.15'
 }

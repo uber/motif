@@ -11,13 +11,11 @@ A Motif Scope is analogous to a Dagger `@Component`.
 </details>
 
 ```java
-import motif.Scope;
-
-@Scope
+@motif.Scope
 interface MainScope {}
 ```
 
-A specially named `Objects` class holds factory methods, which tell Motif how to create objects.
+A class annotated with `@motif.Objects` class holds factory methods, which tell Motif how to create objects.
 
 <details>
 <summary>Notes for Dagger users...</summary>
@@ -26,9 +24,10 @@ The nested `Objects` class is just like a Dagger `@Module` except Motif only all
 </details>
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
+    @motif.Objects
     class Objects {
 
         Constroller controller() {
@@ -41,9 +40,10 @@ interface MainScope {
 Object dependencies can be passed into factory methods as parameters as long as Motif knows how to instantiate them as well:
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
+    @motif.Objects
     class Objects {
 
         View view() {
@@ -70,11 +70,12 @@ Access methods are analogous to a Dagger `@Component` [provision methods](https:
 </details>
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
     Controller controller();
 
+    @motif.Objects
     class Objects {
 
         View view() {
@@ -110,7 +111,7 @@ This is similar to a Dagger `@Subcomponent` [factory method](https://google.gith
 </details>
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
     ChildScope child();
@@ -128,13 +129,14 @@ Unlike Dagger `@Subcomponents` which expose all objects down the graph by defaul
 </details>
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
     ChildScope child();
 
     // ...
 
+    @motif.Objects
     class Objects {
 
         public Database database() {
@@ -145,11 +147,12 @@ interface MainScope {
     }
 }
 
-@Scope
+@motif.Scope
 interface ChildScope {
 
     ChildController controller();
 
+    @motif.Objects
     class Objects {
 
         // No Database factory method.
@@ -174,15 +177,16 @@ ChildScope childScope = mainScope.child();
 
 ## Root Scopes
 
-If Motif finds a nested interface named `Parent` on a Scope, it uses that interface to define exactly what is passed from the parent to the child. This is required in order for Motif to tell you when you have unsatisfied dependencies. The recommended pattern is to always declare an empty `Parent` interface on root Scopes:
+If Motif finds a nested interface annotated with `@Dependencies` on a Scope, it uses that interface to define exactly what this scope needs from its parent. This is required in order for Motif to tell you when you have unsatisfied dependencies. The recommended pattern is to always declare an empty `@Dependencies` interface on root Scopes:
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
     // ...
-    
-    interface Parent {}
+
+    @motif.Dependencies
+    interface Dependencies {}
 }
 ```
 
@@ -199,11 +203,12 @@ This feature is similar to Dagger's `@Inject` constructor injection, but it does
 </details>
 
 ```java
-@Scope
+@motif.Scope
 interface MainScope {
 
     // ...
 
+    @motif.Objects
     abstract class Objects {
         abstract View view();
         abstract Database database();
@@ -220,11 +225,12 @@ interface ControllerObjects<C, V> {
     C controller();
 }
 
-@Scope
+@motif.Scope
 interface MainScope {
 
     // ...
 
+    @motif.Objects
     abstract class Objects implements ControllerObjects<Controller, View> {
         abstract Database database();
     }

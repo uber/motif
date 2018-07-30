@@ -26,6 +26,7 @@ public class Test {
 
         Parent p();
 
+        @motif.Objects
         abstract class Objects {
 
             public abstract testcases.T020_naming_collisions.c.SomeDependency c();

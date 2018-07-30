@@ -19,13 +19,15 @@ public interface RootScope {
 
     BottomSheetScope bottomSheet(ViewGroup parent);
 
+    @motif.Objects
     abstract class Objects extends ControllerObjects<RootController, RootView> {
 
         public abstract Database database();
         public abstract MultiSelector multiSelector();
     }
 
-    interface Parent {
+    @motif.Dependencies
+    interface Dependencies {
 
         Context context();
     }
