@@ -172,7 +172,21 @@ MainScope mainScope = new MainScopeImpl();
 ChildScope childScope = mainScope.child();
 ```
 
-## Scope Dependencies
+## Root Scopes
+
+If Motif finds a nested interface named `Parent` on a Scope, it uses that interface to define exactly what is passed from the parent to the child. This is required in order for Motif to tell you when you have unsatisfied dependencies. The recommended pattern is to always declare an empty `Parent` interface on root Scopes:
+
+```java
+@Scope
+interface MainScope {
+
+    // ...
+    
+    interface Parent {}
+}
+```
+
+With the root `Parent` interface in place, Motif will report any missing dependencies at build time. Without it, missing dependencies will still cause the build to fail, but the error messages will be less intuitive.
 
 ## Convenience APIs
 
