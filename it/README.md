@@ -5,7 +5,6 @@ The tests in this module are run from the test harness in the ``:compiler` modul
 
 #### Basic
 
-- @Spread
 - Nested classes
 - Naming collisions
 
