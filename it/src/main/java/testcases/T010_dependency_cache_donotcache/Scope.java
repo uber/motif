@@ -1,10 +1,10 @@
 package testcases.T010_dependency_cache_donotcache;
 
-import com.uber.motif.DoNotCache;
+import motif.DoNotCache;
 
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

@@ -1,6 +1,6 @@
 package testcases.T020_naming_collisions;
 
-import com.uber.motif.Scope;
+import motif.Scope;
 
 import javax.inject.Named;
 

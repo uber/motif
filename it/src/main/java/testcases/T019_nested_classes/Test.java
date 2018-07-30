@@ -9,7 +9,7 @@ public class Test {
         assertThat(scope.string()).isEqualTo("s");
     }
 
-    @com.uber.motif.Scope
+    @motif.Scope
     public interface Scope {
 
         String string();

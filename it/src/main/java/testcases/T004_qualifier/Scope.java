@@ -2,7 +2,7 @@ package testcases.T004_qualifier;
 
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

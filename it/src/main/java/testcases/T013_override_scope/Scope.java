@@ -1,6 +1,6 @@
 package testcases.T013_override_scope;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope extends ScopeParent {
 
     @Override

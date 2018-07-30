@@ -1,8 +1,10 @@
 package testcases.T026_child_dynamic_dependency;
 
+import motif.Scope;
+
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@Scope
 public interface Child {
 
     @Named("c")

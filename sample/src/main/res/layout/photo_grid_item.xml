@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.uber.motif.sample.app.photo_grid_item.PhotoGridItemView
+<motif.sample.app.photo_grid_item.PhotoGridItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp">
@@ -18,4 +18,4 @@
         android:background="?attr/selectableItemBackground"/>
 
 
-</com.uber.motif.sample.app.photo_grid_item.PhotoGridItemView>
+</motif.sample.app.photo_grid_item.PhotoGridItemView>

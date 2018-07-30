@@ -11,7 +11,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.builders.EmptyModuleFixtureBuilder
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
-import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import motif.intellij.MotifComponent
 import org.junit.Test
 
 

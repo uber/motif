@@ -1,7 +1,7 @@
 package common;
 
 import com.google.common.truth.Correspondence;
-import com.uber.motif.compiler.model.Dependency;
+import motif.compiler.model.Dependency;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 public class DebugStringCorrespondence extends Correspondence<Dependency, String> {

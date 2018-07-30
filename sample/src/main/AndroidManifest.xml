@@ -11,8 +11,8 @@
             android:icon="@drawable/ub__ic_launcher"
             android:label="Motif Sample"
             android:theme="@style/Theme.AppCompat.Light"
-            android:name=".app.application.Application">
-        <activity android:name=".app.root.RootActivity">
+            android:name="motif.sample.app.application.Application">
+        <activity android:name="motif.sample.app.root.RootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

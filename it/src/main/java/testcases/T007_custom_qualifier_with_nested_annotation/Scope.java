@@ -1,6 +1,6 @@
 package testcases.T007_custom_qualifier_with_nested_annotation;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

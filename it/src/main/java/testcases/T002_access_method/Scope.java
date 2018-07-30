@@ -1,6 +1,6 @@
 package testcases.T002_access_method;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

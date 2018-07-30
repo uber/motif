@@ -23,7 +23,7 @@ MyScope myScope = new MyScope(component);
 Since Motif access methods share the same syntax as Dagger Component provision methods, a Motif Scope can be declared as a Component dependency:
 
 ```java
-@com.uber.motif.Scope
+@motif.Scope
 interface MyScope { ... }
 
 @dagger.Component(dependencies = MyScope.class)
@@ -54,7 +54,7 @@ interface Component {
     }
 }
 
-@com.uber.motif.Scope
+@motif.Scope
 interface MyScope {
 
     abstract class Objects {
@@ -65,7 +65,7 @@ interface MyScope {
             return new Foo(daggerDependency);
         }
 
-        @com.uber.motif.Spread
+        @motif.Spread
         Component component(MotifDependency d) {
             return DaggerComponent.builder()
                     .motifDependency(d)

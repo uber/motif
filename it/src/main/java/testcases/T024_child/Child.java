@@ -1,6 +1,8 @@
 package testcases.T024_child;
 
-@com.uber.motif.Scope
+import motif.Scope;
+
+@Scope
 public interface Child {
 
     String string();

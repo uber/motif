@@ -1,6 +1,6 @@
 package testcases.E001_missing_dependency;
 
-import com.uber.motif.compiler.errors.MissingDependencies;
+import motif.compiler.errors.MissingDependencies;
 import common.DebugStringCorrespondence;
 
 import static com.google.common.truth.Truth.assertThat;

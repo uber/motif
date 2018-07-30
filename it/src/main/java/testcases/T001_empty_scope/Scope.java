@@ -1,4 +1,4 @@
 package testcases.T001_empty_scope;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {}

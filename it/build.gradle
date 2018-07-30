@@ -8,6 +8,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     annotationProcessor project(':stub-compiler')
+    compile project(':compiler')
     compile project(':lib')
     compile 'com.google.truth:truth:0.42'
 }

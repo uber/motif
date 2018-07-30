@@ -1,10 +1,10 @@
 package testcases.T017_spread;
 
-import com.uber.motif.Spread;
+import motif.Spread;
 
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     @Named("a")

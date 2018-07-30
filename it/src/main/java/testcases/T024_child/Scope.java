@@ -1,6 +1,6 @@
 package testcases.T024_child;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

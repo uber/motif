@@ -1,6 +1,6 @@
 package testcases.T021_objects_interface;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     Dependency dependency();

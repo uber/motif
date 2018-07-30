@@ -1,6 +1,6 @@
 package testcases.T005_custom_qualifier;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

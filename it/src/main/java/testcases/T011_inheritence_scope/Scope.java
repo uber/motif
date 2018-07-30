@@ -1,6 +1,6 @@
 package testcases.T011_inheritence_scope;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope extends ScopeParent<String, Integer> {
 
     class Objects {

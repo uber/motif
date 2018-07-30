@@ -2,7 +2,7 @@ package testcases.T009_dependency_cache;
 
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

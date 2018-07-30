@@ -2,7 +2,7 @@ package testcases.T025_child_dependency_from_parent;
 
 import javax.inject.Named;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     Child child();

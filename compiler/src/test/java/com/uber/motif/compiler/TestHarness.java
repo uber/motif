@@ -3,6 +3,8 @@ package com.uber.motif.compiler;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
+import motif.compiler.AnnotationProcessor;
+import motif.compiler.CompilationError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

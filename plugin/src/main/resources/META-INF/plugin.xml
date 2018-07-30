@@ -17,20 +17,20 @@
 
     <project-components>
         <component>
-            <implementation-class>com.uber.motif.intellij.MotifComponent</implementation-class>
+            <implementation-class>motif.intellij.MotifComponent</implementation-class>
         </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileBasedIndex implementation="com.uber.motif.intellij.index.ScopeIndex"/>
-        <projectService serviceImplementation="com.uber.motif.intellij.MotifComponent"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="com.uber.motif.intellij.MotifScopeLineMarkerProvider"/>
+        <fileBasedIndex implementation="motif.intellij.index.ScopeIndex"/>
+        <projectService serviceImplementation="motif.intellij.MotifComponent"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.MotifScopeLineMarkerProvider"/>
     </extensions>
 
     <actions>
         <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">
             <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="Myplugin.Textboxes" class="com.uber.motif.intellij.HelloAction" text="Hello" description="Says hello"/>
+            <action id="Myplugin.Textboxes" class="motif.intellij.HelloAction" text="Hello" description="Says hello"/>
         </group>
     </actions>
 

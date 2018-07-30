@@ -1,6 +1,6 @@
 package testcases.T003_multiple_dependencies;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     String string();

@@ -1,6 +1,6 @@
 package testcases.T014_override_objects;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     A a();

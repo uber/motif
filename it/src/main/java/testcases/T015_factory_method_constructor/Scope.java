@@ -1,6 +1,6 @@
 package testcases.T015_factory_method_constructor;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     A a();

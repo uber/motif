@@ -1,6 +1,6 @@
 package testcases.T016_factory_method_binds;
 
-@com.uber.motif.Scope
+@motif.Scope
 public interface Scope {
 
     B b();

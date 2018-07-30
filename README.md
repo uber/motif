@@ -11,7 +11,7 @@ A Motif Scope is analogous to a Dagger `@Component`.
 </details>
 
 ```java
-import com.uber.motif.Scope;
+import motif.Scope;
 
 @Scope
 interface MainScope {}
