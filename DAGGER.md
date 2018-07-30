@@ -40,7 +40,7 @@ Component component = DaggerComponent.builder()
 If there is a bidirectional dependency between the Dagger Component and the Motif Scope (ie: Dagger needs an object provided by Motif and Motif needs an object provided by Dagger), you can make use of Motif's `@Spread` feature:
 
 ```java
-@dagger.Component
+@dagger.Component(dependencies = MyScope.class)
 interface Component {
 
     DaggerDependency();
@@ -48,7 +48,7 @@ interface Component {
     @dagger.Component.Builder
     interface Builder {
 
-        motifDependency(MotifDependency motifDependency);
+        myScope(MyScope myScope);
 
         // ...
     }
@@ -66,13 +66,13 @@ interface MyScope {
         }
 
         @motif.Spread
-        Component component(MotifDependency d) {
+        Component component(MyScope myScope) {
             return DaggerComponent.builder()
-                    .motifDependency(d)
+                    .myScope(myScope)
                     .build();
         }
     }
 }
 ```
 
-Above, `@Spread` tells Motif to provide all of the dependencies declared by the Component's provision methods in addition to the Component itself. With this pattern, it's possible pass in Motif-provided objects to the Component's Builder, while allowing Motif factory methods to rely on Dagger-provided objects.
+Above, `@Spread` tells Motif to provide all of the dependencies declared by the Component's provision methods in addition to the Component itself. With this pattern, it's possible to pass the Motif Scope into the Dagger Component as a dependency, while allowing Motif factory methods to rely on Dagger-provided objects.
