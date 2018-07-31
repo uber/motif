@@ -190,7 +190,7 @@ interface MainScope {
 }
 ```
 
-With the root `Parent` interface in place, Motif will report any missing dependencies at build time. Without it, missing dependencies will still cause the build to fail, but the error messages will be less intuitive.
+With the root `Dependencies` interface in place, Motif will report any missing dependencies at build time. Without it, missing dependencies will still cause the build to fail, but the error messages will be less intuitive.
 
 ## Convenience APIs
 
