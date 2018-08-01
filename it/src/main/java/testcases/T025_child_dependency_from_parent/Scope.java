@@ -15,4 +15,7 @@ public interface Scope {
             return "p";
         }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

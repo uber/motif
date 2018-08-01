@@ -16,4 +16,7 @@ public interface Scope {
 
     @motif.Objects
     abstract class Objects extends ObjectsParent<A, B> {}
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

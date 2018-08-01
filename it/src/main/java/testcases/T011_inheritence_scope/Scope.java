@@ -14,4 +14,7 @@ public interface Scope extends ScopeParent<String, Integer> {
             return 1;
         }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

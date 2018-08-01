@@ -13,4 +13,7 @@ public interface Scope {
 
         abstract C c();
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

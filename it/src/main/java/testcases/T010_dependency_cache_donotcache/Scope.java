@@ -29,4 +29,7 @@ public interface Scope {
             return String.valueOf(i++);
         }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

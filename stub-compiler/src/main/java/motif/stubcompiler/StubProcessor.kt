@@ -6,18 +6,19 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import motif.Scope
-import motif.compiler.asDeclaredType
-import motif.compiler.graph.ClassNames
-import motif.compiler.methods
+import motif.compiler.javax.Executable
+import motif.compiler.javax.JavaxUtil
 import java.util.*
 import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
-class StubProcessor : AbstractProcessor() {
+class StubProcessor : AbstractProcessor(), JavaxUtil {
+
+    override val env: ProcessingEnvironment by lazy { processingEnv }
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -32,21 +33,21 @@ class StubProcessor : AbstractProcessor() {
                 .map { it as TypeElement }
                 .forEach { scopeElement ->
                     val packageName: String = MoreElements.getPackage(scopeElement).qualifiedName.toString()
-                    val spec: TypeSpec = spec(scopeElement.asDeclaredType())
+                    val spec: TypeSpec = spec(scopeElement.asType() as DeclaredType)
                     JavaFile.builder(packageName, spec).build().writeTo(processingEnv.filer)
                 }
         return true
     }
 
-    private fun spec(scopeElement: DeclaredType): TypeSpec {
-        val scopeClassName = ClassName.get(scopeElement)
-        val scopeImplClassName = ClassNames.scopeImpl(scopeElement)
+    private fun spec(scopeType: DeclaredType): TypeSpec {
+        val scopeClassName = ClassName.get(scopeType)
+        val scopeImplClassName = scopeImpl(scopeType)
         val builder = TypeSpec.classBuilder(scopeImplClassName)
                 .addSuperinterface(scopeClassName)
 
-        scopeElement.methods(processingEnv)
-                .forEach { method: ExecutableElement ->
-                    val methodSpec: MethodSpec = MethodSpec.overriding(method, scopeElement, processingEnv.typeUtils)
+        scopeType.methods()
+                .forEach { method: Executable ->
+                    val methodSpec: MethodSpec = MethodSpec.overriding(method.element, scopeType, processingEnv.typeUtils)
                             .addStatement("throw new \$T()", IllegalStateException::class.java)
                             .build()
                     builder.addMethod(methodSpec)

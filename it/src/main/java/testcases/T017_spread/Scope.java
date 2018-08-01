@@ -19,4 +19,7 @@ public interface Scope {
         @Spread
         abstract Spreadable spreadable();
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

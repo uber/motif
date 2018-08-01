@@ -3,8 +3,8 @@ package com.uber.motif.compiler;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
-import motif.compiler.AnnotationProcessor;
-import motif.compiler.CompilationError;
+import motif.compiler.Processor;
+import motif.compiler.errors.CompilationError;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +78,7 @@ public class TestHarness {
                 .toArray(JavaFileObject[]::new);
 
         Compilation compilation = javac().withProcessors(
-                new AnnotationProcessor(error -> this.error = error),
+                new Processor(error -> this.error = error),
                 new ComponentProcessor()).compile(files);
 
         Class<?> testClass;
@@ -88,7 +88,7 @@ public class TestHarness {
                     new ComponentProcessor()).compile(files);
             testClass = new CompilationClassLoader(noProcessorCompilation).loadClass(testClassName);
             try {
-                Field expectedException = testClass.getField("expectedException");
+                Field expectedException = testClass.getField("expectedError");
                 expectedException.set(null, error);
             } catch (NoSuchFieldException ignore) {
                 assertThat(compilation).succeeded();

@@ -10,4 +10,7 @@ public interface Scope {
 
         Dependency dependency();
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

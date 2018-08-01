@@ -17,6 +17,7 @@ dependencies {
     compile deps.kotlin.stdlib
     compile deps.misc.dagger
     compile project(':lib')
+    compile project(':ir')
     compile 'com.google.auto:auto-common:0.10'
     compile('com.google.dagger:dagger-compiler:2.16') {
         exclude group: 'com.squareup:javapoet'

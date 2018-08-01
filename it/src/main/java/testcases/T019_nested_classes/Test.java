@@ -21,5 +21,8 @@ public class Test {
                 return "s";
             }
         }
+
+        @motif.Dependencies
+        interface Dependencies {}
     }
 }

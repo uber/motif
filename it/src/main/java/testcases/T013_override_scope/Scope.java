@@ -13,4 +13,7 @@ public interface Scope extends ScopeParent {
             return "s";
         }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

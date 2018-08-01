@@ -42,6 +42,9 @@ public class Test {
                 return "b";
             }
         }
+
+        @motif.Dependencies
+        interface Dependencies {}
     }
 
     @Scope

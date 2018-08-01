@@ -9,4 +9,7 @@ public interface Scope {
     abstract class Objects {
         abstract A a();
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

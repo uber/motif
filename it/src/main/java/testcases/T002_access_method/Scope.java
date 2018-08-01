@@ -12,4 +12,7 @@ public interface Scope {
             return "s";
         }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

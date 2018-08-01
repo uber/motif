@@ -11,4 +11,7 @@ public interface Scope {
 
         abstract B b(A a);
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }
