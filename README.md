@@ -30,7 +30,7 @@ interface MainScope {
     @motif.Objects
     class Objects {
 
-        Constroller controller() {
+        Controller controller() {
             return new Controller();
         }
     }
