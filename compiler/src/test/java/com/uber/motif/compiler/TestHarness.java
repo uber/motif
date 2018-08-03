@@ -1,11 +1,13 @@
 package com.uber.motif.compiler;
 
 import com.google.testing.compile.Compilation;
+import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
 import motif.compiler.Processor;
 import motif.compiler.errors.CompilationError;
 import motif.stubcompiler.StubProcessor;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -13,6 +15,7 @@ import org.junit.runners.Parameterized;
 import javax.annotation.Nullable;
 import javax.tools.JavaFileObject;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -20,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,15 +34,19 @@ import static com.google.testing.compile.Compiler.javac;
 @RunWith(Parameterized.class)
 public class TestHarness {
 
-    @Parameterized.Parameters(name = "{2}")
+    @Parameterized.Parameters(name = "{3}")
     public static Collection<Object[]> data() {
         File sourceRoot = new File("../it/src/main/java/");
         File testCaseRoot = new File(sourceRoot, "testcases");
+        File externalRoot = new File(sourceRoot, "external");
         File commonDir = new File(sourceRoot, "common");
         File[] testCaseDirs = testCaseRoot.listFiles(TestHarness::isTestDir);
         if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + testCaseRoot);
         return Arrays.stream(testCaseDirs)
-                .map(file -> new Object[]{commonDir, file.getAbsoluteFile(), file.getName()})
+                .map(file -> {
+                    File externalDir = new File(externalRoot, file.getName());
+                    return new Object[]{commonDir, file.getAbsoluteFile(), externalDir, file.getName()};
+                })
                 .collect(Collectors.toList());
     }
 
@@ -49,16 +57,20 @@ public class TestHarness {
                 && (filename.startsWith("T") || filename.startsWith("E"));
     }
 
+    @Rule public ExternalSourceCompiler externalSourceCompiler = new ExternalSourceCompiler();
+
     private final File testCaseDir;
     private final File commonDir;
+    private final File externalDir;
     private final String testClassName;
 
     @Nullable private CompilationError error;
 
     @SuppressWarnings("unused")
-    public TestHarness(File commonDir, File testCaseDir, String testName) {
-        this.commonDir = commonDir;
+    public TestHarness(File commonDir, File testCaseDir, File externalDir, String testName) {
         this.testCaseDir = testCaseDir;
+        this.commonDir = commonDir;
+        this.externalDir = externalDir;
         this.testClassName = "testcases." + testName + ".Test";
     }
 
@@ -77,9 +89,15 @@ public class TestHarness {
                 })
                 .toArray(JavaFileObject[]::new);
 
-        Compilation compilation = javac().withProcessors(
+        ClassLoader externalSourcesClassLoader = compileExternalSources();
+
+        Compiler compiler = javac().withProcessors(
                 new Processor(error -> this.error = error),
-                new ComponentProcessor()).compile(files);
+                new ComponentProcessor());
+        if (externalSourcesClassLoader != null) {
+            compiler = compiler.withClasspathFrom(externalSourcesClassLoader);
+        }
+        Compilation compilation = compiler.compile(files);
 
         Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
@@ -103,5 +121,32 @@ public class TestHarness {
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+
+    @Nullable
+    private ClassLoader compileExternalSources() throws IOException {
+        File[] files = externalDir.listFiles();
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        Compilation compilation = externalSourceCompiler.compile(externalDir);
+        assertThat(compilation).succeeded();
+        return externalSourceCompiler.classLoader;
+    }
+
+    static List<JavaFileObject> javaFileObjects(File dir) throws IOException {
+        return Stream.of(Files.walk(dir.toPath()))
+                .flatMap(Function.identity())
+                .map(Path::toFile)
+                .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
+                .map(file -> {
+                    try {
+                        return JavaFileObjects.forResource(file.toURI().toURL());
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }
