@@ -22,15 +22,13 @@ public class ExternalSourceCompiler extends TemporaryFolder {
     public String classpath;
 
     private File compilerOutputDir;
-    private File jarFile;
 
     @Override
     protected void before() throws Throwable {
         super.before();
         compilerOutputDir = newFolder();
-        jarFile = newFile("external.jar");
         String currentClasspath = System.getProperty("java.class.path");
-        classpath = currentClasspath + ":" + jarFile.getAbsolutePath();
+        classpath = currentClasspath + ":" + compilerOutputDir.getAbsolutePath();
     }
 
     Compilation compile(
@@ -48,16 +46,12 @@ public class ExternalSourceCompiler extends TemporaryFolder {
                 files);
         task.setProcessors(ImmutableList.copyOf(processors));
         boolean succeeded = task.call();
-        Compilation compilation = CompilationFactory.create(
+        return CompilationFactory.create(
                 Compiler.javac(),
                 files,
                 succeeded,
                 diagnosticCollector.getDiagnostics(),
                 fileManager.getOutputFiles());
-
-        JarUtil.createJar(compilerOutputDir, jarFile);
-
-        return compilation;
     }
 
     private class CollectingFileManager extends ForwardingJavaFileManager<JavaFileManager> {
