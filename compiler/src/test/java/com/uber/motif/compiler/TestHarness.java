@@ -64,6 +64,7 @@ public class TestHarness {
     private final File commonDir;
     private final File externalDir;
     private final String testClassName;
+    private final boolean hasExternalSources;
 
     @Nullable private CompilationError error;
 
@@ -73,6 +74,7 @@ public class TestHarness {
         this.commonDir = commonDir;
         this.externalDir = externalDir;
         this.testClassName = "testcases." + testName + ".Test";
+        this.hasExternalSources = externalDir.listFiles() != null && externalDir.listFiles().length > 0;
     }
 
     @Test
@@ -90,24 +92,14 @@ public class TestHarness {
                 })
                 .toArray(JavaFileObject[]::new);
 
-        Compiler compiler = javac().withProcessors(
-                new Processor(error -> this.error = error),
-                new ComponentProcessor());
-        if (compileExternalSources()) {
-            compiler = compiler.withOptions(ImmutableList.builder()
-                    .addAll(compiler.options())
-                    .add("-classpath")
-                    .add(externalSourceCompiler.classpath)
-                    .build());
-        }
-        Compilation compilation = compiler.compile(files);
+        if (hasExternalSources) compileExternalSources();
+
+        Compilation compilation = compiler(new Processor(error -> this.error = error)).compile(files);
 
         Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
-            Compilation noProcessorCompilation = javac().withProcessors(
-                    new StubProcessor(),
-                    new ComponentProcessor()).compile(files);
-            testClass = new CompilationClassLoader(noProcessorCompilation).loadClass(testClassName);
+            Compilation noProcessorCompilation = compiler(new StubProcessor()).compile(files);
+            testClass = compilationClassLoader(noProcessorCompilation).loadClass(testClassName);
             try {
                 Field expectedException = testClass.getField("expectedError");
                 expectedException.set(null, error);
@@ -115,8 +107,7 @@ public class TestHarness {
                 assertThat(compilation).succeeded();
             }
         } else {
-            ClassLoader classLoader = new CompilationClassLoader(compilation);
-            testClass = classLoader.loadClass(testClassName);
+            testClass = compilationClassLoader(compilation).loadClass(testClassName);
         }
 
         try {
@@ -124,6 +115,22 @@ public class TestHarness {
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+
+    private ClassLoader compilationClassLoader(Compilation compilation) {
+        if (hasExternalSources) {
+            return new CompilationClassLoader(externalSourceCompiler.classLoader, compilation);
+        } else {
+            return new CompilationClassLoader(compilation);
+        }
+    }
+
+    private Compiler compiler(javax.annotation.processing.Processor processor) {
+        Compiler compiler = javac().withProcessors(processor, new ComponentProcessor());
+        if (hasExternalSources) {
+            compiler = compiler.withClasspathFrom(externalSourceCompiler.classLoader);
+        }
+        return compiler;
     }
 
     private boolean compileExternalSources() throws IOException {

@@ -56,7 +56,7 @@ class ScopeImplFactory(
     private fun dependencies(scope: Scope): TypeSpec {
         return TypeSpec.interfaceBuilder(scope.dependenciesTypeName)
                 .addModifiers(Modifier.PUBLIC)
-                .addMethods(scope.dependencies.abstractMethodSpecs().map { it.value })
+                .addMethods(scope.dependencies.abstractMethodSpecsMeta().map { it.value })
                 .build()
     }
 

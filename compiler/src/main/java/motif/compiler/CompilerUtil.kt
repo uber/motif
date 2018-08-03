@@ -9,7 +9,7 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 
 val TypeMirror.ir: Type
-    get() = Type(toString())
+    get() = Type(this, toString())
 
 val AnnotationMirror.ir: motif.ir.source.base.Annotation
     get() = motif.ir.source.base.Annotation(this, toString())

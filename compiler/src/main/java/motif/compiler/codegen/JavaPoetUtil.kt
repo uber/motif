@@ -7,6 +7,7 @@ import motif.compiler.javax.JavaxUtil
 import motif.ir.graph.Scope
 import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.base.Dependency
+import motif.ir.source.base.Type
 import motif.ir.source.child.ChildDeclaration
 import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.objects.FactoryMethod
@@ -17,8 +18,12 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.TypeMirror
 
 interface JavaPoetUtil : JavaxUtil {
+
+    val Type.mirror: TypeMirror
+        get() = userData as TypeMirror
 
     val ObjectsClass.isInterface: Boolean
         get() = type.asElement().kind == ElementKind.INTERFACE

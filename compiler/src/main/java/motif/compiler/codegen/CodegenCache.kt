@@ -1,14 +1,18 @@
 package motif.compiler.codegen
 
 import com.google.auto.common.MoreElements
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import motif.compiler.GENERATED_DEPENDENCIES_NAME
 import motif.cache.ExtCache
 import motif.cache.ExtCacheScope
+import motif.internal.Meta
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
+import motif.ir.source.dependencies.AnnotatedDependency
+import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
@@ -67,6 +71,27 @@ open class CodegenCache(
 
     val Scope.componentFieldSpec: FieldSpec by cache {
         FieldSpec.builder(componentTypeName, "component", Modifier.PRIVATE, Modifier.FINAL)
+                .build()
+    }
+
+    fun Dependencies.abstractMethodSpecsMeta(): Map<Dependency, MethodSpec> {
+        return nameScope {
+            list.associateBy({ it.dependency }) {
+                val metaSpec = it.metaSpec()
+                it.dependency.methodSpecBuilder()
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .addAnnotation(metaSpec)
+                        .build()
+            }
+        }
+    }
+
+    fun AnnotatedDependency.metaSpec(): AnnotationSpec {
+        val consumingClassNames = consumingScopes.map { it.mirror.typeName }.toTypedArray()
+        val consumingList = consumingClassNames.map { "\$T.class" }.joinToString(", ")
+        return AnnotationSpec.builder(Meta::class.java)
+                .addMember("transitive", "$transitive")
+                .addMember("consumingScopes", "{$consumingList}", *consumingClassNames)
                 .build()
     }
 }
