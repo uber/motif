@@ -3,10 +3,10 @@ package motif.compiler.codegen
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import motif.GENERATED_DEPENDENCIES_NAME
+import motif.compiler.GENERATED_DEPENDENCIES_NAME
 import motif.cache.ExtCacheScope
 import motif.compiler.javax.ExecutableParam
-import motif.ir
+import motif.compiler.ir
 import motif.ir.graph.Graph
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency

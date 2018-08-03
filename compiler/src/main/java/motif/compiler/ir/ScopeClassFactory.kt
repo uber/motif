@@ -1,7 +1,7 @@
 package motif.compiler.ir
 
 import motif.compiler.javax.JavaxUtil
-import motif.ir
+import motif.compiler.ir
 import motif.ir.source.ScopeClass
 import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.child.ChildDeclaration

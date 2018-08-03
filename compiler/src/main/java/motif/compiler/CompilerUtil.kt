@@ -1,4 +1,4 @@
-package motif
+package motif.compiler
 
 import com.google.auto.common.AnnotationMirrors
 import com.squareup.javapoet.ClassName

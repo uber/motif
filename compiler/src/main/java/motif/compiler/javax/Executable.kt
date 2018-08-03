@@ -1,8 +1,8 @@
 package motif.compiler.javax
 
-import motif.ir
+import motif.compiler.ir
 import motif.ir.source.base.Dependency
-import motif.qualifierAnnotation
+import motif.compiler.qualifierAnnotation
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType

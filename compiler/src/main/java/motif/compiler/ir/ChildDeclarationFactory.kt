@@ -4,7 +4,7 @@ import com.google.auto.common.MoreTypes
 import motif.Scope
 import motif.compiler.javax.Executable
 import motif.compiler.javax.JavaxUtil
-import motif.ir
+import motif.compiler.ir
 import motif.ir.source.child.ChildDeclaration
 import motif.ir.source.child.ChildMethod
 import javax.annotation.processing.ProcessingEnvironment

@@ -64,7 +64,7 @@ public class TestHarness {
 
     @Test
     public void test() throws Throwable {
-        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
+        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()))
                 .flatMap(Function.identity())
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))

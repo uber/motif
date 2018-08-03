@@ -1,13 +1,13 @@
 package motif.compiler.ir
 
-import motif.GENERATED_DEPENDENCIES_NAME
+import motif.compiler.GENERATED_DEPENDENCIES_NAME
 import motif.compiler.javax.Executable
 import motif.compiler.javax.JavaxUtil
 import motif.internal.Meta
-import motif.ir
+import motif.compiler.ir
 import motif.ir.source.dependencies.AnnotatedDependency
 import motif.ir.source.dependencies.GeneratedDependencies
-import motif.qualifiedName
+import motif.compiler.qualifiedName
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.MirroredTypesException

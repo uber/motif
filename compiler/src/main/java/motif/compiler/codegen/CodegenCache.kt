@@ -4,7 +4,7 @@ import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
-import motif.GENERATED_DEPENDENCIES_NAME
+import motif.compiler.GENERATED_DEPENDENCIES_NAME
 import motif.cache.ExtCache
 import motif.cache.ExtCacheScope
 import motif.ir.graph.Scope
