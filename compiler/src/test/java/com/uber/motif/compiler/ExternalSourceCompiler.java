@@ -10,8 +10,6 @@ import javax.annotation.processing.Processor;
 import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +19,7 @@ public class ExternalSourceCompiler extends TemporaryFolder {
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-    public ClassLoader classLoader;
+    public String classpath;
 
     private File compilerOutputDir;
     private File jarFile;
@@ -31,7 +29,8 @@ public class ExternalSourceCompiler extends TemporaryFolder {
         super.before();
         compilerOutputDir = newFolder();
         jarFile = newFile("external.jar");
-        classLoader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()});
+        String currentClasspath = System.getProperty("java.class.path");
+        classpath = currentClasspath + ":" + jarFile.getAbsolutePath();
     }
 
     Compilation compile(

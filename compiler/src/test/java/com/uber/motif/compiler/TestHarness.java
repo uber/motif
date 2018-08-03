@@ -1,5 +1,6 @@
 package com.uber.motif.compiler;
 
+import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
@@ -89,13 +90,15 @@ public class TestHarness {
                 })
                 .toArray(JavaFileObject[]::new);
 
-        ClassLoader externalSourcesClassLoader = compileExternalSources();
-
         Compiler compiler = javac().withProcessors(
                 new Processor(error -> this.error = error),
                 new ComponentProcessor());
-        if (externalSourcesClassLoader != null) {
-            compiler = compiler.withClasspathFrom(externalSourcesClassLoader);
+        if (compileExternalSources()) {
+            compiler = compiler.withOptions(ImmutableList.builder()
+                    .addAll(compiler.options())
+                    .add("-classpath")
+                    .add(externalSourceCompiler.classpath)
+                    .build());
         }
         Compilation compilation = compiler.compile(files);
 
@@ -123,16 +126,18 @@ public class TestHarness {
         }
     }
 
-    @Nullable
-    private ClassLoader compileExternalSources() throws IOException {
+    private boolean compileExternalSources() throws IOException {
         File[] files = externalDir.listFiles();
         if (files == null || files.length == 0) {
-            return null;
+            return false;
         }
 
-        Compilation compilation = externalSourceCompiler.compile(externalDir);
+        Compilation compilation = externalSourceCompiler.compile(
+                externalDir,
+                new Processor(),
+                new ComponentProcessor());
         assertThat(compilation).succeeded();
-        return externalSourceCompiler.classLoader;
+        return true;
     }
 
     static List<JavaFileObject> javaFileObjects(File dir) throws IOException {
