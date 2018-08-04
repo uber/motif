@@ -69,27 +69,6 @@ open class CodegenCache(
                 .build()
     }
 
-    fun Dependencies.abstractMethodSpecsMeta(): Map<Dependency, MethodSpec> {
-        return nameScope {
-            list.associateBy({ it.dependency }) {
-                val metaSpec = it.metaSpec()
-                it.dependency.methodSpecBuilder()
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .addAnnotation(metaSpec)
-                        .build()
-            }
-        }
-    }
-
-    fun AnnotatedDependency.metaSpec(): AnnotationSpec {
-        val consumingClassNames = consumingScopes.map { it.mirror.typeName }.toTypedArray()
-        val consumingList = consumingClassNames.map { "\$T.class" }.joinToString(", ")
-        return AnnotationSpec.builder(Meta::class.java)
-                .addMember("transitive", "$transitive")
-                .addMember("consumingScopes", "{$consumingList}", *consumingClassNames)
-                .build()
-    }
-
     private fun <R, T> cache(block: R.() -> T): ReadOnlyProperty<R, T> {
         return cacheScope.cache(block)
     }
