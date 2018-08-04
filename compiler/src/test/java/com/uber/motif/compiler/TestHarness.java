@@ -79,7 +79,7 @@ public class TestHarness {
 
     @Test
     public void test() throws Throwable {
-        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()))
+        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
                 .flatMap(Function.identity())
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
@@ -133,18 +133,12 @@ public class TestHarness {
         return compiler;
     }
 
-    private boolean compileExternalSources() throws IOException {
-        File[] files = externalDir.listFiles();
-        if (files == null || files.length == 0) {
-            return false;
-        }
-
+    private void compileExternalSources() throws IOException {
         Compilation compilation = externalSourceCompiler.compile(
                 externalDir,
                 new Processor(),
                 new ComponentProcessor());
         assertThat(compilation).succeeded();
-        return true;
     }
 
     static List<JavaFileObject> javaFileObjects(File dir) throws IOException {
