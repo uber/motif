@@ -6,7 +6,6 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import dagger.Module
 import dagger.Provides
-import motif.cache.ExtCacheScope
 import motif.internal.DaggerScope
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
@@ -18,7 +17,7 @@ import javax.lang.model.element.Modifier
 
 class ModuleFactory(
         env: ProcessingEnvironment,
-        cacheScope: ExtCacheScope) : CodegenCache(env, cacheScope) {
+        cacheScope: CacheScope) : CodegenCache(env, cacheScope) {
 
     fun create(scope: Scope): TypeSpec {
         val builder = TypeSpec.classBuilder(scope.moduleTypeName)

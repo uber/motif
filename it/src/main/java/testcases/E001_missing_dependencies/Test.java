@@ -1,4 +1,4 @@
-package testcases.E001_nonstandard_dependencies_name;
+package testcases.E001_missing_dependencies;
 
 import motif.compiler.errors.MissingDependenciesError;
 

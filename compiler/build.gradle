@@ -41,3 +41,7 @@ publishing {
         }
     }
 }
+
+test {
+    inputs.files(file("$rootDir/it/src"))
+}

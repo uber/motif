@@ -6,8 +6,6 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import motif.compiler.GENERATED_DEPENDENCIES_NAME
-import motif.cache.ExtCache
-import motif.cache.ExtCacheScope
 import motif.internal.Meta
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
@@ -18,14 +16,11 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 open class CodegenCache(
         override val env: ProcessingEnvironment,
-        override val cacheScope: ExtCacheScope) : ExtCache, JavaPoetUtil {
-
-    final override fun <R, T> cache(block: R.() -> T): ReadOnlyProperty<R, T> {
-        return super.cache(block)
-    }
+        val cacheScope: CacheScope) : JavaPoetUtil {
 
     val Scope.daggerComponentName: ClassName by cache {
         val simpleName = componentTypeName.simpleNames().joinToString("_")
@@ -93,5 +88,30 @@ open class CodegenCache(
                 .addMember("transitive", "$transitive")
                 .addMember("consumingScopes", "{$consumingList}", *consumingClassNames)
                 .build()
+    }
+
+    private fun <R, T> cache(block: R.() -> T): ReadOnlyProperty<R, T> {
+        return cacheScope.cache(block)
+    }
+
+    class CacheScope {
+
+        private val map: MutableMap<LazyExtGet, Any?> = mutableMapOf()
+
+        fun <R, T> cache(block: R.() -> T): ReadOnlyProperty<R, T> {
+            return object: ReadOnlyProperty<R, T> {
+
+                @Synchronized
+                override fun getValue(thisRef: R, property: KProperty<*>): T {
+                    val get = LazyExtGet(thisRef, property)
+                    @Suppress("UNCHECKED_CAST")
+                    return map.computeIfAbsent(get) { thisRef.block() } as T
+                }
+            }
+        }
+
+        private data class LazyExtGet(
+                private val thisRef: Any?,
+                private val property: KProperty<*>)
     }
 }

@@ -5,7 +5,6 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeSpec
 import dagger.Component
-import motif.cache.ExtCacheScope
 import motif.internal.DaggerScope
 import motif.ir.graph.Graph
 import motif.ir.graph.Scope
@@ -16,7 +15,7 @@ import javax.lang.model.element.Modifier
 
 class ScopeImplFactory(
         env: ProcessingEnvironment,
-        cacheScope: ExtCacheScope,
+        cacheScope: CacheScope,
         graph: Graph) : CodegenCache(env, cacheScope) {
 
     private val childMethodFactory = ChildMethodFactory(env, cacheScope, graph)

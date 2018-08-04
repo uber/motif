@@ -4,7 +4,6 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import motif.compiler.GENERATED_DEPENDENCIES_NAME
-import motif.cache.ExtCacheScope
 import motif.compiler.javax.ExecutableParam
 import motif.compiler.ir
 import motif.ir.graph.Graph
@@ -17,7 +16,7 @@ import javax.lang.model.element.Modifier
 
 class ChildMethodFactory(
         env: ProcessingEnvironment,
-        cacheScope: ExtCacheScope,
+        cacheScope: CacheScope,
         private val graph: Graph) : CodegenCache(env, cacheScope) {
 
     fun create(
