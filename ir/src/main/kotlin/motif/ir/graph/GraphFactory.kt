@@ -24,11 +24,11 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
     }
 
     private fun createUnsafe(): Graph {
-        val nodes = scopeClasses.values.associateBy({ it }) { node(listOf(), it.type) }
+        val nodes = scopeClasses.values.associateBy({ it }) { calculatedNode(listOf(), it.type) }
         return Graph(this.nodes, nodes, null, null)
     }
 
-    private fun node(visited: List<Type>, scopeType: Type): Node {
+    private fun calculatedNode(visited: List<Type>, scopeType: Type): Node {
         if (scopeType in visited) {
             throw ScopeCycleError(visited)
         }
@@ -39,14 +39,14 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
                     .map { childDeclaration ->
                         val method = childDeclaration.method
                         childDeclaration.generatedDependencies?.let {
-                            ScopeChild(method, node(method.scope, it))
-                        } ?: ScopeChild(method, node(newVisited, method.scope))
+                            ScopeChild(method, generatedNode(method.scope, it))
+                        } ?: ScopeChild(method, calculatedNode(newVisited, method.scope))
                     }
             ScopeClassNode(scopeClass, scopeChildren)
         }
     }
 
-    private fun node(scopeType: Type, generatedDependencies: GeneratedDependencies): Node {
+    private fun generatedNode(scopeType: Type, generatedDependencies: GeneratedDependencies): Node {
         return nodes.computeIfAbsent(scopeType) { GeneratedNode(generatedDependencies)  }
     }
 
