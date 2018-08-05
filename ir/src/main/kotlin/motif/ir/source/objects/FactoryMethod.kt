@@ -17,14 +17,6 @@ class FactoryMethod(
         (spreadDependency?.methods?.map { it.dependency } ?: listOf()) + providedDependency
     }
 
-    val exposedDependencies: List<Dependency> by lazy {
-        if (isExposed) {
-            providedDependencies
-        } else {
-            listOf()
-        }
-    }
-
     enum class Kind (val isAbstract: Boolean) {
         BASIC(isAbstract = false),
         BINDS(isAbstract = true),

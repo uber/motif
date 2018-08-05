@@ -20,11 +20,13 @@ class ScopeClass(
 
     val scopeDependency = Dependency(userData, type, null)
 
-    private val factoryMethods: List<FactoryMethod> = objectsClass?.factoryMethods ?: listOf()
+    val factoryMethods: List<FactoryMethod> = objectsClass?.factoryMethods ?: listOf()
+
     private val allProvided: List<Dependency> = factoryMethods.flatMap { it.providedDependencies } + scopeDependency
+
     private val consumed: List<Dependency> = factoryMethods.flatMap { it.consumedDependencies } + accessMethods.map { it.dependency }
 
-    val exposed: List<Dependency> = factoryMethods.flatMap { it.exposedDependencies }
+    val exposed: List<Dependency> = factoryMethods.filter { it.isExposed }.flatMap { it.providedDependencies }
 
     val selfDependencies: Dependencies by lazy {
         val annotatedDependencies = (consumed - allProvided).map { AnnotatedDependency(it, false, setOf(type)) }

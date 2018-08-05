@@ -15,7 +15,9 @@ class GeneratedNode(private val generatedDependencies: GeneratedDependencies) : 
 
     override val dependencyCycle: DependencyCycle? = null
 
+    override val duplicateFactoryMethods: List<DuplicateFactoryMethod> = listOf()
+
     override val children: List<Node> = listOf()
 
-    override val parents: MutableList<Node> = mutableListOf()
+    override val parents: MutableList<ScopeClassNode> = mutableListOf()
 }

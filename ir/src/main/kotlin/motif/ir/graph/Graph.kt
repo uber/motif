@@ -20,7 +20,8 @@ class Graph(
                 scopeCycleError,
                 unprocessedScopeError,
                 missingDependenciesError(),
-                dependencyCycleError())
+                dependencyCycleError(),
+                duplicateFactoryMethodsError())
     }
 
     private fun missingDependenciesError(): MissingDependenciesError? {
@@ -39,6 +40,15 @@ class Graph(
             null
         } else {
             DependencyCycleError(cycles)
+        }
+    }
+
+    private fun duplicateFactoryMethodsError(): DuplicateFactorMethodsError? {
+        val duplicates = nodes.values.flatMap { it.duplicateFactoryMethods }
+        return if (duplicates.isEmpty()) {
+            null
+        } else {
+            DuplicateFactorMethodsError(duplicates)
         }
     }
 
