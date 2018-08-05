@@ -1,13 +1,10 @@
-package motif.ir.graph
-
-import motif.ir.graph.errors.MissingDependenciesError
-import motif.ir.graph.errors.ScopeCycleError
-import motif.ir.graph.errors.UnprocessedScopeError
+package motif.ir.graph.errors
 
 class GraphErrors(
         val scopeCycleError: ScopeCycleError?,
         val unprocessedScopeError: UnprocessedScopeError?,
-        val missingDependenciesError: MissingDependenciesError?) {
+        val missingDependenciesError: MissingDependenciesError?,
+        val dependencyCycleError: DependencyCycleError?) {
 
     val isEmpty: Boolean = scopeCycleError == null
             && unprocessedScopeError == null

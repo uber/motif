@@ -1,6 +1,5 @@
 package motif.ir.graph
 
-import motif.ir.source.base.Dependency
 import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.dependencies.GeneratedDependencies
 
@@ -14,7 +13,7 @@ class GeneratedNode(private val generatedDependencies: GeneratedDependencies) : 
 
     override val missingDependencies: Dependencies? = null
 
-    override val dependencyCycle: List<Dependency>? = null
+    override val dependencyCycle: DependencyCycle? = null
 
     override val children: List<Node> = listOf()
 }

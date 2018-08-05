@@ -1,10 +1,12 @@
 package com.uber.motif.compiler;
 
+import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
 import motif.compiler.Processor;
+import motif.ir.graph.errors.GraphErrors;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,14 +98,18 @@ public class TestHarness {
         if (compilation.status() == Compilation.Status.FAILURE) {
             Compilation noProcessorCompilation = compiler(new StubProcessor()).compile(files);
             testClass = compilationClassLoader(noProcessorCompilation).loadClass(testClassName);
-            try {
-                Field expectedException = testClass.getField("errors");
-                expectedException.set(null, processor.getErrors());
-            } catch (NoSuchFieldException ignore) {
-                assertThat(compilation).succeeded();
-            }
         } else {
             testClass = compilationClassLoader(compilation).loadClass(testClassName);
+        }
+
+        try {
+            Field expectedException = testClass.getField("errors");
+            assertThat(compilation).failed();
+            GraphErrors errors = processor.getErrors();
+            Truth.assertThat(errors).isNotNull();
+            expectedException.set(null, errors);
+        } catch (NoSuchFieldException ignore) {
+            assertThat(compilation).succeeded();
         }
 
         try {

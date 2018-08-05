@@ -1,10 +1,7 @@
 package motif.ir.graph
 
-import motif.ir.graph.errors.MissingDependenciesError
-import motif.ir.graph.errors.ScopeCycleError
-import motif.ir.graph.errors.UnprocessedScopeError
+import motif.ir.graph.errors.*
 import motif.ir.source.ScopeClass
-import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
 import motif.ir.source.dependencies.Dependencies
 
@@ -19,7 +16,11 @@ class Graph(
     }
 
     val graphErrors: GraphErrors by lazy {
-        GraphErrors(scopeCycleError, unprocessedScopeError, missingDependenciesError())
+        GraphErrors(
+                scopeCycleError,
+                unprocessedScopeError,
+                missingDependenciesError(),
+                dependencyCycleError())
     }
 
     private fun missingDependenciesError(): MissingDependenciesError? {
@@ -32,8 +33,13 @@ class Graph(
         }
     }
 
-    private val dependencyCycles: Map<Type, List<Dependency>?> by lazy {
-        nodes.entries.associateBy({ it.key.type }) { it.value.dependencyCycle }
+    private fun dependencyCycleError(): DependencyCycleError? {
+        val cycles = nodes.values.mapNotNull { it.dependencyCycle }
+        return if (cycles.isEmpty()) {
+            null
+        } else {
+            DependencyCycleError(cycles)
+        }
     }
 
     fun getDependencies(scopeType: Type): Dependencies? {

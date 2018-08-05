@@ -1,4 +1,4 @@
-package testcases.E004_scope_cycle_2;
+package testcases.E005_dependencies_cycle;
 
 import com.google.common.truth.Truth;
 import motif.ir.graph.errors.GraphErrors;
@@ -13,8 +13,6 @@ public class Test {
         ScopeCycleError error = errors.getScopeCycleError();
         Truth.assertThat(error).isNotNull();
         Truth.assertThat(error.getCycle())
-                .containsExactly(
-                        new Type(null, Scope.class.getName()),
-                        new Type(null, Child.class.getName()));
+                .containsExactly(new Type(null, Scope.class.getName()));
     }
 }

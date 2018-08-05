@@ -1,7 +1,6 @@
 package motif.ir.graph
 
 import motif.ir.source.ScopeClass
-import motif.ir.source.base.Dependency
 import motif.ir.source.dependencies.AnnotatedDependency
 import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.dependencies.ExplicitDependencies
@@ -17,7 +16,7 @@ class ScopeClassNode(
         internalMissingDependencies
     }
 
-    override val dependencyCycle: List<Dependency>? by lazy {
+    override val dependencyCycle: DependencyCycle? by lazy {
         DependencyCycleFinder(scopeClass).findCycle()
     }
 

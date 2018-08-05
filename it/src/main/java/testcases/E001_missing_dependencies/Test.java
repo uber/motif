@@ -2,7 +2,7 @@ package testcases.E001_missing_dependencies;
 
 import com.google.common.truth.Truth;
 import common.DependenciesSubject;
-import motif.ir.graph.GraphErrors;
+import motif.ir.graph.errors.GraphErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
 public class Test {

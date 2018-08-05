@@ -3,7 +3,7 @@ package motif.compiler
 import motif.Scope
 import motif.compiler.codegen.Generator
 import motif.compiler.ir.ScopeClassFactory
-import motif.ir.graph.GraphErrors
+import motif.ir.graph.errors.GraphErrors
 import motif.ir.graph.GraphFactory
 import motif.ir.source.SourceSet
 import javax.annotation.processing.AbstractProcessor

@@ -1,7 +1,7 @@
 package testcases.E003_scope_cycle;
 
 import com.google.common.truth.Truth;
-import motif.ir.graph.GraphErrors;
+import motif.ir.graph.errors.GraphErrors;
 import motif.ir.graph.errors.ScopeCycleError;
 import motif.ir.source.base.Type;
 
