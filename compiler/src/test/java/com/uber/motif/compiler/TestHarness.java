@@ -8,6 +8,7 @@ import dagger.internal.codegen.ComponentProcessor;
 import motif.compiler.Processor;
 import motif.ir.graph.errors.GraphErrors;
 import motif.stubcompiler.StubProcessor;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,6 +101,10 @@ public class TestHarness {
             testClass = compilationClassLoader(noProcessorCompilation).loadClass(testClassName);
         } else {
             testClass = compilationClassLoader(compilation).loadClass(testClassName);
+        }
+
+        if (testClass.getAnnotation(Ignore.class) != null) {
+            return;
         }
 
         try {
