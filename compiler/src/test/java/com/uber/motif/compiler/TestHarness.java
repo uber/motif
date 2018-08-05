@@ -1,19 +1,16 @@
 package com.uber.motif.compiler;
 
-import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
 import motif.compiler.Processor;
-import motif.compiler.errors.CompilationError;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.annotation.Nullable;
 import javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.IOException;
@@ -66,8 +63,6 @@ public class TestHarness {
     private final String testClassName;
     private final boolean hasExternalSources;
 
-    @Nullable private CompilationError error;
-
     @SuppressWarnings("unused")
     public TestHarness(File commonDir, File testCaseDir, File externalDir, String testName) {
         this.testCaseDir = testCaseDir;
@@ -94,15 +89,16 @@ public class TestHarness {
 
         if (hasExternalSources) compileExternalSources();
 
-        Compilation compilation = compiler(new Processor(error -> this.error = error)).compile(files);
+        Processor processor = new Processor();
+        Compilation compilation = compiler(processor).compile(files);
 
         Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
             Compilation noProcessorCompilation = compiler(new StubProcessor()).compile(files);
             testClass = compilationClassLoader(noProcessorCompilation).loadClass(testClassName);
             try {
-                Field expectedException = testClass.getField("expectedError");
-                expectedException.set(null, error);
+                Field expectedException = testClass.getField("errors");
+                expectedException.set(null, processor.getErrors());
             } catch (NoSuchFieldException ignore) {
                 assertThat(compilation).succeeded();
             }
