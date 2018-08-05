@@ -3,7 +3,6 @@ package motif.ir.graph
 import motif.ir.source.ScopeClass
 import motif.ir.source.SourceSet
 import motif.ir.source.base.Type
-import motif.ir.source.child.ChildDeclaration
 import motif.ir.source.dependencies.AnnotatedDependency
 import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.dependencies.ExplicitDependencies
@@ -21,7 +20,10 @@ class GraphFactory private constructor(private val sourceSet: SourceSet) {
             val dependencies = it.type.dependencies()
             Scope(it, it.childDependencies(), dependencies)
         }
-        return Graph(missingDependencies, scopes, scopeDependencies)
+        return Graph(
+                missingDependencies,
+                scopes,
+                scopeDependencies)
     }
 
     private val Type.scopeClass: ScopeClass?
@@ -43,7 +45,19 @@ class GraphFactory private constructor(private val sourceSet: SourceSet) {
 
     private fun ScopeClass.childDependencies(): Dependencies {
         return childDependencies.computeIfAbsent(type) {
-            childDeclarations.map { it.calculateDependencies() }.map { it.toTransitive() }.merge()
+            childDeclarations
+                    .map {
+                        val childDependencies = it.method.scope.dependencies()
+                        val dynamicDependencies = it.method.dynamicDependencies
+                        childDependencies.filter {
+                            // Only allow dynamic dependencies to satisfy non-transitive dependencies.
+                            // TODO If transitive, remove satisfied non-transitive scopes from AnnotatedDependency.consumingScopes
+                            it.transitive || it.dependency !in dynamicDependencies
+                        }
+                    }
+                    .map { it.toTransitive() }
+                    .merge()
+
         }
     }
 
@@ -52,16 +66,6 @@ class GraphFactory private constructor(private val sourceSet: SourceSet) {
             isEmpty() -> Dependencies(listOf())
             size == 1 -> this[0]
             else -> reduce { acc, dependencies -> acc + dependencies }
-        }
-    }
-
-    private fun ChildDeclaration.calculateDependencies(): Dependencies {
-        val childDependencies = method.scope.dependencies()
-        val dynamicDependencies = method.dynamicDependencies
-        return childDependencies.filter {
-            // Only allow dynamic dependencies to satisfy non-transitive dependencies.
-            // TODO If transitive, remove satisfied non-transitive scopes from AnnotatedDependency.consumingScopes
-            it.transitive || it.dependency !in dynamicDependencies
         }
     }
 
