@@ -136,10 +136,7 @@ public class TestHarness {
     }
 
     private void compileExternalSources() throws IOException {
-        Compilation compilation = externalSourceCompiler.compile(
-                externalDir,
-                new Processor(),
-                new ComponentProcessor());
+        Compilation compilation = externalSourceCompiler.compile(externalDir);
         assertThat(compilation).succeeded();
     }
 
