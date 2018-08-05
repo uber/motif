@@ -9,6 +9,7 @@ class GraphErrors(
     val isEmpty: Boolean = scopeCycleError == null
             && unprocessedScopeError == null
             && missingDependenciesError == null
+            && dependencyCycleError == null
 
     fun getMessage(): String {
         return "TODO: Implement graph error message."
