@@ -42,7 +42,9 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
                             ScopeChild(method, generatedNode(method.scope, it))
                         } ?: ScopeChild(method, calculatedNode(newVisited, method.scope))
                     }
-            ScopeClassNode(scopeClass, scopeChildren)
+            ScopeClassNode(scopeClass, scopeChildren).apply {
+                scopeChildren.forEach { it.node.parents.add(this) }
+            }
         }
     }
 

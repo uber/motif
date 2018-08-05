@@ -49,6 +49,8 @@ class ScopeClassNode(
 
     override val children: List<Node> = scopeChildren.map { it.node }
 
+    override val parents: MutableList<Node> = mutableListOf()
+
     private fun List<Dependencies>.merge(): Dependencies {
         return when {
             isEmpty() -> Dependencies(listOf())

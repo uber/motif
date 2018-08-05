@@ -8,4 +8,8 @@ interface Node {
     val missingDependencies: Dependencies?
     val dependencyCycle: DependencyCycle?
     val children: List<Node>
+
+    // Mutable to allow circular reference between child <-> parent Nodes.
+    // Should not be updated outside of GraphFactory.
+    val parents: MutableList<Node>
 }
