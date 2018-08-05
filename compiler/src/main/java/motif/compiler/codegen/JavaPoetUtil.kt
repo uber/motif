@@ -154,7 +154,7 @@ interface JavaPoetUtil : JavaxUtil {
         }
 
         fun Dependency.parameterSpec(): ParameterSpec {
-            return ParameterSpec.builder(typeName, names.unique(name()))
+            return ParameterSpec.builder(typeName, name())
                     .apply { qualifier?.let { addAnnotation(it.spec()) } }
                     .build()
         }
