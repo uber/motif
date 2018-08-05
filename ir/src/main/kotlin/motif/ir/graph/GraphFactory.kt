@@ -1,79 +1,53 @@
 package motif.ir.graph
 
+import motif.ir.graph.errors.ScopeCycleError
+import motif.ir.graph.errors.UnprocessedScopeError
 import motif.ir.source.ScopeClass
 import motif.ir.source.SourceSet
 import motif.ir.source.base.Type
-import motif.ir.source.dependencies.AnnotatedDependency
-import motif.ir.source.dependencies.Dependencies
-import motif.ir.source.dependencies.ExplicitDependencies
+import motif.ir.source.dependencies.GeneratedDependencies
 
-class GraphFactory private constructor(private val sourceSet: SourceSet) {
+class GraphFactory private constructor(sourceSet: SourceSet) {
 
     private val scopeClasses: Map<Type, ScopeClass> = sourceSet.scopeClasses.associateBy { it.type }
-    private val childDependencies: MutableMap<Type, Dependencies> = mutableMapOf()
-    private val scopeDependencies: MutableMap<Type, Dependencies> = mutableMapOf()
 
-    private var missingDependencies: Dependencies = Dependencies(listOf())
+    private val nodes: MutableMap<Type, Node> = mutableMapOf()
 
     private fun create(): Graph {
-        val scopes = sourceSet.scopeClasses.map {
-            val dependencies = it.type.dependencies()
-            Scope(it, it.childDependencies(), dependencies)
-        }
-        return Graph(
-                missingDependencies,
-                scopes,
-                scopeDependencies)
-    }
-
-    private val Type.scopeClass: ScopeClass?
-        get() = scopeClasses[this]
-
-    private fun Type.dependencies(): Dependencies {
-        return scopeDependencies.computeIfAbsent(this) {
-            sourceSet.generatedDependencies[this]?.let { return@computeIfAbsent it }
-            val scopeClass = scopeClass ?: throw IllegalStateException("ScopeClass not found for: $this")
-            val dependencies = scopeClass.childDependencies() - scopeClass.exposed + scopeClass.selfDependencies
-            scopeClass.explicitDependencies?.let { explicitDependencies ->
-                val missingDependencies = dependencies - explicitDependencies.dependencies
-                this@GraphFactory.missingDependencies += missingDependencies
-                return@computeIfAbsent explicitDependencies.override(scopeClass, dependencies)
-            }
-            dependencies
+        return try {
+            createUnsafe()
+        } catch (e: ScopeCycleError) {
+            Graph(mapOf(), mapOf(), e, null)
+        } catch (e: UnprocessedScopeError) {
+            Graph(mapOf(), mapOf(), null, e)
         }
     }
 
-    private fun ScopeClass.childDependencies(): Dependencies {
-        return childDependencies.computeIfAbsent(type) {
-            childDeclarations
-                    .map {
-                        val childDependencies = it.method.scope.dependencies()
-                        val dynamicDependencies = it.method.dynamicDependencies
-                        childDependencies.filter {
-                            // Only allow dynamic dependencies to satisfy non-transitive dependencies.
-                            // TODO If transitive, remove satisfied non-transitive scopes from AnnotatedDependency.consumingScopes
-                            it.transitive || it.dependency !in dynamicDependencies
-                        }
+    private fun createUnsafe(): Graph {
+        val nodes = scopeClasses.values.associateBy({ it }) { node(listOf(), it.type) }
+        return Graph(this.nodes, nodes, null, null)
+    }
+
+    private fun node(visited: List<Type>, scopeType: Type): Node {
+        if (scopeType in visited) {
+            throw ScopeCycleError(visited)
+        }
+        val newVisited = visited + scopeType
+        return nodes.computeIfAbsent(scopeType) {
+            val scopeClass = scopeClasses[scopeType] ?: throw UnprocessedScopeError(scopeType)
+            val scopeChildren: List<ScopeChild> = scopeClass.childDeclarations
+                    .map { childDeclaration ->
+                        val method = childDeclaration.method
+                        childDeclaration.generatedDependencies?.let {
+                            ScopeChild(method, node(method.scope, it))
+                        } ?: ScopeChild(method, node(newVisited, method.scope))
                     }
-                    .map { it.toTransitive() }
-                    .merge()
-
+            ScopeClassNode(scopeClass, scopeChildren)
         }
     }
 
-    private fun List<Dependencies>.merge(): Dependencies {
-        return when {
-            isEmpty() -> Dependencies(listOf())
-            size == 1 -> this[0]
-            else -> reduce { acc, dependencies -> acc + dependencies }
-        }
-    }
-
-    private fun ExplicitDependencies.override(scopeClass: ScopeClass, dependencies: Dependencies): Dependencies {
-        val list = this.dependencies.map {
-            dependencies[it] ?: AnnotatedDependency(it, false, setOf(scopeClass.type))
-        }
-        return Dependencies(list)
+    private fun node(scopeType: Type, generatedDependencies: GeneratedDependencies): Node {
+        return nodes.computeIfAbsent(scopeType) { GeneratedNode(generatedDependencies)  }
     }
 
     companion object {

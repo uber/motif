@@ -42,9 +42,7 @@ class Processor(private val listener: Listener? = null) : AbstractProcessor() {
                 .map { factory.create(it) }
 
         val graph = GraphFactory.create(SourceSet(scopes))
-        if (graph.missingDependencies.list.isNotEmpty()) {
-            throw MissingDependenciesError(graph.missingDependencies)
-        }
+        graph.missingDependencies?.let { throw MissingDependenciesError(it) }
 
         Generator(processingEnv, graph).generate()
     }
