@@ -1,7 +1,9 @@
 package com.google.testing.compile;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSetMultimap;
 import dagger.internal.codegen.ComponentProcessor;
+import motif.compiler.buck.ClassUsageFileManager;
 
 import javax.annotation.Nullable;
 import javax.annotation.processing.Processor;
@@ -11,17 +13,18 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MotifTestCompiler {
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-    public Compilation compile(
+    public Result compile(
             @Nullable File classpathDir,
             @Nullable File outDir,
             @Nullable Processor motifProcessor,
@@ -29,7 +32,8 @@ public class MotifTestCompiler {
         List<JavaFileObject> files = javaFileObjects(dirs);
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
 
-        JavaFileManager fileManager = compiler.getStandardFileManager(diagnosticCollector, Locale.getDefault(), UTF_8);
+        ClassUsageFileManager classUsageFileManager = new ClassUsageFileManager(diagnosticCollector, classpathDir);
+        JavaFileManager fileManager = classUsageFileManager;
         if (outDir == null) {
             fileManager = new InMemoryJavaFileManager(fileManager);
         }
@@ -61,12 +65,13 @@ public class MotifTestCompiler {
 
         task.setProcessors(processorsBuilder.build());
         boolean succeeded = task.call();
-        return new Compilation(
+        Compilation compilation = new Compilation(
                 Compiler.javac(),
                 files,
                 succeeded,
                 diagnosticCollector.getDiagnostics(),
                 collectingFileManager.getOutputFiles());
+        return new Result(compilation, classUsageFileManager.getClassnames());
     }
 
     private class CollectingFileManager extends ForwardingJavaFileManager<JavaFileManager> {
@@ -109,5 +114,16 @@ public class MotifTestCompiler {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public static class Result {
+
+        public final Compilation compilation;
+        public final Set<String> classnames;
+
+        public Result(Compilation compilation, Set<String> classnames) {
+            this.compilation = compilation;
+            this.classnames = classnames;
+        }
     }
 }

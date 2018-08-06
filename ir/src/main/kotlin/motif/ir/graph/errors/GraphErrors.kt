@@ -1,6 +1,6 @@
 package motif.ir.graph.errors
 
-class GraphErrors(
+data class GraphErrors(
         val scopeCycleError: ScopeCycleError?,
         val unprocessedScopeError: UnprocessedScopeError?,
         val missingDependenciesError: MissingDependenciesError?,
@@ -14,6 +14,6 @@ class GraphErrors(
             && duplicateFactorMethodsError == null
 
     fun getMessage(): String {
-        return "TODO: Implement graph error message."
+        return "$this"
     }
 }

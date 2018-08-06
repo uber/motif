@@ -77,20 +77,22 @@ public class TestHarness {
 
         if (externalOutputDir != null) {
             boolean shouldProcess = !new File(externalDir, "DO_NOT_PROCESS").exists();
-            compiler.compile(
+            Compilation externalCompilation = compiler.compile(
                     null,
                     externalOutputDir,
                     shouldProcess ? new Processor() : null,
-                    externalDir);
+                    externalDir).compilation;
+            assertThat(externalCompilation).succeeded();
         }
 
         Processor processor = new Processor();
-        Compilation compilation = compiler.compile(
+        MotifTestCompiler.Result result = compiler.compile(
                 externalOutputDir,
                 null,
                 processor,
                 testCaseDir,
                 commonDir);
+        Compilation compilation = result.compilation;
 
         Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
@@ -99,7 +101,7 @@ public class TestHarness {
                     null,
                     new StubProcessor(),
                     testCaseDir,
-                    commonDir);
+                    commonDir).compilation;
             testClass = loadTestClass(noProcessorCompilation);
         } else {
             testClass = loadTestClass(compilation);
@@ -118,6 +120,11 @@ public class TestHarness {
         } catch (NoSuchFieldException ignore) {
             assertThat(compilation).succeeded();
         }
+
+        try {
+            Field loadedClasses = testClass.getField("loadedClasses");
+            loadedClasses.set(null, result.classnames);
+        } catch (NoSuchFieldException ignore) {}
 
         try {
             testClass.getMethod("run").invoke(null);
