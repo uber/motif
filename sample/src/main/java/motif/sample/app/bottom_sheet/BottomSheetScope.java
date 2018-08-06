@@ -4,6 +4,7 @@ import android.view.ViewGroup;
 
 import motif.Scope;
 import motif.sample.app.bottom_header.BottomHeaderScope;
+import motif.sample.app.photo_grid.PhotoGridScope;
 import motif.sample.app.photo_list.PhotoListScope;
 import motif.sample.lib.controller.ControllerObjects;
 
@@ -15,6 +16,8 @@ public interface BottomSheetScope {
     BottomHeaderScope header(ViewGroup parent);
 
     PhotoListScope photoList(ViewGroup parent);
+
+    PhotoGridScope photoGrid(ViewGroup parent);
 
     @motif.Objects
     abstract class Objects extends ControllerObjects<BottomSheetController, BottomSheetView> {}
