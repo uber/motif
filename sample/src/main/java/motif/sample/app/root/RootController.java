@@ -2,7 +2,7 @@ package motif.sample.app.root;
 
 import android.content.Context;
 
-import com.uber.motif.sample.R;
+import motif.sample.R;
 import motif.sample.app.photo_grid.PhotoGridView;
 import motif.sample.app.bottom_sheet.BottomSheetView;
 import motif.sample.lib.controller.Controller;

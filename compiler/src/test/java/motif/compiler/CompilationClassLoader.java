@@ -1,4 +1,4 @@
-package com.uber.motif.compiler;
+package motif.compiler;
 
 import com.google.common.io.ByteStreams;
 import com.google.testing.compile.Compilation;

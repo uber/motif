@@ -1,11 +1,10 @@
-package com.uber.motif.compiler;
+package motif.compiler;
 
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationFactory;
 import com.google.testing.compile.Compiler;
 import dagger.internal.codegen.ComponentProcessor;
-import motif.compiler.Processor;
 import org.junit.rules.TemporaryFolder;
 
 import javax.tools.*;

@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.uber.motif.sample.R;
+import motif.sample.R;
 
 import java.util.Locale;
 

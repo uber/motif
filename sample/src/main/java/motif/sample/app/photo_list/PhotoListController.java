@@ -3,7 +3,7 @@ package motif.sample.app.photo_list;
 
 import android.view.ViewGroup;
 
-import com.uber.motif.sample.R;
+import motif.sample.R;
 import motif.sample.lib.controller.Controller;
 import motif.sample.lib.multiselect.MultiSelector;
 

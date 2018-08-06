@@ -2,7 +2,7 @@ package motif.sample.app.bottom_header;
 
 import android.view.ViewGroup;
 
-import com.uber.motif.sample.R;
+import motif.sample.R;
 import motif.sample.lib.controller.Controller;
 import motif.sample.lib.multiselect.MultiSelector;
 

@@ -1,11 +1,10 @@
-package com.uber.motif.compiler;
+package motif.compiler;
 
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import dagger.internal.codegen.ComponentProcessor;
-import motif.compiler.Processor;
 import motif.ir.graph.errors.GraphErrors;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Ignore;

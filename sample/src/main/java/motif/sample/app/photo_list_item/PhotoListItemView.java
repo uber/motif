@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.uber.motif.sample.R;
+import motif.sample.R;
 import motif.sample.lib.db.Photo;
 
 import butterknife.BindView;
