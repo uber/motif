@@ -10,26 +10,6 @@ import kotlin.system.measureNanoTime
 
 class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
 
-    val visited: MutableSet<PsiClass> = mutableSetOf()
-
-    fun visitAnnotation(annotation: PsiAnnotation) {
-        annotation.text
-    }
-
-    fun visitType(type: PsiType) {
-        type.canonicalText
-        type.annotations.forEach(::visitAnnotation)
-    }
-
-    fun visitSignature(signature: HierarchicalMethodSignature) {
-        signature.parameterTypes.forEach(::visitType)
-        signature.method.returnType?.let(::visitType)
-    }
-
-    fun visitClass(psiClass: PsiClass) {
-        psiClass.visibleSignatures.forEach(::visitSignature)
-    }
-
     override fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in RelatedItemLineMarkerInfo<PsiElement>>) {
 
         if (element !is PsiMethod && element !is PsiIdentifier) return
@@ -37,14 +17,6 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
         val component = MotifComponent.get(element.project)
         val graphProcessor = component.graphProcessor
         val scopeClassesMap = graphProcessor.scopeClassesMap()
-        scopeClassesMap.forEach { scopeClass, _ ->
-            val alreadyVisited = !visited.add(scopeClass)
-            val dur = measureNanoTime {
-                scopeClass.let(::visitClass)
-                scopeClass.innerClasses.find { it.name == "Objects" }!!.let(::visitClass)
-            }
-            println("$alreadyVisited: $dur: $scopeClass")
-        }
 
         when(element) {
             is PsiIdentifier -> {
