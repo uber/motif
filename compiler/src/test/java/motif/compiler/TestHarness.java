@@ -2,34 +2,27 @@ package motif.compiler;
 
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
-import com.google.testing.compile.Compiler;
-import com.google.testing.compile.JavaFileObjects;
-import dagger.internal.codegen.ComponentProcessor;
+import com.google.testing.compile.MotifTestCompiler;
 import motif.ir.graph.errors.GraphErrors;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.tools.JavaFileObject;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
 
 @RunWith(Parameterized.class)
 public class TestHarness {
@@ -57,13 +50,16 @@ public class TestHarness {
                 && (filename.startsWith("T") || filename.startsWith("E"));
     }
 
-    @Rule public ExternalSourceCompiler externalSourceCompiler = new ExternalSourceCompiler();
+    @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private final MotifTestCompiler compiler = new MotifTestCompiler();
 
     private final File testCaseDir;
     private final File commonDir;
     private final File externalDir;
     private final String testClassName;
-    private final boolean hasExternalSources;
+
+    private File externalOutputDir;
 
     @SuppressWarnings("unused")
     public TestHarness(File commonDir, File testCaseDir, File externalDir, String testName) {
@@ -71,35 +67,42 @@ public class TestHarness {
         this.commonDir = commonDir;
         this.externalDir = externalDir;
         this.testClassName = "testcases." + testName + ".Test";
-        this.hasExternalSources = externalDir.listFiles() != null && externalDir.listFiles().length > 0;
     }
 
     @Test
     public void test() throws Throwable {
-        JavaFileObject[] files = Stream.of(Files.walk(testCaseDir.toPath()), Files.walk(commonDir.toPath()))
-                .flatMap(Function.identity())
-                .map(Path::toFile)
-                .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
-                .map(file -> {
-                    try {
-                        return JavaFileObjects.forResource(file.toURI().toURL());
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toArray(JavaFileObject[]::new);
+        File[] externalDirContents = externalDir.listFiles();
+        boolean hasExternalSources = externalDirContents != null && externalDirContents.length > 0;
+        externalOutputDir = hasExternalSources ? temporaryFolder.newFolder() : null;
 
-        if (hasExternalSources) compileExternalSources();
+        if (externalOutputDir != null) {
+            boolean shouldProcess = !new File(externalDir, "DO_NOT_PROCESS").exists();
+            compiler.compile(
+                    null,
+                    externalOutputDir,
+                    shouldProcess ? new Processor() : null,
+                    externalDir);
+        }
 
         Processor processor = new Processor();
-        Compilation compilation = compiler(processor).compile(files);
+        Compilation compilation = compiler.compile(
+                externalOutputDir,
+                null,
+                processor,
+                testCaseDir,
+                commonDir);
 
         Class<?> testClass;
         if (compilation.status() == Compilation.Status.FAILURE) {
-            Compilation noProcessorCompilation = compiler(new StubProcessor()).compile(files);
-            testClass = compilationClassLoader(noProcessorCompilation).loadClass(testClassName);
+            Compilation noProcessorCompilation = compiler.compile(
+                    externalOutputDir,
+                    null,
+                    new StubProcessor(),
+                    testCaseDir,
+                    commonDir);
+            testClass = loadTestClass(noProcessorCompilation);
         } else {
-            testClass = compilationClassLoader(compilation).loadClass(testClassName);
+            testClass = loadTestClass(compilation);
         }
 
         if (testClass.getAnnotation(Ignore.class) != null) {
@@ -123,39 +126,14 @@ public class TestHarness {
         }
     }
 
-    private ClassLoader compilationClassLoader(Compilation compilation) {
-        if (hasExternalSources) {
-            return new CompilationClassLoader(externalSourceCompiler.classLoader, compilation);
+    private Class<?> loadTestClass(Compilation compilation) throws ClassNotFoundException, MalformedURLException {
+        ClassLoader classLoader;
+        if (externalOutputDir == null) {
+            classLoader = new CompilationClassLoader(compilation);
         } else {
-            return new CompilationClassLoader(compilation);
+            ClassLoader externalClassLoader = new URLClassLoader(new URL[]{externalOutputDir.toURI().toURL()});
+            classLoader = new CompilationClassLoader(externalClassLoader, compilation);
         }
-    }
-
-    private Compiler compiler(javax.annotation.processing.Processor processor) {
-        Compiler compiler = javac().withProcessors(processor, new ComponentProcessor());
-        if (hasExternalSources) {
-            compiler = compiler.withClasspathFrom(externalSourceCompiler.classLoader);
-        }
-        return compiler;
-    }
-
-    private void compileExternalSources() throws IOException {
-        Compilation compilation = externalSourceCompiler.compile(externalDir);
-        assertThat(compilation).succeeded();
-    }
-
-    static List<JavaFileObject> javaFileObjects(File dir) throws IOException {
-        return Stream.of(Files.walk(dir.toPath()))
-                .flatMap(Function.identity())
-                .map(Path::toFile)
-                .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
-                .map(file -> {
-                    try {
-                        return JavaFileObjects.forResource(file.toURI().toURL());
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        return classLoader.loadClass(testClassName);
     }
 }
