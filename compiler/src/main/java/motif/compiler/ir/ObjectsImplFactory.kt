@@ -1,6 +1,7 @@
 package motif.compiler.ir
 
 import motif.DoNotCache
+import motif.Expose
 import motif.Objects
 import motif.Spread
 import motif.compiler.javax.Executable
@@ -32,8 +33,7 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                 }
                 .map { (executable, method) ->
                     val providedDependency = executable.returnedDependency
-                    // TODO Replace with annotation
-                    val isExposed = executable.isPublic
+                    val isExposed = executable.hasAnnotation(Expose::class)
                     val isCached = !executable.hasAnnotation(DoNotCache::class)
                     FactoryMethod(
                             userData = executable,

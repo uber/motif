@@ -1,6 +1,7 @@
 package testcases.T028_external;
 
 import external.T028_external.Child;
+import motif.Expose;
 
 @motif.Scope
 public interface Scope {
@@ -10,7 +11,8 @@ public interface Scope {
     @motif.Objects
     class Objects {
 
-        public String string() {
+        @Expose
+        String string() {
             return "s";
         }
     }

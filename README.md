@@ -120,12 +120,12 @@ interface MainScope {
 }
 ```
 
-Child Scopes can use objects declared on parent's `Objects` classes as long as they are marked public:
+Child Scopes can use objects provided by parent factory methods as long as they are annotated with `@Expose`:
 
 <details>
 <summary>Notes for Dagger users...</summary>
 
-Unlike Dagger `@Subcomponents` which expose all objects down the graph by default, Motif Scopes consider objects internal to the Scope unless explicitly marked as public.
+Unlike Dagger `@Subcomponents` which expose all objects down the graph by default, Motif Scopes consider objects internal to the Scope unless explicitly annotated otherwise.
 </details>
 
 ```java
@@ -139,7 +139,8 @@ interface MainScope {
     @motif.Objects
     class Objects {
 
-        public Database database() {
+        @Expose
+        Database database() {
             return new Database();
         }
 

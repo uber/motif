@@ -1,5 +1,6 @@
 package testcases.T020_naming_collisions;
 
+import motif.Expose;
 import motif.Scope;
 
 import javax.inject.Named;
@@ -29,16 +30,21 @@ public class Test {
         @motif.Objects
         abstract class Objects {
 
-            public abstract testcases.T020_naming_collisions.c.SomeDependency c();
-            public abstract testcases.T020_naming_collisions.d.SomeDependency d();
+            @Expose
+            abstract testcases.T020_naming_collisions.c.SomeDependency c();
 
+            @Expose
+            abstract testcases.T020_naming_collisions.d.SomeDependency d();
+
+            @Expose
             @Named("A")
-            public String a() {
+            String a() {
                 return "a";
             }
 
+            @Expose
             @Named("B")
-            public String b() {
+            String b() {
                 return "b";
             }
         }
