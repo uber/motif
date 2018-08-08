@@ -5,7 +5,7 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import motif.compiler.javax.Executable;
 import motif.ir.graph.DuplicateFactoryMethod;
-import motif.ir.graph.errors.DuplicateFactorMethodsError;
+import motif.ir.graph.errors.DuplicateFactoryMethodsError;
 import motif.ir.source.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertAbout;
 
-public class DuplicateFactoryMethodsSubject extends Subject<DuplicateFactoryMethodsSubject, DuplicateFactorMethodsError> {
+public class DuplicateFactoryMethodsSubject extends Subject<DuplicateFactoryMethodsSubject, DuplicateFactoryMethodsError> {
 
-    private static final Factory<DuplicateFactoryMethodsSubject, DuplicateFactorMethodsError> FACTORY = DuplicateFactoryMethodsSubject::new;
+    private static final Factory<DuplicateFactoryMethodsSubject, DuplicateFactoryMethodsError> FACTORY = DuplicateFactoryMethodsSubject::new;
 
     private final Map<String, List<String>> expectedDuplicates = new HashMap<>();
 
-    private DuplicateFactoryMethodsSubject(FailureMetadata metadata, @NullableDecl DuplicateFactorMethodsError actual) {
+    private DuplicateFactoryMethodsSubject(FailureMetadata metadata, @NullableDecl DuplicateFactoryMethodsError actual) {
         super(metadata, actual);
     }
 
@@ -53,7 +53,7 @@ public class DuplicateFactoryMethodsSubject extends Subject<DuplicateFactoryMeth
         return this;
     }
 
-    public static DuplicateFactoryMethodsSubject assertThat(DuplicateFactorMethodsError dependencyCycle) {
+    public static DuplicateFactoryMethodsSubject assertThat(DuplicateFactoryMethodsError dependencyCycle) {
         return assertAbout(FACTORY).that(dependencyCycle);
     }
 }

@@ -2,6 +2,14 @@ package motif.ir.source.base
 
 class Type(val userData: Any?, val id: String) {
 
+    val packageName: String by lazy {
+        id.substringBeforeLast('.')
+    }
+
+    val simpleName: String by lazy {
+        id.substringAfterLast('.')
+    }
+
     override fun toString(): String {
         return id
     }

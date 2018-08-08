@@ -13,6 +13,7 @@ repositories {
 dependencies {
     compile deps.kotlin.stdlib
     compile project(':lib')
+    compile 'de.vandermeer:asciitable:0.3.2'
 
     testCompile deps.test.junit
 }

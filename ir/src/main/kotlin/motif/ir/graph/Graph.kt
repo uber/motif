@@ -43,12 +43,12 @@ class Graph(
         }
     }
 
-    private fun duplicateFactoryMethodsError(): DuplicateFactorMethodsError? {
+    private fun duplicateFactoryMethodsError(): DuplicateFactoryMethodsError? {
         val duplicates = nodes.values.flatMap { it.duplicateFactoryMethods }
         return if (duplicates.isEmpty()) {
             null
         } else {
-            DuplicateFactorMethodsError(duplicates)
+            DuplicateFactoryMethodsError(duplicates)
         }
     }
 

@@ -19,7 +19,7 @@ class Processor : AbstractProcessor() {
     var errors: GraphErrors? = null
 
     private val hasErrors: Boolean
-        get() = !(errors?.isEmpty ?: true)
+        get() = !(errors?.isEmpty() ?: true)
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -37,7 +37,7 @@ class Processor : AbstractProcessor() {
         return true
     }
 
-    fun process(roundEnv: RoundEnvironment) {
+    private fun process(roundEnv: RoundEnvironment) {
         val factory = ScopeClassFactory(processingEnv)
         val scopes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
                 .map { it as TypeElement }
@@ -48,10 +48,12 @@ class Processor : AbstractProcessor() {
         val errors = graph.graphErrors
         this.errors = errors
 
-        if (hasErrors) {
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, errors.getMessage())
-        } else {
+        if (errors.isEmpty()) {
             Generator(processingEnv, graph).generate()
+        } else {
+            errors.forEach { error ->
+                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${error.message}\n")
+            }
         }
     }
 }
