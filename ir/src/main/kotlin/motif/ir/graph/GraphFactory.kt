@@ -14,19 +14,19 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
     private fun create(): Graph {
         return try {
             createUnsafe()
-        } catch (e: ScopeCycleError) {
-            Graph(mapOf(), mapOf(), e)
+        } catch (e: ScopeCycleException) {
+            Graph(mapOf(), e.error)
         }
     }
 
     private fun createUnsafe(): Graph {
-        val nodes = scopeClasses.values.associateBy({ it }) { node(listOf(), it.type) }
-        return Graph(this.nodes, nodes, null)
+        val nodes = scopeClasses.values.associateBy({ it.type }) { node(listOf(), it.type) }
+        return Graph(nodes, null)
     }
 
     private fun node(visited: List<Type>, scopeType: Type): Node {
         if (scopeType in visited) {
-            throw ScopeCycleError(visited)
+            throw ScopeCycleException(ScopeCycleError(visited))
         }
         val newVisited = visited + scopeType
         return nodes.computeIfAbsent(scopeType) {
@@ -40,6 +40,8 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
             }
         }
     }
+
+    private class ScopeCycleException(val error: ScopeCycleError) : RuntimeException()
 
     companion object {
 

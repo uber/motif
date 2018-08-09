@@ -2,16 +2,14 @@ package motif.compiler
 
 import motif.Scope
 import motif.compiler.codegen.Generator
-import motif.compiler.ir.ScopeClassFactory
+import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.SourceSetFactory
-import motif.ir.graph.errors.GraphErrors
 import motif.ir.graph.GraphFactory
-import motif.ir.source.SourceSet
+import motif.ir.graph.errors.GraphErrors
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
 
 class Processor : AbstractProcessor() {
@@ -49,7 +47,8 @@ class Processor : AbstractProcessor() {
             Generator(processingEnv, graph).generate()
         } else {
             errors.forEach { error ->
-                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${error.message}\n")
+                val errorMessage = ErrorHandler.handle(error)
+                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${errorMessage.message}\n", errorMessage.element)
             }
         }
     }

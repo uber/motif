@@ -17,7 +17,7 @@ class Dependency(
 
     override fun toString(): String {
         val qualifierString = qualifier?.let { "$it " } ?: ""
-        return "$qualifierString\n${type.simpleName}"
+        return "$qualifierString $type"
     }
 
     override fun equals(other: Any?): Boolean {

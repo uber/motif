@@ -5,12 +5,12 @@ import motif.ir.source.base.Type
 
 class Dependencies(val list: List<AnnotatedDependency>) {
 
-    val scopeToDependencies: Map<Type, List<Dependency>> by lazy {
+    val scopeToDependencies: Map<Type, Dependencies> by lazy {
         list.flatMap { annotatedDependency ->
             annotatedDependency.consumingScopes.map { scopeType ->
                 Pair(scopeType, annotatedDependency)
             }
-        }.groupBy({ it.first }) { it.second.dependency }
+        }.groupBy({ it.first }) { it.second }.mapValues { Dependencies(it.value) }
     }
 
     private val map: Map<Dependency, AnnotatedDependency> by lazy {

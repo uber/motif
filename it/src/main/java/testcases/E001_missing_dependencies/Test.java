@@ -5,14 +5,16 @@ import common.DependenciesSubject;
 import motif.ir.graph.errors.GraphErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
+import java.util.List;
+
 public class Test {
 
     public static GraphErrors errors;
 
     public static void run() {
-        MissingDependenciesError error = errors.getMissingDependenciesError();
-        Truth.assertThat(error).isNotNull();
-        DependenciesSubject.assertThat(error.getDependencies())
+        List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();
+        Truth.assertThat(errors).hasSize(1);
+        DependenciesSubject.assertThat(errors.get(0).getDependencies())
                 .with(String.class, Scope.class)
                 .matches();
     }

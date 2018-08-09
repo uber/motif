@@ -1,17 +1,15 @@
 package motif.ir.graph
 
 import motif.ir.graph.errors.*
-import motif.ir.source.ScopeClass
 import motif.ir.source.base.Type
 import motif.ir.source.dependencies.Dependencies
 
 class Graph(
-        private val allNodes: Map<Type, Node>,
-        private val nodes: Map<ScopeClass, Node>,
+        private val nodes: Map<Type, Node>,
         private val scopeCycleError: ScopeCycleError?) {
 
-    val scopes: List<Scope> = nodes.map { (scopeClass, node) ->
-        Scope(scopeClass, node.childDependencies, node.dependencies)
+    val scopes: List<Scope> = nodes.map { (_, node) ->
+        Scope(node.scopeClass, node.childDependencies, node.dependencies)
     }
 
     val graphErrors: GraphErrors by lazy {
@@ -22,13 +20,16 @@ class Graph(
                 duplicateFactoryMethodsError())
     }
 
-    private fun missingDependenciesError(): MissingDependenciesError? {
+    private fun missingDependenciesError(): List<MissingDependenciesError> {
         val allMissingDepenendencies: List<Dependencies> = nodes.values.mapNotNull { it.missingDependencies }
         return if (allMissingDepenendencies.isEmpty()) {
-            null
+            listOf()
         }  else {
             val missing = allMissingDepenendencies.reduce { acc, dependencies -> acc + dependencies }
-            MissingDependenciesError(missing)
+            missing.scopeToDependencies.map { (scopeType, missing) ->
+                val scopeNode = nodes[scopeType] ?: throw IllegalStateException()
+                MissingDependenciesError(scopeNode, missing)
+            }
         }
     }
 
@@ -51,6 +52,6 @@ class Graph(
     }
 
     fun getDependencies(scopeType: Type): Dependencies? {
-        return allNodes[scopeType]?.dependencies
+        return nodes[scopeType]?.dependencies
     }
 }

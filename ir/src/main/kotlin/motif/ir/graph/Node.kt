@@ -8,7 +8,7 @@ import motif.ir.source.dependencies.ExplicitDependencies
 import motif.ir.source.objects.FactoryMethod
 
 class Node(
-        private val scopeClass: ScopeClass,
+        val scopeClass: ScopeClass,
         private val scopeChildren: List<ScopeChild>) {
 
     private var internalMissingDependencies: Dependencies? = null
