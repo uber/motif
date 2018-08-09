@@ -3,29 +3,9 @@ The tests in this module are run from the test harness in the ``:compiler` modul
 
 ### TODO
 
-#### Child Scopes
-
-- Dynamic dependency
-- Circular scope
-- Circular scope: Cycle length > 2
-- Increase visibility of base Objects class factory method
-- Internal with qualifier
-
-#### Dagger
-
 - Dagger as parent
 - Dagger as child
 - Dagger w/ @Spread
-
-#### Errors
-
-- Circular dependencies
-- Provided in multiple places (Not yet implemented)
 - Missing constructor dependency
 - Missing dependency due to dependency visibility
-- Missing dependency due to package-private method
-- Missing dependency due to package-private spread method
 - Missing dependency due to dynamic dependency default visibility
-
-- Invalid methods
-- Non-interface annotated w/ @Scope
