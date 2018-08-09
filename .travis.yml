@@ -1,0 +1,11 @@
+language: android
+
+cache:
+  directories:
+  - $HOME/.gradle
+
+before_install:
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "$LICENSES_HASH" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo "$LICENSES_HASH_TWO" >> "$ANDROID_HOME/licenses/android-sdk-license"
