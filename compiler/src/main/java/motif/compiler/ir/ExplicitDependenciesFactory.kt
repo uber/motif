@@ -1,6 +1,7 @@
 package motif.compiler.ir
 
 import motif.Dependencies
+import motif.compiler.errors.CompilerError
 import motif.compiler.javax.JavaxUtil
 import motif.ir.source.dependencies.ExplicitDependencies
 import javax.annotation.processing.ProcessingEnvironment
@@ -12,8 +13,8 @@ class ExplicitDependenciesFactory(override val env: ProcessingEnvironment) : Jav
         val explicitDependenciesType = scopeType.annotatedInnerType(Dependencies::class) ?: return null
         val depedencies = explicitDependenciesType.methods()
                 .onEach {
-                    if (it.isVoid) throw IllegalStateException("Dependencies methods must not return void.")
-                    if (it.parameters.isNotEmpty()) throw IllegalStateException("Dependencies methods must be parameterless.")
+                    if (it.isVoid) throw CompilerError(it.element, "Dependencies methods must not return void.")
+                    if (it.parameters.isNotEmpty()) throw CompilerError(it.element, "Dependencies methods must be parameterless.")
                 }
                 .map { it.returnedDependency }
         return ExplicitDependencies(explicitDependenciesType, depedencies)

@@ -2,6 +2,7 @@ package motif.compiler
 
 import motif.Scope
 import motif.compiler.codegen.Generator
+import motif.compiler.errors.CompilerError
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.SourceSetFactory
 import motif.ir.graph.GraphFactory
@@ -37,8 +38,13 @@ class Processor : AbstractProcessor() {
     }
 
     private fun process(roundEnv: RoundEnvironment) {
-        val sourceSetFactory = SourceSetFactory(processingEnv)
-        val sourceSet = sourceSetFactory.create(roundEnv)
+        val sourceSet = try {
+            SourceSetFactory(processingEnv).create(roundEnv)
+        } catch (e: CompilerError) {
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e.message}\n", e.element)
+            return
+        }
+
         val graph = GraphFactory.create(sourceSet)
         val errors = graph.graphErrors
         this.errors = errors

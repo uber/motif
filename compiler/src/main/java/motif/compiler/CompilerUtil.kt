@@ -2,6 +2,7 @@ package motif.compiler
 
 import com.google.auto.common.AnnotationMirrors
 import com.squareup.javapoet.ClassName
+import motif.compiler.errors.CompilerError
 import motif.ir.source.base.Type
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
@@ -20,7 +21,7 @@ fun Element.qualifierAnnotation(): motif.ir.source.base.Annotation? {
         return null
     }
     if (qualifiers.size > 1) {
-        throw IllegalStateException("More than one qualifier found: $qualifiers.")
+        throw CompilerError(this, "More than one qualifier found: $qualifiers.")
     }
     return qualifiers.first().ir
 }
