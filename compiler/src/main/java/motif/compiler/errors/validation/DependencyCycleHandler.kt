@@ -1,7 +1,6 @@
-package motif.compiler.errors
+package motif.compiler.errors.validation
 
 import motif.ir.graph.errors.DependencyCycleError
-import motif.ir.graph.errors.ScopeCycleError
 import javax.lang.model.element.Element
 
 class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {

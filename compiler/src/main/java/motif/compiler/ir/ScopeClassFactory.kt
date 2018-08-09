@@ -1,6 +1,6 @@
 package motif.compiler.ir
 
-import motif.compiler.errors.CompilerError
+import motif.compiler.errors.parsing.ParsingError
 import motif.compiler.javax.JavaxUtil
 import motif.compiler.ir
 import motif.ir.source.ScopeClass
@@ -25,7 +25,7 @@ class ScopeClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                     when {
                         childFactory.isApplicable(it) -> childMethods.add(childFactory.create(it))
                         accessMethodFactory.isApplicable(it) -> accessMethods.add(accessMethodFactory.create(it))
-                        else -> throw CompilerError(it.element, "Invalid Scope method")
+                        else -> throw ParsingError(it.element, "Invalid Scope method")
                     }
                 }
 

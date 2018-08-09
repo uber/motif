@@ -1,4 +1,4 @@
-package motif.compiler.errors
+package motif.compiler.errors.validation
 
 import javax.lang.model.element.Element
 

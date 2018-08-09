@@ -1,4 +1,4 @@
-package motif.compiler.errors
+package motif.compiler.errors.validation
 
 import motif.ir.graph.errors.DuplicateFactoryMethodsError
 import javax.lang.model.element.Element

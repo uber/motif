@@ -2,8 +2,8 @@ package motif.compiler
 
 import motif.Scope
 import motif.compiler.codegen.Generator
-import motif.compiler.errors.CompilerError
-import motif.compiler.errors.ErrorHandler
+import motif.compiler.errors.parsing.ParsingError
+import motif.compiler.errors.validation.ErrorHandler
 import motif.compiler.ir.SourceSetFactory
 import motif.ir.graph.GraphFactory
 import motif.ir.graph.errors.GraphValidationErrors
@@ -40,7 +40,7 @@ class Processor : AbstractProcessor() {
     private fun process(roundEnv: RoundEnvironment) {
         val sourceSet = try {
             SourceSetFactory(processingEnv).create(roundEnv)
-        } catch (e: CompilerError) {
+        } catch (e: ParsingError) {
             processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e.message}\n", e.element)
             return
         }

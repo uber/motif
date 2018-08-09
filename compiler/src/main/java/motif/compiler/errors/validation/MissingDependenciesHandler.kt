@@ -1,4 +1,4 @@
-package motif.compiler.errors
+package motif.compiler.errors.validation
 
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable

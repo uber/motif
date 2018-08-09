@@ -4,7 +4,7 @@ import motif.DoNotCache
 import motif.Expose
 import motif.Objects
 import motif.Spread
-import motif.compiler.errors.CompilerError
+import motif.compiler.errors.parsing.ParsingError
 import motif.compiler.javax.Executable
 import motif.compiler.javax.JavaxUtil
 import motif.ir.source.base.Dependency
@@ -21,15 +21,15 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
         val objectsType = scopeType.annotatedInnerType(Objects::class) ?: return null
         val methods = objectsType.methods()
                 .onEach {
-                    if (it.isVoid) throw CompilerError(it.element, "Factory method must not return void")
-                    if (it.isPrivate) throw CompilerError(it.element, "Factory method cannot be private")
+                    if (it.isVoid) throw ParsingError(it.element, "Factory method must not return void")
+                    if (it.isPrivate) throw ParsingError(it.element, "Factory method cannot be private")
                 }
                 .map {
                     // Order matters here.
                     val method = basic(it)
                             ?: constructor(it)
                             ?: binds(it)
-                            ?: throw CompilerError(it.element, "Invalid Objects method")
+                            ?: throw ParsingError(it.element, "Invalid Objects method")
                     Pair(it, method)
                 }
                 .map { (executable, method) ->
@@ -67,7 +67,7 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                 .map { Executable(providedType, it.toType(providedType), it) }
 
         if (constructors.isEmpty()) {
-            throw CompilerError(providedType.asElement(), "Unable to find a constructor for type")
+            throw ParsingError(providedType.asElement(), "Unable to find a constructor for type")
         }
 
         // TODO Better handling of multiple constructors.
@@ -84,7 +84,7 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
         val parameter = executable.parameters[0]
         if (!parameter.type.isAssignableTo(executable.returnType)) {
-            throw CompilerError(executable.element, "Invalid binds method. Parameter is not assignable to return type.")
+            throw ParsingError(executable.element, "Invalid binds method. Parameter is not assignable to return type.")
         }
 
         return Method(FactoryMethod.Kind.BINDS, listOf(parameter.dependency))
