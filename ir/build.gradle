@@ -1,4 +1,8 @@
 plugins {
+    id 'maven-publish'
+}
+
+plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -14,4 +18,16 @@ dependencies {
     compile deps.kotlin.stdlib
     compile project(':lib')
     compile deps.asciiTable
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.uber.motif'
+            artifactId = 'motif-compiler'
+            version = '0.0.1-LOCAL'
+
+            from components.java
+        }
+    }
 }
