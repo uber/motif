@@ -14,8 +14,8 @@ class MissingDependenciesHandler : ErrorHandler<MissingDependenciesError>() {
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
             addRule()
-            error.dependencies.list.forEach { annotatedDependency ->
-                addRow(annotatedDependency.dependency).setPaddingLeft(1)
+            error.dependencies.forEach { dependency ->
+                addRow(dependency).setPaddingLeft(1)
                 addRule()
             }
         }

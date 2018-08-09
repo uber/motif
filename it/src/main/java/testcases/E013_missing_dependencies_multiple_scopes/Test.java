@@ -1,12 +1,11 @@
-package testcases.E002_nonstandard_dependencies_name;
+package testcases.E013_missing_dependencies_multiple_scopes;
 
+import com.google.common.truth.Truth;
 import common.MissingDependenciesSubject;
 import motif.ir.graph.errors.GraphErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
 import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
@@ -14,8 +13,10 @@ public class Test {
 
     public static void run() {
         List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();
-        assertThat(errors).hasSize(1);
+        Truth.assertThat(errors).hasSize(2);
         MissingDependenciesSubject.assertThat(errors.get(0))
-                .matches(Scope.class, String.class);
+                .matches(ChildA.class, String.class);
+        MissingDependenciesSubject.assertThat(errors.get(1))
+                .matches(ChildB.class, String.class);
     }
 }

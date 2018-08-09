@@ -1,7 +1,7 @@
 package testcases.E001_missing_dependencies;
 
 import com.google.common.truth.Truth;
-import common.DependenciesSubject;
+import common.MissingDependenciesSubject;
 import motif.ir.graph.errors.GraphErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
@@ -14,8 +14,7 @@ public class Test {
     public static void run() {
         List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();
         Truth.assertThat(errors).hasSize(1);
-        DependenciesSubject.assertThat(errors.get(0).getDependencies())
-                .with(String.class, Scope.class)
-                .matches();
+        MissingDependenciesSubject.assertThat(errors.get(0))
+                .matches(Scope.class, String.class);
     }
 }

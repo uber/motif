@@ -58,10 +58,10 @@ public class MotifTestCompiler {
                 files);
 
         ImmutableList.Builder<Processor> processorsBuilder = ImmutableList.builder();
-        processorsBuilder.add(new ComponentProcessor());
         if (motifProcessor != null) {
             processorsBuilder.add(motifProcessor);
         }
+        processorsBuilder.add(new ComponentProcessor());
 
         task.setProcessors(processorsBuilder.build());
         boolean succeeded = task.call();
@@ -105,7 +105,7 @@ public class MotifTestCompiler {
                     }
                 })
                 .map(Path::toFile)
-                .filter(file -> !file.isDirectory() && file.getName().endsWith(".java"))
+                .filter(file -> !file.isDirectory() && file.getName().endsWith(".java") && !file.getName().endsWith("ScopeImpl.java"))
                 .map(file -> {
                     try {
                         return JavaFileObjects.forResource(file.toURI().toURL());

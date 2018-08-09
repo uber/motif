@@ -7,6 +7,7 @@ import de.vandermeer.skb.interfaces.transformers.textformat.TextAlignment
 import motif.ir.graph.DependencyCycle
 import motif.ir.graph.DuplicateFactoryMethod
 import motif.ir.graph.Node
+import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
 import motif.ir.source.dependencies.Dependencies
 
@@ -32,7 +33,7 @@ class DuplicateFactoryMethodsError(val duplicates: List<DuplicateFactoryMethod>)
 
 class MissingDependenciesError(
         val requiredBy: Node,
-        val dependencies: Dependencies) : GraphError() {
+        val dependencies: List<Dependency>) : GraphError() {
 
     private val tableContext = AT_Context()
             .setGrid(U8_Grids.borderStrongDoubleLight())
@@ -40,8 +41,8 @@ class MissingDependenciesError(
     override val message: String = AsciiTable(tableContext).apply {
         addRule()
         addRow("MISSING DEPENDENCIES").setTextAlignment(TextAlignment.CENTER)
-        dependencies.list.forEach { annotatedDependency ->
-            addRow(annotatedDependency).setPaddingLeft(1)
+        dependencies.forEach { dependency ->
+            addRow(dependency).setPaddingLeft(1)
         }
     }.render()
 }
