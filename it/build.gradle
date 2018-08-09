@@ -10,5 +10,5 @@ dependencies {
     annotationProcessor project(':stub-compiler')
     compile project(':compiler')
     compile project(':lib')
-    compile 'com.google.truth:truth:0.42'
+    compile deps.test.truth
 }

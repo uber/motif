@@ -13,7 +13,6 @@ subprojects {
         dependencies {
             classpath deps.build.gradlePlugins.android
             classpath deps.build.gradlePlugins.kotlin
-            classpath 'com.jakewharton:butterknife-gradle-plugin:8.8.1'
         }
     }
 

@@ -9,8 +9,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.google.auto:auto-common:0.10'
+    compile deps.autoCommon
     compile deps.kotlin.stdlib
-    compile 'com.squareup:javapoet:1.11.1'
+    compile deps.javapoet
     compile project(':compiler')
 }

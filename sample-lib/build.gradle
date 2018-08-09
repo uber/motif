@@ -2,8 +2,6 @@ plugins {
     id 'com.android.library'
 }
 
-//apply plugin: 'com.jakewharton.butterknife'
-
 android {
     compileSdkVersion deps.build.compileSdkVersion
     buildToolsVersion deps.build.buildToolsVersion
@@ -32,13 +30,13 @@ android {
 
 dependencies {
     annotationProcessor project(':compiler')
-    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+    annotationProcessor deps.roomCompiler
     api project(':lib')
-    api "android.arch.persistence.room:rxjava2:1.1.1"
-    api 'com.uber.autodispose:autodispose:0.8.0'
-    api 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
-    api 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
-    api 'com.android.support:recyclerview-v7:27.1.1'
-    api 'com.android.support:appcompat-v7:27.1.1'
-    api 'android.arch.persistence.room:runtime:1.1.1'
+    api deps.roomRx
+    api deps.autodispose
+    api deps.rx.binding
+    api deps.rx.relay
+    api deps.support.recyclerview
+    api deps.support.appCompat
+    api deps.room
 }
