@@ -8,4 +8,3 @@ The tests in this module are run from the test harness in the `:compiler` module
 - Dagger w/ @Spread
 - Missing constructor dependency
 - Missing dependency due to dependency visibility
-- Missing dependency due to dynamic dependency default visibility

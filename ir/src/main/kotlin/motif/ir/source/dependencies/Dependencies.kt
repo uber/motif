@@ -21,8 +21,19 @@ class Dependencies(val list: List<AnnotatedDependency>) {
         return Dependencies(list.map { AnnotatedDependency(it.dependency, true, it.consumingScopes) })
     }
 
-    fun filter(filter: (AnnotatedDependency) -> Boolean): Dependencies {
-        return Dependencies(map.values.filter(filter))
+    /**
+     * Dynamic dependencies are internal so they can only satisfy dependencies for the immediate scope into which
+     * they are passed.
+     */
+    fun satisfiedByDynamic(immediateScopeType: Type, dependencyList: List<Dependency>): Dependencies {
+        val result = list.mapNotNull { annotatedDependency ->
+            when {
+                annotatedDependency.transitive -> annotatedDependency - immediateScopeType
+                annotatedDependency.dependency in dependencyList -> null
+                else -> annotatedDependency
+            }
+        }
+        return Dependencies(result)
     }
 
     operator fun get(dependency: Dependency): AnnotatedDependency? {

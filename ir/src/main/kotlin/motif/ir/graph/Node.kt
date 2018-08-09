@@ -27,11 +27,7 @@ class Node(
                 .map { child ->
                     val childDependencies: Dependencies = child.node.dependencies
                     val dynamicDependencies = child.method.dynamicDependencies
-                    childDependencies.filter {
-                        // Only allow dynamic dependencies to satisfy non-transitive dependencies.
-                        // TODO If transitive, remove satisfied non-transitive scopes from AnnotatedDependency.consumingScopes
-                        it.transitive || it.dependency !in dynamicDependencies
-                    }
+                    childDependencies.satisfiedByDynamic(child.method.scope, dynamicDependencies)
                 }
                 .map { it.toTransitive() }
                 .merge()

@@ -8,6 +8,10 @@ class AnnotatedDependency(
         val transitive: Boolean,
         val consumingScopes: Set<Type>) {
 
+    operator fun minus(scope: Type): AnnotatedDependency {
+        return AnnotatedDependency(dependency, transitive, consumingScopes - scope)
+    }
+
     override fun toString(): String {
         return "$dependency $consumingScopes"
     }
