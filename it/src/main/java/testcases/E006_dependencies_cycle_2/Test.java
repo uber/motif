@@ -3,11 +3,11 @@ package testcases.E006_dependencies_cycle_2;
 import com.google.common.truth.Truth;
 import common.DependencyCycleSubject;
 import motif.ir.graph.errors.DependencyCycleError;
-import motif.ir.graph.errors.GraphErrors;
+import motif.ir.graph.errors.GraphValidationErrors;
 
 public class Test {
 
-    public static GraphErrors errors;
+    public static GraphValidationErrors errors;
 
     public static void run() {
         DependencyCycleError error = errors.getDependencyCycleError();

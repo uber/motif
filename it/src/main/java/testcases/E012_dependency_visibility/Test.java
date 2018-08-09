@@ -2,14 +2,14 @@ package testcases.E012_dependency_visibility;
 
 import com.google.common.truth.Truth;
 import common.MissingDependenciesSubject;
-import motif.ir.graph.errors.GraphErrors;
+import motif.ir.graph.errors.GraphValidationErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
 import java.util.List;
 
 public class Test {
 
-    public static GraphErrors errors;
+    public static GraphValidationErrors errors;
 
     public static void run() {
         List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();

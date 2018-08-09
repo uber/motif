@@ -1,6 +1,6 @@
 package motif.ir.graph.errors
 
-class GraphErrors(
+class GraphValidationErrors(
         val scopeCycleError: ScopeCycleError?,
         val missingDependenciesErrors: List<MissingDependenciesError>,
         val dependencyCycleError: DependencyCycleError?,

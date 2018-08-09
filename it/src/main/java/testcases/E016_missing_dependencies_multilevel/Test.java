@@ -1,7 +1,7 @@
 package testcases.E016_missing_dependencies_multilevel;
 
 import common.MissingDependenciesSubject;
-import motif.ir.graph.errors.GraphErrors;
+import motif.ir.graph.errors.GraphValidationErrors;
 import motif.ir.graph.errors.MissingDependenciesError;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static GraphErrors errors;
+    public static GraphValidationErrors errors;
 
     public static void run() {
         List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();

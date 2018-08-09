@@ -1,13 +1,13 @@
 package testcases.E003_scope_cycle;
 
 import com.google.common.truth.Truth;
-import motif.ir.graph.errors.GraphErrors;
+import motif.ir.graph.errors.GraphValidationErrors;
 import motif.ir.graph.errors.ScopeCycleError;
 import motif.ir.source.base.Type;
 
 public class Test {
 
-    public static GraphErrors errors;
+    public static GraphValidationErrors errors;
 
     public static void run() {
         ScopeCycleError error = errors.getScopeCycleError();

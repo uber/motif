@@ -3,7 +3,7 @@ package motif.compiler;
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.MotifTestCompiler;
-import motif.ir.graph.errors.GraphErrors;
+import motif.ir.graph.errors.GraphValidationErrors;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -114,7 +114,7 @@ public class TestHarness {
         try {
             Field expectedException = testClass.getField("errors");
             assertThat(compilation).failed();
-            GraphErrors errors = processor.getErrors();
+            GraphValidationErrors errors = processor.getValidationErrors();
             Truth.assertThat(errors).isNotNull();
             expectedException.set(null, errors);
         } catch (NoSuchFieldException ignore) {

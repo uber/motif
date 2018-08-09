@@ -12,8 +12,8 @@ class Graph(
         Scope(node.scopeClass, node.childDependencies, node.dependencies)
     }
 
-    val graphErrors: GraphErrors by lazy {
-        GraphErrors(
+    val validationErrors: GraphValidationErrors by lazy {
+        GraphValidationErrors(
                 scopeCycleError,
                 missingDependenciesError(),
                 dependencyCycleError(),

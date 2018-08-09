@@ -6,7 +6,7 @@ import motif.compiler.errors.CompilerError
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.SourceSetFactory
 import motif.ir.graph.GraphFactory
-import motif.ir.graph.errors.GraphErrors
+import motif.ir.graph.errors.GraphValidationErrors
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -16,10 +16,10 @@ import javax.tools.Diagnostic
 class Processor : AbstractProcessor() {
 
     // For testing only.
-    var errors: GraphErrors? = null
+    var validationErrors: GraphValidationErrors? = null
 
     private val hasErrors: Boolean
-        get() = !(errors?.isEmpty() ?: true)
+        get() = !(validationErrors?.isEmpty() ?: true)
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -46,8 +46,8 @@ class Processor : AbstractProcessor() {
         }
 
         val graph = GraphFactory.create(sourceSet)
-        val errors = graph.graphErrors
-        this.errors = errors
+        val errors = graph.validationErrors
+        this.validationErrors = errors
 
         if (errors.isEmpty()) {
             Generator(processingEnv, graph).generate()
