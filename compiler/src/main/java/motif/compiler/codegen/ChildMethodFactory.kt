@@ -9,7 +9,7 @@ import motif.compiler.ir
 import motif.ir.graph.Graph
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
-import motif.ir.source.child.ChildDeclaration
+import motif.ir.source.child.ChildMethod
 import motif.ir.source.dependencies.Dependencies
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
@@ -21,8 +21,8 @@ class ChildMethodFactory(
 
     fun create(
             scope: Scope,
-            childDeclaration: ChildDeclaration): MethodSpec {
-        val executable = childDeclaration.executable
+            childMethod: ChildMethod): MethodSpec {
+        val executable = childMethod.executable
         val childScopeImplName = scopeImpl(executable.returnDeclaredType)
         val childDependenciesName = childScopeImplName.nestedClass(GENERATED_DEPENDENCIES_NAME)
 
@@ -31,11 +31,11 @@ class ChildMethodFactory(
                 .addStatement(
                         "return new \$T(\$L)",
                         childScopeImplName,
-                        childDeclaration.childDependenciesImpl(scope, childDependenciesName))
+                        childMethod.childDependenciesImpl(scope, childDependenciesName))
                 .build()
     }
 
-    private fun ChildDeclaration.childDependenciesImpl(
+    private fun ChildMethod.childDependenciesImpl(
             scope: Scope,
             childDependenciesName: TypeName): TypeSpec {
         val dynamicDependencies: Map<Dependency, ExecutableParam> = executable.parameterMap

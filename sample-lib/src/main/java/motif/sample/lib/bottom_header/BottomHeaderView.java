@@ -1,4 +1,4 @@
-package motif.sample.app.bottom_header;
+package motif.sample.lib.bottom_header;
 
 import android.content.Context;
 import android.support.annotation.FloatRange;
@@ -8,27 +8,16 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import motif.sample.R;
+import motif.sample_lib.R;
 
 import java.util.Locale;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class BottomHeaderView extends FrameLayout {
 
-    @BindView(R.id.title)
-    TextView titleView;
-
-    @BindView(R.id.cancel)
-    View cancelButton;
-
-    @BindView(R.id.close)
-    View closeButton;
-
-    @BindView(R.id.edit)
-    View editButton;
+    private TextView titleView;
+    private View cancelButton;
+    private View closeButton;
+    private View editButton;
 
     private Listener listener;
 
@@ -62,7 +51,10 @@ public class BottomHeaderView extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        ButterKnife.bind(this);
+        titleView = findViewById(R.id.title);
+        cancelButton = findViewById(R.id.cancel);
+        closeButton = findViewById(R.id.close);
+        editButton = findViewById(R.id.edit);
 
         cancelButton.setOnClickListener(v -> {
             if (listener != null) {

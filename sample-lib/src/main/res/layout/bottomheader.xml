@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<motif.sample.app.bottom_header.BottomHeaderView
+<motif.sample.lib.bottom_header.BottomHeaderView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -50,4 +50,4 @@
             android:layout_height="match_parent"/>
     </FrameLayout>
 
-</motif.sample.app.bottom_header.BottomHeaderView>
+</motif.sample.lib.bottom_header.BottomHeaderView>

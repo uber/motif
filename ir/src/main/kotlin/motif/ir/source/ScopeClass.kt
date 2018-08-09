@@ -3,7 +3,7 @@ package motif.ir.source
 import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
-import motif.ir.source.child.ChildDeclaration
+import motif.ir.source.child.ChildMethod
 import motif.ir.source.dependencies.AnnotatedDependency
 import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.dependencies.ExplicitDependencies
@@ -13,7 +13,7 @@ import motif.ir.source.objects.ObjectsClass
 class ScopeClass(
         val userData: Any?,
         val type: Type,
-        val childDeclarations: List<ChildDeclaration>,
+        val childMethods: List<ChildMethod>,
         val accessMethods: List<AccessMethod>,
         val objectsClass: ObjectsClass?,
         val explicitDependencies: ExplicitDependencies?) {

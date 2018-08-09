@@ -8,8 +8,7 @@ import motif.ir.source.dependencies.Dependencies
 class Graph(
         private val allNodes: Map<Type, Node>,
         private val nodes: Map<ScopeClass, Node>,
-        private val scopeCycleError: ScopeCycleError?,
-        private val unprocessedScopeError: UnprocessedScopeError?) {
+        private val scopeCycleError: ScopeCycleError?) {
 
     val scopes: List<Scope> = nodes.map { (scopeClass, node) ->
         Scope(scopeClass, node.childDependencies, node.dependencies)
@@ -18,7 +17,6 @@ class Graph(
     val graphErrors: GraphErrors by lazy {
         GraphErrors(
                 scopeCycleError,
-                unprocessedScopeError,
                 missingDependenciesError(),
                 dependencyCycleError(),
                 duplicateFactoryMethodsError())

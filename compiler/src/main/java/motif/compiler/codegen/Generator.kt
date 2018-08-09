@@ -1,6 +1,8 @@
 package motif.compiler.codegen
 
+import motif.compiler.qualifiedName
 import motif.ir.graph.Graph
+import motif.ir.graph.Scope
 import javax.annotation.processing.ProcessingEnvironment
 
 class Generator(
@@ -10,8 +12,17 @@ class Generator(
     private val scopeImplFactory = ScopeImplFactory(env, cacheScope, graph)
 
     fun generate() {
-        graph.scopes.forEach {
-            scopeImplFactory.create(it)
-        }
+        graph.scopes
+                .filter {
+                    !it.isImplGenerated()
+                }
+                .forEach {
+                    scopeImplFactory.create(it)
+                }
+    }
+
+    private fun Scope.isImplGenerated(): Boolean {
+        val scopeImplName = implTypeName.qualifiedName()
+        return env.elementUtils.getTypeElement(scopeImplName) != null
     }
 }

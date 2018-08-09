@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
-import motif.sample.app.bottom_header.BottomHeaderView;
+import motif.sample.lib.bottom_header.BottomHeaderView;
 import motif.sample.app.photo_list.PhotoListView;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;

@@ -1,4 +1,4 @@
-package external.E007_unprocessed_scope;
+package external.T033_unprocessed_scope;
 
 import motif.Scope;
 

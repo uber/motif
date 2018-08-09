@@ -3,7 +3,7 @@ package motif.sample.app.bottom_sheet;
 import android.view.ViewGroup;
 
 import motif.sample.R;
-import motif.sample.app.bottom_header.BottomHeaderView;
+import motif.sample.lib.bottom_header.BottomHeaderView;
 import motif.sample.app.photo_list.PhotoListView;
 import motif.sample.lib.controller.Controller;
 

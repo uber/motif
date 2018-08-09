@@ -1,16 +1,12 @@
 package motif.compiler.codegen
 
 import com.google.auto.common.MoreElements
-import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import motif.compiler.GENERATED_DEPENDENCIES_NAME
-import motif.internal.Meta
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
-import motif.ir.source.dependencies.AnnotatedDependency
-import motif.ir.source.dependencies.Dependencies
 import motif.ir.source.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier

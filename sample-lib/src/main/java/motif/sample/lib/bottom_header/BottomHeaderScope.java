@@ -1,4 +1,4 @@
-package motif.sample.app.bottom_header;
+package motif.sample.lib.bottom_header;
 
 import motif.Scope;
 import motif.sample.lib.controller.ControllerObjects;

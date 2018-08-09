@@ -22,7 +22,7 @@ class ScopeImplFactory(
     private val moduleFactory = ModuleFactory(env, cacheScope)
 
     fun create(scope: Scope): TypeSpec {
-        val childMethods = scope.childDeclarations.map { childMethodFactory.create(scope, it) }
+        val childMethods = scope.childMethods.map { childMethodFactory.create(scope, it) }
         val accessMethodImpls = scope.accessMethods.map { it.implSpec(scope) }
 
         return TypeSpec.classBuilder(scope.implTypeName)

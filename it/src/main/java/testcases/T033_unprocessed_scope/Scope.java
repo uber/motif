@@ -1,6 +1,7 @@
-package testcases.E007_unprocessed_scope;
+package testcases.T033_unprocessed_scope;
 
-import external.E007_unprocessed_scope.Child;
+import external.T033_unprocessed_scope.Child;
+import motif.Expose;
 
 @motif.Scope
 public interface Scope {
@@ -10,7 +11,8 @@ public interface Scope {
     @motif.Objects
     class Objects {
 
-        public String string() {
+        @Expose
+        String string() {
             return "s";
         }
     }

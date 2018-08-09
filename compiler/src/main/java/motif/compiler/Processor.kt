@@ -3,6 +3,7 @@ package motif.compiler
 import motif.Scope
 import motif.compiler.codegen.Generator
 import motif.compiler.ir.ScopeClassFactory
+import motif.compiler.ir.SourceSetFactory
 import motif.ir.graph.errors.GraphErrors
 import motif.ir.graph.GraphFactory
 import motif.ir.source.SourceSet
@@ -38,13 +39,9 @@ class Processor : AbstractProcessor() {
     }
 
     private fun process(roundEnv: RoundEnvironment) {
-        val factory = ScopeClassFactory(processingEnv)
-        val scopes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
-                .map { it as TypeElement }
-                .map { it.asType() as DeclaredType }
-                .map { factory.create(it) }
-
-        val graph = GraphFactory.create(SourceSet(scopes))
+        val sourceSetFactory = SourceSetFactory(processingEnv)
+        val sourceSet = sourceSetFactory.create(roundEnv)
+        val graph = GraphFactory.create(sourceSet)
         val errors = graph.graphErrors
         this.errors = errors
 

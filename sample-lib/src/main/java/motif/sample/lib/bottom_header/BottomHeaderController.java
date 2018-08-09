@@ -1,10 +1,10 @@
-package motif.sample.app.bottom_header;
+package motif.sample.lib.bottom_header;
 
 import android.view.ViewGroup;
 
-import motif.sample.R;
 import motif.sample.lib.controller.Controller;
 import motif.sample.lib.multiselect.MultiSelector;
+import motif.sample_lib.R;
 
 public class BottomHeaderController extends Controller<BottomHeaderView> {
 

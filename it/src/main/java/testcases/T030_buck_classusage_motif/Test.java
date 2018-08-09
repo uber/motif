@@ -9,6 +9,7 @@ public class Test {
     public static Set<String> loadedClasses;
 
     public static void run() {
-        assertThat(loadedClasses).doesNotContain("external.T030_buck_classusage_motif.A");
+        // This is not ideal, but is a trade-off that we're documenting via this integration test.
+        assertThat(loadedClasses).contains("external.T030_buck_classusage_motif.A");
     }
 }

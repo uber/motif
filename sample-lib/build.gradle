@@ -1,6 +1,8 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
 }
+
+//apply plugin: 'com.jakewharton.butterknife'
 
 android {
     compileSdkVersion deps.build.compileSdkVersion
@@ -29,13 +31,14 @@ android {
 }
 
 dependencies {
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
     annotationProcessor project(':compiler')
-    implementation project(':sample-lib')
-    implementation project(':lib')
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+    api project(':lib')
+    api "android.arch.persistence.room:rxjava2:1.1.1"
+    api 'com.uber.autodispose:autodispose:0.8.0'
+    api 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
+    api 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
+    api 'com.android.support:recyclerview-v7:27.1.1'
+    api 'com.android.support:appcompat-v7:27.1.1'
+    api 'android.arch.persistence.room:runtime:1.1.1'
 }
