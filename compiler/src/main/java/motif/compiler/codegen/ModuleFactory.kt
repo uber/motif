@@ -70,13 +70,11 @@ class ModuleFactory(
         }.apply { addParameters(this) }.toTypedArray()
         val callParams: String = parameters.joinToString(", ") { "\$N" }
 
-        val returnStatement = when (method.kind) {
-            FactoryMethod.Kind.BASIC -> CodeBlock.of("return \$N.\$N($callParams)", objectsField, method.executable.name, *parameters)
-            FactoryMethod.Kind.BINDS -> CodeBlock.of("return $callParams", *parameters)
-            FactoryMethod.Kind.CONSTRUCTOR -> CodeBlock.of("return new \$T($callParams)", dependency.typeName, *parameters)
+        when (method.kind) {
+            FactoryMethod.Kind.BASIC -> addStatement("return \$N.\$N($callParams)", objectsField, method.executable.name, *parameters)
+            FactoryMethod.Kind.BINDS -> addStatement("return $callParams", *parameters)
+            FactoryMethod.Kind.CONSTRUCTOR -> addStatement("return new \$T($callParams)", dependency.typeName, *parameters)
         }
-
-        addStatement(returnStatement)
 
         return build()
     }
