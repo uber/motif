@@ -87,11 +87,11 @@ interface JavaPoetUtil : JavaxUtil {
     val motif.ir.source.base.Annotation.mirror: AnnotationMirror
         get() = userData as AnnotationMirror
 
-    val Dependency.declaredType: DeclaredType
-        get() = userData as DeclaredType
+    val Dependency.typeMirror: TypeMirror
+        get() = userData as TypeMirror
 
     val Dependency.typeName: TypeName
-        get() = ClassName.get(declaredType)
+        get() = ClassName.get(typeMirror)
 
     fun TypeSpec.write(packageName: String): TypeSpec {
         JavaFile.builder(packageName, this).build().writeTo(env.filer)
@@ -151,8 +151,7 @@ interface JavaPoetUtil : JavaxUtil {
         }
 
         fun Dependency.name(): String {
-            val preferred = declaredType.asElement().simpleName.toString().decapitalize()
-            return names.unique(preferred)
+            return names.unique(Names.safeName(typeMirror))
         }
 
         fun claim(name: String) {
