@@ -248,7 +248,7 @@ interface MainScope {
 }
 ```
 
-## Download
+## Gradle
 
 ```
 annotationProcessor 'com.uber.motif:motif:x.y.z'
