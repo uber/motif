@@ -1,6 +1,6 @@
 # Motif
 
-Motif is a DI library that offers a simple API optimized for nested scopes. It generates [Dagger](https://google.github.io/dagger/) code under the hood.
+Motif is a DI library that offers a simple API optimized for nested scopes. Under the hood it generates [Dagger](https://google.github.io/dagger/) code.
 
 *IMPORTANT: Motif is under heavy development. There will likely be breaking changes.*
 
@@ -246,6 +246,13 @@ interface MainScope {
         abstract Database database();
     }
 }
+```
+
+## Download
+
+```
+annotationProcessor 'com.uber.motif:motif:x.y.z'
+compile 'com.uber.motif:motif:x.y.z'
 ```
 
 ## License
