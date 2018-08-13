@@ -1,9 +1,6 @@
 plugins {
-    id 'maven-publish'
-}
-
-plugins {
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
 }
 
 sourceCompatibility = 1.8
@@ -27,18 +24,8 @@ dependencies {
     testCompile project(':stub-compiler')
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.uber.motif'
-            artifactId = 'motif-compiler'
-            version = '0.0.1-LOCAL'
-
-            from components.java
-        }
-    }
-}
-
 test {
     inputs.files(file("$rootDir/it/src"))
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

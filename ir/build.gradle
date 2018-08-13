@@ -1,9 +1,6 @@
 plugins {
-    id 'maven-publish'
-}
-
-plugins {
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
 }
 
 apply plugin: 'kotlin-kapt'
@@ -20,14 +17,4 @@ dependencies {
     compile deps.asciiTable
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.uber.motif'
-            artifactId = 'motif-ir'
-            version = '0.0.1-LOCAL'
-
-            from components.java
-        }
-    }
-}
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

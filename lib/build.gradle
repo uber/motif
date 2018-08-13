@@ -1,7 +1,3 @@
-plugins {
-    id 'maven-publish'
-}
-
 apply plugin: 'java'
 
 sourceCompatibility = 1.7
@@ -11,14 +7,4 @@ dependencies {
     compile deps.dagger
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.uber.motif'
-            artifactId = 'motif'
-            version = '0.0.1-LOCAL'
-
-            from components.java
-        }
-    }
-}
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
