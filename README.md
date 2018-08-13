@@ -8,7 +8,7 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 
 * [Minimal API](#the-basics)
 * [IDE Integration](https://github.com/uber/motif/blob/master/plugin/README.md)
-* [Interoperability with Dagger Components](https://github.com/uber/motif/blob/master/DAGGER.md)
+* [Dagger Interoperability](https://github.com/uber/motif/blob/master/DAGGER.md)
 
 ## The Basics
 
