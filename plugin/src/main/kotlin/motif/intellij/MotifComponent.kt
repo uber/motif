@@ -15,12 +15,15 @@
  */
 package motif.intellij
 
+import com.intellij.ide.hierarchy.LanguageTypeHierarchy
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiTreeChangeEvent
 import motif.intellij.graph.GraphProcessor
+import motif.intellij.hierarchy.MotifScopeHierarchyProvider
 import motif.intellij.index.ScopeIndex
 import motif.intellij.psi.PsiTreeChangeAdapter
 import motif.intellij.psi.isMaybeScopeFile
@@ -30,6 +33,11 @@ class MotifComponent(private val project: Project) : ProjectComponent {
     val graphProcessor = GraphProcessor(project)
 
     private val scopeIndex = ScopeIndex.getInstance()
+
+    init {
+        println("MotifScopeHierarchyProvider addExplicitExtension")
+        LanguageTypeHierarchy.INSTANCE.addExplicitExtension(JavaLanguage.INSTANCE, MotifScopeHierarchyProvider.INSTANCE)
+    }
 
     override fun projectOpened() {
         PsiManager.getInstance(project).addPsiTreeChangeListener(object : PsiTreeChangeAdapter() {

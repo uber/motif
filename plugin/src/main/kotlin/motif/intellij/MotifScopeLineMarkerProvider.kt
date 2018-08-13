@@ -30,7 +30,7 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
 
         val component = MotifComponent.get(element.project)
         val graphProcessor = component.graphProcessor
-        val scopeClassesMap = graphProcessor.scopeClassesMap()
+        val scopeClassesMap = graphProcessor.scopeToParentsMap()
 
         when(element) {
             is PsiIdentifier -> {

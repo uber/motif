@@ -25,11 +25,10 @@ class GraphProcessor(private val project: Project) {
     private val psiManager = PsiManager.getInstance(project)
     private val index = ScopeIndex.getInstance()
 
-
     /**
      * Returns a map of Scope -> List of Parent Scopes
      */
-    fun scopeClassesMap(): Map<PsiClass, List<PsiClass>> {
+    fun scopeToParentsMap(): Map<PsiClass, List<PsiClass>> {
 
         // get a mapping of scopeClass -> scopesDeclared
         val scopeClasses = scopeClasses()
@@ -42,6 +41,25 @@ class GraphProcessor(private val project: Project) {
                 .filter { it.childReturnType in scopeClasses }
                 .groupBy({ it.childReturnType }) {
                     it.scopeClass
+                }
+    }
+
+    /**
+     * Returns a map of Scope -> List of Children Scopes
+     */
+    fun scopeToChildrenMap(): Map<PsiClass, List<PsiClass>> {
+
+        // get a mapping of scopeClass -> scopesDeclared
+        val scopeClasses = scopeClasses()
+        return scopeClasses
+                .flatMap { scopeClass ->
+                    scopeClass.methods
+                            .filter { it.returnType != null}
+                            .map { ScopeMethod(scopeClass, getClass(it.returnType!!)) }
+                }
+                .filter { it.childReturnType in scopeClasses }
+                .groupBy({ it.scopeClass }) {
+                    it.childReturnType
                 }
     }
 

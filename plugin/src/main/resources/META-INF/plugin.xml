@@ -25,6 +25,8 @@
         <fileBasedIndex implementation="motif.intellij.index.ScopeIndex"/>
         <projectService serviceImplementation="motif.intellij.MotifComponent"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.MotifScopeLineMarkerProvider"/>
+        <typeHierarchyProvider language="JAVA"
+                               implementationClass="motif.intellij.hierarchy.MotifScopeHierarchyProvider"/>
     </extensions>
 
     <actions>
