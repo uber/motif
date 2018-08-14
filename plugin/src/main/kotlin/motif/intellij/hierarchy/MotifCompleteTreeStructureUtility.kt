@@ -23,13 +23,12 @@ class MotifCompleteTreeStructureUtility {
             val newDescriptor: HierarchyNodeDescriptor = TypeHierarchyNodeDescriptor(project, descriptor,
                     it, false)
             if (descriptor != null) {
-                val childrenArray: Array<HierarchyNodeDescriptor> = arrayOf(newDescriptor)
-//                descriptor.cachedChildren(childrenArray)
+                descriptor?.cachedChildren = arrayOf(newDescriptor)
             }
             descriptor = newDescriptor
         }
         val newDescriptor: HierarchyNodeDescriptor = TypeHierarchyNodeDescriptor(project, descriptor, psiClass, true)
-//        descriptor.cachedChildren(newDescriptor)
+        descriptor?.cachedChildren = arrayOf(newDescriptor)
         return newDescriptor
     }
 
