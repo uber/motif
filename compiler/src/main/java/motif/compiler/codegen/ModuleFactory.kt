@@ -15,7 +15,6 @@
  */
 package motif.compiler.codegen
 
-import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
@@ -24,6 +23,7 @@ import dagger.Provides
 import motif.internal.DaggerScope
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
+import motif.ir.source.dependencies.RequiredDependency
 import motif.ir.source.objects.FactoryMethod
 import motif.ir.source.objects.ObjectsClass
 import motif.ir.source.objects.SpreadMethod
@@ -81,7 +81,7 @@ class ModuleFactory(
     private fun MethodSpec.Builder.build(objectsField: FieldSpec, method: FactoryMethod): MethodSpec {
         val dependency = method.providedDependency
         val parameters = nameScope {
-            method.consumedDependencies.map { it.parameterSpec() }
+            method.requiredDependencies.list.map { it.parameterSpec() }
         }.apply { addParameters(this) }.toTypedArray()
         val callParams: String = parameters.joinToString(", ") { "\$N" }
 

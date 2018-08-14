@@ -40,7 +40,8 @@ class DependencyCycleFinder(private val scopeClass: ScopeClass) {
 
         val newVisited = visited + factoryMethod
 
-        factoryMethod.consumedDependencies
+        factoryMethod.requiredDependencies.list
+                .map { it.dependency }
                 .mapNotNull { factoryMethods[it] }
                 .forEach { findCycle(newVisited, it)?.let { return it } }
 
