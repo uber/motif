@@ -4,6 +4,16 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 
 *IMPORTANT: Motif is under heavy development. There will likely be breaking changes.*
 
+## Gradle
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://mvnrepository.com/artifact/com.uber.motif/motif)
+[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://mvnrepository.com/artifact/com.uber.motif/motif-compiler)
+
+```
+annotationProcessor 'com.uber.motif:motif:x.y.z'
+compile 'com.uber.motif:motif:x.y.z'
+```
+
 ## Features
 
 * [Minimal API](#the-basics)
@@ -246,13 +256,6 @@ interface MainScope {
         abstract Database database();
     }
 }
-```
-
-## Gradle
-
-```
-annotationProcessor 'com.uber.motif:motif:x.y.z'
-compile 'com.uber.motif:motif:x.y.z'
 ```
 
 ## License
