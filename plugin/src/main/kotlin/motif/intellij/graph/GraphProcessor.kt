@@ -18,6 +18,7 @@ package motif.intellij.graph
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import motif.intellij.index.ScopeIndex
+import motif.intellij.psi.getClass
 import motif.intellij.psi.getScopeClasses
 
 class GraphProcessor(private val project: Project) {
@@ -29,41 +30,26 @@ class GraphProcessor(private val project: Project) {
      * Returns a map of Scope -> List of Parent Scopes
      */
     fun scopeToParentsMap(): Map<PsiClass, List<PsiClass>> {
-
-        // get a mapping of scopeClass -> scopesDeclared
-        val scopeClasses = scopeClasses()
-        return scopeClasses
-                .flatMap { scopeClass ->
-                    scopeClass.methods
-                            .filter { it.returnType != null }
-                            .map { ScopeMethod(scopeClass, getClass(it.returnType!!)) }
-                }
-                .filter { it.childReturnType in scopeClasses }
-                .groupBy({ it.childReturnType }) {
-                    it.scopeClass
-                }
+        return scopeMethods().groupBy({ it.childReturnType }) { it.scopeClass }
     }
 
     /**
      * Returns a map of Scope -> List of Children Scopes
      */
     fun scopeToChildrenMap(): Map<PsiClass, List<PsiClass>> {
+        return scopeMethods().groupBy({ it.scopeClass }) { it.childReturnType }
+    }
 
-        // get a mapping of scopeClass -> scopesDeclared
+    private fun scopeMethods(): List<ScopeMethod> {
         val scopeClasses = scopeClasses()
         return scopeClasses
                 .flatMap { scopeClass ->
                     scopeClass.methods
-                            .filter { it.returnType != null}
-                            .map { ScopeMethod(scopeClass, getClass(it.returnType!!)) }
+                            .filter { it.returnType != null }
+                            .map { ScopeMethod(scopeClass, it.returnType!!.getClass()) }
                 }
                 .filter { it.childReturnType in scopeClasses }
-                .groupBy({ it.scopeClass }) {
-                    it.childReturnType
-                }
     }
-
-    private data class ScopeMethod(val scopeClass: PsiClass, val childReturnType: PsiClass)
 
     /**
      * Return a list of PsiClasses that are Motif Scopes.
@@ -74,11 +60,5 @@ class GraphProcessor(private val project: Project) {
                 .flatMap(PsiFile::getScopeClasses)
     }
 
-    /**
-     * Get a PsiClass from a PsiType
-     */
-    fun getClass(psiType: PsiType): PsiClass {
-        val psiClassType = psiType as PsiClassType
-        return psiClassType.resolve()!!
-    }
+    private data class ScopeMethod(val scopeClass: PsiClass, val childReturnType: PsiClass)
 }

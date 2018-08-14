@@ -35,7 +35,8 @@ class MotifComponent(private val project: Project) : ProjectComponent {
     private val scopeIndex = ScopeIndex.getInstance()
 
     init {
-        println("MotifScopeHierarchyProvider addExplicitExtension")
+        // adding the language extension here allows us to be called before Java's type hierarchy extension is
+        // called, allowing Motif to create its own tree structure for the hierarchy viewer.
         LanguageTypeHierarchy.INSTANCE.addExplicitExtension(JavaLanguage.INSTANCE, MotifScopeHierarchyProvider.INSTANCE)
     }
 

@@ -20,23 +20,34 @@ import com.intellij.ide.hierarchy.type.TypeHierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import motif.intellij.MotifComponent
+import motif.intellij.graph.GraphProcessor
 import java.util.ArrayDeque
 
+/**
+ * Creates a complete upward graph of Motif Scopes for a given PsiClass.
+ */
 class MotifCompleteTreeStructureUtility {
 
     /**
-     * Creates the tree top down, starting from the top most parent, down to the scope at hand. This allows us to
-     * pass the scope node to HierarchyTreeStructure class to build its children aka the lower tree using the Subtree
-     * logic.
+     * Using the list of all nodes for building the hierarchy, and the root from the HierarchyRootAndAllNodes object
+     * computed by the allNodesInHierarchy method, this builds back the graph in HierarchyNodeDescriptor objects,
+     * with the original PsiClass as the final child / leaf node.
      */
     fun buildParentHierarchy(psiClass: PsiClass, project: Project): HierarchyNodeDescriptor {
-        val component = MotifComponent.get(project)
-        val scopeToParentsMap: Map<PsiClass, List<PsiClass>> = component.graphProcessor.scopeToParentsMap()
-        var descriptor: HierarchyNodeDescriptor? = null
+        // get information about parent <-> child scope relationships from the GraphProcessor, and create the
+        // HierarchyRootAndAllNodes object
+        val graphProcessor: GraphProcessor = MotifComponent.get(project).graphProcessor
+        val scopeToParentsMap: Map<PsiClass, List<PsiClass>> = graphProcessor.scopeToParentsMap()
+        val scopeToChildrenMap: Map<PsiClass, List<PsiClass>> = graphProcessor.scopeToChildrenMap()
         val hierarchyRootAndAllNodes: HierarchyRootAndAllNodes = allNodesInHierarchy(psiClass, scopeToParentsMap)
-        val scopeToChildrenMap: Map<PsiClass, List<PsiClass>> = component.graphProcessor.scopeToChildrenMap()
+
+        // setup to start building the actual graph
+        var descriptor: HierarchyNodeDescriptor? = null
         val nodeQueue: ArrayDeque<PsiClass> = ArrayDeque(hierarchyRootAndAllNodes.allNodes.size)
         val classToDescriptorMap: MutableMap<PsiClass, HierarchyNodeDescriptor> = mutableMapOf()
+
+        // start from the root, and run BFS over all children in the list of nodes from HierarchyRootAndAllNodes.
+        // This allows us to build a complete graph of all nodes in the upwards hierarchy of the base PsiClass.
         nodeQueue.add(hierarchyRootAndAllNodes.root)
         while (nodeQueue.isNotEmpty()) {
             val currNode = nodeQueue.pop()
@@ -66,6 +77,12 @@ class MotifCompleteTreeStructureUtility {
         return descriptor!!
     }
 
+    /**
+     * Starts from the provided psiClass and performs BFS up the tree, exploring the entire parent hierarchy to the
+     * root. This assumes that all scopes eventually end up at the same root. Returns a HierarchyRootAndAllNodes
+     * object, containing the source of the entire graph, along with a list of all nodes explored i.e. all nodes in
+     * all paths, from the PsiClass to the source.
+     */
     private fun allNodesInHierarchy(psiClass: PsiClass, scopeToParentsMap: Map<PsiClass, List<PsiClass>>): HierarchyRootAndAllNodes {
         var root: PsiClass = psiClass
         val visitedNodes: MutableSet<PsiClass> = mutableSetOf()

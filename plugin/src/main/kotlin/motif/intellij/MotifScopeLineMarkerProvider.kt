@@ -20,8 +20,13 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.*
 import motif.intellij.icons.Icons
+import motif.intellij.psi.getClass
 
-
+/**
+ * This class is invoked when rendering the gutter on the side of a class in IntelliJ. It determines the pieces of
+ * code that are Motif scopes and adds markers to them. For a Motif Scope class, it adds a marker to navigate to the
+ * parents where the current scope is declared, and next to the child scopes to navigate to their definition.
+ */
 class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
 
     override fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in RelatedItemLineMarkerInfo<PsiElement>>) {
@@ -33,6 +38,7 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
         val scopeClassesMap = graphProcessor.scopeToParentsMap()
 
         when(element) {
+            // the case when the class itself is a Motif Scope
             is PsiIdentifier -> {
                 val scopeClass = element.parent as? PsiClass ?: return
                 scopeClassesMap.entries
@@ -42,7 +48,7 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
                             parentScopeClasses
                                     .forEach { parentClass ->
                                         parentClass.methods
-                                                .first { graphProcessor.getClass(it.returnType!!) == scopeClass }
+                                                .first { it.returnType!!.getClass() == scopeClass }
                                                 .let { parentTargets.add(it) }
                                     }
                             val builder: NavigationGutterIconBuilder<PsiElement> =
@@ -53,10 +59,11 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
                             result.add(builder.createLineMarkerInfo(element))
                         }
             }
+            // the case when a child scope is declared in a class
             is PsiMethod -> {
                 val returnType = element.returnType ?: return
                 scopeClassesMap.entries
-                        .find { it.key == graphProcessor.getClass(returnType) }
+                        .find { it.key == returnType.getClass() }
                         ?.let {
                             val builder: NavigationGutterIconBuilder<PsiElement> =
                                     NavigationGutterIconBuilder

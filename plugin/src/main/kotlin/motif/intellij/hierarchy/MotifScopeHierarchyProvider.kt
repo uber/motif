@@ -24,17 +24,31 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.psi.*
 import motif.intellij.psi.isScopeClass
 
+/**
+ * Motif's custom Hierarchy Provider to replace Java's JavaTypeHierarchyProvider when looking at Motif Scopes.
+ */
 class MotifScopeHierarchyProvider : HierarchyProvider {
 
+    /**
+     * Dictates that the default view to display is the entire hierarchy for the selected Motif Scope.
+     */
     override fun browserActivated(hierarchyBrowser: HierarchyBrowser) {
         val browser: MotifScopeHierarchyBrowser = hierarchyBrowser as MotifScopeHierarchyBrowser
         browser.changeView(TypeHierarchyBrowserBase.TYPE_HIERARCHY_TYPE)
     }
 
+    /**
+     * Returns the custom MotifScopeHierarchyBrowser instead of the default JavaTypeHierarchyBrowser.
+     */
     override fun createHierarchyBrowser(target: PsiElement): HierarchyBrowser {
         return MotifScopeHierarchyBrowser(target.project, target as PsiClass)
     }
 
+    /**
+     * Determines if the target element is a Motif Scope. If so, it returns the PsiElement corresponding to it,
+     * otherwise, returns null. Returning null invalidates this provider, making IntelliJ move on to the next
+     * provider, which is usually the JavaTypeHierarchyProvider.
+     */
     override fun getTarget(dataContext: DataContext): PsiElement? {
 
         val editor = CommonDataKeys.EDITOR.getData(dataContext) ?: return null

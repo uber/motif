@@ -15,9 +15,7 @@
  */
 package motif.intellij.psi
 
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.*
 import motif.Scope
 
 /**
@@ -52,4 +50,11 @@ fun PsiFile.isMaybeScopeFile(): Boolean {
 fun PsiClass.isMaybeScopeClass(): Boolean {
     return annotations.mapNotNull { it.nameReferenceElement?.referenceName }
             .find { it == "Scope" || it == "motif.Scope" } != null
+}
+
+/**
+ * Get a PsiClass from a PsiType
+ */
+fun PsiType.getClass(): PsiClass {
+    return (this as PsiClassType).resolve()!!
 }

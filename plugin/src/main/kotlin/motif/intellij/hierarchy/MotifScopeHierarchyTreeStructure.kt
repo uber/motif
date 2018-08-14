@@ -24,6 +24,10 @@ import com.intellij.psi.PsiClass
 import motif.intellij.MotifComponent
 import motif.intellij.psi.isScopeClass
 
+/**
+ * Defines the logic to create a Motif tree hierarchy for the Hierarchy Navigation View. Supports both, buliding a
+ * tree of parent scope hierarchies, and that of child scope hierarchies.
+ */
 open class MotifScopeHierarchyTreeStructure: HierarchyTreeStructure {
 
     private val scopeToParentsMap: MutableMap<PsiClass, List<PsiClass>> = mutableMapOf()
@@ -70,11 +74,17 @@ open class MotifScopeHierarchyTreeStructure: HierarchyTreeStructure {
         return descriptors.toTypedArray()
     }
 
+    /**
+     * Return a list of Parent Scopes of the provided PsiClass, if any exist.
+     */
     private fun getParentsIfAny(psiClass: PsiClass): List<PsiClass> {
         if (!psiClass.isScopeClass()) return emptyList()
         return scopeToParentsMap[psiClass] ?: emptyList()
     }
 
+    /**
+     * Return a list of Child Scopes of the provided PsiClass, if any exist.
+     */
     private fun getChildrenIfAny(psiClass: PsiClass): List<PsiClass> {
         if (!psiClass.isScopeClass()) return emptyList()
         return scopeToChildrenMap[psiClass] ?: emptyList()
