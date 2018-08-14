@@ -24,7 +24,6 @@ import motif.ir.graph.DuplicateFactoryMethod
 import motif.ir.graph.Node
 import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
-import motif.ir.source.dependencies.Dependencies
 
 sealed class GraphError {
     abstract val message: String

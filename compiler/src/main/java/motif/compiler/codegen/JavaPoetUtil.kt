@@ -24,7 +24,7 @@ import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
 import motif.ir.source.child.ChildMethod
-import motif.ir.source.dependencies.Dependencies
+import motif.ir.source.dependencies.RequiredDependencies
 import motif.ir.source.objects.FactoryMethod
 import motif.ir.source.objects.ObjectsClass
 import motif.ir.source.objects.SpreadMethod
@@ -113,14 +113,14 @@ interface JavaPoetUtil : JavaxUtil {
         return this
     }
 
-    fun Dependencies.abstractMethodSpecs(
+    fun RequiredDependencies.abstractMethodSpecs(
             additionalDependencies: List<Dependency> = listOf()): Map<Dependency, MethodSpec> {
         return methodSpecBuilders(additionalDependencies).mapValues {
             it.value.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build()
         }
     }
 
-    fun Dependencies.methodSpecBuilders(
+    fun RequiredDependencies.methodSpecBuilders(
             additionalDependencies: List<Dependency> = listOf()): Map<Dependency, MethodSpec.Builder> {
         return nameScope {
             list.map { it.dependency }
@@ -131,7 +131,7 @@ interface JavaPoetUtil : JavaxUtil {
         }
     }
 
-    fun Dependencies.abstractMethodSpecsMeta(): Map<Dependency, MethodSpec> {
+    fun RequiredDependencies.abstractMethodSpecsMeta(): Map<Dependency, MethodSpec> {
         return nameScope {
             list.associateBy({ it.dependency }) {
                 it.dependency.methodSpecBuilder()

@@ -17,8 +17,8 @@ package motif.ir.graph
 
 import motif.ir.source.ScopeClass
 import motif.ir.source.base.Dependency
-import motif.ir.source.dependencies.AnnotatedDependency
-import motif.ir.source.dependencies.Dependencies
+import motif.ir.source.dependencies.RequiredDependency
+import motif.ir.source.dependencies.RequiredDependencies
 import motif.ir.source.dependencies.ExplicitDependencies
 import motif.ir.source.objects.FactoryMethod
 
@@ -26,10 +26,10 @@ class Node(
         val scopeClass: ScopeClass,
         private val scopeChildren: List<ScopeChild>) {
 
-    private var internalMissingDependencies: Dependencies? = null
+    private var internalMissingDependencies: RequiredDependencies? = null
 
-    val missingDependencies: Dependencies? by lazy {
-        dependencies // Ensure dependencies are resolved.
+    val missingDependencies: RequiredDependencies? by lazy {
+        requiredDependencies // Ensure dependencies are resolved.
         internalMissingDependencies
     }
 
@@ -37,19 +37,19 @@ class Node(
         DependencyCycleFinder(scopeClass).findCycle()
     }
 
-    val childDependencies: Dependencies by lazy {
+    val childRequiredDependencies: RequiredDependencies by lazy {
         scopeChildren
                 .map { child ->
-                    val childDependencies: Dependencies = child.node.dependencies
+                    val childRequiredDependencies: RequiredDependencies = child.node.requiredDependencies
                     val dynamicDependencies = child.method.dynamicDependencies
-                    childDependencies.satisfiedByDynamic(child.method.scope, dynamicDependencies)
+                    childRequiredDependencies.satisfiedByDynamic(child.method.scope, dynamicDependencies)
                 }
                 .map { it.toTransitive() }
                 .merge()
     }
 
-    val dependencies: Dependencies by lazy {
-        val dependencies = childDependencies - scopeClass.exposed + scopeClass.selfDependencies
+    val requiredDependencies: RequiredDependencies by lazy {
+        val dependencies = childRequiredDependencies - scopeClass.exposed + scopeClass.selfRequiredDependencies
         scopeClass.explicitDependencies?.let { explicitDependencies ->
             val missingDependencies = dependencies - explicitDependencies.dependencies
             if (missingDependencies.list.isNotEmpty()) {
@@ -86,18 +86,18 @@ class Node(
 
     val parents: MutableList<Node> = mutableListOf()
 
-    private fun List<Dependencies>.merge(): Dependencies {
+    private fun List<RequiredDependencies>.merge(): RequiredDependencies {
         return when {
-            isEmpty() -> Dependencies(listOf())
+            isEmpty() -> RequiredDependencies(listOf())
             size == 1 -> this[0]
             else -> reduce { acc, dependencies -> acc + dependencies }
         }
     }
 
-    private fun ExplicitDependencies.override(scopeClass: ScopeClass, dependencies: Dependencies): Dependencies {
+    private fun ExplicitDependencies.override(scopeClass: ScopeClass, requiredDependencies: RequiredDependencies): RequiredDependencies {
         val list = this.dependencies.map {
-            dependencies[it] ?: AnnotatedDependency(it, false, setOf(scopeClass.type))
+            requiredDependencies[it] ?: RequiredDependency(it, false, setOf(scopeClass.type))
         }
-        return Dependencies(list)
+        return RequiredDependencies(list)
     }
 }

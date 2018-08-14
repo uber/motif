@@ -72,7 +72,7 @@ open class CodegenCache(
 
     val Scope.componentMethodSpecs: Map<Dependency, MethodSpec> by cache {
         val accessMethodDependencies = accessMethods.map { it.dependency }
-        childDependencies.abstractMethodSpecs(accessMethodDependencies)
+        childRequiredDependencies.abstractMethodSpecs(accessMethodDependencies)
     }
 
     val Scope.componentFieldSpec: FieldSpec by cache {
