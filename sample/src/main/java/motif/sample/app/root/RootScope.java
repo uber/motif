@@ -15,9 +15,7 @@
  */
 package motif.sample.app.root;
 
-import android.content.Context;
 import android.view.ViewGroup;
-
 import motif.Expose;
 import motif.Scope;
 import motif.sample.app.bottom_sheet.BottomSheetScope;
@@ -43,11 +41,5 @@ public interface RootScope {
 
         @Expose
         abstract MultiSelector multiSelector();
-    }
-
-    @motif.Dependencies
-    interface Dependencies {
-
-        Context context();
     }
 }

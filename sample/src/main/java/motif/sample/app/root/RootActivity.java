@@ -25,7 +25,7 @@ public class RootActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View rootView = new RootScopeImpl(() -> RootActivity.this).view();
-        setContentView(rootView);
+        RootScope rootScope = new RootFactoryImpl().create(this);
+        setContentView(rootScope.view());
     }
 }
