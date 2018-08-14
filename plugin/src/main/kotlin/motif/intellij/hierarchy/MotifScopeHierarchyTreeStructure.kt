@@ -57,11 +57,11 @@ open class MotifScopeHierarchyTreeStructure: HierarchyTreeStructure {
 
     private fun getParentsIfAny(psiClass: PsiClass): List<PsiClass> {
         if (!psiClass.isScopeClass()) return emptyList()
-        return scopeToParentsMap[psiClass]!!
+        return scopeToParentsMap[psiClass] ?: emptyList()
     }
 
     private fun getChildrenIfAny(psiClass: PsiClass): List<PsiClass> {
         if (!psiClass.isScopeClass()) return emptyList()
-        return scopeToChildrenMap[psiClass]!!
+        return scopeToChildrenMap[psiClass] ?: emptyList()
     }
 }

@@ -4,8 +4,8 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.type.TypeHierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import motif.intellij.MotifComponent
+import java.util.ArrayDeque
 
 class MotifCompleteTreeStructureUtility {
 
@@ -18,34 +18,56 @@ class MotifCompleteTreeStructureUtility {
         val component = MotifComponent.get(project)
         val scopeToParentsMap: Map<PsiClass, List<PsiClass>> = component.graphProcessor.scopeToParentsMap()
         var descriptor: HierarchyNodeDescriptor? = null
-        val parents: Array<PsiClass> = getTopDownParentHierarchy(psiClass, scopeToParentsMap)
-        parents.forEach {
-            val newDescriptor: HierarchyNodeDescriptor = TypeHierarchyNodeDescriptor(project, descriptor,
-                    it, false)
-            if (descriptor != null) {
-                descriptor?.cachedChildren = arrayOf(newDescriptor)
+        val hierarchyRootAndAllNodes: HierarchyRootAndAllNodes = allNodesInHierarchy(psiClass, scopeToParentsMap)
+        val scopeToChildrenMap: Map<PsiClass, List<PsiClass>> = component.graphProcessor.scopeToChildrenMap()
+        val nodeQueue: ArrayDeque<PsiClass> = ArrayDeque(hierarchyRootAndAllNodes.allNodes.size)
+        val classToDescriptorMap: MutableMap<PsiClass, HierarchyNodeDescriptor> = mutableMapOf()
+        nodeQueue.add(hierarchyRootAndAllNodes.root)
+        while (nodeQueue.isNotEmpty()) {
+            val currNode = nodeQueue.pop()
+            var newDescriptor: HierarchyNodeDescriptor? = classToDescriptorMap[currNode]
+            if (newDescriptor == null) {
+                newDescriptor = TypeHierarchyNodeDescriptor(project, descriptor, currNode, false)
+                classToDescriptorMap[currNode] = newDescriptor
             }
-            descriptor = newDescriptor
+            val childList = scopeToChildrenMap[currNode]?.filter { hierarchyRootAndAllNodes.allNodes.contains(it) }
+            if (childList == null || childList.isEmpty()) {
+                descriptor = classToDescriptorMap[currNode]
+                break
+            }
+            val childDescriptorArray: MutableList<HierarchyNodeDescriptor> = mutableListOf()
+            childList.forEach {
+                nodeQueue.add(it)
+                if (!classToDescriptorMap.containsKey(it)) {
+                    val childDescriptor = TypeHierarchyNodeDescriptor(project, newDescriptor, it, false)
+                    childDescriptorArray.add(childDescriptor)
+                    classToDescriptorMap[it] = childDescriptor
+                } else {
+                    childDescriptorArray.add(classToDescriptorMap[it]!!)
+                }
+            }
+            newDescriptor.cachedChildren = childDescriptorArray.toTypedArray()
         }
-        val newDescriptor: HierarchyNodeDescriptor = TypeHierarchyNodeDescriptor(project, descriptor, psiClass, true)
-        descriptor?.cachedChildren = arrayOf(newDescriptor)
-        return newDescriptor
+        return descriptor!!
     }
 
-    /**
-     * Recursively iterates upwards through the parent hierarchy, adding them to an array in order. Returns an array
-     * of parents, starting form the top, all the way down to the scope's immediate parent.
-     */
-    private fun getTopDownParentHierarchy(psiClass: PsiClass, scopeToParentsMap: Map<PsiClass, List<PsiClass>>): Array<PsiClass> {
-        val parentScopes: MutableList<PsiClass> = mutableListOf()
-        var parentList: List<PsiClass>? = scopeToParentsMap[psiClass] ?: return parentScopes.toTypedArray()
-        var index = 0
-        while (parentList != null && !parentList.isEmpty()) {
-            // TODO(currently handling only 1 parent hierarchy. Need to add support for handling multiple parents.)
-            val parent: PsiClass = parentList[0]
-            parentScopes.add(index++, parent)
-            parentList = scopeToParentsMap[parent]
+    private fun allNodesInHierarchy(psiClass: PsiClass, scopeToParentsMap: Map<PsiClass, List<PsiClass>>): HierarchyRootAndAllNodes {
+        var root: PsiClass = psiClass
+        val visitedNodes: MutableSet<PsiClass> = mutableSetOf()
+        val nodeQueue: ArrayDeque<PsiClass> = ArrayDeque(20)
+        nodeQueue.add(psiClass)
+        while (nodeQueue.isNotEmpty()) {
+            val currNode = nodeQueue.pop()
+            visitedNodes.add(currNode)
+            val tempParentList = scopeToParentsMap[currNode]
+            if (tempParentList == null || tempParentList.isEmpty()) {
+                root = currNode
+            } else {
+                nodeQueue.addAll(tempParentList)
+            }
         }
-        return parentScopes.toTypedArray().reversedArray()
+        return HierarchyRootAndAllNodes(root, visitedNodes)
     }
+
+    private data class HierarchyRootAndAllNodes(val root: PsiClass, val allNodes: Set<PsiClass>)
 }
