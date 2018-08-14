@@ -5,7 +5,15 @@ cache:
   - $HOME/.gradle
 
 before_install:
-  # Install SDK license so Android Gradle plugin can install deps.
-  - mkdir "$ANDROID_HOME/licenses" || true
-  - echo 8933bad161af4178b1185d1a37fbf41ea5269c55 > "$ANDROID_HOME/licenses/android-sdk-license"
-  - echo d56f5187479451eabf01fb78af6dfcb131a6481e >> "$ANDROID_HOME/licenses/android-sdk-license"
+# Install SDK license so Android Gradle plugin can install deps.
+- mkdir "$ANDROID_HOME/licenses" || true
+- echo 8933bad161af4178b1185d1a37fbf41ea5269c55 > "$ANDROID_HOME/licenses/android-sdk-license"
+- echo d56f5187479451eabf01fb78af6dfcb131a6481e >> "$ANDROID_HOME/licenses/android-sdk-license"
+
+after_success:
+- .buildscript/deploy_snapshot.sh
+
+env:
+  global:
+  - secure: gpoJYjtarRyVZBi0IwIgI5T8VNEN5G3J9b0eYdx6a0T3GWU2uYInRZ+SrKFYOg7UElfKUk0uMu7BnAnpcxgBzo3qyVHtFY64cZ0pXZ4hz4yrEOj7oz2JF0Jnahs8QnpHL/zlf4GmGzjq522bJ/Oez8xE1W+KxdHc1tAIaDoEk5l5JNeEMVhWcNzFuU3fqtcJQeCT+vwfjyYROe4BIpnGyVAqWEr3roLyX5R24WsimUTypMVBJ8VpopNzDcI1hwe3M8qq1fYt4T8Z6J/xDd9lU0DP1fiAXe3NON+gWj0kDJbpUjlfuttZAeOacGpovQ1X9oh2HjpXp/W2Ycwnnwb7LcENMeCUUpbZuuJfPiee4aHXP/Vsyoo29GegDbGvPF1pSxejArBqnT29TpRkcLnRkjvVg5o/X5E/wFQMiBXC+W0cxYDkmZQW+8jz3K5X9tmGuzjVz1TKS9dvBCLVh7HC29MSoo2ExITtZovk1iI4L/75QY3XWkM/c2m9CPBTX1ZYDn4dIqjCM5bXecFQ9I5wdV2ZuVnB+C+mf9Q4LfSlIL81OPk/DX03a3udwRYjS4l+4dYQLQiiTgkYnXZQq/MTVGeNq8OYivz+TbaFVqjllc67IS4idTcZx1p8ECSyFWQLzqaOx/zvsTvD16PxUoQI1csKtBfEJhAiDXbAeQPwPP4=
+  - secure: BBbMOzy4aVpzfSYqaRWaKMHt7e459NGimj0ImGdb5wWmI0JpjQpUNNhwqibwybVHD8jBLCqnfdS69lVmBg6Eamp0QQFeyK8qDnVD98CP1a1+RiMT4xkdguIAYbRx0FApxEnkJj0xZPCGh6mZqcsyMul1IyR46+6B4A04KROxqvJ5znhPc8ZJvuWfpRWLLIcj1h902m4kpw6EAMOtiC9A63rD/e5lvDjsl2puwzYx3PDa9S1meiur6XkYNWV59eZ9p4Nter7LdPV7c9USoyI/CPByLBDksAUVThpWG7E9TzI4m5X5BdO98ZIPWi2SkRTJgdjeKhHFUxxOuBoChguMo6lDDzWAaScaIeICdOn8F0r8qjjOu0S0SF5CNHUbTurHTeAjtt0cU/wnENttkwvFhQbx8jyJpSUUzJd5vUYUw96AWuxyLT99HkKm/qYffSQqmB24mqxidUJDUG7YQnwUXIgeHWoKRcVNx2iw4bjj3fIOuGPPPqqtJ9qaJu2P2ZwmwzNqHfnfVWckrTR6M2yWElZN8dHkG0FPkg3cS3KMUN4GxdTeHxjGU9dymjg33TafRW7TT2A3Ks0dnAKZiWPmWkrSmjD7FMPJJnxbzFfRhi4LxF95GQO00v+SAzdk26rJTG/CWuy53YjPgVO+991YdPodC2aFjJr+4Ir/7AlGG2A=
