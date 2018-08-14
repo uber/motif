@@ -55,7 +55,7 @@ class LicenseTest {
 
     private fun File.ensureLicense(): Boolean {
         val hasLicense = useLines {
-            it.take(3).find { "Copyright (c) 2018 Uber Technologies, Inc." in it } != null
+            it.take(3).find { "Copyright" in it } != null
         }
 
         if (hasLicense) {
