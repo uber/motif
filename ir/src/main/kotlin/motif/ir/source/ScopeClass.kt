@@ -39,7 +39,7 @@ class ScopeClass(
 
     private val allProvided: List<Dependency> = factoryMethods.flatMap { it.providedDependencies } + scopeDependency
 
-    private val consumed: List<Dependency> = factoryMethods.flatMap { it.consumedDependencies } + accessMethods.map { it.dependency }
+    private val consumed: List<Dependency> = factoryMethods.flatMap { it.requiredDependencies.list }.map { it.dependency } + accessMethods.map { it.dependency }
 
     val exposed: List<Dependency> = factoryMethods.filter { it.isExposed }.flatMap { it.providedDependencies }
 

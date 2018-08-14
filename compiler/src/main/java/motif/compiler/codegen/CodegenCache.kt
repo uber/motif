@@ -22,6 +22,8 @@ import com.squareup.javapoet.MethodSpec
 import motif.compiler.GENERATED_DEPENDENCIES_NAME
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
+import motif.ir.source.dependencies.RequiredDependencies
+import motif.ir.source.dependencies.RequiredDependency
 import motif.ir.source.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
@@ -71,8 +73,12 @@ open class CodegenCache(
     }
 
     val Scope.componentMethodSpecs: Map<Dependency, MethodSpec> by cache {
-        val accessMethodDependencies = accessMethods.map { it.dependency }
-        childRequiredDependencies.abstractMethodSpecs(accessMethodDependencies)
+        val accessMethodDependencies = accessMethods.map {
+            RequiredDependency(it.dependency, false, setOf(this.scopeClass.type))
+        }
+        val requiredAccessMethodDependencies = RequiredDependencies(accessMethodDependencies)
+        (childRequiredDependencies + requiredAccessMethodDependencies).methodSpecBuilders()
+                .mapValues { it.value.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build() }
     }
 
     val Scope.componentFieldSpec: FieldSpec by cache {

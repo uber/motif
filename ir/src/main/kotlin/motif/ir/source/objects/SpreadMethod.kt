@@ -16,8 +16,9 @@
 package motif.ir.source.objects
 
 import motif.ir.source.base.Dependency
+import motif.ir.source.dependencies.RequiredDependency
 
 class SpreadMethod(
         val userData: Any?,
-        val source: Dependency,
+        val source: RequiredDependency,
         val dependency: Dependency)

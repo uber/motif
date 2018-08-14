@@ -20,9 +20,12 @@ import motif.Expose
 import motif.Objects
 import motif.Spread
 import motif.compiler.errors.parsing.ParsingError
+import motif.compiler.ir
 import motif.compiler.javax.Executable
 import motif.compiler.javax.JavaxUtil
 import motif.ir.source.base.Dependency
+import motif.ir.source.dependencies.RequiredDependencies
+import motif.ir.source.dependencies.RequiredDependency
 import motif.ir.source.objects.FactoryMethod
 import motif.ir.source.objects.ObjectsClass
 import motif.ir.source.objects.SpreadDependency
@@ -41,9 +44,9 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                 }
                 .map {
                     // Order matters here.
-                    val method = basic(it)
-                            ?: constructor(it)
-                            ?: binds(it)
+                    val method = basic(scopeType, it)
+                            ?: constructor(scopeType, it)
+                            ?: binds(scopeType, it)
                             ?: throw ParsingError(it.element, "Invalid Objects method")
                     Pair(it, method)
                 }
@@ -56,23 +59,26 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                             kind = method.kind,
                             isExposed = isExposed,
                             isCached = isCached,
-                            consumedDependencies = method.consumedDependencies,
+                            requiredDependencies = method.requiredDependencies,
                             providedDependency = providedDependency,
-                            spreadDependency = spread(executable))
+                            spreadDependency = spread(scopeType, executable))
                 }
         return ObjectsClass(objectsType, methods)
     }
 
-    private fun basic(executable: Executable): Method? {
+    private fun basic(scopeType: DeclaredType, executable: Executable): Method? {
         if (executable.isAbstract) {
             return null
         }
 
-        val consumedDependencies = executable.parameters.map { it.dependency }
-        return Method(FactoryMethod.Kind.BASIC, consumedDependencies)
+        val requiredDependencyList = executable.parameters.map {
+            RequiredDependency(it.dependency, false, setOf(scopeType.ir))
+        }
+        val requiredDependencies = RequiredDependencies(requiredDependencyList)
+        return Method(FactoryMethod.Kind.BASIC, requiredDependencies)
     }
 
-    private fun constructor(executable: Executable): Method? {
+    private fun constructor(scopeType: DeclaredType, executable: Executable): Method? {
         if (!executable.parameters.isEmpty()) {
             return null
         }
@@ -88,11 +94,14 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
         // TODO Better handling of multiple constructors.
         val constructor = constructors[0]
 
-        val consumedDependencies: List<Dependency> = constructor.parameters.map { it.dependency }
-        return Method(FactoryMethod.Kind.CONSTRUCTOR, consumedDependencies)
+        val requiredDependencyList = constructor.parameters.map {
+            RequiredDependency(it.dependency, false, setOf(scopeType.ir))
+        }
+        val requiredDependencies = RequiredDependencies(requiredDependencyList)
+        return Method(FactoryMethod.Kind.CONSTRUCTOR, requiredDependencies)
     }
 
-    private fun binds(executable: Executable): Method? {
+    private fun binds(scopeType: DeclaredType, executable: Executable): Method? {
         if (executable.parameters.size != 1) {
             return null
         }
@@ -102,10 +111,13 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
             throw ParsingError(executable.element, "Invalid binds method. Parameter is not assignable to return type.")
         }
 
-        return Method(FactoryMethod.Kind.BINDS, listOf(parameter.dependency))
+        val requiredDependency = RequiredDependency(parameter.dependency, false, setOf(scopeType.ir))
+        val requiredDependencies = RequiredDependencies(listOf(requiredDependency))
+
+        return Method(FactoryMethod.Kind.BINDS, requiredDependencies)
     }
 
-    private fun spread(executable: Executable): SpreadDependency? {
+    private fun spread(scopeType: DeclaredType, executable: Executable): SpreadDependency? {
         if (!executable.hasAnnotation(Spread::class)) {
             return null
         }
@@ -113,10 +125,13 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
         val providedType = executable.returnType as DeclaredType
         val methods = providedType.methods()
                 .filter { !it.isVoid && it.isPublic  && it.parameters.isEmpty()}
-                .map { SpreadMethod(it, executable.returnedDependency, it.returnedDependency) }
+                .map {
+                    val source = RequiredDependency(executable.returnedDependency, false, setOf(scopeType.ir))
+                    SpreadMethod(it, source, it.returnedDependency)
+                }
 
         return SpreadDependency(methods)
     }
 
-    private data class Method(val kind: FactoryMethod.Kind, val consumedDependencies: List<Dependency>)
+    private data class Method(val kind: FactoryMethod.Kind, val requiredDependencies: RequiredDependencies)
 }
