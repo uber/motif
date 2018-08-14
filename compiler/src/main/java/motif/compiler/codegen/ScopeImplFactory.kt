@@ -70,7 +70,7 @@ class ScopeImplFactory(
     private fun dependencies(scope: Scope): TypeSpec {
         return TypeSpec.interfaceBuilder(scope.dependenciesTypeName)
                 .addModifiers(Modifier.PUBLIC)
-                .addMethods(scope.dependencies.abstractMethodSpecsMeta().map { it.value })
+                .addMethods(scope.requiredDependencies.abstractMethodSpecsMeta().map { it.value })
                 .build()
     }
 
@@ -82,7 +82,7 @@ class ScopeImplFactory(
     }
 
     private fun TypeSpec.Builder.addAltConstructorSpec(scope: Scope): TypeSpec.Builder {
-        if (!scope.dependencies.list.isEmpty()) return this
+        if (!scope.requiredDependencies.list.isEmpty()) return this
 
         val spec = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)

@@ -17,14 +17,14 @@ package motif.ir.graph
 
 import motif.ir.graph.errors.*
 import motif.ir.source.base.Type
-import motif.ir.source.dependencies.Dependencies
+import motif.ir.source.dependencies.RequiredDependencies
 
 class Graph(
         private val nodes: Map<Type, Node>,
         private val scopeCycleError: ScopeCycleError?) {
 
     val scopes: List<Scope> = nodes.map { (_, node) ->
-        Scope(node.scopeClass, node.childDependencies, node.dependencies)
+        Scope(node.scopeClass, node.childRequiredDependencies, node.requiredDependencies)
     }
 
     val validationErrors: GraphValidationErrors by lazy {
@@ -36,7 +36,7 @@ class Graph(
     }
 
     private fun missingDependenciesError(): List<MissingDependenciesError> {
-        val allMissingDepenendencies: List<Dependencies> = nodes.values.mapNotNull { it.missingDependencies }
+        val allMissingDepenendencies: List<RequiredDependencies> = nodes.values.mapNotNull { it.missingDependencies }
         return if (allMissingDepenendencies.isEmpty()) {
             listOf()
         }  else {
@@ -66,7 +66,7 @@ class Graph(
         }
     }
 
-    fun getDependencies(scopeType: Type): Dependencies? {
-        return nodes[scopeType]?.dependencies
+    fun getDependencies(scopeType: Type): RequiredDependencies? {
+        return nodes[scopeType]?.requiredDependencies
     }
 }

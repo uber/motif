@@ -25,7 +25,7 @@ import motif.ir.graph.Graph
 import motif.ir.graph.Scope
 import motif.ir.source.base.Dependency
 import motif.ir.source.child.ChildMethod
-import motif.ir.source.dependencies.Dependencies
+import motif.ir.source.dependencies.RequiredDependencies
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
@@ -67,10 +67,10 @@ class ChildMethodFactory(
         }
 
         val childType = executable.returnType.ir
-        val childDependencies: Dependencies = graph.getDependencies(childType)
+        val childRequiredDependencies: RequiredDependencies = graph.getDependencies(childType)
                 ?: throw IllegalStateException("Could not find Dependenencies for child: $childType")
 
-        val methods: List<MethodSpec> = childDependencies.methodSpecBuilders()
+        val methods: List<MethodSpec> = childRequiredDependencies.methodSpecBuilders()
                 .map { (dependency, builder) ->
                     builder
                             .addModifiers(Modifier.PUBLIC)

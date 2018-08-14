@@ -19,13 +19,13 @@ import motif.ir.source.ScopeClass
 import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.base.Dependency
 import motif.ir.source.child.ChildMethod
-import motif.ir.source.dependencies.Dependencies
+import motif.ir.source.dependencies.RequiredDependencies
 import motif.ir.source.objects.ObjectsClass
 
 class Scope(
         val scopeClass: ScopeClass,
-        val childDependencies: Dependencies,
-        val dependencies: Dependencies) {
+        val childRequiredDependencies: RequiredDependencies,
+        val requiredDependencies: RequiredDependencies) {
 
     val childMethods: List<ChildMethod> = scopeClass.childMethods
     val accessMethods: List<AccessMethod> = scopeClass.accessMethods

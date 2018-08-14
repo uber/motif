@@ -18,7 +18,7 @@ package motif.ir.source.dependencies
 import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
 
-class Dependencies(val list: List<AnnotatedDependency>) {
+class RequiredDependencies(val list: List<RequiredDependency>) {
 
     val scopeToDependencies: Map<Type, List<Dependency>> by lazy {
         list.flatMap { annotatedDependency ->
@@ -28,19 +28,19 @@ class Dependencies(val list: List<AnnotatedDependency>) {
         }.groupBy({ it.first }) { it.second }
     }
 
-    private val map: Map<Dependency, AnnotatedDependency> by lazy {
+    private val map: Map<Dependency, RequiredDependency> by lazy {
         list.associateBy { it.dependency }
     }
 
-    fun toTransitive(): Dependencies {
-        return Dependencies(list.map { AnnotatedDependency(it.dependency, true, it.consumingScopes) })
+    fun toTransitive(): RequiredDependencies {
+        return RequiredDependencies(list.map { RequiredDependency(it.dependency, true, it.consumingScopes) })
     }
 
     /**
      * Dynamic dependencies are internal so they can only satisfy dependencies for the immediate scope into which
      * they are passed.
      */
-    fun satisfiedByDynamic(immediateScopeType: Type, dependencyList: List<Dependency>): Dependencies {
+    fun satisfiedByDynamic(immediateScopeType: Type, dependencyList: List<Dependency>): RequiredDependencies {
         val result = list.mapNotNull { annotatedDependency ->
             when {
                 annotatedDependency.transitive -> annotatedDependency - immediateScopeType
@@ -48,24 +48,24 @@ class Dependencies(val list: List<AnnotatedDependency>) {
                 else -> annotatedDependency
             }
         }
-        return Dependencies(result)
+        return RequiredDependencies(result)
     }
 
-    operator fun get(dependency: Dependency): AnnotatedDependency? {
+    operator fun get(dependency: Dependency): RequiredDependency? {
         return map[dependency]
     }
 
-    operator fun minus(dependencyList: List<Dependency>): Dependencies {
-        return Dependencies((map - dependencyList).values.toList())
+    operator fun minus(dependencyList: List<Dependency>): RequiredDependencies {
+        return RequiredDependencies((map - dependencyList).values.toList())
     }
 
-    operator fun plus(dependencies: Dependencies): Dependencies {
-        val annotatedDependencies = map.keys.plus(dependencies.map.keys).toSet().map { dependency ->
-            val isTransitive = isTransitive(dependency) || dependencies.isTransitive(dependency)
-            val consumingScopes = consumingScopes(dependency) + dependencies.consumingScopes(dependency)
-            AnnotatedDependency(dependency, isTransitive, consumingScopes)
+    operator fun plus(requiredDependencies: RequiredDependencies): RequiredDependencies {
+        val annotatedDependencies = map.keys.plus(requiredDependencies.map.keys).toSet().map { dependency ->
+            val isTransitive = isTransitive(dependency) || requiredDependencies.isTransitive(dependency)
+            val consumingScopes = consumingScopes(dependency) + requiredDependencies.consumingScopes(dependency)
+            RequiredDependency(dependency, isTransitive, consumingScopes)
         }
-        return Dependencies(annotatedDependencies)
+        return RequiredDependencies(annotatedDependencies)
     }
 
     private fun isTransitive(dependency: Dependency): Boolean {
