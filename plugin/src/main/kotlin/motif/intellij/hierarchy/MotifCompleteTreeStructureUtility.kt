@@ -19,9 +19,9 @@ class MotifCompleteTreeStructureUtility {
         val scopeToParentsMap: Map<PsiClass, List<PsiClass>> = component.graphProcessor.scopeToParentsMap()
         var descriptor: HierarchyNodeDescriptor? = null
         val parents: Array<PsiClass> = getTopDownParentHierarchy(psiClass, scopeToParentsMap)
-        for (parentClass: PsiClass in parents) {
+        parents.forEach {
             val newDescriptor: HierarchyNodeDescriptor = TypeHierarchyNodeDescriptor(project, descriptor,
-                    parentClass as PsiElement, false)
+                    it, false)
             if (descriptor != null) {
                 val childrenArray: Array<HierarchyNodeDescriptor> = arrayOf(newDescriptor)
 //                descriptor.cachedChildren(childrenArray)
