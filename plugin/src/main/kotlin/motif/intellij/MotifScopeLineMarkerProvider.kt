@@ -20,7 +20,6 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.*
 import motif.intellij.icons.Icons
-import kotlin.system.measureNanoTime
 
 
 class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
@@ -39,10 +38,18 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
                 scopeClassesMap.entries
                         .find { it.key == scopeClass }
                         ?.let { (_, parentScopeClasses) ->
+                            val parentTargets: MutableList<PsiMethod> = mutableListOf()
+                            parentScopeClasses
+                                    .forEach { parentClass ->
+                                        parentClass.methods
+                                                .first { graphProcessor.getClass(it.returnType!!) == scopeClass }
+                                                .let { parentTargets.add(it) }
+                                    }
                             val builder: NavigationGutterIconBuilder<PsiElement> =
                                     NavigationGutterIconBuilder
                                             .create(Icons.PARENT_SCOPES)
-                                            .setTargets(parentScopeClasses)
+                                            .setTooltipTitle("Navigate to Parent")
+                                            .setTargets(parentTargets)
                             result.add(builder.createLineMarkerInfo(element))
                         }
             }
@@ -54,6 +61,7 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
                             val builder: NavigationGutterIconBuilder<PsiElement> =
                                     NavigationGutterIconBuilder
                                             .create(Icons.CHILD_SCOPE)
+                                            .setTooltipTitle("Navigate to Definition")
                                             .setTargets(it.key)
                             result.add(builder.createLineMarkerInfo(element))
                         }
