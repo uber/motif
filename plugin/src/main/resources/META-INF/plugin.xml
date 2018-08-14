@@ -28,12 +28,4 @@
         <typeHierarchyProvider language="JAVA"
                                implementationClass="motif.intellij.hierarchy.MotifScopeHierarchyProvider"/>
     </extensions>
-
-    <actions>
-        <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">
-            <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="Myplugin.Textboxes" class="motif.intellij.HelloAction" text="Hello" description="Says hello"/>
-        </group>
-    </actions>
-
 </idea-plugin>
