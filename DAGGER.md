@@ -41,14 +41,6 @@ If there is a bidirectional dependency between the Dagger Component and the Moti
 interface Component {
 
     DaggerDependency();
-    
-    @dagger.Component.Builder
-    interface Builder {
-
-        myScope(MyScope myScope);
-
-        // ...
-    }
 }
 
 @motif.Scope
