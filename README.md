@@ -71,7 +71,7 @@ interface MainScope {
             return new Database();
         }
 
-        Constroller controller(View view, Database database) {
+        Controller controller(View view, Database database) {
             return new Controller(view, database);
         }
     }
@@ -103,7 +103,7 @@ interface MainScope {
             return new Database();
         }
 
-        Constroller controller(View view, Database database) {
+        Controller controller(View view, Database database) {
             return new Controller(view, database);
         }
     }
@@ -230,7 +230,7 @@ interface MainScope {
     abstract class Objects {
         abstract View view();
         abstract Database database();
-        abstract Constroller controller();
+        abstract Controller controller();
     }
 }
 ```
