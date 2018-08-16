@@ -32,7 +32,7 @@ dependencies {
     annotationProcessor deps.butterknifeCompiler
     annotationProcessor deps.glideCompiler
     annotationProcessor project(':compiler')
-    implementation project(':sample-lib')
+    implementation project(':samples:sample-lib')
     implementation project(':lib')
     implementation deps.glide
     implementation deps.stetho

@@ -25,7 +25,17 @@ class LicenseTest {
 
     @Rule @JvmField val temporaryFolder = TemporaryFolder()
 
-    private val modules = sequenceOf("lib", "compiler", "sample", "plugin", "ir", "it", "stub-compiler", "sample-lib")
+    private val modules = sequenceOf(
+            "lib",
+            "compiler",
+            "samples/sample",
+            "samples/sample-lib",
+            "samples/dagger-comparison",
+            "plugin",
+            "ir",
+            "it",
+            "stub-compiler")
+
     private val licenseText = """
         /*
          * Copyright (c) 2018 Uber Technologies, Inc.
