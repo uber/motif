@@ -135,7 +135,6 @@ interface JavaPoetUtil : JavaxUtil {
         }
 
         fun RequiredDependency.parameterSpec(): ParameterSpec {
-            // TODO handle Provider
             return ParameterSpec.builder(dependency.typeName, dependency.name())
                     .apply { dependency.qualifier?.let { addAnnotation(it.spec()) } }
                     .build()
