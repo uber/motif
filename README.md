@@ -2,9 +2,19 @@
 
 [![Build Status](https://travis-ci.org/uber/motif.svg?branch=master)](https://travis-ci.org/uber/motif)
 
+*IMPORTANT: Motif is under heavy development. There will likely be breaking changes.*
+
 Motif is a DI library that offers a simple API optimized for nested scopes. Under the hood it generates [Dagger](https://google.github.io/dagger/) code.
 
-*IMPORTANT: Motif is under heavy development. There will likely be breaking changes.*
+* [Gradle](#gradle)
+* [Features](#features)
+* [The Basics](#the-basics)
+* [Child Scopes](#child-scopes)
+* [Root Scopes](#root-scopes)
+* [Convenience APIs](#convenience-apis)
+* [Motif vs Dagger](#motif-vs-dagger)
+* [Snapshots](#snapshots)
+* [License](#license)
 
 ## Gradle
 
