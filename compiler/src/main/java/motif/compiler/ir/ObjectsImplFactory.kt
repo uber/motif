@@ -87,7 +87,6 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
         val providedType = executable.returnType as DeclaredType
         val constructors = providedType.constructors()
-                .filter { Modifier.PUBLIC in it.modifiers }
                 .map { Executable(providedType, it.toType(providedType), it) }
 
         if (constructors.isEmpty()) {
