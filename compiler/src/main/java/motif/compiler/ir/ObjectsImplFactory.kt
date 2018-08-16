@@ -31,6 +31,8 @@ import motif.ir.source.objects.ObjectsClass
 import motif.ir.source.objects.SpreadDependency
 import motif.ir.source.objects.SpreadMethod
 import javax.annotation.processing.ProcessingEnvironment
+import javax.inject.Inject
+import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 
 class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
@@ -85,14 +87,14 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
         val providedType = executable.returnType as DeclaredType
         val constructors = providedType.constructors()
+                .filter { Modifier.PUBLIC in it.modifiers }
                 .map { Executable(providedType, it.toType(providedType), it) }
 
         if (constructors.isEmpty()) {
             throw ParsingError(providedType.asElement(), "Unable to find a constructor for type")
         }
 
-        // TODO Better handling of multiple constructors.
-        val constructor = constructors[0]
+        val constructor = constructors.find { it.hasAnnotation(Inject::class) } ?: constructors[0]
 
         val requiredDependencyList = constructor.parameters.map {
             RequiredDependency(it.dependency, false, setOf(scopeType.ir))
