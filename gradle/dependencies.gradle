@@ -41,7 +41,9 @@ ext.deps = [
                 ]
         ],
         "kotlin": [
-                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
+                reflection: "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
+
         ],
         "rx": [
                 android: 'io.reactivex.rxjava2:rxandroid:2.0.1',
