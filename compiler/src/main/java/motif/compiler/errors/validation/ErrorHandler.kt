@@ -35,6 +35,7 @@ abstract class ErrorHandler<T : GraphError> {
                 is ScopeCycleError -> ScopeCycleHandler().error(error)
                 is DependencyCycleError -> DependencyCycleHandler().error(error)
                 is DuplicateFactoryMethodsError -> DuplicateFactoryMethodsHandler().error(error)
+                is NotExposedError -> NotExposedHandler().error(error)
             }
         }
     }

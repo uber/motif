@@ -15,6 +15,7 @@
  */
 package motif.ir.graph
 
+import motif.ir.graph.errors.NotExposedError
 import motif.ir.source.ScopeClass
 import motif.ir.source.base.Dependency
 import motif.ir.source.dependencies.RequiredDependency
@@ -37,6 +38,14 @@ class Node(
         DependencyCycleFinder(scopeClass).findCycle()
     }
 
+    val notExposedErrors: List<NotExposedError> by lazy {
+        childRequiredDependencies.list
+                .mapNotNull { requiredDependency ->
+                    val factoryMethod = scopeClass.notExposed[requiredDependency.dependency] ?: return@mapNotNull null
+                    NotExposedError(scopeClass, factoryMethod, requiredDependency)
+                }
+    }
+
     val childRequiredDependencies: RequiredDependencies by lazy {
         scopeChildren
                 .map { child ->
@@ -49,7 +58,13 @@ class Node(
     }
 
     val requiredDependencies: RequiredDependencies by lazy {
-        val dependencies = childRequiredDependencies - scopeClass.exposed + scopeClass.selfRequiredDependencies
+        // This looks like a bug at first since we are seemingly satisfying child required dependencies with
+        // all dependencies provided by this scope, when we should instead only be able to satisfy child
+        // required dependencies if the provided dependency is @Exposed. However, in cases where we're providing
+        // a non-@Exposed dependency that is required by a child (or descendant), we'll surface a NotExposedError.
+        // In this case, compilation will fail but we still want an accurate picture of the rest of the graph, which
+        // is why we also allow non-@Exposed dependencies to satisfy child required dependencies here.
+        val dependencies = childRequiredDependencies - scopeClass.provided + scopeClass.selfRequiredDependencies
         scopeClass.explicitDependencies?.let { explicitDependencies ->
             val missingDependencies = dependencies - explicitDependencies.dependencies
             if (missingDependencies.list.isNotEmpty()) {

@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ir.graph.errors
+package motif.compiler.errors.validation
 
-class GraphValidationErrors(
-        val scopeCycleError: ScopeCycleError?,
-        val missingDependenciesErrors: List<MissingDependenciesError>,
-        val dependencyCycleError: DependencyCycleError?,
-        val duplicateFactoryMethodsError: DuplicateFactoryMethodsError?,
-        val notExposedErrors: List<NotExposedError>)
-    : List<GraphError> by notExposedErrors + listOfNotNull(
-        scopeCycleError,
-        dependencyCycleError,
-        duplicateFactoryMethodsError) + missingDependenciesErrors
+import motif.ir.graph.errors.NotExposedError
+import javax.lang.model.element.Element
+
+class NotExposedHandler : ErrorHandler<NotExposedError>() {
+
+    override fun message(error: NotExposedError): String {
+        return this::class.java.name
+    }
+
+    override fun element(error: NotExposedError): Element? {
+        return null
+    }
+}

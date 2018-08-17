@@ -18,8 +18,11 @@ package motif.ir.graph.errors
 import motif.ir.graph.DependencyCycle
 import motif.ir.graph.DuplicateFactoryMethod
 import motif.ir.graph.Node
+import motif.ir.source.ScopeClass
 import motif.ir.source.base.Dependency
 import motif.ir.source.base.Type
+import motif.ir.source.dependencies.RequiredDependency
+import motif.ir.source.objects.FactoryMethod
 
 sealed class GraphError
 
@@ -32,3 +35,16 @@ class MissingDependenciesError(
         val dependencies: List<Dependency>) : GraphError()
 
 class ScopeCycleError(val cycle: List<Type>) : GraphError()
+
+/**
+ * Compared to other GraphErrors, it's not as intuitive why NotExposedError needs to exist. We hit this error
+ * when an ancestor scope defines a non-@Exposed factory method that provides a dependency required
+ * by one of its descendants. Initially, it may seem like a premature failure since that dependency may be satisfied
+ * by scopes higher in the graph. However, if a scope higher in the graph exposes a factory method that provides the
+ * same type, the lower, non-@Exposed factory method would conflict, causing a DuplicateFactoryMethodsError. Thus,
+ * there is no situation where this case is valid so we surface this error.
+ */
+class NotExposedError(
+        val scopeClass: ScopeClass,
+        val factoryMethod: FactoryMethod,
+        val requiredDependency: RequiredDependency) : GraphError()

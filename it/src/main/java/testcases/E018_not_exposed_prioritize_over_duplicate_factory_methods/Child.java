@@ -13,21 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.E012_dependency_visibility;
+package testcases.E018_not_exposed_prioritize_over_duplicate_factory_methods;
 
 @motif.Scope
-public interface Scope {
+public interface Child {
 
-    Child child();
-
-    @motif.Objects
-    class Objects {
-
-        String string() {
-            return "s";
-        }
-    }
-
-    @motif.Dependencies
-    interface Dependencies {}
+    String string();
 }

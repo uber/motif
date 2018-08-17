@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ir.graph.errors
+package testcases.E017_not_exposed;
 
-class GraphValidationErrors(
-        val scopeCycleError: ScopeCycleError?,
-        val missingDependenciesErrors: List<MissingDependenciesError>,
-        val dependencyCycleError: DependencyCycleError?,
-        val duplicateFactoryMethodsError: DuplicateFactoryMethodsError?,
-        val notExposedErrors: List<NotExposedError>)
-    : List<GraphError> by notExposedErrors + listOfNotNull(
-        scopeCycleError,
-        dependencyCycleError,
-        duplicateFactoryMethodsError) + missingDependenciesErrors
+@motif.Scope
+public interface Scope {
+
+    Child child();
+
+    @motif.Objects
+    class Objects {
+
+        String string() {
+            return "a";
+        }
+    }
+}

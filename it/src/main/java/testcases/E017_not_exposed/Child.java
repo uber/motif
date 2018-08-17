@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.E012_dependency_visibility;
+package testcases.E017_not_exposed;
 
 @motif.Scope
 public interface Child {
