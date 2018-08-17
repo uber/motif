@@ -54,7 +54,7 @@ class GraphProcessor(private val project: Project) {
     /**
      * Return a list of PsiClasses that are Motif Scopes.
      */
-    private fun scopeClasses(): List<PsiClass> {
+    fun scopeClasses(): List<PsiClass> {
         return index.getSnapshot(project).files
                 .mapNotNull { psiManager.findFile(it) }
                 .flatMap(PsiFile::getScopeClasses)

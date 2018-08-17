@@ -57,5 +57,7 @@ fun PsiClass.isMaybeScopeClass(): Boolean {
  */
 fun PsiType.getClass(): PsiClass? {
     if (this is PsiClassType) return this.resolve()
+    // when the PsiType is a PsiPrimitiveType instead
     return null
 }
+
