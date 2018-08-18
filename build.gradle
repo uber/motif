@@ -1,22 +1,23 @@
 // https://github.com/gradle/gradle/issues/4848
 gradle.startParameter.configureOnDemand = false
 
-apply from: 'gradle/dependencies.gradle'
+
+buildscript {
+    apply from: 'gradle/dependencies.gradle'
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath deps.build.gradlePlugins.android
+        classpath deps.build.gradlePlugins.kotlin
+        classpath deps.build.gradlePlugins.dokka
+        classpath deps.build.gradlePlugins.dokkaAndroid
+    }
+}
 
 subprojects {
     apply from: rootProject.file('gradle/dependencies.gradle')
-    buildscript {
-        repositories {
-            jcenter()
-            google()
-        }
-        dependencies {
-            classpath deps.build.gradlePlugins.android
-            classpath deps.build.gradlePlugins.kotlin
-            classpath deps.build.gradlePlugins.dokka
-            classpath deps.build.gradlePlugins.dokkaAndroid
-        }
-    }
 
     repositories {
         jcenter()

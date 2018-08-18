@@ -5,10 +5,6 @@ plugins {
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile deps.kotlin.stdlib
     compile deps.autoCommon
