@@ -2,13 +2,16 @@ plugins {
     id 'net.ltgt.apt-idea' version "0.15"
 }
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 sourceCompatibility = 1.8
 
 dependencies {
     annotationProcessor project(':stub-compiler')
-    compile project(':compiler')
-    compile project(':lib')
-    compile deps.test.truth
+    implementation project(':ir')
+    implementation project(':compiler')
+    implementation project(':lib')
+    implementation deps.kotlin.stdlib
+    implementation deps.dagger
+    implementation deps.test.truth
 }

@@ -30,5 +30,6 @@ android {
 
 dependencies {
     annotationProcessor project(':compiler')
+    implementation deps.dagger
     implementation project(':lib')
 }

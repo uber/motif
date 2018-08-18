@@ -6,18 +6,19 @@ plugins {
 sourceCompatibility = 1.8
 
 dependencies {
-    compile deps.kotlin.stdlib
-    compile deps.autoCommon
-    compile deps.commonsCodec
-    compile deps.javapoet
-    compile deps.dagger
-    compile deps.daggerCompiler
-    compile project(':lib')
-    compile project(':ir')
+    implementation deps.kotlin.stdlib
+    implementation deps.autoCommon
+    implementation deps.commonsCodec
+    implementation deps.javapoet
+    implementation deps.dagger
+    implementation deps.daggerCompiler
+    implementation deps.asciiTable
+    implementation project(':lib')
+    implementation project(':ir')
 
-    testCompile deps.test.truth
-    testCompile deps.test.compileTesting
-    testCompile project(':stub-compiler')
+    testImplementation deps.test.truth
+    testImplementation deps.test.compileTesting
+    testImplementation project(':stub-compiler')
 }
 
 test {
