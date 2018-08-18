@@ -7,14 +7,11 @@ apply plugin: 'kotlin-kapt'
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
-    compile deps.kotlin.stdlib
-    compile project(':lib')
-    compile deps.asciiTable
+    implementation deps.kotlin.stdlib
+    implementation project(':lib')
+    implementation deps.asciiTable
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

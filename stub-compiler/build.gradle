@@ -4,13 +4,10 @@ plugins {
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile deps.autoCommon
-    compile deps.kotlin.stdlib
-    compile deps.javapoet
-    compile project(':compiler')
+    implementation deps.autoCommon
+    implementation deps.kotlin.stdlib
+    implementation deps.javapoet
+    implementation project(':compiler')
+    implementation project(':lib')
 }
