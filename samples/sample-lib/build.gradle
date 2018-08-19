@@ -31,7 +31,6 @@ android {
 dependencies {
     annotationProcessor project(':compiler')
     annotationProcessor deps.roomCompiler
-    implementation deps.dagger
     api project(':lib')
     api deps.roomRx
     api deps.autodispose

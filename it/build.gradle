@@ -12,6 +12,5 @@ dependencies {
     implementation project(':compiler')
     implementation project(':lib')
     implementation deps.kotlin.stdlib
-    implementation deps.dagger
     implementation deps.test.truth
 }
