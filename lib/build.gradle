@@ -4,7 +4,8 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 dependencies {
-    implementation deps.dagger
+    // Dagger is part of the API since we generate code which depends on Dagger's API in the consuming gradle module.
+    api deps.dagger
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

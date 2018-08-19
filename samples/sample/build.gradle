@@ -34,7 +34,6 @@ dependencies {
     annotationProcessor project(':compiler')
     implementation project(':samples:sample-lib')
     implementation project(':lib')
-    implementation deps.dagger
     implementation deps.glide
     implementation deps.stetho
     implementation deps.support.design
