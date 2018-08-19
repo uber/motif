@@ -31,10 +31,6 @@ class UniqueNameSet {
     fun claim(name: String) {
         used.add(name)
     }
-
-    fun abstract() {
-
-    }
 }
 
 private val KEYWORDS = setOf(
