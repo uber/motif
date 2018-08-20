@@ -56,7 +56,7 @@ class Processor : AbstractProcessor() {
         val sourceSet = try {
             SourceSetFactory(processingEnv).create(roundEnv)
         } catch (e: ParsingError) {
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e.message}\n", e.element)
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e.message}\n${e.element}\n", e.element)
             return
         }
 

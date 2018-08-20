@@ -32,6 +32,7 @@ import motif.ir.source.objects.SpreadDependency
 import motif.ir.source.objects.SpreadMethod
 import javax.annotation.processing.ProcessingEnvironment
 import javax.inject.Inject
+import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 
@@ -45,6 +46,7 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                     if (it.isPrivate) throw ParsingError(it.element, "Factory method cannot be private")
                 }
                 .map {
+                    it.ensureNonNull()
                     // Order matters here.
                     val method = basic(scopeType, it)
                             ?: constructor(scopeType, it)
@@ -66,6 +68,22 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                             spreadDependency = spread(scopeType, executable))
                 }
         return ObjectsClass(objectsType, methods)
+    }
+
+    private fun Executable.ensureNonNull() {
+        element.ensureNonNull(element, "Factory methods must return non-null values.")
+        parameters.forEach {
+            it.element.ensureNonNull(element, "Factory method parameters must be non-null.")
+        }
+    }
+
+    private fun Element.ensureNonNull(element: Element, message: String) {
+        val isNullable = annotationMirrors.find {
+            it.annotationType.asElement().simpleName.toString() == "Nullable"
+        } != null
+        if (isNullable) {
+            throw ParsingError(element, message)
+        }
     }
 
     private fun basic(scopeType: DeclaredType, executable: Executable): Method? {
@@ -94,6 +112,7 @@ class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
         }
 
         val constructor = constructors.find { it.hasAnnotation(Inject::class) } ?: constructors[0]
+        constructor.ensureNonNull()
 
         val requiredDependencyList = constructor.parameters.map {
             RequiredDependency(it.dependency, false, setOf(scopeType.ir))
