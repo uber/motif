@@ -28,7 +28,7 @@ class ScopeClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
     private val childFactory = ChildDeclarationFactory(env)
     private val accessMethodFactory = AccessMethodFactory(env)
-    private val objectsClassFactory = ObjectsImplFactory(env)
+    private val objectsClassFactory = ObjectsClassFactory(env)
     private val explicitDependenciesFactory = ExplicitDependenciesFactory(env)
 
     fun create(scopeType: DeclaredType): ScopeClass {

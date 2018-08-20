@@ -27,8 +27,6 @@ public interface Scope {
     @motif.Objects
     class Objects {
 
-        int i = 0;
-
         String string(@Named("a") String a, @Named("i") String i) {
             return a + i;
         }
@@ -41,10 +39,14 @@ public interface Scope {
         @DoNotCache
         @Named("i")
         String i() {
-            return String.valueOf(i++);
+            return String.valueOf(Counter.i++);
         }
     }
 
     @motif.Dependencies
     interface Dependencies {}
+}
+
+class Counter {
+    static int i = 0;
 }

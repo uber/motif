@@ -25,6 +25,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
+import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
 import kotlin.reflect.KClass
@@ -71,6 +72,31 @@ interface JavaxUtil {
 
     fun DeclaredType.constructors(): List<ExecutableElement> {
         return ElementFilter.constructorsIn(asElement().enclosedElements)
+    }
+
+    fun DeclaredType.hasFieldsRecursive(): Boolean {
+        val typeElement: TypeElement = asElement() as TypeElement
+        if (ElementFilter.fieldsIn(typeElement.enclosedElements).isNotEmpty()) {
+            return true
+        }
+
+        val superclass: TypeMirror = typeElement.superclass
+        if (superclass.kind == TypeKind.DECLARED) {
+            if ((superclass as DeclaredType).hasFieldsRecursive()) {
+                return true
+            }
+        } else if (superclass.kind != TypeKind.NONE) {
+            // TODO Is it possible for TypeElement.superclass to return a TypeMirror of TypeKind other than
+            // DECLARED or NONE? If so, then we should not throw an Exception here and instead handle the
+            // recursion properly.
+            throw IllegalStateException("Unknown superclass type.")
+        }
+
+        return false
+    }
+
+    fun DeclaredType.hasNonDefaultConstructor(): Boolean {
+        return constructors().find { !it.parameters.isEmpty() } != null
     }
 
     fun DeclaredType.packageName(): String {

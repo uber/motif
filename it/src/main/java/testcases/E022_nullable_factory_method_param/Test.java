@@ -13,37 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T009_dependency_cache;
+package testcases.E022_nullable_factory_method_param;
 
-import javax.inject.Named;
+import motif.compiler.errors.parsing.ParsingError;
 
-@motif.Scope
-public interface Scope {
+import static com.google.common.truth.Truth.assertThat;
 
-    String string();
+public class Test {
 
-    @motif.Objects
-    class Objects {
+    public static ParsingError parsingError;
 
-        String string(@Named("a") String a, @Named("i") String i) {
-            return a + i;
-        }
-
-        @Named("a")
-        String a(@Named("i") String i1, @Named("i") String i2) {
-            return "a" + i1 + i2;
-        }
-
-        @Named("i")
-        String i() {
-            return String.valueOf(Counter.i++);
-        }
+    public static void run() {
+        assertThat(parsingError).isNotNull();
     }
-
-    @motif.Dependencies
-    interface Dependencies {}
-}
-
-class Counter {
-    static int i = 0;
 }

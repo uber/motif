@@ -13,37 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T009_dependency_cache;
+package testcases.E023_objects_fields_inherited;
 
-import javax.inject.Named;
+public class ObjectsParent {
 
-@motif.Scope
-public interface Scope {
+    private final String s = "s";
 
-    String string();
-
-    @motif.Objects
-    class Objects {
-
-        String string(@Named("a") String a, @Named("i") String i) {
-            return a + i;
-        }
-
-        @Named("a")
-        String a(@Named("i") String i1, @Named("i") String i2) {
-            return "a" + i1 + i2;
-        }
-
-        @Named("i")
-        String i() {
-            return String.valueOf(Counter.i++);
-        }
+    public String s() {
+        return s;
     }
-
-    @motif.Dependencies
-    interface Dependencies {}
-}
-
-class Counter {
-    static int i = 0;
 }

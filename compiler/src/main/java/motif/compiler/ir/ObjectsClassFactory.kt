@@ -36,10 +36,17 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 
-class ObjectsImplFactory(override val env: ProcessingEnvironment) : JavaxUtil {
+class ObjectsClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
     fun create(scopeType: DeclaredType): ObjectsClass? {
         val objectsType = scopeType.annotatedInnerType(Objects::class) ?: return null
+        if (objectsType.hasFieldsRecursive()) {
+            throw ParsingError(objectsType.asElement(), "@Objects-annotated class may not declare any fields.")
+        }
+        if (objectsType.hasNonDefaultConstructor()) {
+            throw ParsingError(objectsType.asElement(), "@Objects-annotated class may not declare any non-default constructors.")
+        }
+
         val methods = objectsType.methods()
                 .onEach {
                     if (it.isVoid) throw ParsingError(it.element, "Factory method must not return void")
