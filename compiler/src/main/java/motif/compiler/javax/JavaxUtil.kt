@@ -19,10 +19,7 @@ import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.*
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
@@ -74,15 +71,15 @@ interface JavaxUtil {
         return ElementFilter.constructorsIn(asElement().enclosedElements)
     }
 
-    fun DeclaredType.hasFieldsRecursive(): Boolean {
+    fun DeclaredType.hasInstanceFieldsRecursive(): Boolean {
         val typeElement: TypeElement = asElement() as TypeElement
-        if (ElementFilter.fieldsIn(typeElement.enclosedElements).isNotEmpty()) {
+        if (ElementFilter.fieldsIn(typeElement.enclosedElements).any { Modifier.STATIC !in it.modifiers }) {
             return true
         }
 
         val superclass: TypeMirror = typeElement.superclass
         if (superclass.kind == TypeKind.DECLARED) {
-            if ((superclass as DeclaredType).hasFieldsRecursive()) {
+            if ((superclass as DeclaredType).hasInstanceFieldsRecursive()) {
                 return true
             }
         } else if (superclass.kind != TypeKind.NONE) {

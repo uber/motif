@@ -40,8 +40,8 @@ class ObjectsClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
 
     fun create(scopeType: DeclaredType): ObjectsClass? {
         val objectsType = scopeType.annotatedInnerType(Objects::class) ?: return null
-        if (objectsType.hasFieldsRecursive()) {
-            throw ParsingError(objectsType.asElement(), "@Objects-annotated class may not declare any fields.")
+        if (objectsType.hasInstanceFieldsRecursive()) {
+            throw ParsingError(objectsType.asElement(), "@Objects-annotated class may not declare any instance fields.")
         }
         if (objectsType.hasNonDefaultConstructor()) {
             throw ParsingError(objectsType.asElement(), "@Objects-annotated class may not declare any non-default constructors.")
