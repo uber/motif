@@ -15,16 +15,31 @@
  */
 package motif.compiler.errors.validation
 
+import de.vandermeer.asciitable.AT_Context
+import de.vandermeer.asciitable.AsciiTable
+import de.vandermeer.asciithemes.u8.U8_Grids
+import motif.compiler.javax.Executable
 import motif.ir.graph.errors.NotExposedError
 import javax.lang.model.element.Element
 
 class NotExposedHandler : ErrorHandler<NotExposedError>() {
 
     override fun message(error: NotExposedError): String {
-        return this::class.java.name
+        val table = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+            addRow(element(error)).setPaddingLeft(1)
+            addRule()
+        }
+        return StringBuilder().apply {
+            appendln("NOT EXPOSED:")
+            appendln(error.scopeClass.type)
+            appendln(table.render())
+        }.toString()
     }
 
-    override fun element(error: NotExposedError): Element? {
-        return null
+    override fun element(error: NotExposedError): Element {
+        return (error.factoryMethod.userData as Executable).element
     }
 }
