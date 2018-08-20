@@ -22,6 +22,7 @@ import motif.ir.source.ScopeClass
 import motif.ir.source.accessmethod.AccessMethod
 import motif.ir.source.child.ChildMethod
 import javax.annotation.processing.ProcessingEnvironment
+import javax.lang.model.element.ElementKind
 import javax.lang.model.type.DeclaredType
 
 class ScopeClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
@@ -32,6 +33,10 @@ class ScopeClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
     private val explicitDependenciesFactory = ExplicitDependenciesFactory(env)
 
     fun create(scopeType: DeclaredType): ScopeClass {
+        if (scopeType.asElement().kind != ElementKind.INTERFACE) {
+            throw ParsingError(scopeType.asElement(), "@Scope-annotated class must be an interface.")
+        }
+
         val childMethods: MutableList<ChildMethod> = mutableListOf()
         val accessMethods: MutableList<AccessMethod> = mutableListOf()
 
