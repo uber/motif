@@ -25,6 +25,13 @@ import javax.lang.model.type.DeclaredType
 class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
 
     override fun message(error: DependencyCycleError): String {
+        val scopeTable = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+            addRow(error.scopeClass.type.simpleName).setPaddingLeft(1)
+            addRule()
+        }
         val table = AsciiTable(AT_Context()
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
@@ -38,7 +45,8 @@ class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
         }
         return StringBuilder().apply {
             appendln("DEPENDENCY CYCLE FOUND:")
-            appendln(error.scopeClass.type)
+            appendln(scopeTable.render())
+            appendln("contains the following dependency cycle:")
             appendln(table.render())
         }.toString()
     }

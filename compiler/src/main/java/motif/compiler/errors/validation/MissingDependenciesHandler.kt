@@ -25,6 +25,13 @@ import javax.lang.model.type.DeclaredType
 class MissingDependenciesHandler : ErrorHandler<MissingDependenciesError>() {
 
     override fun message(error: MissingDependenciesError): String {
+        val scopeTable = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+            addRow(error.requiredBy.scopeClass.type.simpleName).setPaddingLeft(1)
+            addRule()
+        }
         val table = AsciiTable(AT_Context()
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
@@ -36,7 +43,7 @@ class MissingDependenciesHandler : ErrorHandler<MissingDependenciesError>() {
         }
         return StringBuilder().apply {
             appendln("MISSING DEPENDENCIES:")
-            appendln(error.requiredBy.scopeClass.type)
+            appendln(scopeTable.render())
             appendln("is missing the following dependencies:")
             appendln(table.render())
         }.toString()
