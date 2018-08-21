@@ -31,7 +31,7 @@ class Graph(
         GraphValidationErrors(
                 scopeCycleError,
                 missingDependenciesError(),
-                dependencyCycleError(),
+                dependencyCycleErrors(),
                 duplicateFactoryMethodsError(),
                 notExposedErrors())
     }
@@ -49,13 +49,14 @@ class Graph(
         }
     }
 
-    private fun dependencyCycleError(): DependencyCycleError? {
-        val cycles = nodes.values.mapNotNull { it.dependencyCycle }
-        return if (cycles.isEmpty()) {
-            null
-        } else {
-            DependencyCycleError(cycles)
-        }
+    private fun dependencyCycleErrors(): List<DependencyCycleError> {
+        return nodes.values
+                .mapNotNull {
+                    it.dependencyCycle
+                }
+                .map {
+                    DependencyCycleError(it.scopeClass, it.cycle)
+                }
     }
 
     private fun duplicateFactoryMethodsError(): DuplicateFactoryMethodsError? {

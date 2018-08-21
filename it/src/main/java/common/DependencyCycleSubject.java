@@ -26,10 +26,7 @@ import motif.ir.source.base.Type;
 import motif.ir.source.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertAbout;
@@ -38,39 +35,37 @@ public class DependencyCycleSubject extends Subject<DependencyCycleSubject, Depe
 
     private static final Factory<DependencyCycleSubject, DependencyCycleError> FACTORY = DependencyCycleSubject::new;
 
-    private final Map<Type, List<Dependency>> expectedCycles = new HashMap<>();
-
     private DependencyCycleSubject(FailureMetadata metadata, @NullableDecl DependencyCycleError actual) {
         super(metadata, actual);
     }
 
-    public void matches() {
+    public void matches(Class<?> scopeClass, String... cycleNames) {
         assertThat(actual()).isNotNull();
 
-        Map<Type, List<Dependency>> actualCycles = new HashMap<>();
-        for (DependencyCycle cycle : actual().getCycles()) {
-            List<Dependency> actualCycle = cycle.getCycle().stream()
-                    .map(FactoryMethod::getProvidedDependency)
-                    .collect(Collectors.toList());
-            actualCycles.put(cycle.getScopeClass().getType(), actualCycle);
-        }
-
-        if (!actualCycles.equals(expectedCycles)) {
-            failWithoutActual(
-                    Fact.fact("expected", expectedCycles),
-                    Fact.fact("but was", actualCycles));
-        }
-    }
-
-    public DependencyCycleSubject with(Class<?> scopeClass, String... cycleNames) {
         List<Dependency> expectedCycle = Arrays.stream(cycleNames)
                 .map(cycleName -> new Dependency(
                         null,
                         new Type(null, "java.lang.String"),
                         new Annotation(null, "@javax.inject.Named(\"" + cycleName + "\")")))
                 .collect(Collectors.toList());
-        expectedCycles.put(new Type(null, scopeClass.getName()), expectedCycle);
-        return this;
+
+        List<Dependency> actualCycle = actual().getCycle().stream()
+                .map(FactoryMethod::getProvidedDependency)
+                .collect(Collectors.toList());
+
+        Type expectedScopeType = new Type(null, scopeClass.getName());
+        Type actualScopeType = actual().getScopeClass().getType();
+        if (!expectedScopeType.equals(actualScopeType)) {
+            failWithoutActual(
+                    Fact.fact("expected", expectedScopeType),
+                    Fact.fact("but was", actualScopeType));
+        }
+
+        if (!actualCycle.equals(expectedCycle)) {
+            failWithoutActual(
+                    Fact.fact("expected", expectedCycle),
+                    Fact.fact("but was", actualCycle));
+        }
     }
 
     public static DependencyCycleSubject assertThat(DependencyCycleError dependencyCycle) {

@@ -15,7 +15,6 @@
  */
 package motif.ir.graph.errors
 
-import motif.ir.graph.DependencyCycle
 import motif.ir.graph.DuplicateFactoryMethod
 import motif.ir.graph.Node
 import motif.ir.source.ScopeClass
@@ -26,7 +25,7 @@ import motif.ir.source.objects.FactoryMethod
 
 sealed class GraphError
 
-class DependencyCycleError(val cycles: List<DependencyCycle>) : GraphError()
+class DependencyCycleError(val scopeClass: ScopeClass, val cycle: List<FactoryMethod>) : GraphError()
 
 class DuplicateFactoryMethodsError(val duplicates: List<DuplicateFactoryMethod>) : GraphError()
 

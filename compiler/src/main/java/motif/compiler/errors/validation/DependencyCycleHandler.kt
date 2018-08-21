@@ -15,16 +15,35 @@
  */
 package motif.compiler.errors.validation
 
+import de.vandermeer.asciitable.AT_Context
+import de.vandermeer.asciitable.AsciiTable
+import de.vandermeer.asciithemes.u8.U8_Grids
 import motif.ir.graph.errors.DependencyCycleError
 import javax.lang.model.element.Element
+import javax.lang.model.type.DeclaredType
 
 class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
 
     override fun message(error: DependencyCycleError): String {
-        return this::class.java.name
+        val table = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+
+            (error.cycle + error.cycle.first()).forEachIndexed { i, factoryMethod ->
+                val prefix = if (i == 0) "" else "-> "
+                addRow("$prefix${factoryMethod.providedDependency}").setPaddingLeft(1)
+                addRule()
+            }
+        }
+        return StringBuilder().apply {
+            appendln("DEPENDENCY CYCLE FOUND:")
+            appendln(error.scopeClass.type)
+            appendln(table.render())
+        }.toString()
     }
 
     override fun element(error: DependencyCycleError): Element? {
-        return null
+        return (error.scopeClass.userData as DeclaredType).asElement()
     }
 }

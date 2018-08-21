@@ -18,10 +18,9 @@ package motif.ir.graph.errors
 class GraphValidationErrors(
         val scopeCycleError: ScopeCycleError?,
         val missingDependenciesErrors: List<MissingDependenciesError>,
-        val dependencyCycleError: DependencyCycleError?,
+        val dependencyCycleErrors: List<DependencyCycleError>,
         val duplicateFactoryMethodsError: DuplicateFactoryMethodsError?,
         val notExposedErrors: List<NotExposedError>)
     : List<GraphError> by notExposedErrors + listOfNotNull(
         scopeCycleError,
-        dependencyCycleError,
-        duplicateFactoryMethodsError) + missingDependenciesErrors
+        duplicateFactoryMethodsError) + dependencyCycleErrors + missingDependenciesErrors
