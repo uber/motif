@@ -27,7 +27,11 @@ class Names {
 
         @JvmStatic
         fun safeName(typeMirror: TypeMirror): String {
-            return NameVisitor.visit(typeMirror).decapitalize()
+            var name = NameVisitor.visit(typeMirror).decapitalize()
+            if (name in KEYWORDS) {
+                name += "_"
+            }
+            return name
         }
     }
 }
@@ -100,3 +104,55 @@ private object NameVisitor : SimpleTypeVisitor8<String, Void>() {
         throw IllegalArgumentException("Unexpected type mirror: $e")
     }
 }
+
+private val KEYWORDS = setOf(
+        "abstract",
+        "continue",
+        "for",
+        "new",
+        "switch",
+        "assert",
+        "default",
+        "goto",
+        "package",
+        "synchronized",
+        "boolean",
+        "do",
+        "if",
+        "private",
+        "this",
+        "break",
+        "double",
+        "implements",
+        "protected",
+        "throw",
+        "byte",
+        "else",
+        "import",
+        "public",
+        "throws",
+        "case",
+        "enum",
+        "instanceof",
+        "return",
+        "transient",
+        "catch",
+        "extends",
+        "int",
+        "short",
+        "try",
+        "char",
+        "final",
+        "interface",
+        "static",
+        "void",
+        "class",
+        "finally",
+        "long",
+        "strictfp",
+        "volatile",
+        "const",
+        "float",
+        "native",
+        "super",
+        "while")

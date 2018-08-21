@@ -72,6 +72,12 @@ public class NamesTest {
         assertThat(name).isEqualTo("stringIntegerMapEntry");
     }
 
+    @Test
+    public void keyword() {
+        String name = getName("java.lang.Boolean");
+        assertThat(name).isEqualTo("boolean_");
+    }
+
     private static String getName(String className, String... typeArguments) {
         String typeArgumentString = String.join(",", typeArguments);
         if (!typeArgumentString.isEmpty()) {
