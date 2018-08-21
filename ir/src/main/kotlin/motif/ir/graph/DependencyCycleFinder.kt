@@ -34,8 +34,9 @@ class DependencyCycleFinder(private val scopeClass: ScopeClass) {
     }
 
     private fun findCycle(visited: List<FactoryMethod>, factoryMethod: FactoryMethod): DependencyCycle? {
-        if (factoryMethod in visited) {
-            return DependencyCycle(scopeClass, visited)
+        val cycleStartIndex = visited.indexOf(factoryMethod)
+        if (cycleStartIndex != -1) {
+            return DependencyCycle(scopeClass, visited.subList(cycleStartIndex, visited.size))
         }
 
         val newVisited = visited + factoryMethod
