@@ -25,17 +25,36 @@ import javax.lang.model.element.Element
 class NotExposedHandler : ErrorHandler<NotExposedError>() {
 
     override fun message(error: NotExposedError): String {
-        val table = AsciiTable(AT_Context()
+        val dependencyTable = AsciiTable(AT_Context()
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
             addRule()
-            addRow(element(error)).setPaddingLeft(1)
+            addRow(error.requiredDependency.dependency).setPaddingLeft(1)
             addRule()
         }
+        val scopeTable = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+            addRow(error.scopeClass.type.simpleName).setPaddingLeft(1)
+            addRule()
+        }
+        val requiredByTable = AsciiTable(AT_Context()
+                .setGrid(U8_Grids.borderStrongDoubleLight())
+                .setWidth(60)).apply {
+            addRule()
+            error.requiredDependency.consumingScopes.forEach {
+                addRow(it.simpleName).setPaddingLeft(1)
+                addRule()
+            }
+        }
         return StringBuilder().apply {
-            appendln("NOT EXPOSED:")
-            appendln(error.scopeClass.type)
-            appendln(table.render())
+            appendln("DEPENDENCY NOT EXPOSED:")
+            appendln(dependencyTable.render())
+            appendln("is not exposed by:")
+            appendln(scopeTable.render())
+            appendln("but is required by:")
+            appendln(requiredByTable.render())
         }.toString()
     }
 

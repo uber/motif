@@ -37,6 +37,7 @@ class MissingDependenciesHandler : ErrorHandler<MissingDependenciesError>() {
         return StringBuilder().apply {
             appendln("MISSING DEPENDENCIES:")
             appendln(error.requiredBy.scopeClass.type)
+            appendln("is missing the following dependencies:")
             appendln(table.render())
         }.toString()
     }
