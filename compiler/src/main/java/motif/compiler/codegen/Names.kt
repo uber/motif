@@ -15,7 +15,10 @@
  */
 package motif.compiler.codegen
 
+import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.*
+import javax.lang.model.util.SimpleElementVisitor8
 import javax.lang.model.util.SimpleTypeVisitor8
 
 class Names {
@@ -46,7 +49,19 @@ private object NameVisitor : SimpleTypeVisitor8<String, Void>() {
     }
 
     override fun visitDeclared(t: DeclaredType, p: Void?): String {
-        val rawString = t.asElement().simpleName.toString()
+        val simpleName = t.asElement().simpleName.toString()
+        val enclosingElementString = t.asElement().enclosingElement.accept(object : SimpleElementVisitor8<String, Void?>() {
+
+            override fun defaultAction(e: Element?, p: Void?): String {
+                return ""
+            }
+
+            override fun visitType(e: TypeElement, p: Void?): String {
+                return e.simpleName.toString()
+            }
+        }, null)
+
+        val rawString = "$enclosingElementString$simpleName"
 
         if (t.typeArguments.isEmpty()) {
             return rawString

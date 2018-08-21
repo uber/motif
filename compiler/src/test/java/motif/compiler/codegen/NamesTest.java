@@ -66,6 +66,12 @@ public class NamesTest {
         assertThat(name).isEqualTo("stringIntegerHashMapIntegerHashMap");
     }
 
+    @Test
+    public void innerClass() {
+        String name = getName("java.util.Map.Entry", "String", "Integer");
+        assertThat(name).isEqualTo("stringIntegerMapEntry");
+    }
+
     private static String getName(String className, String... typeArguments) {
         String typeArgumentString = String.join(",", typeArguments);
         if (!typeArgumentString.isEmpty()) {
