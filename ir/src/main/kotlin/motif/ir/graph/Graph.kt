@@ -32,7 +32,7 @@ class Graph(
                 scopeCycleError,
                 missingDependenciesError(),
                 dependencyCycleErrors(),
-                duplicateFactoryMethodsError(),
+                duplicateFactoryMethodsErrors(),
                 notExposedErrors())
     }
 
@@ -59,13 +59,9 @@ class Graph(
                 }
     }
 
-    private fun duplicateFactoryMethodsError(): DuplicateFactoryMethodsError? {
-        val duplicates = nodes.values.flatMap { it.duplicateFactoryMethods }
-        return if (duplicates.isEmpty()) {
-            null
-        } else {
-            DuplicateFactoryMethodsError(duplicates)
-        }
+    private fun duplicateFactoryMethodsErrors(): List<DuplicateFactoryMethodsError> {
+        return nodes.values.flatMap { it.duplicateFactoryMethods }
+                .map { DuplicateFactoryMethodsError(it.duplicate, it.existing) }
     }
 
     private fun notExposedErrors(): List<NotExposedError> {

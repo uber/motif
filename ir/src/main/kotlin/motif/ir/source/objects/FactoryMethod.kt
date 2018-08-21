@@ -16,11 +16,13 @@
 package motif.ir.source.objects
 
 import motif.ir.source.base.Dependency
+import motif.ir.source.base.Type
 import motif.ir.source.dependencies.RequiredDependencies
 
 class FactoryMethod(
         val userData: Any?,
         val kind: Kind,
+        val scopeType: Type,
         val isExposed: Boolean,
         val isCached: Boolean,
         val requiredDependencies: RequiredDependencies,

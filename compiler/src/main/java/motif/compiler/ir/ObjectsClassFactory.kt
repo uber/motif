@@ -67,6 +67,7 @@ class ObjectsClassFactory(override val env: ProcessingEnvironment) : JavaxUtil {
                     val isCached = !executable.hasAnnotation(DoNotCache::class)
                     FactoryMethod(
                             userData = executable,
+                            scopeType = scopeType.ir,
                             kind = method.kind,
                             isExposed = isExposed,
                             isCached = isCached,

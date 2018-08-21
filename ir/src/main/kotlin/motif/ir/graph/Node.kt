@@ -90,7 +90,9 @@ class Node(
         scopeClass.factoryMethods.mapNotNull { factoryMethod ->
             val visibleFactoryMethodList = visibleFactoryMethods[factoryMethod.providedDependency] ?: throw IllegalStateException()
             if (visibleFactoryMethodList.size > 1) {
-                DuplicateFactoryMethod(factoryMethod, visibleFactoryMethodList - factoryMethod)
+                DuplicateFactoryMethod(
+                        factoryMethod,
+                        (visibleFactoryMethodList - factoryMethod).map { it.scopeType }.toSet())
             } else {
                 null
             }

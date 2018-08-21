@@ -19,8 +19,10 @@ class GraphValidationErrors(
         val scopeCycleError: ScopeCycleError?,
         val missingDependenciesErrors: List<MissingDependenciesError>,
         val dependencyCycleErrors: List<DependencyCycleError>,
-        val duplicateFactoryMethodsError: DuplicateFactoryMethodsError?,
+        val duplicateFactoryMethodsErrors: List<DuplicateFactoryMethodsError>,
         val notExposedErrors: List<NotExposedError>)
-    : List<GraphError> by notExposedErrors + listOfNotNull(
-        scopeCycleError,
-        duplicateFactoryMethodsError) + dependencyCycleErrors + missingDependenciesErrors
+    : List<GraphError> by notExposedErrors +
+        listOfNotNull(scopeCycleError) +
+        duplicateFactoryMethodsErrors +
+        dependencyCycleErrors +
+        missingDependenciesErrors

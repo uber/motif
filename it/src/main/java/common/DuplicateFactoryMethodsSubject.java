@@ -21,13 +21,11 @@ import com.google.common.truth.Subject;
 import motif.compiler.javax.Executable;
 import motif.ir.graph.DuplicateFactoryMethod;
 import motif.ir.graph.errors.DuplicateFactoryMethodsError;
+import motif.ir.source.base.Type;
 import motif.ir.source.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertAbout;
@@ -36,36 +34,33 @@ public class DuplicateFactoryMethodsSubject extends Subject<DuplicateFactoryMeth
 
     private static final Factory<DuplicateFactoryMethodsSubject, DuplicateFactoryMethodsError> FACTORY = DuplicateFactoryMethodsSubject::new;
 
-    private final Map<String, List<String>> expectedDuplicates = new HashMap<>();
-
     private DuplicateFactoryMethodsSubject(FailureMetadata metadata, @NullableDecl DuplicateFactoryMethodsError actual) {
         super(metadata, actual);
     }
 
-    public void matches() {
+    public void matches(String expectedDuplicateName, Class<?>... expectedExistingClasses) {
         assertThat(actual()).isNotNull();
 
-        Map<String, List<String>> actualDuplicates = new HashMap<>();
-        for (DuplicateFactoryMethod duplicate : actual().getDuplicates()) {
-            String duplicateName = getName(duplicate.getDuplicate());
-            List<String> existingNames = duplicate.getExisting().stream().map(DuplicateFactoryMethodsSubject::getName).collect(Collectors.toList());
-            actualDuplicates.put(duplicateName, existingNames);
+        String actualDuplicateName = getName(actual().getDuplicate());
+        if (!actualDuplicateName.equals(expectedDuplicateName)) {
+            failWithoutActual(
+                    Fact.fact("expected", expectedDuplicateName),
+                    Fact.fact("but was", actualDuplicateName));
         }
 
-        if (!actualDuplicates.equals(expectedDuplicates)) {
+        Set<Type> expectedExisting = Arrays.stream(expectedExistingClasses)
+                .map(aClass -> new Type(null, aClass.getName()))
+                .collect(Collectors.toSet());
+
+        if (!actual().getExisting().equals(expectedExisting)) {
             failWithoutActual(
-                    Fact.fact("expected", expectedDuplicates),
-                    Fact.fact("but was", actualDuplicates));
+                    Fact.fact("expected", expectedExisting),
+                    Fact.fact("but was", actual().getExisting()));
         }
     }
 
     private static String getName(FactoryMethod factoryMethod) {
         return ((Executable) factoryMethod.getUserData()).getName();
-    }
-
-    public DuplicateFactoryMethodsSubject with(String duplicateFactoryMethodName, String... existingFactoryMethodNames) {
-        expectedDuplicates.put(duplicateFactoryMethodName, Arrays.asList(existingFactoryMethodNames));
-        return this;
     }
 
     public static DuplicateFactoryMethodsSubject assertThat(DuplicateFactoryMethodsError dependencyCycle) {
