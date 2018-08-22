@@ -45,8 +45,8 @@ class GraphProcessor(private val project: Project) {
         return scopeClasses
                 .flatMap { scopeClass ->
                     scopeClass.methods
-                            .filter { it.returnType != null }
-                            .map { ScopeMethod(scopeClass, it.returnType!!.getClass()) }
+                            .mapNotNull { it.returnType?.getClass() }
+                            .map { ScopeMethod(scopeClass, it) }
                 }
                 .filter { it.childReturnType in scopeClasses }
     }

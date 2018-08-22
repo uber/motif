@@ -55,6 +55,7 @@ fun PsiClass.isMaybeScopeClass(): Boolean {
 /**
  * Get a PsiClass from a PsiType
  */
-fun PsiType.getClass(): PsiClass {
-    return (this as PsiClassType).resolve()!!
+fun PsiType.getClass(): PsiClass? {
+    if (this is PsiClassType) return this.resolve()
+    return null
 }
