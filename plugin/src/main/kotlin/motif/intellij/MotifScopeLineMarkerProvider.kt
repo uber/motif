@@ -63,17 +63,18 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
             // the case when a child scope is declared in a class
             is PsiMethod -> {
                 val returnType = element.returnType ?: return
-                if (element.containingClass != null && !element.containingClass!!.isScopeClass()) return
-                scopeClassesMap.entries
-                        .find { it.key == returnType.getClass() }
-                        ?.let {
-                            val builder: NavigationGutterIconBuilder<PsiElement> =
-                                    NavigationGutterIconBuilder
-                                            .create(Icons.CHILD_SCOPE)
-                                            .setTooltipTitle("Navigate to Definition")
-                                            .setTargets(it.key)
-                            result.add(builder.createLineMarkerInfo(element))
-                        }
+                if (element.containingClass?.isScopeClass() == true) {
+                    scopeClassesMap.entries
+                            .find { it.key == returnType.getClass() }
+                            ?.let {
+                                val builder: NavigationGutterIconBuilder<PsiElement> =
+                                        NavigationGutterIconBuilder
+                                                .create(Icons.CHILD_SCOPE)
+                                                .setTooltipTitle("Navigate to Definition")
+                                                .setTargets(it.key)
+                                result.add(builder.createLineMarkerInfo(element))
+                            }
+                }
             }
         }
     }
