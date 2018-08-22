@@ -20,7 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class Test {
 
     public static void run() {
-        Scope scope = new Test_ScopeImpl();
+        Scope scope = new TestScopeImpl();
         assertThat(scope.string()).isEqualTo("s");
     }
 

@@ -102,7 +102,7 @@ interface JavaxUtil {
 
     fun scopeImpl(scopeType: DeclaredType): ClassName {
         val scopeClassName = scopeType.typeName as ClassName
-        val prefix = scopeClassName.simpleNames().joinToString("_")
+        val prefix = scopeClassName.simpleNames().joinToString("")
         return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
     }
 

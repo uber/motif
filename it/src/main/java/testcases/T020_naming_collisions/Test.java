@@ -25,7 +25,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class Test {
 
     public static void run() {
-        Parent parent = new Test_GrandparentImpl().p();
+        Parent parent = new TestGrandparentImpl().p();
         ChildA a = parent.a();
         ChildB b = parent.b();
         ChildC c = parent.c();
