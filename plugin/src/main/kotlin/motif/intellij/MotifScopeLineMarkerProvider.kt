@@ -21,6 +21,7 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.psi.*
 import motif.intellij.icons.Icons
 import motif.intellij.psi.getClass
+import motif.intellij.psi.isScopeClass
 
 /**
  * This class is invoked when rendering the gutter on the side of a class in IntelliJ. It determines the pieces of
@@ -62,6 +63,7 @@ class MotifScopeLineMarkerProvider : RelatedItemLineMarkerProvider() {
             // the case when a child scope is declared in a class
             is PsiMethod -> {
                 val returnType = element.returnType ?: return
+                if (element.containingClass != null && !element.containingClass!!.isScopeClass()) return
                 scopeClassesMap.entries
                         .find { it.key == returnType.getClass() }
                         ?.let {
