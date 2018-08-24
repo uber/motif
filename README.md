@@ -42,7 +42,7 @@ A Motif Scope is analogous to a Dagger `@Component`.
 interface MainScope {}
 ```
 
-Define a `@motif.Objects`-annotated class to hold `factory methods`, which tell Motif how to create objects.
+Define a `@motif.Objects`-annotated class to hold *factory methods*, which tell Motif how to create objects.
 
 <details>
 <summary>Notes for Dagger users...</summary>
@@ -88,7 +88,7 @@ interface MainScope {
 }
 ```
 
-Retrieve objects from a Scope via `access methods` defined on your Scope interface:
+Retrieve objects from a Scope via *access methods* defined on your Scope interface:
 
 <details>
 <summary>Notes for Dagger users...</summary>
@@ -129,7 +129,7 @@ Controller controller = mainScope.controller();
 
 ## Child Scopes
 
-Define a `child method` on the Scope interface to declare a Scope as the child of another Scope:
+Define a *child method* on the Scope interface to declare a Scope as the child of another Scope:
 
 <details>
 <summary>Notes for Dagger users...</summary>
