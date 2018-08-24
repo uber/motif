@@ -13,7 +13,7 @@ group 'com.uber.motif'
 version '0.0.1' // Plugin version
 
 dependencies {
-    implementation project(':lib')
+    compile project(':lib')
     implementation deps.rx.java
     implementation deps.rx.relay
 
