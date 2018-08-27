@@ -15,7 +15,7 @@ version '0.0.1' // Plugin version
 dependencies {
 
     compile project(':lib')
-    compile project(':ir')
+    compile project(':models')
 
     implementation deps.rx.java
     implementation deps.rx.relay

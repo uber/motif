@@ -27,5 +27,6 @@
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.MotifScopeLineMarkerProvider"/>
         <typeHierarchyProvider language="JAVA"
                                implementationClass="motif.intellij.hierarchy.MotifScopeHierarchyProvider"/>
+        <inspectionToolProvider implementation="motif.intellij.inspection.MotifInspectionsProvider"/>
     </extensions>
 </idea-plugin>

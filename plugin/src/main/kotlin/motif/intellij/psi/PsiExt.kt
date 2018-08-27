@@ -61,3 +61,7 @@ fun PsiType.getClass(): PsiClass? {
     return null
 }
 
+fun PsiClass.containedByScopeClass(): Boolean {
+    if (isScopeClass()) return true
+    return containingClass?.containedByScopeClass() ?: false
+}

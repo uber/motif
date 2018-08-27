@@ -83,13 +83,16 @@ class ObjectsClassParser : ParserUtil {
 
         val constructors: List<IrMethod> = returnClass.constructors
 
-        if (constructors.isEmpty()) throw NoSuitableConstructor(returnType, method)
+        val requiredDependencies: RequiredDependencies = if (constructors.isEmpty()) {
+            RequiredDependencies(listOf())
+        } else {
+            val constructor = constructors.find { it.hasAnnotation(Inject::class) } ?: constructors[0]
 
-        val constructor = constructors.find { it.hasAnnotation(Inject::class) } ?: constructors[0]
+            ensureNonNullParameters(constructor)
 
-        ensureNonNullParameters(constructor)
+            constructor.requiredDependencies(scopeClass)
+        }
 
-        val requiredDependencies: RequiredDependencies = constructor.requiredDependencies(scopeClass)
         return ParsedMethod(FactoryMethod.Kind.CONSTRUCTOR, requiredDependencies)
     }
 
