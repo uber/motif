@@ -1,33 +1,43 @@
+/*
+ * Copyright (c) 2018 Uber Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package motif.ir
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElementFactory
 import motif.intellij.MotifComponent
-import motif.intellij.graph.PsiToIrUtilHelper
-import motif.ir.source.ScopeClass
-import motif.ir.source.SourceSet
-import motif.ir.source.base.Type
+import motif.intellij.ir.IntelliJType
+import motif.models.java.IrType
+import motif.models.motif.SourceSet
+import motif.models.parsing.SourceSetParser
 
 class SourceSetGenerator {
 
     fun createSourceSet(project: Project): SourceSet {
+        val scopePsiClasses: List<PsiClass> = MotifComponent.get(project).graphProcessor.scopeClasses()
+        val scopeAnnotatedTypes: Set<IrType> = scopePsiClasses
+                // TODO remove these filters
+                .filter { !it.containingFile.containingDirectory.toString().contains("test") && !it.containingFile.containingDirectory.toString().contains("external")}
+                .map { psiClass ->
+                    val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(psiClass)
+                    IntelliJType(project, psiClassType)
+                }
+                .toSet()
 
-        val validationHelper = PsiToIrUtilHelper()
-        val allScopes: List<PsiClass> = MotifComponent.get(project).graphProcessor.scopeClasses()
-
-        return SourceSet(
-                allScopes
-                        // TODO: remove these filters
-                        .filter { !it.containingFile.containingDirectory.toString().contains("test") && !it.containingFile.containingDirectory.toString().contains("external")}
-//                        .filter { it.qualifiedName.toString() == "motif.sample.app.root.RootScope" }
-                        .map { it -> ScopeClass(
-                                it,
-                                Type(it, it.qualifiedName.toString()),
-                                validationHelper.childMethods(it),
-                                validationHelper.accessMethods(it),
-                                validationHelper.objectsClass(it),
-                                validationHelper.explicitDependencies(it))
-                        }
-        )
+        return SourceSetParser().parse(scopeAnnotatedTypes)
     }
 }

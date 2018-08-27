@@ -25,13 +25,7 @@ import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMethod
-import motif.intellij.graph.errors.MotifPsiParsingError
 import motif.intellij.psi.isScopeClass
-import motif.ir.SourceSetGenerator
-import motif.ir.graph.Graph
-import motif.ir.graph.GraphFactory
-import motif.ir.graph.errors.*
 import java.util.Comparator
 import javax.swing.JPanel
 import javax.swing.JTree
@@ -67,17 +61,6 @@ class MotifScopeHierarchyBrowser(project: Project?, element: PsiElement?) : Type
     }
 
     override fun createHierarchyTreeStructure(typeName: String, psiElement: PsiElement): HierarchyTreeStructure? {
-        // TEMPORARY, FIND BETTER PLACE FOR THIS
-        val sourceSetGenerator = SourceSetGenerator()
-        try {
-            val scopes = sourceSetGenerator.createSourceSet(myProject)
-            val processor: Graph = GraphFactory.create(scopes)
-            if (processor.validationErrors.isNotEmpty()) {
-                processor.validationErrors.forEach { printValidationErrors(it) }
-            }
-        } catch (e: MotifPsiParsingError) {
-            println(e.errorMessage)
-        }
         if (typeName == TypeHierarchyBrowserBase.TYPE_HIERARCHY_TYPE) {
                val completeTreeStructure = MotifCompleteTreeStructureUtility()
                val descriptor: HierarchyNodeDescriptor = completeTreeStructure.buildParentHierarchy(psiElement as
@@ -85,18 +68,6 @@ class MotifScopeHierarchyBrowser(project: Project?, element: PsiElement?) : Type
                 return MotifScopeHierarchyTreeStructure(myProject, descriptor)
             }
         return MotifScopeHierarchyTreeStructure(myProject, psiElement as PsiClass, typeName)
-    }
-
-    private fun printValidationErrors(error: GraphError) {
-        when (error) {
-            is MissingDependenciesError -> println(error.requiredBy.scopeClass.toString() + " is missing dependencies" +
-                    " " + error.dependencies.map { it.type.simpleName })
-            is ScopeCycleError -> println("Cyclic Dependency between Scopes " + error.cycle.map { it.simpleName })
-            is DependencyCycleError -> println("Dependency Cycle in " + error.scopeClass.toString() + " between " +
-                    "dependencies " + error.cycle.map { (it.userData as PsiMethod).name })
-            is DuplicateFactoryMethodsError -> println("Duplicate Factory Methods")
-            is NotExposedError -> println("Not Exposed Error")
-        }
     }
 
     override fun canBeDeleted(psiElement: PsiElement?): Boolean {
