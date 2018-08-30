@@ -15,17 +15,16 @@
  */
 package common;
 
-import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
-import motif.compiler.javax.Executable;
-import motif.ir.graph.DuplicateFactoryMethod;
-import motif.ir.graph.errors.DuplicateFactoryMethodsError;
-import motif.ir.source.base.Type;
-import motif.ir.source.objects.FactoryMethod;
+import com.google.common.truth.Truth;
+import motif.models.graph.errors.DuplicateFactoryMethodsError;
+import motif.models.java.IrType;
+import motif.models.motif.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertAbout;
@@ -42,25 +41,21 @@ public class DuplicateFactoryMethodsSubject extends Subject<DuplicateFactoryMeth
         assertThat(actual()).isNotNull();
 
         String actualDuplicateName = getName(actual().getDuplicate());
-        if (!actualDuplicateName.equals(expectedDuplicateName)) {
-            failWithoutActual(
-                    Fact.fact("expected", expectedDuplicateName),
-                    Fact.fact("but was", actualDuplicateName));
-        }
+        Truth.assertThat(actualDuplicateName).isEqualTo(expectedDuplicateName);
 
-        Set<Type> expectedExisting = Arrays.stream(expectedExistingClasses)
-                .map(aClass -> new Type(null, aClass.getName()))
+        Set<String> expectedExisting = Arrays.stream(expectedExistingClasses)
+                .map(Class::getName)
                 .collect(Collectors.toSet());
 
-        if (!actual().getExisting().equals(expectedExisting)) {
-            failWithoutActual(
-                    Fact.fact("expected", expectedExisting),
-                    Fact.fact("but was", actual().getExisting()));
-        }
+        Set<String> actualExisting = actual().getExisting().stream()
+                .map(IrType::getQualifiedName)
+                .collect(Collectors.toSet());
+
+        Truth.assertThat(actualExisting).isEqualTo(expectedExisting);
     }
 
     private static String getName(FactoryMethod factoryMethod) {
-        return ((Executable) factoryMethod.getUserData()).getName();
+        return factoryMethod.getIr().getName();
     }
 
     public static DuplicateFactoryMethodsSubject assertThat(DuplicateFactoryMethodsError dependencyCycle) {

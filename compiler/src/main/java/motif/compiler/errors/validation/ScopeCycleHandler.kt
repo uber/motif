@@ -18,7 +18,7 @@ package motif.compiler.errors.validation
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
-import motif.ir.graph.errors.ScopeCycleError
+import motif.models.graph.errors.ScopeCycleError
 import javax.lang.model.element.Element
 
 class ScopeCycleHandler : ErrorHandler<ScopeCycleError>() {

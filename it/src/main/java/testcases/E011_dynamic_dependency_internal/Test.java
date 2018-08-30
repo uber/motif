@@ -16,8 +16,8 @@
 package testcases.E011_dynamic_dependency_internal;
 
 import common.MissingDependenciesSubject;
-import motif.ir.graph.errors.GraphValidationErrors;
-import motif.ir.graph.errors.MissingDependenciesError;
+import motif.models.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.MissingDependenciesError;
 
 import java.util.List;
 

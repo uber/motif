@@ -16,8 +16,8 @@
 package testcases.E006_dependencies_cycle_2;
 
 import common.DependencyCycleSubject;
-import motif.ir.graph.errors.DependencyCycleError;
-import motif.ir.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.DependencyCycleError;
+import motif.models.graph.errors.GraphValidationErrors;
 
 import java.util.List;
 

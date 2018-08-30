@@ -16,9 +16,11 @@
 package testcases.E003_scope_cycle;
 
 import com.google.common.truth.Truth;
-import motif.ir.graph.errors.GraphValidationErrors;
-import motif.ir.graph.errors.ScopeCycleError;
-import motif.ir.source.base.Type;
+import motif.models.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.ScopeCycleError;
+import motif.models.java.IrType;
+
+import java.util.stream.Collectors;
 
 public class Test {
 
@@ -27,7 +29,7 @@ public class Test {
     public static void run() {
         ScopeCycleError error = errors.getScopeCycleError();
         Truth.assertThat(error).isNotNull();
-        Truth.assertThat(error.getCycle())
-                .containsExactly(new Type(null, Scope.class.getName()));
+        Truth.assertThat(error.getCycle().stream().map(IrType::getQualifiedName).collect(Collectors.toList()))
+                .containsExactly(Scope.class.getName());
     }
 }

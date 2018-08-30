@@ -18,9 +18,9 @@ package motif.compiler.errors.validation
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
-import motif.ir.graph.errors.DependencyCycleError
+import motif.compiler.ir.CompilerClass
+import motif.models.graph.errors.DependencyCycleError
 import javax.lang.model.element.Element
-import javax.lang.model.type.DeclaredType
 
 class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
 
@@ -29,7 +29,7 @@ class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
             addRule()
-            addRow(error.scopeClass.type.simpleName).setPaddingLeft(1)
+            addRow(error.scopeClass.ir.type.simpleName).setPaddingLeft(1)
             addRule()
         }
         val table = AsciiTable(AT_Context()
@@ -52,6 +52,6 @@ class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {
     }
 
     override fun element(error: DependencyCycleError): Element? {
-        return (error.scopeClass.userData as DeclaredType).asElement()
+        return (error.scopeClass.ir as CompilerClass).declaredType.asElement()
     }
 }

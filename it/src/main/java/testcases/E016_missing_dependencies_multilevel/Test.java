@@ -16,8 +16,8 @@
 package testcases.E016_missing_dependencies_multilevel;
 
 import common.MissingDependenciesSubject;
-import motif.ir.graph.errors.GraphValidationErrors;
-import motif.ir.graph.errors.MissingDependenciesError;
+import motif.models.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.MissingDependenciesError;
 
 import java.util.List;
 

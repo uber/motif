@@ -9,5 +9,6 @@ dependencies {
     implementation deps.kotlin.stdlib
     implementation deps.javapoet
     implementation project(':compiler')
+    implementation project(':models')
     implementation project(':lib')
 }

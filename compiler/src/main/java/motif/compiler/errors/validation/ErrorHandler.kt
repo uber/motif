@@ -15,7 +15,7 @@
  */
 package motif.compiler.errors.validation
 
-import motif.ir.graph.errors.*
+import motif.models.graph.errors.*
 import javax.lang.model.element.Element
 
 abstract class ErrorHandler<T : GraphError> {

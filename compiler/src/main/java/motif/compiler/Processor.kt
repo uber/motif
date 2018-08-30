@@ -17,11 +17,12 @@ package motif.compiler
 
 import motif.Scope
 import motif.compiler.codegen.Generator
-import motif.compiler.errors.parsing.ParsingError
 import motif.compiler.errors.validation.ErrorHandler
-import motif.compiler.ir.SourceSetFactory
-import motif.ir.graph.GraphFactory
-import motif.ir.graph.errors.GraphValidationErrors
+import motif.compiler.ir.CompilerType
+import motif.models.graph.GraphFactory
+import motif.models.graph.errors.GraphValidationErrors
+import motif.models.parsing.SourceSetParser
+import motif.models.parsing.errors.ParsingError
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -55,10 +56,13 @@ class Processor : AbstractProcessor() {
 
     private fun process(roundEnv: RoundEnvironment) {
         val sourceSet = try {
-            SourceSetFactory(processingEnv).create(roundEnv)
+            val scopeTypes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
+                    .map { CompilerType(processingEnv, it.asType()) }
+                    .toSet()
+            SourceSetParser().parse(scopeTypes)
         } catch (e: ParsingError) {
             this.parsingError = e
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e.message}\n${e.element}\n", e.element)
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e::class.java.name}\n", null)
             return
         }
 

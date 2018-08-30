@@ -21,12 +21,11 @@ import com.squareup.javapoet.TypeSpec
 import dagger.Module
 import dagger.Provides
 import motif.internal.DaggerScope
-import motif.ir.graph.Scope
-import motif.ir.source.base.Dependency
-import motif.ir.source.dependencies.RequiredDependency
-import motif.ir.source.objects.FactoryMethod
-import motif.ir.source.objects.ObjectsClass
-import motif.ir.source.objects.SpreadMethod
+import motif.models.graph.Scope
+import motif.models.motif.dependencies.Dependency
+import motif.models.motif.objects.FactoryMethod
+import motif.models.motif.objects.ObjectsClass
+import motif.models.motif.objects.SpreadMethod
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
@@ -86,7 +85,7 @@ class ModuleFactory(
         val callParams: String = parameters.joinToString(", ") { "\$N" }
 
         when (method.kind) {
-            FactoryMethod.Kind.BASIC -> addStatement("return \$N.\$N($callParams)", objectsField, method.executable.name, *parameters)
+            FactoryMethod.Kind.BASIC -> addStatement("return \$N.\$N($callParams)", objectsField, method.cir.name, *parameters)
             FactoryMethod.Kind.BINDS -> addStatement("return $callParams", *parameters)
             FactoryMethod.Kind.CONSTRUCTOR -> addStatement("return new \$T($callParams)", dependency.typeName, *parameters)
         }
@@ -97,7 +96,7 @@ class ModuleFactory(
     private fun MethodSpec.Builder.build(method: SpreadMethod): MethodSpec {
         val spreadParameter = nameScope { method.source.parameterSpec() }
         addParameter(spreadParameter)
-        addStatement("return \$N.\$N()", spreadParameter, method.executable.name)
+        addStatement("return \$N.\$N()", spreadParameter, method.cir.name)
         return build()
     }
 }

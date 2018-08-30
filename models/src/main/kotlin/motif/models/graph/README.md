@@ -1,0 +1,2 @@
+This package handle building the graph from the Motif models in the `motif.models.motif` package. `GraphFactory`
+ will throw an appropriate graph validation error if the graph is invalid (See `motif.models.graph.errors`).

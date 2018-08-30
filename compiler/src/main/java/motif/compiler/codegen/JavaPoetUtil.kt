@@ -16,63 +16,87 @@
 package motif.compiler.codegen
 
 import com.squareup.javapoet.*
-import motif.compiler.javax.Executable
-import motif.compiler.javax.ExecutableParam
-import motif.compiler.javax.JavaxUtil
-import motif.ir.graph.Scope
-import motif.ir.source.accessmethod.AccessMethod
-import motif.ir.source.base.Dependency
-import motif.ir.source.base.Type
-import motif.ir.source.child.ChildMethod
-import motif.ir.source.dependencies.RequiredDependencies
-import motif.ir.source.dependencies.RequiredDependency
-import motif.ir.source.objects.FactoryMethod
-import motif.ir.source.objects.ObjectsClass
-import motif.ir.source.objects.SpreadMethod
+import motif.compiler.ir.*
+import motif.models.graph.Scope
+import motif.models.java.IrAnnotation
+import motif.models.java.IrClass
+import motif.models.java.IrMethod
+import motif.models.java.IrType
+import motif.models.parsing.ParserUtil
+import motif.models.motif.accessmethod.AccessMethod
+import motif.models.motif.dependencies.Dependency
+import motif.models.motif.child.ChildMethod
+import motif.models.motif.dependencies.RequiredDependencies
+import motif.models.motif.dependencies.RequiredDependency
+import motif.models.motif.objects.FactoryMethod
+import motif.models.motif.objects.ObjectsClass
+import motif.models.motif.objects.SpreadMethod
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-interface JavaPoetUtil : JavaxUtil {
+interface JavaPoetUtil : ParserUtil {
 
-    val Type.mirror: TypeMirror
-        get() = userData as TypeMirror
+    val env: ProcessingEnvironment
 
-    val ObjectsClass.isInterface: Boolean
-        get() = type.asElement().kind == ElementKind.INTERFACE
+    val IrType.cir: CompilerType
+        get() = this as CompilerType
 
-    fun ObjectsClass.abstractFactoryMethods(): List<Executable> {
-        return factoryMethods
-                .filter { it.isAbstract }
-                .map { it.executable }
+    val IrAnnotation.cir: CompilerAnnotation
+        get() = this as CompilerAnnotation
+
+    val IrClass.cir: CompilerClass
+        get() = this as CompilerClass
+
+    val IrMethod.cir: CompilerMethod
+        get() = this as CompilerMethod
+
+    val SpreadMethod.cir: CompilerMethod
+        get() = ir.cir
+
+    val FactoryMethod.cir: CompilerMethod
+        get() = ir.cir
+
+    val AccessMethod.cir: CompilerMethod
+        get() = ir.cir
+
+    val ObjectsClass.cir: CompilerType
+        get() = type.cir
+
+    val ChildMethod.cir: CompilerMethod
+        get() = ir.cir
+
+    val Scope.cir: CompilerClass
+        get() = scopeClass.ir.cir
+
+    val Dependency.cir: CompilerType
+        get() = type.cir
+
+    fun ClassName.qualifiedName(): String {
+        return "${packageName()}.${simpleNames().joinToString(".")}"
     }
 
-    val SpreadMethod.executable: Executable
-        get() = userData as Executable
+    fun ObjectsClass.abstractFactoryMethods(): List<CompilerMethod> {
+        return factoryMethods
+                .filter { it.isAbstract }
+                .map { it.cir }
+    }
 
-    val FactoryMethod.executable: Executable
-        get() = userData as Executable
-
-    fun Executable.overriding(): MethodSpec.Builder {
+    fun CompilerMethod.overriding(): MethodSpec.Builder {
         return MethodSpec.overriding(element, owner, env.typeUtils)
     }
 
-    fun Executable.overrideUnsupported(): MethodSpec {
+    fun CompilerMethod.overrideUnsupported(): MethodSpec {
         return overriding()
                 .addStatement("throw new \$T()", UnsupportedOperationException::class.java)
                 .build()
     }
 
-    val AccessMethod.executable: Executable
-        get() = userData as Executable
-
-    fun Executable.overrideWithFinalParams(): MethodSpec.Builder {
+    fun CompilerMethod.overrideWithFinalParams(): MethodSpec.Builder {
         val builder = MethodSpec.methodBuilder(name)
                 .addAnnotation(Override::class.java)
-                .returns(returnType.typeName)
+                .returns(returnType.cir.mirror.typeName)
 
         parameters
                 .map {
@@ -85,29 +109,14 @@ interface JavaPoetUtil : JavaxUtil {
         return builder
     }
 
-    fun ExecutableParam.specBuilder(): ParameterSpec.Builder {
+    fun CompilerMethodParameter.specBuilder(): ParameterSpec.Builder {
         return ParameterSpec.builder(
-                type.typeName,
+                type.cir.mirror.typeName,
                 element.simpleName.toString())
     }
 
-    val ObjectsClass.type: DeclaredType
-        get() = userData as DeclaredType
-
-    val ChildMethod.executable: Executable
-        get() = userData as Executable
-
-    val Scope.type: DeclaredType
-        get() = scopeClass.userData as DeclaredType
-
-    val motif.ir.source.base.Annotation.mirror: AnnotationMirror
-        get() = userData as AnnotationMirror
-
-    val Dependency.typeMirror: TypeMirror
-        get() = userData as TypeMirror
-
     val Dependency.typeName: TypeName
-        get() = ClassName.get(typeMirror)
+        get() = ClassName.get(type.cir.mirror)
 
     fun TypeSpec.write(packageName: String): TypeSpec {
         JavaFile.builder(packageName, this).build().writeTo(env.filer)
@@ -119,6 +128,15 @@ interface JavaPoetUtil : JavaxUtil {
             list.associateBy({ it.dependency }) { it.dependency.methodSpecBuilder() }
         }
     }
+
+    fun scopeImpl(scopeType: DeclaredType): ClassName {
+        val scopeClassName = scopeType.typeName as ClassName
+        val prefix = scopeClassName.simpleNames().joinToString("")
+        return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
+    }
+
+    val TypeMirror.typeName: TypeName
+        get() = ClassName.get(this)
 
     fun <T> nameScope(block: NameScope.() -> T): T {
         return NameScope(env).block()
@@ -140,12 +158,12 @@ interface JavaPoetUtil : JavaxUtil {
                     .build()
         }
 
-        fun motif.ir.source.base.Annotation.spec(): AnnotationSpec {
-            return AnnotationSpec.get(mirror)
+        fun IrAnnotation.spec(): AnnotationSpec {
+            return AnnotationSpec.get(cir.mirror)
         }
 
         fun Dependency.name(): String {
-            return names.unique(Names.safeName(typeMirror))
+            return names.unique(Names.safeName(type.cir.mirror))
         }
 
         fun claim(name: String) {

@@ -15,7 +15,8 @@
  */
 package testcases.E022_nullable_factory_method_param;
 
-import motif.compiler.errors.parsing.ParsingError;
+import motif.models.parsing.errors.NullableDependency;
+import motif.models.parsing.errors.ParsingError;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -24,6 +25,6 @@ public class Test {
     public static ParsingError parsingError;
 
     public static void run() {
-        assertThat(parsingError).isNotNull();
+        assertThat(parsingError).isInstanceOf(NullableDependency.class);
     }
 }

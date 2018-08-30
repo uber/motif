@@ -15,18 +15,16 @@
  */
 package common;
 
-import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
-import motif.ir.graph.DependencyCycle;
-import motif.ir.graph.errors.DependencyCycleError;
-import motif.ir.source.base.Annotation;
-import motif.ir.source.base.Dependency;
-import motif.ir.source.base.Type;
-import motif.ir.source.objects.FactoryMethod;
+import com.google.common.truth.Truth;
+import motif.models.graph.errors.DependencyCycleError;
+import motif.models.motif.dependencies.Dependency;
+import motif.models.motif.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertAbout;
@@ -42,30 +40,20 @@ public class DependencyCycleSubject extends Subject<DependencyCycleSubject, Depe
     public void matches(Class<?> scopeClass, String... cycleNames) {
         assertThat(actual()).isNotNull();
 
-        List<Dependency> expectedCycle = Arrays.stream(cycleNames)
-                .map(cycleName -> new Dependency(
-                        null,
-                        new Type(null, "java.lang.String"),
-                        new Annotation(null, "@javax.inject.Named(\"" + cycleName + "\")")))
+        String expectedScopeName = scopeClass.getName();
+        String actualScopeName = actual().getScopeClass().getIr().getType().getQualifiedName();
+        Truth.assertThat(actualScopeName).isEqualTo(expectedScopeName);
+
+        List<String> expectedCycle = Arrays.stream(cycleNames)
+                .map(s -> "@javax.inject.Named(\"" + s + "\") java.lang.String")
                 .collect(Collectors.toList());
 
-        List<Dependency> actualCycle = actual().getCycle().stream()
+        List<String> actualCycle = actual().getCycle().stream()
                 .map(FactoryMethod::getProvidedDependency)
+                .map(Dependency::toString)
                 .collect(Collectors.toList());
 
-        Type expectedScopeType = new Type(null, scopeClass.getName());
-        Type actualScopeType = actual().getScopeClass().getType();
-        if (!expectedScopeType.equals(actualScopeType)) {
-            failWithoutActual(
-                    Fact.fact("expected", expectedScopeType),
-                    Fact.fact("but was", actualScopeType));
-        }
-
-        if (!actualCycle.equals(expectedCycle)) {
-            failWithoutActual(
-                    Fact.fact("expected", expectedCycle),
-                    Fact.fact("but was", actualCycle));
-        }
+        Truth.assertThat(actualCycle).isEqualTo(expectedCycle);
     }
 
     public static DependencyCycleSubject assertThat(DependencyCycleError dependencyCycle) {

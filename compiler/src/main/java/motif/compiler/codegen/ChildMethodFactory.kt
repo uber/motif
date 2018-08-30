@@ -18,16 +18,15 @@ package motif.compiler.codegen
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import motif.compiler.GENERATED_DEPENDENCIES_NAME
-import motif.compiler.javax.ExecutableParam
-import motif.compiler.ir
-import motif.ir.graph.Graph
-import motif.ir.graph.Scope
-import motif.ir.source.base.Dependency
-import motif.ir.source.child.ChildMethod
-import motif.ir.source.dependencies.RequiredDependencies
+import motif.compiler.ir.CompilerMethodParameter
+import motif.models.graph.Graph
+import motif.models.graph.Scope
+import motif.models.motif.dependencies.Dependency
+import motif.models.motif.child.ChildMethod
+import motif.models.motif.dependencies.RequiredDependencies
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
+import javax.lang.model.type.DeclaredType
 
 class ChildMethodFactory(
         env: ProcessingEnvironment,
@@ -37,8 +36,8 @@ class ChildMethodFactory(
     fun create(
             scope: Scope,
             childMethod: ChildMethod): MethodSpec {
-        val executable = childMethod.executable
-        val childScopeImplName = scopeImpl(executable.returnDeclaredType)
+        val executable = childMethod.cir
+        val childScopeImplName = scopeImpl(executable.returnType.cir.mirror as DeclaredType)
         val childDependenciesName = childScopeImplName.nestedClass(GENERATED_DEPENDENCIES_NAME)
 
         return executable.overrideWithFinalParams()
@@ -53,7 +52,9 @@ class ChildMethodFactory(
     private fun ChildMethod.childDependenciesImpl(
             scope: Scope,
             childDependenciesName: TypeName): TypeSpec {
-        val dynamicDependencies: Map<Dependency, ExecutableParam> = executable.parameterMap
+        val dynamicDependencies: Map<Dependency, CompilerMethodParameter> = cir.parameters.associateBy({ parameter ->
+            parameter.toDependency()
+        }) { it }
         val componentMethods: Map<Dependency, MethodSpec> = scope.componentMethodSpecs
         fun MethodSpec.Builder.addReturn(dependency: Dependency): MethodSpec.Builder {
             val dynamicDependency = dynamicDependencies[dependency]
@@ -66,7 +67,7 @@ class ChildMethodFactory(
             return this
         }
 
-        val childType = executable.returnType.ir
+        val childType = cir.returnType
         val childRequiredDependencies: RequiredDependencies = graph.getDependencies(childType)
                 ?: throw IllegalStateException("Could not find Dependenencies for child: $childType")
 

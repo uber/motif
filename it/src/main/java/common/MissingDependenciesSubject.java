@@ -15,13 +15,10 @@
  */
 package common;
 
-import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
-import motif.ir.graph.errors.MissingDependenciesError;
-import motif.ir.source.base.Dependency;
-import motif.ir.source.base.Type;
+import motif.models.graph.errors.MissingDependenciesError;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.Arrays;
@@ -41,22 +38,19 @@ public class MissingDependenciesSubject extends Subject<MissingDependenciesSubje
     public void matches(Class<?> scopeClass, Class<?>... dependencies) {
         assertThat(actual()).isNotNull();
 
-        Type expectedScopeType = type(scopeClass);
-        Type actualScopeType = actual().getRequiredBy().getScopeClass().getType();
-        if (!expectedScopeType.equals(actualScopeType)) {
-            failWithoutActual(
-                    Fact.fact("expected Scope", expectedScopeType),
-                    Fact.fact("but was", actualScopeType));
-        }
+        String expectedScopeName = scopeClass.getName();
+        String actualScopeName = actual().getRequiredBy().getScopeClass().getIr().getType().getQualifiedName();
+        Truth.assertThat(actualScopeName).isEqualTo(expectedScopeName);
 
-        List<Dependency> expectedDependencies = Arrays.stream(dependencies)
-                .map(expectedDependencyClass -> new Dependency(null, type(expectedDependencyClass), null))
+        List<String> expectedDependencies = Arrays.stream(dependencies)
+                .map(Class::getName)
                 .collect(Collectors.toList());
-        Truth.assertThat(actual().getDependencies()).containsExactlyElementsIn(expectedDependencies);
-    }
 
-    private static Type type(Class<?> typeClass) {
-        return new Type(null, typeClass.getName());
+        List<String> actualDependencies = actual().getDependencies().stream()
+                .map(dependency -> dependency.getType().getQualifiedName())
+                .collect(Collectors.toList());
+
+        Truth.assertThat(actualDependencies).containsExactlyElementsIn(expectedDependencies);
     }
 
     public static MissingDependenciesSubject assertThat(MissingDependenciesError error) {

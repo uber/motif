@@ -15,10 +15,8 @@
  */
 package testcases.E017_not_exposed;
 
-import motif.ir.graph.errors.GraphValidationErrors;
-import motif.ir.graph.errors.NotExposedError;
-import motif.ir.source.base.Dependency;
-import motif.ir.source.base.Type;
+import motif.models.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.NotExposedError;
 
 import java.util.List;
 
@@ -33,7 +31,7 @@ public class Test {
         assertThat(errors).hasSize(1);
         NotExposedError error = errors.get(0);
         assertThat(error.getFactoryMethod()).isNotNull();
-        assertThat(error.getRequiredDependency().getDependency())
-                .isEqualTo(new Dependency(null, new Type(null, String.class.getName()), null));
+        assertThat(error.getRequiredDependency().getDependency().getType().getQualifiedName())
+                .isEqualTo(String.class.getName());
     }
 }
