@@ -16,6 +16,4 @@ dependencies {
     compile project(':lib')
     implementation deps.rx.java
     implementation deps.rx.relay
-
-    testImplementation deps.test.junit
 }
