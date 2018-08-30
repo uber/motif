@@ -19,21 +19,21 @@ import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
-import motif.compiler.GENERATED_DEPENDENCIES_NAME
-import motif.ir.graph.Scope
-import motif.ir.source.base.Dependency
-import motif.ir.source.dependencies.RequiredDependencies
-import motif.ir.source.dependencies.RequiredDependency
-import motif.ir.source.objects.ObjectsClass
+import motif.models.graph.Scope
+import motif.models.motif.dependencies.Dependency
+import motif.models.motif.dependencies.RequiredDependencies
+import motif.models.motif.dependencies.RequiredDependency
+import motif.models.motif.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
-import javax.lang.model.type.DeclaredType
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 open class CodegenCache(
         override val env: ProcessingEnvironment,
         val cacheScope: CacheScope) : JavaPoetUtil {
+
+    val GENERATED_DEPENDENCIES_NAME = "Dependencies"
 
     val Scope.daggerComponentName: ClassName by cache {
         val simpleName = componentTypeName.simpleNames().joinToString("_")
@@ -49,11 +49,11 @@ open class CodegenCache(
     }
 
     val ObjectsClass.typeName: ClassName by cache {
-        ClassName.get(type) as ClassName
+        ClassName.get(type.cir.mirror) as ClassName
     }
 
     val Scope.implTypeName: ClassName by cache {
-        scopeImpl(type)
+        scopeImpl(cir.declaredType)
     }
 
     val Scope.componentTypeName: ClassName by cache {
@@ -65,16 +65,16 @@ open class CodegenCache(
     }
 
     val Scope.packageName: String by cache {
-        MoreElements.getPackage(type.asElement()).qualifiedName.toString()
+        MoreElements.getPackage(cir.declaredType.asElement()).qualifiedName.toString()
     }
 
     val Scope.typeName: ClassName by cache {
-        ClassName.get(scopeClass.userData as DeclaredType) as ClassName
+        ClassName.get(cir.declaredType) as ClassName
     }
 
     val Scope.componentMethodSpecs: Map<Dependency, MethodSpec> by cache {
         val accessMethodDependencies = accessMethods.map {
-            RequiredDependency(it.dependency, false, setOf(this.scopeClass.type))
+            RequiredDependency(it.dependency, false, setOf(this.scopeClass.ir.type))
         }
         val requiredAccessMethodDependencies = RequiredDependencies(accessMethodDependencies)
         (childRequiredDependencies + requiredAccessMethodDependencies).methodSpecBuilders()

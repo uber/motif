@@ -20,11 +20,12 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeSpec
 import dagger.Component
+import motif.compiler.ir.CompilerType
 import motif.internal.DaggerScope
-import motif.ir.graph.Graph
-import motif.ir.graph.Scope
-import motif.ir.source.accessmethod.AccessMethod
-import motif.ir.source.objects.ObjectsClass
+import motif.models.graph.Graph
+import motif.models.graph.Scope
+import motif.models.motif.accessmethod.AccessMethod
+import motif.models.motif.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
@@ -116,7 +117,7 @@ class ScopeImplFactory(
         val overriddenMethods = abstractFactoryMethods().map { it.overrideUnsupported() }
         return TypeSpec.classBuilder(scope.objectsImplTypeName)
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .apply { if (isInterface) addSuperinterface(typeName) else superclass(typeName) }
+                .apply { if ((type as CompilerType).isInterface()) addSuperinterface(typeName) else superclass(typeName) }
                 .addMethods(overriddenMethods)
                 .build()
     }
@@ -124,7 +125,7 @@ class ScopeImplFactory(
     private fun AccessMethod.implSpec(scope: Scope): MethodSpec {
         val componentMethod = scope.componentMethodSpecs[dependency]
                 ?: throw IllegalStateException("Could not find component method for AccessMethod: $dependency")
-        return executable.overriding()
+        return cir.overriding()
                 .addStatement("return \$N.\$N()", scope.componentFieldSpec, componentMethod)
                 .build()
     }

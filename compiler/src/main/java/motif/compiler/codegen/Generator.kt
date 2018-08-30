@@ -15,9 +15,8 @@
  */
 package motif.compiler.codegen
 
-import motif.compiler.qualifiedName
-import motif.ir.graph.Graph
-import motif.ir.graph.Scope
+import motif.models.graph.Graph
+import motif.models.graph.Scope
 import javax.annotation.processing.ProcessingEnvironment
 
 class Generator(

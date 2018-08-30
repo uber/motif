@@ -18,8 +18,8 @@ package motif.compiler.errors.validation
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
-import motif.compiler.javax.Executable
-import motif.ir.graph.errors.DuplicateFactoryMethodsError
+import motif.compiler.ir.CompilerMethod
+import motif.models.graph.errors.DuplicateFactoryMethodsError
 import javax.lang.model.element.Element
 
 class DuplicateFactoryMethodsHandler : ErrorHandler<DuplicateFactoryMethodsError>() {
@@ -59,6 +59,6 @@ class DuplicateFactoryMethodsHandler : ErrorHandler<DuplicateFactoryMethodsError
     }
 
     override fun element(error: DuplicateFactoryMethodsError): Element {
-        return (error.duplicate.userData as Executable).element
+        return (error.duplicate.ir as CompilerMethod).element
     }
 }

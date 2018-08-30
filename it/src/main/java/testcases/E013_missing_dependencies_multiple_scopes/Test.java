@@ -17,8 +17,8 @@ package testcases.E013_missing_dependencies_multiple_scopes;
 
 import com.google.common.truth.Truth;
 import common.MissingDependenciesSubject;
-import motif.ir.graph.errors.GraphValidationErrors;
-import motif.ir.graph.errors.MissingDependenciesError;
+import motif.models.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.MissingDependenciesError;
 
 import java.util.List;
 

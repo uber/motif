@@ -16,8 +16,8 @@
 package testcases.E009_duplicate_factory_method_cross_scope;
 
 import common.DuplicateFactoryMethodsSubject;
-import motif.ir.graph.errors.DuplicateFactoryMethodsError;
-import motif.ir.graph.errors.GraphValidationErrors;
+import motif.models.graph.errors.DuplicateFactoryMethodsError;
+import motif.models.graph.errors.GraphValidationErrors;
 
 import java.util.List;
 

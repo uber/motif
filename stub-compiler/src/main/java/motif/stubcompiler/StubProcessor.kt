@@ -21,9 +21,9 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import motif.Scope
-import motif.compiler.javax.Executable
-import motif.compiler.javax.JavaxUtil
-import motif.compiler.qualifiedName
+import motif.compiler.codegen.JavaPoetUtil
+import motif.compiler.ir.CompilerClass
+import motif.compiler.ir.CompilerMethod
 import java.util.*
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
@@ -33,7 +33,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
-class StubProcessor : AbstractProcessor(), JavaxUtil {
+class StubProcessor : AbstractProcessor(), JavaPoetUtil {
 
     override val env: ProcessingEnvironment by lazy { processingEnv }
 
@@ -71,8 +71,9 @@ class StubProcessor : AbstractProcessor(), JavaxUtil {
             builder.superclass(scopeClassName)
         }
 
-        scopeType.methods()
-                .forEach { method: Executable ->
+        CompilerClass(env, scopeType).methods
+                .map { it as CompilerMethod }
+                .forEach { method: CompilerMethod ->
                     val methodSpec: MethodSpec = MethodSpec.overriding(method.element, scopeType, processingEnv.typeUtils)
                             .addStatement("throw new \$T()", IllegalStateException::class.java)
                             .build()

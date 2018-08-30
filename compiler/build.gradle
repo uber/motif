@@ -14,7 +14,7 @@ dependencies {
     implementation deps.daggerCompiler
     implementation deps.asciiTable
     implementation project(':lib')
-    implementation project(':ir')
+    implementation project(':models')
 
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting

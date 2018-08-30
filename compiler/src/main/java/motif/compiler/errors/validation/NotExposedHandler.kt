@@ -18,8 +18,8 @@ package motif.compiler.errors.validation
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
-import motif.compiler.javax.Executable
-import motif.ir.graph.errors.NotExposedError
+import motif.compiler.ir.CompilerMethod
+import motif.models.graph.errors.NotExposedError
 import javax.lang.model.element.Element
 
 class NotExposedHandler : ErrorHandler<NotExposedError>() {
@@ -36,7 +36,7 @@ class NotExposedHandler : ErrorHandler<NotExposedError>() {
                 .setGrid(U8_Grids.borderStrongDoubleLight())
                 .setWidth(60)).apply {
             addRule()
-            addRow(error.scopeClass.type.simpleName).setPaddingLeft(1)
+            addRow(error.scopeClass.ir.type.simpleName).setPaddingLeft(1)
             addRule()
         }
         val requiredByTable = AsciiTable(AT_Context()
@@ -59,6 +59,6 @@ class NotExposedHandler : ErrorHandler<NotExposedError>() {
     }
 
     override fun element(error: NotExposedError): Element {
-        return (error.factoryMethod.userData as Executable).element
+        return (error.factoryMethod.ir as CompilerMethod).element
     }
 }
