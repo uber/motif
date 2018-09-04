@@ -74,5 +74,6 @@ ext.deps = [
         roomRx: "android.arch.persistence.room:rxjava2:${versions.room}",
         roomCompiler: "android.arch.persistence.room:compiler:${versions.room}",
         room: "android.arch.persistence.room:runtime:${versions.room}",
-        autodispose: 'com.uber.autodispose:autodispose:0.8.0'
+        autodispose: 'com.uber.autodispose:autodispose:0.8.0',
+        apacheClient: 'org.apache.httpcomponents:httpclient:4.5.2'
 ]
