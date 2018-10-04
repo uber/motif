@@ -23,10 +23,13 @@ import android.util.AttributeSet;
 import motif.sample.app.photo_grid.PhotoGridView;
 import motif.sample.app.bottom_sheet.BottomSheetView;
 
+import javax.inject.Inject;
+
 public class RootView extends CoordinatorLayout {
 
     private BottomSheetView bottomSheetView;
 
+    @Inject
     public RootView(Context context) {
         this(context, null);
     }

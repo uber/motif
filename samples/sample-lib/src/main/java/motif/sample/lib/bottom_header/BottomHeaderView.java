@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import motif.sample_lib.R;
 
+import javax.inject.Inject;
 import java.util.Locale;
 
 public class BottomHeaderView extends FrameLayout {
@@ -36,6 +37,7 @@ public class BottomHeaderView extends FrameLayout {
 
     private Listener listener;
 
+    @Inject
     public BottomHeaderView(@NonNull Context context) {
         this(context, null);
     }

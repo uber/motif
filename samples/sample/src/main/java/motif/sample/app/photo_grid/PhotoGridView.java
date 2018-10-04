@@ -20,8 +20,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
+import javax.inject.Inject;
+
 public class PhotoGridView extends RecyclerView {
 
+    @Inject
     public PhotoGridView(Context context) {
         this(context, null);
     }

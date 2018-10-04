@@ -23,6 +23,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class Database {
@@ -34,6 +35,7 @@ public class Database {
     private final FileSystem fileSystem;
     private final PhotoDao photoDao;
 
+    @Inject
     public Database(Context context) {
         this(context.getSharedPreferences(SHARED_PREFS_FILENAME, Context.MODE_PRIVATE),
                 new FileSystem(context),

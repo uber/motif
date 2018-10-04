@@ -23,8 +23,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
+import javax.inject.Inject;
+
 public class PhotoListView extends RecyclerView {
 
+    @Inject
     public PhotoListView(@NonNull Context context) {
         this(context, null);
     }

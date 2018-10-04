@@ -28,6 +28,8 @@ import android.widget.LinearLayout;
 import motif.sample.lib.bottom_header.BottomHeaderView;
 import motif.sample.app.photo_list.PhotoListView;
 
+import javax.inject.Inject;
+
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 
@@ -35,6 +37,7 @@ public class BottomSheetView extends LinearLayout {
 
     private BottomSheetBehavior<BottomSheetView> behavior;
 
+    @Inject
     public BottomSheetView(@NonNull Context context) {
         this(context, null);
     }
