@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T037_factory_method_multiple_constructors;
+package testcases.E026_factory_method_missing_constructor_inject;
 
-@motif.Scope
-public interface Scope {
+public class A {
 
-    B b();
+    public A() {}
 
-    @motif.Objects
-    abstract class Objects {
-        abstract A a();
-        abstract B b();
-    }
-
-    @motif.Dependencies
-    interface Dependencies {}
+    public A(String string) {}
 }

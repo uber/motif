@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T037_factory_method_multiple_constructors;
+package testcases.E026_factory_method_missing_constructor_inject;
 
-public class B {
+@motif.Scope
+public interface Scope {
 
-    private final A a;
+    @motif.Objects
+    abstract class Objects {
 
-    public B(A a) {
-        this.a = a;
+        abstract A a();
+
+        String string() {
+            return "s";
+        }
     }
 
-    public B(String s) {
-        throw new UnsupportedOperationException();
-    }
+    @motif.Dependencies
+    interface Dependencies {}
 }

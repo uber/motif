@@ -86,7 +86,11 @@ class ObjectsClassParser : ParserUtil {
         val requiredDependencies: RequiredDependencies = if (constructors.isEmpty()) {
             RequiredDependencies(listOf())
         } else {
-            val constructor = constructors.find { it.hasAnnotation(Inject::class) } ?: constructors[0]
+            val constructor = if (constructors.size == 1) {
+                constructors[0]
+            } else {
+                constructors.find { it.hasAnnotation(Inject::class) } ?: throw MissingInjectAnnotation(returnType)
+            }
 
             ensureNonNullParameters(constructor)
 

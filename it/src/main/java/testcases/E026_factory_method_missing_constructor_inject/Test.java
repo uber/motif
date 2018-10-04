@@ -13,6 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T037_factory_method_multiple_constructors;
+package testcases.E026_factory_method_missing_constructor_inject;
 
-public class A {}
+import motif.models.parsing.errors.MissingInjectAnnotation;
+import motif.models.parsing.errors.ParsingError;
+
+import static com.google.common.truth.Truth.assertThat;
+
+public class Test {
+
+    public static ParsingError parsingError;
+
+    public static void run() {
+        assertThat(parsingError).isInstanceOf(MissingInjectAnnotation.class);
+    }
+}
