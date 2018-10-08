@@ -227,7 +227,7 @@ Factory methods that pass parameters through to a constructor without modificati
 <details>
 <summary>Notes for Dagger users...</summary>
 
-This feature is similar to Dagger's `@Inject` constructor injection, but it doesn't require annotating the class' constructor, and it scopes the object to the enclosing Motif Scope.
+This feature is similar to Dagger's `@Inject` constructor injection, but it only requires annotating the class' constructor if there are multiple constructors, and it scopes the object to the enclosing Motif Scope.
 </details>
 
 ```java
