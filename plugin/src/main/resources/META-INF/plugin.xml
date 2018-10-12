@@ -22,11 +22,10 @@
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileBasedIndex implementation="motif.intellij.index.ScopeIndex"/>
+        <fileBasedIndex implementation="motif.intellij.validation.index.ScopeIndex"/>
         <projectService serviceImplementation="motif.intellij.MotifComponent"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.MotifScopeLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.hierarchy.ui.MotifScopeLineMarkerProvider"/>
         <typeHierarchyProvider language="JAVA"
-                               implementationClass="motif.intellij.hierarchy.MotifScopeHierarchyProvider"/>
-        <inspectionToolProvider implementation="motif.intellij.inspection.MotifInspectionsProvider"/>
+                               implementationClass="motif.intellij.hierarchy.ui.MotifScopeHierarchyProvider"/>
     </extensions>
 </idea-plugin>

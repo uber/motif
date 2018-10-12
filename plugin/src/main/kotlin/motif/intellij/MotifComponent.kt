@@ -15,41 +15,31 @@
  */
 package motif.intellij
 
+import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar
 import com.intellij.ide.hierarchy.LanguageTypeHierarchy
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiTreeChangeEvent
-import motif.intellij.graph.GraphProcessor
-import motif.intellij.hierarchy.MotifScopeHierarchyProvider
-import motif.intellij.index.ScopeIndex
-import motif.intellij.psi.PsiTreeChangeAdapter
-import motif.intellij.psi.isMaybeScopeFile
+import motif.intellij.hierarchy.graph.GraphProcessor
+import motif.intellij.hierarchy.ui.MotifScopeHierarchyProvider
+import motif.intellij.validation.ui.ValidationHighlightingPass
 
-class MotifComponent(private val project: Project) : ProjectComponent {
+class MotifComponent(project: Project) : ProjectComponent {
 
     val graphProcessor = GraphProcessor(project)
-
-    private val scopeIndex = ScopeIndex.getInstance()
 
     init {
         // adding the language extension here allows us to be called before Java's type hierarchy extension is
         // called, allowing Motif to create its own tree structure for the hierarchy viewer.
         LanguageTypeHierarchy.INSTANCE.addExplicitExtension(JavaLanguage.INSTANCE, MotifScopeHierarchyProvider.INSTANCE)
-    }
+        TextEditorHighlightingPassRegistrar.getInstance(project)
+                .registerTextEditorHighlightingPass(
+                        { _, editor -> ValidationHighlightingPass(editor) },
+                        TextEditorHighlightingPassRegistrar.Anchor.LAST,
+                        -1,
+                        false,
+                        false)
 
-    override fun projectOpened() {
-        PsiManager.getInstance(project).addPsiTreeChangeListener(object : PsiTreeChangeAdapter() {
-
-            override fun onChange(event: PsiTreeChangeEvent) {
-                val psiFile: PsiFile = event.file ?: return
-                if (psiFile.isMaybeScopeFile()) {
-                    scopeIndex.refreshFile(project, psiFile.virtualFile)
-                }
-            }
-        })
     }
 
     companion object {

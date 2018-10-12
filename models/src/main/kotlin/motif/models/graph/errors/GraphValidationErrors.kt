@@ -25,4 +25,9 @@ class GraphValidationErrors(
         listOfNotNull(scopeCycleError) +
         duplicateFactoryMethodsErrors +
         dependencyCycleErrors +
-        missingDependenciesErrors
+        missingDependenciesErrors {
+
+    override fun toString(): String {
+        return toList().toString()
+    }
+}

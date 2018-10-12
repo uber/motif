@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2018 Uber Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package motif.intellij.validation.errorhandlers
+
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiMethod
+import motif.models.graph.errors.DuplicateFactoryMethodsError
+
+
+class DuplicateFactoryMethodsHandler: ErrorHandler<DuplicateFactoryMethodsError>() {
+
+    override fun isApplicable(error: DuplicateFactoryMethodsError, method: PsiMethod): Boolean {
+        return false
+        // TODO
+        // return psiMethodEquivalence(error.duplicate.userData, method)
+    }
+
+    override fun message(error: DuplicateFactoryMethodsError): String {
+        return "Duplicate Factory Method " +
+                error.duplicate.providedDependency.type.simpleName +
+                " declared in " +
+                error.duplicate.scopeType.simpleName +
+                " and in the following scopes " +
+                error.existing.map { it.simpleName }
+    }
+
+    override fun fixes(error: DuplicateFactoryMethodsError): Array<LocalQuickFix> {
+        return arrayOf(NavigateToExistingMethods(error), DeleteDuplicateFactoryMethod())
+    }
+
+    class NavigateToExistingMethods(private val error: DuplicateFactoryMethodsError): LocalQuickFix {
+
+        override fun getFamilyName(): String {
+            return "Navigate to Existing Declaration"
+        }
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            // TODO
+            // error.existing
+            //         .firstOrNull { it.userData is PsiMethod }
+            //         ?.let {
+            //             val navigationElement = (it.userData as PsiMethod).navigationElement
+            //             if (navigationElement is Navigatable && (navigationElement as Navigatable).canNavigate()) {
+            //                 navigationElement.navigate(true)
+            //             }
+            //         }
+        }
+    }
+
+    class DeleteDuplicateFactoryMethod: LocalQuickFix {
+
+        override fun getFamilyName(): String {
+            return "Delete Duplicate Method Declaration"
+        }
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            descriptor.psiElement.delete()
+        }
+    }
+}
