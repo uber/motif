@@ -13,8 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.compiler.errors.validation
+package motif.compiler.errors.parsing
 
+import motif.compiler.errors.ErrorHandler
+import motif.compiler.ir.CompilerMethod
+import motif.models.parsing.errors.NoSuitableConstructor
 import javax.lang.model.element.Element
 
-class ErrorMessage(val element: Element?, val message: String)
+class NoSuitableConstructorHandler : ErrorHandler<NoSuitableConstructor>() {
+
+    override fun message(error: NoSuitableConstructor): String {
+        return "No suitable constructor found for provided type."
+    }
+
+    override fun element(error: NoSuitableConstructor): Element? {
+        return (error.method as CompilerMethod).element
+    }
+}

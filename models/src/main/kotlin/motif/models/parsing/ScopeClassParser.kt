@@ -17,7 +17,7 @@ package motif.models.parsing
 
 import motif.models.java.IrClass
 import motif.models.java.IrType
-import motif.models.parsing.errors.InvalidScopeMethodError
+import motif.models.parsing.errors.InvalidScopeMethod
 import motif.models.parsing.errors.ScopeMustBeAnInterface
 import motif.models.motif.ScopeClass
 import motif.models.motif.accessmethod.AccessMethod
@@ -44,7 +44,7 @@ class ScopeClassParser {
                     when {
                         childMethodParser.isApplicable(it) -> childMethods.add(childMethodParser.parse(it))
                         accessMethodParser.isApplicable(it) -> accessMethods.add(accessMethodParser.parse(it))
-                        else -> throw InvalidScopeMethodError(it)
+                        else -> throw InvalidScopeMethod(it)
                     }
                 }
 

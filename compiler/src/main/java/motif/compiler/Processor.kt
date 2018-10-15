@@ -17,7 +17,7 @@ package motif.compiler
 
 import motif.Scope
 import motif.compiler.codegen.Generator
-import motif.compiler.errors.validation.ErrorHandler
+import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerType
 import motif.models.graph.GraphFactory
 import motif.models.graph.errors.GraphValidationErrors
@@ -62,7 +62,8 @@ class Processor : AbstractProcessor() {
             SourceSetParser().parse(scopeTypes)
         } catch (e: ParsingError) {
             this.parsingError = e
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${e::class.java.name}\n", null)
+            val errorMessage = ErrorHandler.handle(e)
+            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${errorMessage.message}\n", errorMessage.element)
             return
         }
 

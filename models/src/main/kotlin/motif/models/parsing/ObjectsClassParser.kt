@@ -37,8 +37,8 @@ class ObjectsClassParser : ParserUtil {
 
     fun parse(scopeClass: IrClass): ObjectsClass? {
         val objectsClass: IrClass = scopeClass.annotatedInnerClass(Objects::class) ?: return null
-        if (objectsClass.fields.any { !it.isStatic() }) throw ObjectsFieldFound()
-        if (objectsClass.hasNonDefaultConstructor()) throw ObjectsConstructorFound()
+        if (objectsClass.fields.any { !it.isStatic() }) throw ObjectsFieldFound(objectsClass)
+        if (objectsClass.hasNonDefaultConstructor()) throw ObjectsConstructorFound(objectsClass)
 
         val factoryMethods: List<FactoryMethod> = objectsClass.methods
                 .onEach { method ->
@@ -89,7 +89,7 @@ class ObjectsClassParser : ParserUtil {
             val constructor = if (constructors.size == 1) {
                 constructors[0]
             } else {
-                constructors.find { it.hasAnnotation(Inject::class) } ?: throw MissingInjectAnnotation(returnType)
+                constructors.find { it.hasAnnotation(Inject::class) } ?: throw MissingInjectAnnotation(returnType, method)
             }
 
             ensureNonNullParameters(constructor)

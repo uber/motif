@@ -18,6 +18,7 @@ package motif.compiler.errors.validation
 import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
+import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerClass
 import motif.models.graph.errors.DependencyCycleError
 import javax.lang.model.element.Element
