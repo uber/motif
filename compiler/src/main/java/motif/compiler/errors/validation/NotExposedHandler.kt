@@ -20,7 +20,7 @@ import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerMethod
-import motif.models.graph.errors.NotExposedError
+import motif.models.errors.NotExposedError
 import javax.lang.model.element.Element
 
 class NotExposedHandler : ErrorHandler<NotExposedError>() {

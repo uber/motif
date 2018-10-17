@@ -19,7 +19,7 @@ import de.vandermeer.asciitable.AT_Context
 import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
 import motif.compiler.errors.ErrorHandler
-import motif.models.graph.errors.ScopeCycleError
+import motif.models.errors.ScopeCycleError
 import javax.lang.model.element.Element
 
 class ScopeCycleHandler : ErrorHandler<ScopeCycleError>() {

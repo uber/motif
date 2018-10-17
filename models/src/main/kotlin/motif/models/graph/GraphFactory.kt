@@ -15,10 +15,12 @@
  */
 package motif.models.graph
 
-import motif.models.graph.errors.ScopeCycleError
+import motif.models.errors.MotifError
+import motif.models.errors.ScopeCycleError
 import motif.models.java.IrType
 import motif.models.motif.ScopeClass
 import motif.models.motif.SourceSet
+import motif.models.parsing.SourceSetParser
 
 class GraphFactory private constructor(sourceSet: SourceSet) {
 
@@ -30,13 +32,13 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
         return try {
             createUnsafe()
         } catch (e: ScopeCycleException) {
-            Graph(mapOf(), e.error)
+            Graph(mapOf(), listOf(), e.error)
         }
     }
 
     private fun createUnsafe(): Graph {
         val nodes = scopeClasses.values.associateBy({ it.ir.type }) { node(listOf(), it.ir.type) }
-        return Graph(nodes, null)
+        return Graph(nodes, listOf(), null)
     }
 
     private fun node(visited: List<IrType>, scopeType: IrType): Node {
@@ -60,7 +62,12 @@ class GraphFactory private constructor(sourceSet: SourceSet) {
 
     companion object {
 
-        fun create(sourceSet: SourceSet): Graph {
+        fun create(scopeAnnotatedTypes: Set<IrType>): Graph {
+            val sourceSet = try {
+                SourceSetParser().parse(scopeAnnotatedTypes)
+            } catch (e : MotifError) {
+                return Graph(mapOf(), listOf(e), null)
+            }
             return GraphFactory(sourceSet).create()
         }
     }

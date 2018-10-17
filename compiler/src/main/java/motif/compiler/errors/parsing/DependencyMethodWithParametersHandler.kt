@@ -17,7 +17,7 @@ package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerMethod
-import motif.models.parsing.errors.DependencyMethodWithParameters
+import motif.models.errors.DependencyMethodWithParameters
 import javax.lang.model.element.Element
 
 class DependencyMethodWithParametersHandler : ErrorHandler<DependencyMethodWithParameters>() {

@@ -18,7 +18,7 @@ package common;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
-import motif.models.graph.errors.MissingDependenciesError;
+import motif.models.errors.MissingDependenciesError;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.Arrays;

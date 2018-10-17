@@ -17,7 +17,7 @@ package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerClass
-import motif.models.parsing.errors.ObjectsConstructorFound
+import motif.models.errors.ObjectsConstructorFound
 import javax.lang.model.element.Element
 
 class ObjectsConstructorFoundHandler : ErrorHandler<ObjectsConstructorFound>() {

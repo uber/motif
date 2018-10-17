@@ -15,16 +15,16 @@
  */
 package testcases.E027_invalid_scope_method;
 
-import motif.models.parsing.errors.InvalidScopeMethod;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.InvalidScopeMethod;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(InvalidScopeMethod.class);
+        assertThat(error).isInstanceOf(InvalidScopeMethod.class);
     }
 }

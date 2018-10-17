@@ -15,16 +15,16 @@
  */
 package testcases.E026_factory_method_missing_constructor_inject;
 
-import motif.models.parsing.errors.MissingInjectAnnotation;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.MissingInjectAnnotation;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(MissingInjectAnnotation.class);
+        assertThat(error).isInstanceOf(MissingInjectAnnotation.class);
     }
 }

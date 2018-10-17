@@ -15,20 +15,22 @@
  */
 package motif.models.graph
 
-import motif.models.graph.errors.*
+import motif.models.errors.*
 import motif.models.java.IrType
 import motif.models.motif.dependencies.RequiredDependencies
 
 class Graph(
         private val nodes: Map<IrType, Node>,
+        private val parsingErrors: List<MotifError>,
         private val scopeCycleError: ScopeCycleError?) {
 
     val scopes: List<Scope> = nodes.map { (_, node) ->
         Scope(node.scopeClass, node.childRequiredDependencies, node.requiredDependencies)
     }
 
-    val validationErrors: GraphValidationErrors by lazy {
-        GraphValidationErrors(
+    val errors: MotifErrors by lazy {
+        MotifErrors(
+                parsingErrors,
                 scopeCycleError,
                 missingDependenciesError(),
                 dependencyCycleErrors(),

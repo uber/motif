@@ -15,16 +15,16 @@
  */
 package testcases.E032_no_suitable_constructor;
 
-import motif.models.parsing.errors.NoSuitableConstructor;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.NoSuitableConstructor;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(NoSuitableConstructor.class);
+        assertThat(error).isInstanceOf(NoSuitableConstructor.class);
     }
 }

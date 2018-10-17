@@ -15,21 +15,17 @@
  */
 package testcases.E018_not_exposed_prioritize_over_duplicate_factory_methods;
 
-import motif.models.graph.errors.GraphValidationErrors;
-import motif.models.graph.errors.NotExposedError;
-
-import java.util.List;
+import motif.models.errors.MotifError;
+import motif.models.errors.NotExposedError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifError error;
 
     public static void run() {
-        List<NotExposedError> errors = Test.errors.getNotExposedErrors();
-        assertThat(errors).hasSize(1);
-        NotExposedError error = errors.get(0);
+        NotExposedError error = (NotExposedError) Test.error;
         assertThat(error.getFactoryMethod()).isNotNull();
         assertThat(error.getScopeClass().getIr().getType().getQualifiedName())
                 .isEqualTo(Parent.class.getName());

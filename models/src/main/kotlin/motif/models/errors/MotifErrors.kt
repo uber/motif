@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.models.graph.errors
+package motif.models.errors
 
-class GraphValidationErrors(
-        val scopeCycleError: ScopeCycleError?,
-        val missingDependenciesErrors: List<MissingDependenciesError>,
-        val dependencyCycleErrors: List<DependencyCycleError>,
-        val duplicateFactoryMethodsErrors: List<DuplicateFactoryMethodsError>,
-        val notExposedErrors: List<NotExposedError>)
-    : List<GraphError> by notExposedErrors +
+class MotifErrors(
+        private val parsingErrors: List<MotifError>,
+        private val scopeCycleError: ScopeCycleError?,
+        private val missingDependenciesErrors: List<MissingDependenciesError>,
+        private val dependencyCycleErrors: List<DependencyCycleError>,
+        private val duplicateFactoryMethodsErrors: List<DuplicateFactoryMethodsError>,
+        private val notExposedErrors: List<NotExposedError>)
+    : List<MotifError> by parsingErrors +
+        notExposedErrors +
         listOfNotNull(scopeCycleError) +
         duplicateFactoryMethodsErrors +
         dependencyCycleErrors +

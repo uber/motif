@@ -16,23 +16,20 @@
 package testcases.E016_missing_dependencies_multilevel;
 
 import common.MissingDependenciesSubject;
-import motif.models.graph.errors.GraphValidationErrors;
-import motif.models.graph.errors.MissingDependenciesError;
-
-import java.util.List;
+import motif.models.errors.MissingDependenciesError;
+import motif.models.errors.MotifErrors;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifErrors errors;
 
     public static void run() {
-        List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();
         assertThat(errors).hasSize(2);
-        MissingDependenciesSubject.assertThat(errors.get(0))
+        MissingDependenciesSubject.assertThat((MissingDependenciesError) errors.get(0))
                 .matches(Grandchild.class, Integer.class);
-        MissingDependenciesSubject.assertThat(errors.get(1))
+        MissingDependenciesSubject.assertThat((MissingDependenciesError) errors.get(1))
                 .matches(Child.class, String.class);
     }
 }

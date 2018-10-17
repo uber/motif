@@ -16,22 +16,19 @@
 package testcases.E008_duplicate_factory_method;
 
 import common.DuplicateFactoryMethodsSubject;
-import motif.models.graph.errors.DuplicateFactoryMethodsError;
-import motif.models.graph.errors.GraphValidationErrors;
-
-import java.util.List;
+import motif.models.errors.DuplicateFactoryMethodsError;
+import motif.models.errors.MotifErrors;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifErrors errors;
 
     public static void run() {
-        List<DuplicateFactoryMethodsError> errors = Test.errors.getDuplicateFactoryMethodsErrors();
         assertThat(errors).hasSize(2);
 
-        DuplicateFactoryMethodsSubject.assertThat(errors.get(0)).matches("sa", Scope.class);
-        DuplicateFactoryMethodsSubject.assertThat(errors.get(1)).matches("sb", Scope.class);
+        DuplicateFactoryMethodsSubject.assertThat((DuplicateFactoryMethodsError) errors.get(0)).matches("sa", Scope.class);
+        DuplicateFactoryMethodsSubject.assertThat((DuplicateFactoryMethodsError) errors.get(1)).matches("sb", Scope.class);
     }
 }

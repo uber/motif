@@ -15,7 +15,7 @@
  */
 package motif.models.graph
 
-import motif.models.graph.errors.NotExposedError
+import motif.models.errors.NotExposedError
 import motif.models.motif.ScopeClass
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.dependencies.RequiredDependency

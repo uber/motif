@@ -16,21 +16,16 @@
 package testcases.E011_dynamic_dependency_internal;
 
 import common.MissingDependenciesSubject;
-import motif.models.graph.errors.GraphValidationErrors;
-import motif.models.graph.errors.MissingDependenciesError;
-
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
+import motif.models.errors.MissingDependenciesError;
+import motif.models.errors.MotifError;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifError error;
 
     public static void run() {
-        List<MissingDependenciesError> errors = Test.errors.getMissingDependenciesErrors();
-        assertThat(errors).hasSize(1);
-        MissingDependenciesSubject.assertThat(errors.get(0))
+        MissingDependenciesError error = (MissingDependenciesError) Test.error;
+        MissingDependenciesSubject.assertThat(error)
                 .matches(Grandchild.class, String.class);
     }
 }

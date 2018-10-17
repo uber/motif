@@ -19,7 +19,7 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiMethod
-import motif.models.graph.errors.MissingDependenciesError
+import motif.models.errors.MissingDependenciesError
 
 class MissingDependenciesHandler: ErrorHandler<MissingDependenciesError>() {
 

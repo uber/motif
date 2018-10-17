@@ -15,16 +15,16 @@
  */
 package testcases.E020_objects_constructor;
 
-import motif.models.parsing.errors.ObjectsConstructorFound;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.ObjectsConstructorFound;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(ObjectsConstructorFound.class);
+        assertThat(error).isInstanceOf(ObjectsConstructorFound.class);
     }
 }

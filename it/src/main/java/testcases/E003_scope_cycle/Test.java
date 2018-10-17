@@ -16,19 +16,18 @@
 package testcases.E003_scope_cycle;
 
 import com.google.common.truth.Truth;
-import motif.models.graph.errors.GraphValidationErrors;
-import motif.models.graph.errors.ScopeCycleError;
+import motif.models.errors.MotifError;
+import motif.models.errors.ScopeCycleError;
 import motif.models.java.IrType;
 
 import java.util.stream.Collectors;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifError error;
 
     public static void run() {
-        ScopeCycleError error = errors.getScopeCycleError();
-        Truth.assertThat(error).isNotNull();
+        ScopeCycleError error = (ScopeCycleError) Test.error;
         Truth.assertThat(error.getCycle().stream().map(IrType::getQualifiedName).collect(Collectors.toList()))
                 .containsExactly(Scope.class.getName());
     }

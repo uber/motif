@@ -15,16 +15,16 @@
  */
 package testcases.E033_not_assignable;
 
-import motif.models.parsing.errors.NotAssignableBindsMethod;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.NotAssignableBindsMethod;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(NotAssignableBindsMethod.class);
+        assertThat(error).isInstanceOf(NotAssignableBindsMethod.class);
     }
 }

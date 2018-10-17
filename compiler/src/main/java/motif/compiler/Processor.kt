@@ -19,10 +19,8 @@ import motif.Scope
 import motif.compiler.codegen.Generator
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerType
+import motif.models.errors.MotifErrors
 import motif.models.graph.GraphFactory
-import motif.models.graph.errors.GraphValidationErrors
-import motif.models.parsing.SourceSetParser
-import motif.models.parsing.errors.ParsingError
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -32,11 +30,10 @@ import javax.tools.Diagnostic
 class Processor : AbstractProcessor() {
 
     // For testing only.
-    var validationErrors: GraphValidationErrors? = null
-    var parsingError: ParsingError? = null
+    var errors: MotifErrors? = null
 
     private val hasErrors: Boolean
-        get() = !(validationErrors?.isEmpty() ?: true)
+        get() = !(errors?.isEmpty() ?: true)
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -55,21 +52,12 @@ class Processor : AbstractProcessor() {
     }
 
     private fun process(roundEnv: RoundEnvironment) {
-        val sourceSet = try {
-            val scopeTypes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
-                    .map { CompilerType(processingEnv, it.asType()) }
-                    .toSet()
-            SourceSetParser().parse(scopeTypes)
-        } catch (e: ParsingError) {
-            this.parsingError = e
-            val errorMessage = ErrorHandler.handle(e)
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${errorMessage.message}\n", errorMessage.element)
-            return
-        }
-
-        val graph = GraphFactory.create(sourceSet)
-        val errors = graph.validationErrors
-        this.validationErrors = errors
+        val scopeTypes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
+                .map { CompilerType(processingEnv, it.asType()) }
+                .toSet()
+        val graph = GraphFactory.create(scopeTypes)
+        val errors = graph.errors
+        this.errors = errors
 
         if (errors.isEmpty()) {
             Generator(processingEnv, graph).generate()

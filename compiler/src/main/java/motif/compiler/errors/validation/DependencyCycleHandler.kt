@@ -20,7 +20,7 @@ import de.vandermeer.asciitable.AsciiTable
 import de.vandermeer.asciithemes.u8.U8_Grids
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerClass
-import motif.models.graph.errors.DependencyCycleError
+import motif.models.errors.DependencyCycleError
 import javax.lang.model.element.Element
 
 class DependencyCycleHandler : ErrorHandler<DependencyCycleError>() {

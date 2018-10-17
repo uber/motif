@@ -17,7 +17,7 @@ package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerMethod
-import motif.models.parsing.errors.TypeNotSpreadable
+import motif.models.errors.TypeNotSpreadable
 import javax.lang.model.element.Element
 
 class TypeNotSpreadableHandler : ErrorHandler<TypeNotSpreadable>() {

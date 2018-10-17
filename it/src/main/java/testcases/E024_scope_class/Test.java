@@ -15,16 +15,16 @@
  */
 package testcases.E024_scope_class;
 
-import motif.models.parsing.errors.ParsingError;
-import motif.models.parsing.errors.ScopeMustBeAnInterface;
+import motif.models.errors.MotifError;
+import motif.models.errors.ScopeMustBeAnInterface;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(ScopeMustBeAnInterface.class);
+        assertThat(error).isInstanceOf(ScopeMustBeAnInterface.class);
     }
 }

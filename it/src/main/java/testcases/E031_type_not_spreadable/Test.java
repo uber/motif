@@ -15,16 +15,16 @@
  */
 package testcases.E031_type_not_spreadable;
 
-import motif.models.parsing.errors.ParsingError;
-import motif.models.parsing.errors.TypeNotSpreadable;
+import motif.models.errors.MotifError;
+import motif.models.errors.TypeNotSpreadable;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(TypeNotSpreadable.class);
+        assertThat(error).isInstanceOf(TypeNotSpreadable.class);
     }
 }

@@ -16,21 +16,15 @@
 package testcases.E009_duplicate_factory_method_cross_scope;
 
 import common.DuplicateFactoryMethodsSubject;
-import motif.models.graph.errors.DuplicateFactoryMethodsError;
-import motif.models.graph.errors.GraphValidationErrors;
-
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
+import motif.models.errors.DuplicateFactoryMethodsError;
+import motif.models.errors.MotifError;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifError error;
 
     public static void run() {
-        List<DuplicateFactoryMethodsError> errors = Test.errors.getDuplicateFactoryMethodsErrors();
-        assertThat(errors).hasSize(1);
-
-        DuplicateFactoryMethodsSubject.assertThat(errors.get(0)).matches("sb", Scope.class);
+        DuplicateFactoryMethodsError error = (DuplicateFactoryMethodsError) Test.error;
+        DuplicateFactoryMethodsSubject.assertThat(error).matches("sb", Scope.class);
     }
 }

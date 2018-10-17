@@ -15,16 +15,16 @@
  */
 package testcases.E035_dependency_method_parameters;
 
-import motif.models.parsing.errors.DependencyMethodWithParameters;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.DependencyMethodWithParameters;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(DependencyMethodWithParameters.class);
+        assertThat(error).isInstanceOf(DependencyMethodWithParameters.class);
     }
 }

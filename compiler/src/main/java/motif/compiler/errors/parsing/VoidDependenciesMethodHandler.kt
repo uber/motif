@@ -17,7 +17,7 @@ package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerMethod
-import motif.models.parsing.errors.VoidDependenciesMethod
+import motif.models.errors.VoidDependenciesMethod
 import javax.lang.model.element.Element
 
 class VoidDependenciesMethodHandler : ErrorHandler<VoidDependenciesMethod>() {

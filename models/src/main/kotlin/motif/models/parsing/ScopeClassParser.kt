@@ -17,8 +17,8 @@ package motif.models.parsing
 
 import motif.models.java.IrClass
 import motif.models.java.IrType
-import motif.models.parsing.errors.InvalidScopeMethod
-import motif.models.parsing.errors.ScopeMustBeAnInterface
+import motif.models.errors.InvalidScopeMethod
+import motif.models.errors.ScopeMustBeAnInterface
 import motif.models.motif.ScopeClass
 import motif.models.motif.accessmethod.AccessMethod
 import motif.models.motif.child.ChildMethod

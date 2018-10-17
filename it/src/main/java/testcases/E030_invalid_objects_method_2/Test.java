@@ -15,16 +15,16 @@
  */
 package testcases.E030_invalid_objects_method_2;
 
-import motif.models.parsing.errors.InvalidObjectsMethod;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.InvalidObjectsMethod;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(InvalidObjectsMethod.class);
+        assertThat(error).isInstanceOf(InvalidObjectsMethod.class);
     }
 }

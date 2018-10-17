@@ -18,7 +18,7 @@ package common;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
-import motif.models.graph.errors.DependencyCycleError;
+import motif.models.errors.DependencyCycleError;
 import motif.models.motif.dependencies.Dependency;
 import motif.models.motif.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

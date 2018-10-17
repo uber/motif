@@ -18,8 +18,7 @@ package motif.compiler;
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.MotifTestCompiler;
-import motif.models.graph.errors.GraphValidationErrors;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.MotifErrors;
 import motif.stubcompiler.StubProcessor;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -130,16 +129,16 @@ public class TestHarness {
         try {
             Field expectedException = testClass.getField("errors");
             assertThat(compilation).failed();
-            GraphValidationErrors errors = processor.getValidationErrors();
+            MotifErrors errors = processor.getErrors();
             Truth.assertThat(errors).isNotNull();
             expectedException.set(null, errors);
         } catch (NoSuchFieldException e) {
             try {
-                Field expectedException = testClass.getField("parsingError");
+                Field expectedException = testClass.getField("error");
                 assertThat(compilation).failed();
-                ParsingError error = processor.getParsingError();
-                Truth.assertThat(error).isNotNull();
-                expectedException.set(null, error);
+                MotifErrors errors = processor.getErrors();
+                Truth.assertThat(errors).isNotEmpty();
+                expectedException.set(null, errors.get(0));
             } catch (NoSuchFieldException ee) {
                 assertThat(compilation).succeeded();
             }

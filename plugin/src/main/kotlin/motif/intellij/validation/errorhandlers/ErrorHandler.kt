@@ -20,17 +20,17 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import motif.intellij.getClass
-import motif.models.graph.errors.*
+import motif.models.errors.MotifError
 import java.util.*
 
-abstract class ErrorHandler<T : GraphError> {
+abstract class ErrorHandler<T : MotifError> {
 
     abstract fun message(error: T): String
     abstract fun isApplicable(error: T, method: PsiMethod): Boolean
     abstract fun fixes(error: T): Array<LocalQuickFix>
 
     fun error(error: T, element: PsiElement): ValidationResult {
-        return ValidationResult(element, message(error), getFixes(error))
+        return ValidationResult(element, message(error), arrayOf())
     }
 
     data class ValidationResult(val element: PsiElement, val errorMessage: String, val fixes: Array<LocalQuickFix>) {
@@ -61,46 +61,6 @@ abstract class ErrorHandler<T : GraphError> {
             is PsiClass -> userData == method.returnType?.getClass()
             is PsiMethod -> userData == method
             else -> false
-        }
-    }
-
-    companion object {
-
-        private val missingDependenciesHandler = MissingDependenciesHandler()
-        private val scopeCycleHandler = ScopeCycleHandler()
-        private val dependencyCycleHandler = DependencyCycleHandler()
-        private val duplicateFactoryMethodsHandler = DuplicateFactoryMethodsHandler()
-        private val notExposedHandler = NotExposedHandler()
-
-        fun handle(error: GraphError, element: PsiElement): ValidationResult {
-            return when (error) {
-                is MissingDependenciesError -> missingDependenciesHandler.error(error, element)
-                is ScopeCycleError -> scopeCycleHandler.error(error, element)
-                is DependencyCycleError -> dependencyCycleHandler.error(error, element)
-                is DuplicateFactoryMethodsError -> duplicateFactoryMethodsHandler.error(error, element)
-                is NotExposedError -> notExposedHandler.error(error, element)
-            }
-        }
-
-        fun isApplicable(error: GraphError, method: PsiMethod): Boolean {
-            return when (error) {
-                is MissingDependenciesError -> missingDependenciesHandler.isApplicable(error, method)
-                is ScopeCycleError -> scopeCycleHandler.isApplicable(error, method)
-                is DependencyCycleError -> dependencyCycleHandler.isApplicable(error, method)
-                is DuplicateFactoryMethodsError -> duplicateFactoryMethodsHandler.isApplicable(error, method)
-                is NotExposedError -> notExposedHandler.isApplicable(error, method)
-            }
-        }
-
-        private fun getFixes(error: GraphError): Array<LocalQuickFix> {
-            return when (error) {
-                is MissingDependenciesError -> missingDependenciesHandler.fixes(error)
-                is ScopeCycleError -> scopeCycleHandler.fixes(error)
-                is DependencyCycleError -> dependencyCycleHandler.fixes(error)
-                is DuplicateFactoryMethodsError -> duplicateFactoryMethodsHandler.fixes(error)
-                is NotExposedError -> notExposedHandler.fixes(error)
-                else -> throw RuntimeException("Unhandled Motif Validation Error")
-            }
         }
     }
 }

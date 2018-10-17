@@ -19,11 +19,11 @@ import motif.DoNotCache
 import motif.Expose
 import motif.Objects
 import motif.Spread
+import motif.models.errors.*
 import motif.models.java.IrClass
 import motif.models.java.IrMethod
 import motif.models.java.IrParameter
 import motif.models.java.IrType
-import motif.models.parsing.errors.*
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.dependencies.RequiredDependencies
 import motif.models.motif.dependencies.RequiredDependency

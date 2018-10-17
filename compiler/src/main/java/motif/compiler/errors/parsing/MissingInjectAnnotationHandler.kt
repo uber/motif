@@ -17,7 +17,7 @@ package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
 import motif.compiler.ir.CompilerMethod
-import motif.models.parsing.errors.MissingInjectAnnotation
+import motif.models.errors.MissingInjectAnnotation
 import javax.lang.model.element.Element
 
 class MissingInjectAnnotationHandler : ErrorHandler<MissingInjectAnnotation>() {

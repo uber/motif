@@ -15,16 +15,16 @@
  */
 package testcases.E034_void_dependencies_method;
 
-import motif.models.parsing.errors.ParsingError;
-import motif.models.parsing.errors.VoidDependenciesMethod;
+import motif.models.errors.MotifError;
+import motif.models.errors.VoidDependenciesMethod;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(VoidDependenciesMethod.class);
+        assertThat(error).isInstanceOf(VoidDependenciesMethod.class);
     }
 }

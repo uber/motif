@@ -15,16 +15,16 @@
  */
 package testcases.E021_nullable_factory_method_return;
 
-import motif.models.parsing.errors.NullableFactoryMethod;
-import motif.models.parsing.errors.ParsingError;
+import motif.models.errors.NullableFactoryMethod;
+import motif.models.errors.MotifError;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class Test {
 
-    public static ParsingError parsingError;
+    public static MotifError error;
 
     public static void run() {
-        assertThat(parsingError).isInstanceOf(NullableFactoryMethod.class);
+        assertThat(error).isInstanceOf(NullableFactoryMethod.class);
     }
 }

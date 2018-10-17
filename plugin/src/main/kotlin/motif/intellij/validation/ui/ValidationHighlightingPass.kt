@@ -28,42 +28,24 @@ import motif.intellij.validation.ir.IntelliJType
 import motif.models.graph.Graph
 import motif.models.graph.GraphFactory
 import motif.models.java.IrType
-import motif.models.motif.SourceSet
-import motif.models.parsing.SourceSetParser
-import motif.models.parsing.errors.ParsingError
 
 class ValidationHighlightingPass private constructor(private val project: Project, document: Document) : TextEditorHighlightingPass(project, document) {
 
-    private var result: Result? = null
+    private var graph: Graph? = null
 
     constructor(editor: Editor) : this(editor.project!!, editor.document)
 
     override fun doCollectInformation(progress: ProgressIndicator) {
-        result = validateGraph()
+        graph = validateGraph()
     }
 
     override fun doApplyInformationToEditor() {
-        val result: Result = this.result ?: throw IllegalStateException()
+        val graph: Graph = this.graph ?: throw IllegalStateException()
 
-        result.parsingError?.let {
-            println(it)
-        }
-
-        result.graph?.validationErrors?.let { println(it) }
+        graph.errors.let { println(it) }
     }
 
-    private fun validateGraph(): Result {
-        val sourceSet: SourceSet = try {
-            parseSourceSet()
-        } catch (e: ParsingError) {
-            return Result(null, e)
-        }
-
-        val graph: Graph = GraphFactory.create(sourceSet)
-        return Result(graph, null)
-    }
-
-    private fun parseSourceSet(): SourceSet {
+    private fun validateGraph(): Graph {
         val scopeClasses: List<PsiClass> = ScopeIndex.getInstance().getScopeClasses(project)
         val scopeAnnotatedTypes: Set<IrType> = scopeClasses
                 // TODO remove these filters
@@ -74,8 +56,6 @@ class ValidationHighlightingPass private constructor(private val project: Projec
                 }
                 .toSet()
 
-        return SourceSetParser().parse(scopeAnnotatedTypes)
+        return GraphFactory.create(scopeAnnotatedTypes)
     }
-
-    private data class Result(val graph: Graph?, val parsingError: ParsingError?)
 }

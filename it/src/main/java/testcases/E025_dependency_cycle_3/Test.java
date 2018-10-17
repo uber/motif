@@ -16,22 +16,15 @@
 package testcases.E025_dependency_cycle_3;
 
 import common.DependencyCycleSubject;
-import motif.models.graph.errors.DependencyCycleError;
-import motif.models.graph.errors.GraphValidationErrors;
-
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
+import motif.models.errors.DependencyCycleError;
+import motif.models.errors.MotifError;
 
 public class Test {
 
-    public static GraphValidationErrors errors;
+    public static MotifError error;
 
     public static void run() {
-        List<DependencyCycleError> errors = Test.errors.getDependencyCycleErrors();
-        assertThat(errors).hasSize(1);
-
-        DependencyCycleError error = errors.get(0);
+        DependencyCycleError error = (DependencyCycleError) Test.error;
         DependencyCycleSubject.assertThat(error)
                 .matches(Scope.class, "b", "c");
     }

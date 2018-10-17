@@ -17,8 +17,7 @@ package motif.compiler.errors
 
 import motif.compiler.errors.parsing.*
 import motif.compiler.errors.validation.*
-import motif.models.graph.errors.*
-import motif.models.parsing.errors.*
+import motif.models.errors.*
 import javax.lang.model.element.Element
 
 abstract class ErrorHandler<T> {
@@ -32,18 +31,13 @@ abstract class ErrorHandler<T> {
 
     companion object {
 
-        fun handle(error: GraphError): ErrorMessage {
+        fun handle(error: MotifError): ErrorMessage {
             return when (error) {
                 is MissingDependenciesError -> MissingDependenciesHandler().error(error)
                 is ScopeCycleError -> ScopeCycleHandler().error(error)
                 is DependencyCycleError -> DependencyCycleHandler().error(error)
                 is DuplicateFactoryMethodsError -> DuplicateFactoryMethodsHandler().error(error)
                 is NotExposedError -> NotExposedHandler().error(error)
-            }
-        }
-
-        fun handle(error: ParsingError): ErrorMessage {
-            return when(error) {
                 is ScopeMustBeAnInterface -> ScopeMustBeAnInterfaceHandler().error(error)
                 is InvalidScopeMethod -> InvalidScopeMethodHandler().error(error)
                 is ObjectsFieldFound -> ObjectsFieldFoundHandler().error(error)
