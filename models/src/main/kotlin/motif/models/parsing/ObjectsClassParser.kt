@@ -43,7 +43,6 @@ class ObjectsClassParser : ParserUtil {
         val factoryMethods: List<FactoryMethod> = objectsClass.methods
                 .onEach { method ->
                     if (method.isVoid()) throw VoidObjectsMethod(method)
-                    if (method.isPrivate()) throw PrivateObjectsMethod(method)
                     if (method.isNullable()) throw NullableFactoryMethod(method)
                     ensureNonNullParameters(method)
                 }

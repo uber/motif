@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.compiler.errors.parsing
+package testcases.E030_invalid_objects_method_2;
 
-import motif.compiler.errors.ErrorHandler
-import motif.compiler.ir.CompilerMethod
-import motif.models.parsing.errors.PrivateObjectsMethod
-import javax.lang.model.element.Element
+import motif.models.parsing.errors.InvalidObjectsMethod;
+import motif.models.parsing.errors.ParsingError;
 
-class PrivateObjectsMethodHandler : ErrorHandler<PrivateObjectsMethod>() {
+import static com.google.common.truth.Truth.assertThat;
 
-    override fun message(error: PrivateObjectsMethod): String {
-        return "Invalid Motif Objects method."
-    }
+public class Test {
 
-    override fun element(error: PrivateObjectsMethod): Element? {
-        return (error.method as CompilerMethod).element
+    public static ParsingError parsingError;
+
+    public static void run() {
+        assertThat(parsingError).isInstanceOf(InvalidObjectsMethod.class);
     }
 }

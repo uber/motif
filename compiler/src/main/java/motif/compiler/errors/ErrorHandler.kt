@@ -49,7 +49,6 @@ abstract class ErrorHandler<T> {
                 is ObjectsFieldFound -> ObjectsFieldFoundHandler().error(error)
                 is ObjectsConstructorFound -> ObjectsConstructorFoundHandler().error(error)
                 is VoidObjectsMethod -> VoidObjectsMethodHandler().error(error)
-                is PrivateObjectsMethod -> PrivateObjectsMethodHandler().error(error)
                 is NullableFactoryMethod -> NullableFactoryMethodHandler().error(error)
                 is NullableDependency -> NullableDependencyHandler().error(error)
                 is InvalidObjectsMethod -> InvalidObjectsMethodHandler().error(error)
