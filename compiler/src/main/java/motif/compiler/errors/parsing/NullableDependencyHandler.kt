@@ -23,7 +23,7 @@ import javax.lang.model.element.Element
 class NullableDependencyHandler : ErrorHandler<NullableDependency>() {
 
     override fun message(error: NullableDependency): String {
-        return "Motif dependencies may not be nullable."
+        return "Motif dependencies may not be nullable. Consider using Optional<...> instead."
     }
 
     override fun element(error: NullableDependency): Element? {
