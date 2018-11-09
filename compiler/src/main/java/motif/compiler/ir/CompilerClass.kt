@@ -19,6 +19,8 @@ import com.google.auto.common.MoreElements
 import motif.models.java.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
@@ -43,8 +45,11 @@ class CompilerClass(
     }
 
     override val methods: List<IrMethod> by lazy {
-        MoreElements.getLocalAndInheritedMethods(typeElement, env.typeUtils, env.elementUtils)
+        val methods: List<ExecutableElement> = MoreElements.getLocalAndInheritedMethods(typeElement, env.typeUtils, env.elementUtils)
                 .filter { it.enclosingElement.toString() != "java.lang.Object" }
+        val nonPrivateStaticMethods: List<ExecutableElement> = ElementFilter.methodsIn(typeElement.enclosedElements)
+                .filter { Modifier.STATIC in it.modifiers && Modifier.PRIVATE !in it.modifiers }
+        (methods + nonPrivateStaticMethods)
                 .map { executableElement ->
                     val executableType = env.typeUtils.asMemberOf(declaredType, executableElement) as ExecutableType
                     CompilerMethod(env, declaredType, executableType, executableElement)
