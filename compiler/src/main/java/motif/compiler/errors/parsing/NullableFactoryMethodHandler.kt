@@ -23,7 +23,7 @@ import javax.lang.model.element.Element
 class NullableFactoryMethodHandler : ErrorHandler<NullableFactoryMethod>() {
 
     override fun message(error: NullableFactoryMethod): String {
-        return "Invalid Motif factory method."
+        return "Motif factory methods may not provide nullable dependencies. Consider using Optional<...> instead."
     }
 
     override fun element(error: NullableFactoryMethod): Element? {
