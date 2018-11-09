@@ -38,6 +38,7 @@ class IntelliJClass(
         }
     }
 
+    // TODO Verify that this includes static methods for this class and does NOT include static methods from superclasses.
     override val methods: List<IrMethod> by lazy {
         psiClass.allMethods
                 .filter { it.containingClass?.qualifiedName != "java.lang.Object"}
