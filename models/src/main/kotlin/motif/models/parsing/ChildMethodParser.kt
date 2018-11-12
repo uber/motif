@@ -15,11 +15,12 @@
  */
 package motif.models.parsing
 
+import motif.Expose
 import motif.Scope
 import motif.models.java.IrClass
 import motif.models.java.IrMethod
-import motif.models.motif.dependencies.Dependency
 import motif.models.motif.child.ChildMethod
+import motif.models.motif.dependencies.DynamicDependency
 
 class ChildMethodParser : ParserUtil {
 
@@ -29,7 +30,9 @@ class ChildMethodParser : ParserUtil {
     }
 
     fun parse(method: IrMethod): ChildMethod {
-        val dynamicDependencies: List<Dependency> = method.parameters.map { it.toDependency() }
+        val dynamicDependencies: List<DynamicDependency> = method.parameters.map {
+            DynamicDependency(it.toDependency(), it.hasAnnotation(Expose::class))
+        }
         return ChildMethod(method, method.returnType, dynamicDependencies)
     }
 }

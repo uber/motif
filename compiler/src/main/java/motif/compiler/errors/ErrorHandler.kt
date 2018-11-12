@@ -38,6 +38,7 @@ abstract class ErrorHandler<T> {
                 is DependencyCycleError -> DependencyCycleHandler().error(error)
                 is DuplicateFactoryMethodsError -> DuplicateFactoryMethodsHandler().error(error)
                 is NotExposedError -> NotExposedHandler().error(error)
+                is NotExposedDynamicError -> NotExposedDynamicHandler().error(error)
                 is ScopeMustBeAnInterface -> ScopeMustBeAnInterfaceHandler().error(error)
                 is InvalidScopeMethod -> InvalidScopeMethodHandler().error(error)
                 is ObjectsFieldFound -> ObjectsFieldFoundHandler().error(error)

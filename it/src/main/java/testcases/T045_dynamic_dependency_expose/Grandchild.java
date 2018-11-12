@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.E011_dynamic_dependency_internal;
+package testcases.T045_dynamic_dependency_expose;
 
 @motif.Scope
 public interface Grandchild {

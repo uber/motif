@@ -6,6 +6,7 @@ import motif.models.java.IrMethod
 import motif.models.java.IrParameter
 import motif.models.java.IrType
 import motif.models.motif.ScopeClass
+import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.dependencies.RequiredDependency
 import motif.models.motif.objects.FactoryMethod
@@ -47,4 +48,12 @@ class ScopeCycleError(val cycle: List<IrType>) : MotifError()
 class NotExposedError(
         val scopeClass: ScopeClass,
         val factoryMethod: FactoryMethod,
+        val requiredDependency: RequiredDependency) : MotifError()
+
+/**
+ * Similar to NotExposedError except applied to dynamic dependencies.
+ */
+class NotExposedDynamicError(
+        val scopeClass: ScopeClass,
+        val childMethod: ChildMethod,
         val requiredDependency: RequiredDependency) : MotifError()

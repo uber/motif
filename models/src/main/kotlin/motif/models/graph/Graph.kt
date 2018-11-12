@@ -35,7 +35,8 @@ class Graph(
                 missingDependenciesError(),
                 dependencyCycleErrors(),
                 duplicateFactoryMethodsErrors(),
-                notExposedErrors())
+                notExposedErrors(),
+                notExposedDynamicErrors())
     }
 
     private fun missingDependenciesError(): List<MissingDependenciesError> {
@@ -68,6 +69,10 @@ class Graph(
 
     private fun notExposedErrors(): List<NotExposedError> {
         return nodes.values.flatMap { it.notExposedErrors }
+    }
+
+    private fun notExposedDynamicErrors(): List<NotExposedDynamicError> {
+        return nodes.values.flatMap { it.notExposedDynamicErrors }
     }
 
     fun getDependencies(scopeType: IrType): RequiredDependencies? {

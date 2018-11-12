@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.E011_dynamic_dependency_internal;
+package testcases.E011_dynamic_dependency_not_exposed;
 
 @motif.Scope
 public interface Child {
 
     Grandchild grandchild();
-
-    String string();
 }

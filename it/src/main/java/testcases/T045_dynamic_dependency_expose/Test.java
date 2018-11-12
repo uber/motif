@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.models.motif.child
+package testcases.T045_dynamic_dependency_expose;
 
-import motif.models.java.IrMethod
-import motif.models.java.IrType
-import motif.models.motif.dependencies.DynamicDependency
+import common.MissingDependenciesSubject;
+import motif.models.errors.MissingDependenciesError;
+import motif.models.errors.MotifError;
 
-class ChildMethod(
-        val ir: IrMethod,
-        val scope: IrType,
-        val dynamicDependencies: List<DynamicDependency>)
+import static com.google.common.truth.Truth.assertThat;
+
+public class Test {
+
+    public static void run() {
+        Scope scope = new ScopeImpl();
+        assertThat(scope.child("a").grandchild().string()).isEqualTo("a");
+    }
+}

@@ -43,8 +43,8 @@ class ScopeClass(
     val notExposed: Map<Dependency, FactoryMethod> = factoryMethods.filter { !it.isExposed }.associateBy { it.providedDependency }
 
     val selfRequiredDependencies: RequiredDependencies by lazy {
-        val annotatedDependencies = (consumed - provided).map { RequiredDependency(it, false, setOf(ir.type)) }
-        RequiredDependencies(annotatedDependencies)
+        val requiredDependencies = (consumed - provided).map { RequiredDependency(it, false, setOf(ir.type)) }
+        RequiredDependencies(requiredDependencies)
     }
 
     override fun toString(): String {
