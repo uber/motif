@@ -15,12 +15,12 @@
  */
 package motif.models.graph
 
+import motif.models.errors.NotExposedDynamicError
 import motif.models.errors.NotExposedError
+import motif.models.java.IrType
 import motif.models.motif.ScopeClass
-import motif.models.motif.dependencies.Dependency
-import motif.models.motif.dependencies.RequiredDependency
-import motif.models.motif.dependencies.RequiredDependencies
-import motif.models.motif.dependencies.ExplicitDependencies
+import motif.models.motif.child.ChildMethod
+import motif.models.motif.dependencies.*
 import motif.models.motif.objects.FactoryMethod
 
 class Node(
@@ -46,12 +46,35 @@ class Node(
                 }
     }
 
+    val notExposedDynamicErrors: List<NotExposedDynamicError> by lazy {
+        scopeChildren
+                .flatMap { child ->
+                    val childRequiredDependencies: RequiredDependencies = child.node.requiredDependencies
+                    val dynamicDependencies: Map<Dependency, DynamicDependency> = child.method.dynamicDependencies.associateBy { it.dependency }
+                    childRequiredDependencies.list
+                            .filter {
+                                val dynamicDependency = dynamicDependencies[it.dependency]
+                                if (dynamicDependency == null) {
+                                    false
+                                } else {
+                                    it.transitive && !dynamicDependency.isExposed
+                                }
+                            }
+                            .map { notExposedDependency ->
+                                NotExposedDynamicError(scopeClass, child.method, notExposedDependency)
+                            }
+                }
+    }
+
     val childRequiredDependencies: RequiredDependencies by lazy {
         scopeChildren
                 .map { child ->
                     val childRequiredDependencies: RequiredDependencies = child.node.requiredDependencies
                     val dynamicDependencies = child.method.dynamicDependencies
-                    childRequiredDependencies.satisfiedByDynamic(child.method.scope, dynamicDependencies)
+                    // Similar to the logic in Node.requiredDependencies, this looks incorrect at first glance since
+                    // transitive dependencies should only be satisfied by dynamic dependencies annotated with @Expose.
+                    // However, we catch these cases in Node.notExposedDynamicErrors.
+                    childRequiredDependencies - dynamicDependencies.map { it.dependency }
                 }
                 .map { it.toTransitive() }
                 .merge()
@@ -116,5 +139,9 @@ class Node(
             requiredDependencies[it] ?: RequiredDependency(it, false, setOf(scopeClass.ir.type))
         }
         return RequiredDependencies(list)
+    }
+
+    private fun RequiredDependencies.toTransitive(): RequiredDependencies {
+        return RequiredDependencies(list.map { RequiredDependency(it.dependency, true, it.consumingScopes) })
     }
 }

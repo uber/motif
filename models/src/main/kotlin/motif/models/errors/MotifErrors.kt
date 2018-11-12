@@ -21,9 +21,11 @@ class MotifErrors(
         private val missingDependenciesErrors: List<MissingDependenciesError>,
         private val dependencyCycleErrors: List<DependencyCycleError>,
         private val duplicateFactoryMethodsErrors: List<DuplicateFactoryMethodsError>,
-        private val notExposedErrors: List<NotExposedError>)
+        private val notExposedErrors: List<NotExposedError>,
+        private val notExposedDynamicErrors: List<NotExposedDynamicError>)
     : List<MotifError> by parsingErrors +
         notExposedErrors +
+        notExposedDynamicErrors +
         listOfNotNull(scopeCycleError) +
         duplicateFactoryMethodsErrors +
         dependencyCycleErrors +

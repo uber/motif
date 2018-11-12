@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.E011_dynamic_dependency_internal;
+package testcases.E011_dynamic_dependency_not_exposed;
 
-import common.MissingDependenciesSubject;
-import motif.models.errors.MissingDependenciesError;
-import motif.models.errors.MotifError;
+@motif.Scope
+public interface Scope {
 
-public class Test {
+    Child child(String string);
 
-    public static MotifError error;
-
-    public static void run() {
-        MissingDependenciesError error = (MissingDependenciesError) Test.error;
-        MissingDependenciesSubject.assertThat(error)
-                .matches(Grandchild.class, String.class);
-    }
+    @motif.Dependencies
+    interface Dependencies {}
 }

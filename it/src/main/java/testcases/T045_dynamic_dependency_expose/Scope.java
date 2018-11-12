@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.models.motif.child
+package testcases.T045_dynamic_dependency_expose;
 
-import motif.models.java.IrMethod
-import motif.models.java.IrType
-import motif.models.motif.dependencies.DynamicDependency
+import motif.Expose;
 
-class ChildMethod(
-        val ir: IrMethod,
-        val scope: IrType,
-        val dynamicDependencies: List<DynamicDependency>)
+@motif.Scope
+public interface Scope {
+
+    Child child(@Expose String string);
+
+    @motif.Dependencies
+    interface Dependencies {}
+}

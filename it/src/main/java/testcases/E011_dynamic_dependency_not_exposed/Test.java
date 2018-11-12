@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.models.motif.child
+package testcases.E011_dynamic_dependency_not_exposed;
 
-import motif.models.java.IrMethod
-import motif.models.java.IrType
-import motif.models.motif.dependencies.DynamicDependency
+import motif.models.errors.NotExposedDynamicError;
 
-class ChildMethod(
-        val ir: IrMethod,
-        val scope: IrType,
-        val dynamicDependencies: List<DynamicDependency>)
+import static com.google.common.truth.Truth.assertThat;
+
+public class Test {
+
+    public static NotExposedDynamicError error;
+
+    public static void run() {
+        assertThat(error).isNotNull();
+    }
+}
