@@ -15,7 +15,7 @@ For every Scope, Motif generates a `*ScopeImpl.Dependencies` interface, which de
 interface Component extends MyScopeImpl.Dependencies {}
 
 Component component = ...;
-MyScope myScope = new MyScope(component);
+MyScope myScope = new MyScopeImpl(component);
 ```
 
 ## Dagger Component as child of Motif Scope
