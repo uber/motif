@@ -21,7 +21,7 @@ import motif.models.java.*
 
 class IntelliJMethod(
         private val project: Project,
-        private val psiMethod: PsiMethod) : IrUtil, IrMethod {
+        val psiMethod: PsiMethod) : IrUtil, IrMethod {
 
     override val parameters: List<IrParameter> by lazy {
         psiMethod.parameterList.parameters.map { IntelliJMethodParameter(project, it) }

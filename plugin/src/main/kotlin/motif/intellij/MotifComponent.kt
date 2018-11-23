@@ -15,14 +15,12 @@
  */
 package motif.intellij
 
-import com.intellij.codeHighlighting.TextEditorHighlightingPassRegistrar
 import com.intellij.ide.hierarchy.LanguageTypeHierarchy
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
 import motif.intellij.hierarchy.graph.GraphProcessor
 import motif.intellij.hierarchy.ui.MotifScopeHierarchyProvider
-import motif.intellij.validation.ui.ValidationHighlightingPass
 
 class MotifComponent(project: Project) : ProjectComponent {
 
@@ -32,14 +30,6 @@ class MotifComponent(project: Project) : ProjectComponent {
         // adding the language extension here allows us to be called before Java's type hierarchy extension is
         // called, allowing Motif to create its own tree structure for the hierarchy viewer.
         LanguageTypeHierarchy.INSTANCE.addExplicitExtension(JavaLanguage.INSTANCE, MotifScopeHierarchyProvider.INSTANCE)
-        TextEditorHighlightingPassRegistrar.getInstance(project)
-                .registerTextEditorHighlightingPass(
-                        { _, editor -> ValidationHighlightingPass(editor) },
-                        TextEditorHighlightingPassRegistrar.Anchor.LAST,
-                        -1,
-                        false,
-                        false)
-
     }
 
     companion object {
