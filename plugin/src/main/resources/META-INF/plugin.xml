@@ -8,6 +8,8 @@
       Motif plugin.<br>
     ]]></description>
 
+    <idea-version since-build="163"/>
+
     <change-notes><![CDATA[
       Release 0.0.1: Initial release.<br>
     ]]>
@@ -22,6 +24,13 @@
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <toolWindow
+                id="Motif"
+                anchor="right"
+                factoryClass="motif.intellij.validation.ui.MotifToolWindowFactory" />
+        <externalAnnotator
+                language="JAVA"
+                implementationClass="motif.intellij.validation.ui.MotifExternalAnnotator" />
         <fileBasedIndex implementation="motif.intellij.validation.index.ScopeIndex"/>
         <projectService serviceImplementation="motif.intellij.MotifComponent"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.hierarchy.ui.MotifScopeLineMarkerProvider"/>
