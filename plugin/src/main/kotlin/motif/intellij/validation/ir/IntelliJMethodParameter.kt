@@ -17,15 +17,19 @@ package motif.intellij.validation.ir
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiParameter
+import com.intellij.psi.PsiSubstitutor
 import motif.models.java.IrAnnotation
 import motif.models.java.IrParameter
 import motif.models.java.IrType
 
 class IntelliJMethodParameter(
         private val project: Project,
-        private val psiParameter: PsiParameter) : IrUtil, IrParameter {
+        val psiParameter: PsiParameter,
+        val substitutor: PsiSubstitutor) : IrUtil, IrParameter {
 
-    override val type: IrType by lazy { IntelliJType(project, psiParameter.type) }
+    override val type: IrType by lazy {
+        IntelliJType(project, substitutor.substitute(psiParameter.type))
+    }
 
     override val name: String by lazy { psiParameter.name!! }
 

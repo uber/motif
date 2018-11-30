@@ -19,9 +19,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementFactory
+import com.intellij.psi.PsiSubstitutor
 import motif.models.java.*
 
-// TODO Handle generics
 class IntelliJClass(
         private val project: Project,
         private val psiClassType: PsiClassType) : IrUtil, IrClass {
@@ -38,11 +38,10 @@ class IntelliJClass(
         }
     }
 
-    // TODO Verify that this includes static methods for this class and does NOT include static methods from superclasses.
     override val methods: List<IrMethod> by lazy {
-        psiClass.allMethods
-                .filter { it.containingClass?.qualifiedName != "java.lang.Object"}
-                .map { IntelliJMethod(project, it) }
+        psiClass.visibleSignatures
+                .filter { it.method.containingClass?.qualifiedName != "java.lang.Object" }
+                .map { IntelliJMethod(project, it.method, it.substitutor) }
     }
 
     override val nestedClasses: List<IrClass> by lazy {
@@ -59,7 +58,7 @@ class IntelliJClass(
     }
 
     override val constructors: List<IrMethod> by lazy {
-        psiClass.constructors.map { IntelliJMethod(project, it) }
+        psiClass.constructors.map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
     }
 
     override val annotations: List<IrAnnotation> by lazy { psiClass.modifierList!!.irAnnotations(project) }

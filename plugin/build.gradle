@@ -24,4 +24,5 @@ dependencies {
     compile deps.kotlin.reflection
 
     testCompile deps.test.junit
+    testCompile deps.test.truth
 }
