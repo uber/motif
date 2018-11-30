@@ -14,16 +14,16 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 * [Snapshots](#snapshots)
 * [License](#license)
 
+## Other Resources
+
+* [Dagger Interoperability](https://github.com/uber/motif/blob/master/DAGGER.md)
+* [IDE Integration](https://github.com/uber/motif/blob/master/plugin/README.md)
+* [DroidCon Talk](https://www.youtube.com/watch?v=5EviOayNgtc)
+
 ## Gradle
 
 | [![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://search.maven.org/artifact/com.uber.motif/motif-compiler)<br>[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://search.maven.org/artifact/com.uber.motif/motif) | <pre>annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'<br>compile 'com.uber.motif:motif:x.y.z'</pre> |
 |-|:-|
-
-## Features
-
-* [Minimal API](#the-basics)
-* [IDE Integration](https://github.com/uber/motif/blob/master/plugin/README.md)
-* [Dagger Interoperability](https://github.com/uber/motif/blob/master/DAGGER.md)
 
 ## The Basics
 
