@@ -28,7 +28,8 @@ class IntelliJType(
         private val psiType: PsiType) : IrType {
 
     override val qualifiedName: String by lazy {
-        GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(true)
+        val canonicalText: String = GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(true)
+        if ('.' in canonicalText) canonicalText else "java.lang.$canonicalText"
     }
 
     override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
