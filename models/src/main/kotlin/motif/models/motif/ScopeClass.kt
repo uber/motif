@@ -22,6 +22,7 @@ import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.ExplicitDependencies
 import motif.models.motif.dependencies.RequiredDependencies
 import motif.models.motif.dependencies.RequiredDependency
+import motif.models.motif.inject.InjectMethod
 import motif.models.motif.objects.FactoryMethod
 import motif.models.motif.objects.ObjectsClass
 
@@ -29,6 +30,7 @@ class ScopeClass(
         val ir: IrClass,
         val childMethods: List<ChildMethod>,
         val accessMethods: List<AccessMethod>,
+        val injectMethods: List<InjectMethod>,
         val objectsClass: ObjectsClass?,
         val explicitDependencies: ExplicitDependencies?) {
 

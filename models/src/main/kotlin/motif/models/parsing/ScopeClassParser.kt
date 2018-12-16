@@ -23,12 +23,14 @@ import motif.models.motif.ScopeClass
 import motif.models.motif.accessmethod.AccessMethod
 import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.ExplicitDependencies
+import motif.models.motif.inject.InjectMethod
 import motif.models.motif.objects.ObjectsClass
 
 class ScopeClassParser {
 
     private val childMethodParser = ChildMethodParser()
     private val accessMethodParser = AccessMethodParser()
+    private val injectMethodParser = InjectMethodParser()
     private val objectsClassParser = ObjectsClassParser()
     private val explicitDependenciesParser = ExplicitDependenciesParser()
 
@@ -38,12 +40,14 @@ class ScopeClassParser {
 
         val childMethods: MutableList<ChildMethod> = mutableListOf()
         val accessMethods: MutableList<AccessMethod> = mutableListOf()
+        val injectMethods: MutableList<InjectMethod> = mutableListOf()
 
         irScopeClass.methods
                 .forEach {
                     when {
                         childMethodParser.isApplicable(it) -> childMethods.add(childMethodParser.parse(it))
                         accessMethodParser.isApplicable(it) -> accessMethods.add(accessMethodParser.parse(it))
+                        injectMethodParser.isApplicable(it) -> injectMethods.add(injectMethodParser.parse(it))
                         else -> throw InvalidScopeMethod(it)
                     }
                 }
@@ -55,6 +59,7 @@ class ScopeClassParser {
                 irScopeClass,
                 childMethods,
                 accessMethods,
+                injectMethods,
                 objectsClass,
                 explicitDependencies)
     }

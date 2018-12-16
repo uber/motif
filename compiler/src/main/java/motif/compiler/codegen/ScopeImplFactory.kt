@@ -18,6 +18,7 @@ package motif.compiler.codegen
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
+import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import dagger.Component
 import motif.compiler.ir.CompilerType
@@ -25,6 +26,7 @@ import motif.internal.DaggerScope
 import motif.models.graph.Graph
 import motif.models.graph.Scope
 import motif.models.motif.accessmethod.AccessMethod
+import motif.models.motif.inject.InjectMethod
 import motif.models.motif.objects.ObjectsClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
@@ -40,6 +42,7 @@ class ScopeImplFactory(
     fun create(scope: Scope): TypeSpec {
         val childMethods = scope.childMethods.map { childMethodFactory.create(scope, it) }
         val accessMethodImpls = scope.accessMethods.map { it.implSpec(scope) }
+        val injectMethods = scope.injectMethods.map { it.scopeMethodSpec(scope) }
 
         return TypeSpec.classBuilder(scope.implTypeName)
                 .addModifiers(Modifier.PUBLIC)
@@ -53,6 +56,7 @@ class ScopeImplFactory(
                 .addAltConstructorSpec(scope)
                 .addMethods(childMethods)
                 .addMethods(accessMethodImpls)
+                .addMethods(injectMethods)
                 .build()
                 .write(scope.packageName)
     }
@@ -65,6 +69,7 @@ class ScopeImplFactory(
                         .addMember("modules", "\$T.class", scope.moduleTypeName)
                         .build())
                 .addMethods(scope.componentMethodSpecs.map { it.value })
+                .addMethods(scope.injectMethods.map { it.componentMethodSpec() })
                 .build()
     }
 
@@ -128,5 +133,30 @@ class ScopeImplFactory(
         return cir.overriding()
                 .addStatement("return \$N.\$N()", scope.componentFieldSpec, componentMethod)
                 .build()
+    }
+
+    private fun InjectMethod.methodSignatureSpec(): MethodSpec.Builder {
+        val returnType = ir.returnType.cir.mirror.typeName
+        val targetType = target.type.cir.mirror.typeName
+        val targetParam = ParameterSpec.builder(targetType, target.name).build()
+        return MethodSpec.methodBuilder(ir.name)
+            .returns(returnType)
+            .addParameter(targetParam)
+    }
+
+    private fun InjectMethod.scopeMethodSpec(scope: Scope): MethodSpec {
+        val maybeReturn = if (ir.isVoid()) "" else "return "
+        val componentField = scope.componentFieldSpec
+        return methodSignatureSpec()
+            .addAnnotation(Override::class.java)
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("\$L\$N.\$L(\$N)", maybeReturn, componentField, ir.name, target.name)
+            .build()
+    }
+
+    private fun InjectMethod.componentMethodSpec(): MethodSpec {
+        return methodSignatureSpec()
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+            .build()
     }
 }

@@ -20,6 +20,7 @@ import motif.models.motif.accessmethod.AccessMethod
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.RequiredDependencies
+import motif.models.motif.inject.InjectMethod
 import motif.models.motif.objects.ObjectsClass
 
 class Scope(
@@ -29,6 +30,7 @@ class Scope(
 
     val childMethods: List<ChildMethod> = scopeClass.childMethods
     val accessMethods: List<AccessMethod> = scopeClass.accessMethods
+    val injectMethods: List<InjectMethod> = scopeClass.injectMethods
     val objectsClass: ObjectsClass? = scopeClass.objectsClass
     val scopeDependency: Dependency = scopeClass.scopeDependency
 }
