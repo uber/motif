@@ -20,6 +20,7 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeSpec
 import dagger.Component
+import motif.ScopeImpl
 import motif.compiler.ir.CompilerType
 import motif.internal.DaggerScope
 import motif.models.graph.Graph
@@ -42,6 +43,7 @@ class ScopeImplFactory(
         val accessMethodImpls = scope.accessMethods.map { it.implSpec(scope) }
 
         return TypeSpec.classBuilder(scope.implTypeName)
+                .addAnnotation(scopeImplAnnotation(scope, childMethods))
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(scope.typeName)
                 .addField(scope.componentFieldSpec)
@@ -55,6 +57,23 @@ class ScopeImplFactory(
                 .addMethods(accessMethodImpls)
                 .build()
                 .write(scope.packageName)
+    }
+
+    private fun scopeImplAnnotation(scope: Scope, childMethods: List<MethodSpec>): AnnotationSpec {
+        val builder = AnnotationSpec.builder(ScopeImpl::class.java)
+        if (childMethods.isEmpty()) {
+            builder.addMember("children", "{}")
+        } else {
+            childMethods
+                    .map { childMethod -> childMethod.returnType }
+                    .forEach { childType ->
+                        builder.addMember("children", "\$T.class", childType)
+                    }
+        }
+        return builder
+                .addMember("scope", "\$T.class", scope.typeName)
+                .addMember("dependencies", "\$T.class", scope.dependenciesTypeName)
+                .build()
     }
 
     private fun component(scope: Scope): TypeSpec {
