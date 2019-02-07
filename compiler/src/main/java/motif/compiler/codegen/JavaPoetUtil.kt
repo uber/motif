@@ -163,7 +163,7 @@ interface JavaPoetUtil : ParserUtil {
         }
 
         fun Dependency.name(): String {
-            return names.unique(Names.safeName(type.cir.mirror))
+            return names.unique(Names.safeName(type.cir.mirror, qualifier?.cir?.mirror))
         }
 
         fun claim(name: String) {
