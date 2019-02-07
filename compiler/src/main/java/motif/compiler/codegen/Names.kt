@@ -15,6 +15,11 @@
  */
 package motif.compiler.codegen
 
+import com.google.auto.common.AnnotationMirrors
+import com.google.auto.common.MoreElements
+import javax.inject.Named
+import javax.inject.Qualifier
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.*
@@ -26,12 +31,22 @@ class Names {
     companion object {
 
         @JvmStatic
-        fun safeName(typeMirror: TypeMirror): String {
-            var name = NameVisitor.visit(typeMirror).decapitalize()
+        fun safeName(typeMirror: TypeMirror, annnotation: AnnotationMirror?): String {
+            var name = NameVisitor.visit(typeMirror)
+            val annotationString = annnotation?.let(this::annotationString) ?: ""
+            name = "$annotationString$name".decapitalize()
             if (name in KEYWORDS) {
                 name += "_"
             }
             return name
+        }
+
+        private fun annotationString(annnotation: AnnotationMirror): String {
+            return if (annnotation.annotationType.toString() == "javax.inject.Named") {
+                AnnotationMirrors.getAnnotationValue(annnotation, "value").value.toString()
+            } else {
+                annnotation.annotationType.asElement().simpleName.toString()
+            }
         }
     }
 }

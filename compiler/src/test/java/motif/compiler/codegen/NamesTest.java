@@ -19,15 +19,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.JavaFileObjects;
+import dagger.shaded.auto.common.AnnotationMirrors;
 import org.junit.Test;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.inject.Qualifier;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -38,59 +42,68 @@ public class NamesTest {
 
     @Test
     public void basic() {
-        String name = getName("java.util.HashMap");
+        String name = getSafeName("java.util.HashMap");
         assertThat(name).isEqualTo("hashMap");
     }
 
     @Test
     public void typeArgument() {
-        String name = getName("java.util.HashMap", "String", "Integer");
+        String name = getSafeName("java.util.HashMap<String, Integer>");
         assertThat(name).isEqualTo("stringIntegerHashMap");
     }
 
     @Test
     public void wildcard() {
-        String name = getName("java.util.HashMap", "? extends String", "? super Integer");
+        String name = getSafeName("java.util.HashMap<? extends String, ? super Integer>");
         assertThat(name).isEqualTo("stringIntegerHashMap");
     }
 
     @Test
     public void typeVariable() {
-        String name = getName("java.util.HashMap", "String", "A");
+        String name = getSafeName("java.util.HashMap<String, A>");
         assertThat(name).isEqualTo("stringAHashMap");
     }
 
     @Test
     public void nested() {
-        String name = getName("java.util.HashMap", "java.util.HashMap<String, Integer>", "Integer");
+        String name = getSafeName("java.util.HashMap<java.util.HashMap<String, Integer>, Integer>");
         assertThat(name).isEqualTo("stringIntegerHashMapIntegerHashMap");
     }
 
     @Test
     public void innerClass() {
-        String name = getName("java.util.Map.Entry", "String", "Integer");
+        String name = getSafeName("java.util.Map.Entry<String, Integer>");
         assertThat(name).isEqualTo("stringIntegerMapEntry");
     }
 
     @Test
     public void keyword() {
-        String name = getName("java.lang.Boolean");
+        String name = getSafeName("java.lang.Boolean");
         assertThat(name).isEqualTo("boolean_");
     }
 
-    private static String getName(String className, String... typeArguments) {
-        String typeArgumentString = String.join(",", typeArguments);
-        if (!typeArgumentString.isEmpty()) {
-            typeArgumentString = "<" + typeArgumentString + ">";
-        }
+    @Test
+    public void named() {
+        String name = getSafeName("@javax.inject.Named(\"Foo\") String");
+        assertThat(name).isEqualTo("fooString");
+    }
+
+    @Test
+    public void customQualifier() {
+        String name = getSafeName("@Foo String");
+        assertThat(name).isEqualTo("fooString");
+    }
+
+    private static String getSafeName(String classString) {
         SafeNameProcessor processor = new SafeNameProcessor();
         Compilation compilation = javac()
                 .withProcessors(processor)
                 .compile(JavaFileObjects.forSourceLines(
                         "test.Test",
                         "package test;",
+                        "@javax.inject.Qualifier @interface Foo {}",
                         "class Test<A extends String> {",
-                        className + typeArgumentString + " test() { return null; }",
+                        classString + " test() { return null; }",
                         "}"
                 ));
         CompilationSubject.assertThat(compilation).succeeded();
@@ -131,7 +144,9 @@ public class NamesTest {
             ExecutableElement testMethod = methods.get(0);
 
             TypeMirror returnType = testMethod.getReturnType();
-            safeName = Names.safeName(returnType);
+            Collection<? extends AnnotationMirror> qualifiers = AnnotationMirrors.getAnnotatedAnnotations(testMethod, Qualifier.class);
+            AnnotationMirror qualifier = qualifiers.isEmpty() ? null : qualifiers.iterator().next();
+            safeName = Names.safeName(returnType, qualifier);
 
             return true;
         }
