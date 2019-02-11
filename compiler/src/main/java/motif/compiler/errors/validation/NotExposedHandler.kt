@@ -56,6 +56,8 @@ class NotExposedHandler : ErrorHandler<NotExposedError>() {
             appendln(scopeTable.render())
             appendln("but is required by:")
             appendln(requiredByTable.render())
+            appendln("Annotate the factory method with @Expose to allow descendant Scopes to consume the " +
+                    "dependency. See https://github.com/uber/motif/wiki#expose for details.")
         }.toString()
     }
 

@@ -15,4 +15,7 @@
  */
 package motif;
 
+/**
+ * See https://github.com/uber/motif/wiki#expose.
+ */
 public @interface Expose {}
