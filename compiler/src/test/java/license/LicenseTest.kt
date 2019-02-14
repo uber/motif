@@ -29,6 +29,7 @@ class LicenseTest {
             "lib",
             "compiler",
             "samples/sample",
+            "samples/sample-kotlin",
             "samples/sample-lib",
             "samples/dagger-comparison",
             "plugin",
