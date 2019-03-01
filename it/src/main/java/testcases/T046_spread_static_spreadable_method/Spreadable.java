@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T045_dynamic_dependency_expose;
+package testcases.T046_spread_static_spreadable_method;
 
-import static com.google.common.truth.Truth.assertThat;
+public class Spreadable {
 
-public class Test {
-
-    public static void run() {
-        Scope scope = new ScopeImpl();
-        assertThat(scope.child("a").grandchild().string()).isEqualTo("a");
+    public static String a() {
+        return "a";
     }
 }
