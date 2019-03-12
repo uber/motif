@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.T047_dynamic_dependency_named_component;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import motif.Scope;
 
-@Target(ElementType.METHOD)
-public @interface Spread {}
+@Scope
+public interface Child {
+
+    String string();
+}

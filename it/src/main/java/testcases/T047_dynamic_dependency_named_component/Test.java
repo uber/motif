@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.T047_dynamic_dependency_named_component;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import static com.google.common.truth.Truth.assertThat;
 
-@Target(ElementType.METHOD)
-public @interface Spread {}
+public class Test {
+
+    public static void run() {
+        Scope scope = new ScopeImpl();
+        Child child = scope.child(1);
+        assertThat(child.string()).isEqualTo("s");
+    }
+}

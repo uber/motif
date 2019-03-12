@@ -80,6 +80,10 @@ class ObjectsClassParser : ParserUtil {
         val returnType = method.returnType
         val returnClass: IrClass = returnType.resolveClass() ?: throw NoSuitableConstructor(returnType, method)
 
+        if (returnClass.isAbstract()) {
+            throw NoSuitableConstructor(returnType, method)
+        }
+
         val constructors: List<IrMethod> = returnClass.constructors
 
         val requiredDependencies: RequiredDependencies = if (constructors.isEmpty()) {

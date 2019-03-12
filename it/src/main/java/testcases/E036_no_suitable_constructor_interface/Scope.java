@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.E036_no_suitable_constructor_interface;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+@motif.Scope
+public interface Scope {
 
-@Target(ElementType.METHOD)
-public @interface Spread {}
+    @motif.Objects
+    abstract class Objects {
+
+        abstract Foo i();
+    }
+}
