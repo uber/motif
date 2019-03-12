@@ -61,7 +61,7 @@ class ChildMethodFactory(
             val componentMethod = componentMethods[dependency]
             when {
                 dynamicDependency != null -> addStatement("return \$N", dynamicDependency.element.simpleName)
-                componentMethod != null -> addStatement("return \$N.\$N()", scope.componentFieldSpec, componentMethod)
+                componentMethod != null -> addStatement("return \$T.this.\$N.\$N()", scope.implTypeName, scope.componentFieldSpec, componentMethod)
                 else -> throw IllegalStateException("Could not satisfy dependency: $dependency")
             }
             return this
