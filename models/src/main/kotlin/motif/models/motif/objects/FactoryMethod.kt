@@ -30,15 +30,16 @@ class FactoryMethod(
         val providedDependency: Dependency,
         val spreadDependency: SpreadDependency?) {
 
-    val isAbstract: Boolean = kind.isAbstract
+    val isAbstract: Boolean = ir.isAbstract()
+    val isStatic: Boolean = ir.isStatic()
 
     val providedDependencies: List<Dependency> by lazy {
         (spreadDependency?.methods?.map { it.dependency } ?: listOf()) + providedDependency
     }
 
-    enum class Kind (val isAbstract: Boolean) {
-        BASIC(isAbstract = false),
-        BINDS(isAbstract = true),
-        CONSTRUCTOR(isAbstract = true);
+    enum class Kind {
+        BASIC,
+        BINDS,
+        CONSTRUCTOR;
     }
 }

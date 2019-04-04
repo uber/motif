@@ -60,6 +60,10 @@ open class CodegenCache(
         implTypeName.nestedClass("Component")
     }
 
+    val Scope.componentBuilderTypeName: ClassName by cache {
+        componentTypeName.nestedClass("Builder")
+    }
+
     val Scope.dependenciesTypeName: ClassName by cache {
         implTypeName.nestedClass(GENERATED_DEPENDENCIES_NAME)
     }

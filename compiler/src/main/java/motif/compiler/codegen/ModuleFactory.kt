@@ -36,30 +36,26 @@ class ModuleFactory(
     fun create(scope: Scope): TypeSpec {
         val builder = TypeSpec.classBuilder(scope.moduleTypeName)
                 .addAnnotation(Module::class.java)
+                .addModifiers(Modifier.STATIC, Modifier.ABSTRACT)
         val objectsClass = scope.objectsClass ?: return builder.build()
-        val objectsField = FieldSpec.builder(objectsClass.typeName, "objects", Modifier.PRIVATE, Modifier.FINAL)
+        val objectsField = FieldSpec.builder(objectsClass.typeName, "objects", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer("new \$T()", scope.objectsImplTypeName)
                 .build()
         builder.addField(objectsField)
-        builder.build(scope, objectsClass, objectsField)
+        builder.build(objectsClass, objectsField)
         return builder.build()
     }
 
     private fun TypeSpec.Builder.build(
-            scope: Scope,
             objectsClass: ObjectsClass,
             objectsField: FieldSpec) {
         nameScope {
             fun Dependency.providerMethod(isCached: Boolean): MethodSpec.Builder {
                 return methodSpecBuilder()
                         .addAnnotation(Provides::class.java)
+                        .addModifiers(Modifier.STATIC)
                         .apply { if (isCached) addAnnotation(DaggerScope::class.java) }
             }
-
-            val scopeMethod = scope.scopeDependency.providerMethod(false)
-                    .addStatement("return \$T.this", scope.implTypeName)
-                    .build()
-            addMethod(scopeMethod)
 
             val methods = objectsClass.factoryMethods
                     .flatMap { factoryMethod ->
@@ -85,7 +81,13 @@ class ModuleFactory(
         val callParams: String = parameters.joinToString(", ") { "\$N" }
 
         when (method.kind) {
-            FactoryMethod.Kind.BASIC -> addStatement("return \$N.\$N($callParams)", objectsField, method.cir.name, *parameters)
+            FactoryMethod.Kind.BASIC -> {
+                if (method.isStatic) {
+                    addStatement("return \$T.\$N($callParams)", objectsField.type, method.cir.name, *parameters)
+                } else {
+                    addStatement("return \$N.\$N($callParams)", objectsField, method.cir.name, *parameters)
+                }
+            }
             FactoryMethod.Kind.BINDS -> addStatement("return $callParams", *parameters)
             FactoryMethod.Kind.CONSTRUCTOR -> addStatement("return new \$T($callParams)", dependency.typeName, *parameters)
         }
