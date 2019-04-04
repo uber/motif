@@ -40,7 +40,15 @@ class ScopeClass(
 
     private val consumed: List<Dependency> = factoryMethods.flatMap { it.requiredDependencies.list }.map { it.dependency } + accessMethods.map { it.dependency }
 
-    val notExposed: Map<Dependency, FactoryMethod> = factoryMethods.filter { !it.isExposed }.associateBy { it.providedDependency }
+    val notExposed: Map<Dependency, FactoryMethod> = factoryMethods
+            .filter { !it.isExposed }
+            .flatMap { method ->
+                method.providedDependencies.map { provided ->
+                    provided to method
+                }
+            }
+            .toMap()
+
 
     val selfRequiredDependencies: RequiredDependencies by lazy {
         val requiredDependencies = (consumed - provided).map { RequiredDependency(it, false, setOf(ir.type)) }
