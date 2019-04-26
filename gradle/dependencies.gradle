@@ -59,8 +59,9 @@ ext.deps = [
         ],
         "test": [
                 junit: 'junit:junit:4.12',
-                truth: 'com.google.truth:truth:0.42',
-                compileTesting: 'com.google.testing.compile:compile-testing:0.15'
+                truth: 'com.google.truth:truth:0.44',
+                compileTesting: 'com.google.testing.compile:compile-testing:0.16',
+                assertj: 'org.assertj:assertj-core:3.12.2'
         ],
         dagger: "com.google.dagger:dagger:${versions.dagger}",
         daggerCompiler: "com.google.dagger:dagger-compiler:${versions.dagger}",
@@ -77,5 +78,5 @@ ext.deps = [
         roomCompiler: "android.arch.persistence.room:compiler:${versions.room}",
         room: "android.arch.persistence.room:runtime:${versions.room}",
         autodispose: 'com.uber.autodispose:autodispose:0.8.0',
-        apacheClient: 'org.apache.httpcomponents:httpclient:4.5.2'
+        apacheClient: 'org.apache.httpcomponents:httpclient:4.5.2',
 ]

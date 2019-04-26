@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.intellij.hierarchy.ui
+package testcases.E039_binds_different_type_parameters;
 
-import com.intellij.openapi.util.IconLoader
-
-object Icons {
-
-    val CHILD_SCOPE = IconLoader.getIcon("/gutter/childScope.png")
-    val PARENT_SCOPES = IconLoader.getIcon("/gutter/parentScopes.png")
-}
+public class B<T> {}

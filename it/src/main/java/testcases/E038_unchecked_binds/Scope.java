@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.intellij.validation.ui.error
+package testcases.E038_unchecked_binds;
 
-import motif.intellij.validation.ui.GraphError
-import motif.models.errors.MotifError
-import motif.models.graph.Graph
+@motif.Scope
+public interface Scope {
 
-class NoOpErrorHandler : ErrorHandler<MotifError> {
+    B<String> b();
 
-    override fun handle(graph: Graph, error: MotifError) : List<GraphError> {
-        return listOf(GraphError(null, error::class.java.name))
+    @motif.Objects
+    abstract class Objects {
+        abstract A a();
+
+        abstract B<String> b(A a);
     }
 
-    companion object {
-
-        fun create() : ErrorHandler<MotifError> {
-            return NoOpErrorHandler()
-        }
-    }
+    @motif.Dependencies
+    interface Dependencies {}
 }

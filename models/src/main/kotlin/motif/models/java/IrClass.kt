@@ -26,6 +26,9 @@ interface IrClass : IrAnnotated, IrHasModifiers {
     val fields: List<IrField>
     val constructors: List<IrMethod>
 
+    val qualifiedName: String
+        get() = type.qualifiedName
+
     fun hasNonDefaultConstructor(): Boolean {
         return constructors.any { it.hasParameters() }
     }

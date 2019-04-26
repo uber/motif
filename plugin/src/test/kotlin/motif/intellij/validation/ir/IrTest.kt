@@ -15,12 +15,10 @@
  */
 package motif.intellij.validation.ir
 
-import com.google.common.truth.Truth.assertThat
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementFactory
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import motif.models.java.IrField
-import motif.models.java.IrMethod
+import org.assertj.core.api.Assertions.assertThat
+import org.intellij.lang.annotations.Language
 
 class IrTest : LightCodeInsightFixtureTestCase() {
 
@@ -32,8 +30,12 @@ class IrTest : LightCodeInsightFixtureTestCase() {
         psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
     }
 
+    override fun getTestDataPath(): String {
+        return "testData"
+    }
+
     fun testInheritedMethod() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             interface Foo extends Bar {}
@@ -43,12 +45,11 @@ class IrTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val methods: List<IrMethod> = IntelliJClass(project, psiElementFactory.createType(psiClass)).methods
-        assertThat(methods).hasSize(1)
+        assertThat(fooClass.methods).hasSize(1)
     }
 
     fun testInheritedMethod_generic() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             interface Foo extends Bar<String> {}
@@ -58,14 +59,13 @@ class IrTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val methods: List<IrMethod> = IntelliJClass(project, psiElementFactory.createType(psiClass)).methods
-        assertThat(methods).hasSize(1)
-        assertThat(methods[0].returnType.qualifiedName).isEqualTo("java.lang.String")
-        assertThat(methods[0].parameters[0].type.qualifiedName).isEqualTo("java.lang.String")
+        assertThat(fooClass.methods).hasSize(1)
+        assertThat(fooClass.methods[0].returnType.qualifiedName).isEqualTo("java.lang.String")
+        assertThat(fooClass.methods[0].parameters[0].type.qualifiedName).isEqualTo("java.lang.String")
     }
 
     fun testInheritedMethod_static() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             class Foo extends Bar {}
@@ -75,12 +75,11 @@ class IrTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val methods: List<IrMethod> = IntelliJClass(project, psiElementFactory.createType(psiClass)).methods
-        assertThat(methods).hasSize(1)
+        assertThat(fooClass.methods).hasSize(1)
     }
 
     fun testInheritedMethod_privateStatic() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             class Foo extends Bar {}
@@ -90,12 +89,11 @@ class IrTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val methods: List<IrMethod> = IntelliJClass(project, psiElementFactory.createType(psiClass)).methods
-        assertThat(methods).isEmpty()
+        assertThat(fooClass.methods).isEmpty()
     }
 
     fun testInheritedField() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             class Foo extends Bar {}
@@ -105,26 +103,80 @@ class IrTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val fields: List<IrField> = IntelliJClass(project, psiElementFactory.createType(psiClass)).fields
-        assertThat(fields).hasSize(1)
+        assertThat(fooClass.fields).hasSize(1)
     }
 
     fun testInheritedField_generic() {
-        val psiClass: PsiClass = myFixture.addClass("""
+        val fooClass = createIntelliJClass("""
             package motif.intellij;
 
             class Foo extends Bar<String> {}
 
             class Bar<T> {
-                T a;
+                T t;
             }
         """.trimIndent())
 
-        val fields: List<IrField> = IntelliJClass(project, psiElementFactory.createType(psiClass)).fields
-        assertThat(fields).hasSize(1)
+        assertThat(fooClass.fields).hasSize(1)
 
         // TODO The following currently fails. This should be fixed if and when Motif requires correct types for
         // inherited fields. Today we only care about existence of fields.
-        // assertThat(fields[0].type.qualifiedName).isEqualTo("java.lang.String")
+        // assertThat(barClass.fields[0].type.qualifiedName).isEqualTo("java.lang.String")
+    }
+
+    fun testIsAssignableTo() {
+        val fooClass = createIntelliJClass("""
+            package motif.intellij;
+
+            class Foo extends motif.intellij.Bar {}
+        """.trimIndent())
+
+        val barClass = createIntelliJClass("""
+            package motif.intellij;
+
+            class Bar {}
+        """.trimIndent())
+
+        assertThat(fooClass.type.isAssignableTo(barClass.type)).isTrue()
+    }
+
+    fun testIsAssignableTo_genericType() {
+        val fooClass = createIntelliJClass("""
+            package motif.intellij;
+
+            class Foo extends Bar<String> {}
+
+            class Bar<T> {}
+        """.trimIndent())
+
+        val stringBarType = createIntelliJType("motif.intellij.Bar<String>")
+
+        assertThat(fooClass.type.isAssignableTo(stringBarType)).isTrue()
+    }
+
+    fun testIsAssignableTo_genericType2() {
+        val fooClass = createIntelliJClass("""
+            package motif.intellij;
+
+            class Foo extends Bar<String> {}
+
+            class Bar<T> extends Baz<T> {}
+
+            class Baz<T> {}
+        """.trimIndent())
+
+        val stringBazType = createIntelliJType("motif.intellij.Baz<String>")
+
+        assertThat(fooClass.type.isAssignableTo(stringBazType)).isTrue()
+    }
+
+    private fun createIntelliJClass(@Language("JAVA") classText: String): IntelliJClass {
+        val psiClass = myFixture.addClass(classText)
+        return IntelliJClass(project, psiElementFactory.createType(psiClass))
+    }
+
+    private fun createIntelliJType(classText: String): IntelliJType {
+        val psiType = elementFactory.createTypeFromText(classText, null)
+        return IntelliJType(project, psiType)
     }
 }

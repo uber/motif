@@ -44,7 +44,7 @@ class ScopeClassParser {
                     when {
                         childMethodParser.isApplicable(it) -> childMethods.add(childMethodParser.parse(it))
                         accessMethodParser.isApplicable(it) -> accessMethods.add(accessMethodParser.parse(it))
-                        else -> throw InvalidScopeMethod(it)
+                        else -> throw InvalidScopeMethod(irScopeClass, it)
                     }
                 }
 

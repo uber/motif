@@ -21,12 +21,16 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiSubstitutor
 import motif.models.java.*
+import java.lang.IllegalStateException
 
 class IntelliJClass(
         private val project: Project,
         private val psiClassType: PsiClassType) : IrUtil, IrClass {
 
-    val psiClass: PsiClass by lazy { psiClassType.resolve()!! }
+    val psiClass: PsiClass by lazy {
+        psiClassType.resolve()
+                ?: throw IllegalStateException(psiClassType.className)
+    }
 
     override val type: IrType by lazy { IntelliJType(project, psiClassType) }
 

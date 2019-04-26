@@ -20,6 +20,7 @@ import com.intellij.psi.GenericsUtil
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.InheritanceUtil
+import com.intellij.psi.util.TypeConversionUtil
 import motif.models.java.IrClass
 import motif.models.java.IrType
 
@@ -39,7 +40,7 @@ class IntelliJType(
     }
 
     override fun isAssignableTo(type: IrType): Boolean {
-        return InheritanceUtil.isInheritor(psiType, type.qualifiedName)
+        return TypeConversionUtil.isAssignable((type as IntelliJType).psiType, psiType, false)
     }
 
     override fun equals(other: Any?): Boolean {
