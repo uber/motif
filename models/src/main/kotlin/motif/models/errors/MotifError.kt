@@ -11,31 +11,104 @@ import motif.models.motif.dependencies.Dependency
 import motif.models.motif.dependencies.RequiredDependency
 import motif.models.motif.objects.FactoryMethod
 
-sealed class MotifError : RuntimeException()
+sealed class MotifError : RuntimeException() {
+
+    abstract val debugString: String
+}
 
 // Parsing Errors
 
-class ScopeMustBeAnInterface(val scopeClass: IrClass) : MotifError()
-class InvalidScopeMethod(val method: IrMethod) : MotifError()
-class ObjectsFieldFound(val objectsClass: IrClass) : MotifError()
-class ObjectsConstructorFound(val objectsClass: IrClass) : MotifError()
-class VoidObjectsMethod(val method: IrMethod) : MotifError()
-class NullableFactoryMethod(val method: IrMethod) : MotifError()
-class NullableDependency(val parameter: IrParameter, val method: IrMethod) : MotifError()
-class InvalidObjectsMethod(val method: IrMethod) : MotifError()
-class TypeNotSpreadable(val type: IrType, val method: IrMethod) : MotifError()
-class NoSuitableConstructor(val type: IrType, val method: IrMethod) : MotifError()
-class NotAssignableBindsMethod(val method: IrMethod, val returnType: IrType, val parameterType: IrType) : MotifError()
-class VoidDependenciesMethod(val method: IrMethod) : MotifError()
-class DependencyMethodWithParameters(val method: IrMethod) : MotifError()
-class MissingInjectAnnotation(val type: IrType, val method: IrMethod) : MotifError()
+class ScopeMustBeAnInterface(val scopeClass: IrClass) : MotifError() {
+
+    override val debugString = "Scope must be an interface: ${scopeClass.qualifiedName}"
+}
+
+class InvalidScopeMethod(val scopeClass: IrClass, val method: IrMethod) : MotifError() {
+
+    override val debugString = "Scope method is invalid: ${scopeClass.qualifiedName}.${method.name}"
+}
+
+class ObjectsFieldFound(val objectsClass: IrClass) : MotifError() {
+
+    override val debugString = "Objects class may not have fields: ${objectsClass.qualifiedName}"
+}
+
+class ObjectsConstructorFound(val objectsClass: IrClass) : MotifError() {
+
+    override val debugString = "Objects class may not define constructors: ${objectsClass.qualifiedName}"
+}
+
+class VoidObjectsMethod(val objectsClass: IrClass, val method: IrMethod) : MotifError() {
+
+    override val debugString = "Objects methods must be non-void: ${objectsClass.qualifiedName}.${method.name}"
+}
+
+class NullableFactoryMethod(val objectsClass: IrClass, val method: IrMethod) : MotifError() {
+
+    override val debugString = "Factory method may not be nullable: ${objectsClass.qualifiedName}.${method.name}"
+}
+
+class NullableDependency(val owner: IrClass, val method: IrMethod, val parameter: IrParameter) : MotifError() {
+
+    override val debugString = "Parameter may not be nullable: ${parameter.name} in ${owner.qualifiedName}.${method.name}"
+}
+
+class InvalidObjectsMethod(val objectsClass: IrClass, val method: IrMethod) : MotifError() {
+
+    override val debugString = "Objects method is invalid: ${objectsClass.qualifiedName}.${method.name}"
+}
+
+class TypeNotSpreadable(val objectsClass: IrClass, val method: IrMethod, val type: IrType) : MotifError() {
+
+    override val debugString = "Type is not spreadable: ${type.qualifiedName} at ${objectsClass.qualifiedName}.${method.name}"
+}
+
+class NoSuitableConstructor(val type: IrType, val method: IrMethod) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class NotAssignableBindsMethod(val objectsClass: IrClass, val method: IrMethod, val returnType: IrType, val parameterType: IrType) : MotifError() {
+
+    override val debugString = "Invalid binds method: ${objectsClass.qualifiedName}.${method.name}"
+}
+
+class VoidDependenciesMethod(val method: IrMethod) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class DependencyMethodWithParameters(val method: IrMethod) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class MissingInjectAnnotation(val type: IrType, val method: IrMethod) : MotifError() {
+
+    override val debugString = javaClass.name
+}
 
 // Graph Validation Errors
 
-class DependencyCycleError(val scopeClass: ScopeClass, val cycle: List<FactoryMethod>) : MotifError()
-class DuplicateFactoryMethodsError(val duplicate: FactoryMethod, val existing: Set<IrType>) : MotifError()
-class MissingDependenciesError(val requiredBy: Node, val dependencies: List<Dependency>) : MotifError()
-class ScopeCycleError(val cycle: List<IrType>) : MotifError()
+class DependencyCycleError(val scopeClass: ScopeClass, val cycle: List<FactoryMethod>) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class DuplicateFactoryMethodsError(val duplicate: FactoryMethod, val existing: Set<IrType>) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class MissingDependenciesError(val requiredBy: Node, val dependencies: List<Dependency>) : MotifError() {
+
+    override val debugString = javaClass.name
+}
+
+class ScopeCycleError(val cycle: List<IrType>) : MotifError() {
+
+    override val debugString = javaClass.name
+}
 
 /**
  * Compared to other GraphErrors, it's not as intuitive why NotExposedError needs to exist. We hit this error
@@ -48,7 +121,10 @@ class ScopeCycleError(val cycle: List<IrType>) : MotifError()
 class NotExposedError(
         val scopeClass: ScopeClass,
         val factoryMethod: FactoryMethod,
-        val requiredDependency: RequiredDependency) : MotifError()
+        val requiredDependency: RequiredDependency) : MotifError() {
+
+    override val debugString = javaClass.name
+}
 
 /**
  * Similar to NotExposedError except applied to dynamic dependencies.
@@ -56,4 +132,7 @@ class NotExposedError(
 class NotExposedDynamicError(
         val scopeClass: ScopeClass,
         val childMethod: ChildMethod,
-        val requiredDependency: RequiredDependency) : MotifError()
+        val requiredDependency: RequiredDependency) : MotifError() {
+
+    override val debugString = javaClass.name
+}

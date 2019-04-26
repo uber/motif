@@ -42,15 +42,15 @@ class ObjectsClassParser : ParserUtil {
 
         val factoryMethods: List<FactoryMethod> = objectsClass.methods
                 .onEach { method ->
-                    if (method.isVoid()) throw VoidObjectsMethod(method)
-                    if (method.isNullable()) throw NullableFactoryMethod(method)
-                    ensureNonNullParameters(method)
+                    if (method.isVoid()) throw VoidObjectsMethod(objectsClass, method)
+                    if (method.isNullable()) throw NullableFactoryMethod(objectsClass, method)
+                    ensureNonNullParameters(objectsClass, method)
                 }
                 .map { method ->
                     val (kind, requiredDependencies) = basic(scopeClass, method)
                             ?: constructor(scopeClass, method)
-                            ?: binds(scopeClass, method)
-                            ?: throw InvalidObjectsMethod(method)
+                            ?: binds(scopeClass, objectsClass, method)
+                            ?: throw InvalidObjectsMethod(objectsClass, method)
                     val providedDependency: Dependency = method.returnedDependency()
                     val isExposed: Boolean = method.hasAnnotation(Expose::class)
                     val isCached: Boolean = !method.hasAnnotation(DoNotCache::class)
@@ -62,7 +62,7 @@ class ObjectsClassParser : ParserUtil {
                             isCached,
                             requiredDependencies,
                             providedDependency,
-                            spread(scopeClass, method))
+                            spread(scopeClass, objectsClass, method))
                 }
         return ObjectsClass(objectsClass.type, factoryMethods)
     }
@@ -95,7 +95,7 @@ class ObjectsClassParser : ParserUtil {
                 constructors.find { it.hasAnnotation(Inject::class) } ?: throw MissingInjectAnnotation(returnType, method)
             }
 
-            ensureNonNullParameters(constructor)
+            ensureNonNullParameters(returnClass, constructor)
 
             constructor.requiredDependencies(scopeClass)
         }
@@ -103,7 +103,7 @@ class ObjectsClassParser : ParserUtil {
         return ParsedMethod(FactoryMethod.Kind.CONSTRUCTOR, requiredDependencies)
     }
 
-    private fun binds(scopeClass: IrClass, method: IrMethod): ParsedMethod? {
+    private fun binds(scopeClass: IrClass, objectsClass: IrClass, method: IrMethod): ParsedMethod? {
         if (method.parameters.size != 1) return null
 
         val parameter: IrParameter = method.parameters[0]
@@ -111,7 +111,7 @@ class ObjectsClassParser : ParserUtil {
         val returnType: IrType = method.returnType
 
         if (!parameterType.isAssignableTo(returnType)) {
-            throw NotAssignableBindsMethod(method, returnType, parameterType)
+            throw NotAssignableBindsMethod(objectsClass, method, returnType, parameterType)
         }
 
         val requiredDependency = RequiredDependency(parameter.toDependency(), false, setOf(scopeClass.type))
@@ -120,11 +120,11 @@ class ObjectsClassParser : ParserUtil {
         return ParsedMethod(FactoryMethod.Kind.BINDS, requiredDependencies)
     }
 
-    private fun spread(scopeClass: IrClass, method: IrMethod): SpreadDependency? {
+    private fun spread(scopeClass: IrClass, objectsClass: IrClass, method: IrMethod): SpreadDependency? {
         if (!method.hasAnnotation(Spread::class)) return null
 
         val returnType: IrType = method.returnType
-        val returnClass: IrClass = returnType.resolveClass() ?: throw TypeNotSpreadable(returnType, method)
+        val returnClass: IrClass = returnType.resolveClass() ?: throw TypeNotSpreadable(objectsClass, method, returnType)
         val methods: List<SpreadMethod> = returnClass.methods
                 .filter { !it.isVoid() && it.isPublic() && !it.hasParameters() }
                 .map {
@@ -142,9 +142,9 @@ class ObjectsClassParser : ParserUtil {
         return RequiredDependencies(requiredDependencyList)
     }
 
-    private fun ensureNonNullParameters(method: IrMethod) {
+    private fun ensureNonNullParameters(owner: IrClass, method: IrMethod) {
         method.parameters.forEach { parameter ->
-            if (parameter.isNullable()) throw NullableDependency(parameter, method)
+            if (parameter.isNullable()) throw NullableDependency(owner, method, parameter)
         }
     }
 

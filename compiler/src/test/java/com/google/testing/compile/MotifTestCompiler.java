@@ -48,7 +48,7 @@ public class MotifTestCompiler {
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
 
         ClassUsageFileManager classUsageFileManager = new ClassUsageFileManager(diagnosticCollector, classpathDir);
-        JavaFileManager fileManager = classUsageFileManager;
+        StandardJavaFileManager fileManager = classUsageFileManager;
         if (outDir == null) {
             fileManager = new InMemoryJavaFileManager(fileManager);
         }

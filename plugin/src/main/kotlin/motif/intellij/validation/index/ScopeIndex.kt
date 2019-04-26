@@ -66,17 +66,6 @@ class ScopeIndex : ScalarIndexExtension<Boolean>(), PsiDependentIndex {
                 .flatMap(PsiFile::getScopeClasses)
     }
 
-    fun refreshFile(project: Project, file: VirtualFile) {
-        val projectScopeBuilder = ProjectScopeBuilder.getInstance(project)
-        // processValues forces the file to be reindexed
-        FileBasedIndex.getInstance().processValues(
-                ID,
-                true,
-                file,
-                { _, _ -> true },
-                projectScopeBuilder.buildProjectScope())
-    }
-
     companion object {
 
         private val ID: ID<Boolean, Void> = com.intellij.util.indexing.ID.create("ScopeIndex")

@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.intellij.validation.ui.error
+package testcases.E038_unchecked_binds;
 
-import motif.intellij.validation.ui.GraphError
-import motif.models.errors.MotifError
-import motif.models.graph.Graph
+import motif.models.errors.MotifError;
+import motif.models.errors.NotAssignableBindsMethod;
 
-interface ErrorHandler<T : MotifError> {
+import static com.google.common.truth.Truth.assertThat;
 
-    fun handle(graph: Graph, error: T) : List<GraphError>
+public class Test {
+
+    public static MotifError error;
+
+    public static void run() {
+        assertThat(error).isInstanceOf(NotAssignableBindsMethod.class);
+    }
 }

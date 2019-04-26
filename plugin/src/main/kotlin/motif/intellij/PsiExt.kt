@@ -51,17 +51,3 @@ fun PsiClass.isMaybeScopeClass(): Boolean {
     return annotations.mapNotNull { it.nameReferenceElement?.referenceName }
             .find { it == "Scope" || it == "motif.Scope" } != null
 }
-
-/**
- * Get a PsiClass from a PsiType
- */
-fun PsiType.getClass(): PsiClass? {
-    if (this is PsiClassType) return this.resolve()
-    // when the PsiType is a PsiPrimitiveType instead
-    return null
-}
-
-fun PsiClass.containedByScopeClass(): Boolean {
-    if (isScopeClass()) return true
-    return containingClass?.containedByScopeClass() ?: false
-}

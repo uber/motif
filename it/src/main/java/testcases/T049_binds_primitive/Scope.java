@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.intellij.validation.ui.error
+package testcases.T049_binds_primitive;
 
-import motif.intellij.validation.ir.IntelliJMethod
-import motif.intellij.validation.ui.GraphError
-import motif.models.errors.InvalidScopeMethod
-import motif.models.graph.Graph
+import javax.inject.Named;
 
-class InvalidScopeMethodHandler : ErrorHandler<InvalidScopeMethod> {
+@motif.Scope
+public interface Scope {
 
-    override fun handle(graph: Graph, error: InvalidScopeMethod): List<GraphError> {
-        val method: IntelliJMethod = error.method as IntelliJMethod
-        return listOf(GraphError(method.psiMethod, "Invalid Motif Scope method"))
+    int i();
+
+    @motif.Objects
+    abstract class Objects {
+
+        @Named("i")
+        int i() {
+            return 1;
+        }
+
+        abstract int i(@Named("i") int i);
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

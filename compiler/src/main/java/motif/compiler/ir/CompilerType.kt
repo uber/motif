@@ -51,7 +51,39 @@ class CompilerType(
     }
 
     override fun isAssignableTo(type: IrType): Boolean {
-        return env.typeUtils.isAssignable(mirror, (type as CompilerType).mirror)
+        val baseMirror = (type as CompilerType).mirror
+
+        if (!env.typeUtils.isAssignable(mirror, baseMirror)) {
+            return false
+        }
+
+        if (env.typeUtils.isSameType(mirror, baseMirror)) {
+            return true
+        }
+
+        if (mirror !is DeclaredType || baseMirror !is DeclaredType) {
+            return env.typeUtils.isAssignable(mirror, baseMirror)
+        }
+
+        val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
+
+        if (matchingType.typeArguments.size != baseMirror.typeArguments.size) {
+            return false
+        }
+
+        return env.typeUtils.isAssignable(matchingType, baseMirror)
+    }
+
+    private fun getMatchingSuperType(baseType: DeclaredType, type: DeclaredType): DeclaredType? {
+        val baseErasure = env.typeUtils.erasure(baseType)
+        val erasure = env.typeUtils.erasure(type)
+        if (env.typeUtils.isSameType(baseErasure, erasure)) {
+            return type
+        }
+
+        val superType = MoreTypes.nonObjectSuperclass(env.typeUtils, env.elementUtils, type).orNull() ?: return null
+
+        return getMatchingSuperType(baseType, superType)
     }
 
     override fun equals(other: Any?): Boolean {

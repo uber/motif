@@ -17,24 +17,13 @@
 
     <depends>com.intellij.modules.lang</depends>
 
-    <project-components>
-        <component>
-            <implementation-class>motif.intellij.MotifComponent</implementation-class>
-        </component>
-    </project-components>
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow
-                id="Motif"
-                anchor="right"
-                factoryClass="motif.intellij.validation.ui.MotifToolWindowFactory" />
-        <externalAnnotator
-                language="JAVA"
-                implementationClass="motif.intellij.validation.ui.MotifExternalAnnotator" />
         <fileBasedIndex implementation="motif.intellij.validation.index.ScopeIndex"/>
-        <projectService serviceImplementation="motif.intellij.MotifComponent"/>
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.hierarchy.ui.MotifScopeLineMarkerProvider"/>
-        <typeHierarchyProvider language="JAVA"
-                               implementationClass="motif.intellij.hierarchy.ui.MotifScopeHierarchyProvider"/>
     </extensions>
+    <actions>
+        <action id="motif.intellij.validation.ProcessGraphAction" class="motif.intellij.validation.ProcessGraphAction"
+                text="Process Graph">
+            <add-to-group group-id="RefactoringMenu" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>
