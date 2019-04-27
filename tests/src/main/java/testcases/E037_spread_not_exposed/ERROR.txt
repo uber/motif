@@ -1,0 +1,2 @@
+MissingDependencyError: AccessMethodSink[Child.a]
+UnexposedSourceError: SpreadSource[Scope|String.a]->AccessMethodSink[Child.a]

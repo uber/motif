@@ -1,0 +1,1 @@
+NotAssignableBindsMethod: Scope|a(A<? super Integer>):A<Integer>

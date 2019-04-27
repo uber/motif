@@ -1,0 +1,1 @@
+NotAssignableBindsMethod: Scope|b(A<Integer>):B<String>

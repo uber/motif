@@ -1,0 +1,1 @@
+TypeNotSpreadable: Scope|i:int

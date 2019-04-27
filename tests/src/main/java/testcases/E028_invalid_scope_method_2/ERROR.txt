@@ -1,0 +1,1 @@
+InvalidScopeMethod: Scope.invalid

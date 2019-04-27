@@ -11,6 +11,9 @@ sourceCompatibility = 1.8
 dependencies {
     implementation deps.kotlin.stdlib
     implementation deps.dagger
+
+    testImplementation deps.test.junit
+    testImplementation deps.test.truth
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

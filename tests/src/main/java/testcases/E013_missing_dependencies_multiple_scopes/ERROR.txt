@@ -1,0 +1,2 @@
+MissingDependencyError: AccessMethodSink[ChildA.string]
+MissingDependencyError: AccessMethodSink[ChildB.string]

@@ -18,6 +18,8 @@ package testcases.E009_duplicate_factory_method_cross_scope;
 @motif.Scope
 public interface Child {
 
+    String s();
+
     @motif.Objects
     class Objects {
 

@@ -1,0 +1,23 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
+}
+
+apply plugin: 'kotlin-kapt'
+
+sourceCompatibility = 1.8
+
+
+dependencies {
+    api project(':models')
+
+    implementation deps.kotlin.stdlib
+    implementation project(':lib')
+
+    testImplementation project(':compiler-ast')
+    testImplementation deps.test.truth
+    testImplementation deps.test.compileTesting
+    testImplementation deps.kotlin.reflection
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

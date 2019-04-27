@@ -1,0 +1,1 @@
+NoSuitableConstructor: Scope|i:int

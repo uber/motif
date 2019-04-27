@@ -1,0 +1,2 @@
+MissingDependencyError: AccessMethodSink[Scope.string]
+MissingDependencyError: AccessMethodSink[Scope.integer]
