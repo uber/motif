@@ -9,11 +9,8 @@ sourceCompatibility = 1.8
 
 
 dependencies {
-    api project(':models-java')
-
     implementation deps.kotlin.stdlib
-    implementation project(':lib')
-    implementation deps.asciiTable
+    implementation deps.dagger
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
