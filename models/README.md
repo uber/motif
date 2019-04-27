@@ -1,2 +1,1 @@
-Intermediate representation of Motif Scope definitions. This abstraction is necessary to share graph validation logic
-between the compiler and the Intellij plugin. For details, see README's in individual packages.
+Intermediate representation of Motif-specific model definitions.
