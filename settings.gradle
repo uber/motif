@@ -34,14 +34,17 @@ pluginManagement {
 rootProject.name = 'motif'
 include 'lib'
 include 'compiler'
+include 'compiler-ast'
 include 'samples:sample'
 include 'samples:sample-lib'
 include 'samples:sample-kotlin'
 include 'samples:dagger-comparison'
 include 'intellij'
+include 'intellij-ast'
 include 'core'
 include 'ast'
-include 'ast-compiler'
-include 'ast-intellij'
-include 'it'
-include 'stub-compiler'
+include 'tests'
+include 'tests:compiler'
+
+project(':compiler-ast').projectDir = file('compiler/ast')
+project(':intellij-ast').projectDir = file('intellij/ast')
