@@ -15,8 +15,7 @@
  */
 package motif.models.motif.dependencies
 
-import motif.models.errors.NotExposedError
-import motif.models.java.IrType
+import motif.ast.IrType
 
 class RequiredDependencies(val list: List<RequiredDependency>) {
 

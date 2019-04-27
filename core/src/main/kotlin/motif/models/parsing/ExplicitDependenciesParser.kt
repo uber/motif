@@ -16,7 +16,7 @@
 package motif.models.parsing
 
 import motif.Dependencies
-import motif.models.java.IrClass
+import motif.ast.IrClass
 import motif.models.errors.DependencyMethodWithParameters
 import motif.models.errors.VoidDependenciesMethod
 import motif.models.motif.dependencies.Dependency

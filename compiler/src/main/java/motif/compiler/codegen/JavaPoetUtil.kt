@@ -16,12 +16,12 @@
 package motif.compiler.codegen
 
 import com.squareup.javapoet.*
-import motif.compiler.ir.*
 import motif.models.graph.Scope
-import motif.models.java.IrAnnotation
-import motif.models.java.IrClass
-import motif.models.java.IrMethod
-import motif.models.java.IrType
+import motif.ast.IrAnnotation
+import motif.ast.IrClass
+import motif.ast.IrMethod
+import motif.ast.IrType
+import motif.ast.compiler.*
 import motif.models.parsing.ParserUtil
 import motif.models.motif.accessmethod.AccessMethod
 import motif.models.motif.dependencies.Dependency

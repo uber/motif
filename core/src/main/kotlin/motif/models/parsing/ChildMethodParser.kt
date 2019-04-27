@@ -17,8 +17,8 @@ package motif.models.parsing
 
 import motif.Expose
 import motif.Scope
-import motif.models.java.IrClass
-import motif.models.java.IrMethod
+import motif.ast.IrClass
+import motif.ast.IrMethod
 import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.DynamicDependency
 

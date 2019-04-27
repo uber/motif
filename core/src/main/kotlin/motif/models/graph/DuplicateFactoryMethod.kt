@@ -15,7 +15,7 @@
  */
 package motif.models.graph
 
-import motif.models.java.IrType
+import motif.ast.IrType
 import motif.models.motif.objects.FactoryMethod
 
 data class DuplicateFactoryMethod(val duplicate: FactoryMethod, val existing: Set<IrType>)

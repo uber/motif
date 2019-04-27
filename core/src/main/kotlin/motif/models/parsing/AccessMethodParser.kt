@@ -15,7 +15,7 @@
  */
 package motif.models.parsing
 
-import motif.models.java.IrMethod
+import motif.ast.IrMethod
 import motif.models.motif.accessmethod.AccessMethod
 
 class AccessMethodParser : ParserUtil {

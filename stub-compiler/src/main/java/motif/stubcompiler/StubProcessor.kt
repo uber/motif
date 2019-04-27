@@ -22,8 +22,8 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import motif.Scope
 import motif.compiler.codegen.JavaPoetUtil
-import motif.compiler.ir.CompilerClass
-import motif.compiler.ir.CompilerMethod
+import motif.ast.compiler.CompilerClass
+import motif.ast.compiler.CompilerMethod
 import java.util.*
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment

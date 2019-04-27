@@ -17,9 +17,7 @@ package motif.models.graph
 
 import motif.models.errors.NotExposedDynamicError
 import motif.models.errors.NotExposedError
-import motif.models.java.IrType
 import motif.models.motif.ScopeClass
-import motif.models.motif.child.ChildMethod
 import motif.models.motif.dependencies.*
 import motif.models.motif.objects.FactoryMethod
 

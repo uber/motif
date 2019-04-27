@@ -15,7 +15,7 @@
  */
 package motif.models.motif
 
-import motif.models.java.IrClass
+import motif.ast.IrClass
 import motif.models.motif.accessmethod.AccessMethod
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.child.ChildMethod

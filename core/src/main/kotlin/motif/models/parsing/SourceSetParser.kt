@@ -15,7 +15,7 @@
  */
 package motif.models.parsing
 
-import motif.models.java.IrType
+import motif.ast.IrType
 import motif.models.motif.ScopeClass
 import motif.models.motif.SourceSet
 

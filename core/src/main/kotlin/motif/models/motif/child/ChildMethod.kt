@@ -15,8 +15,8 @@
  */
 package motif.models.motif.child
 
-import motif.models.java.IrMethod
-import motif.models.java.IrType
+import motif.ast.IrMethod
+import motif.ast.IrType
 import motif.models.motif.dependencies.DynamicDependency
 
 class ChildMethod(
