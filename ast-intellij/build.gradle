@@ -1,0 +1,21 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.4.8"
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+intellij {
+    version 'IC-2018.1'
+    plugins = []
+    pluginName 'MyPlugin'
+    updateSinceUntilBuild = false
+}
+
+dependencies {
+    compile project(':lib')
+    compile project(':core')
+
+    compile deps.kotlin.reflection
+
+    testCompile deps.test.junit
+    testCompile deps.test.assertj
+}
