@@ -44,7 +44,7 @@ public class TestHarness {
 
     @Parameterized.Parameters(name = "{3}")
     public static Collection<Object[]> data() {
-        File sourceRoot = new File("../it/src/main/java/");
+        File sourceRoot = new File("../tests/src/main/java/");
         File testCaseRoot = new File(sourceRoot, "testcases");
         File externalRoot = new File(sourceRoot, "external");
         File commonDir = new File(sourceRoot, "common");

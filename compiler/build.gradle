@@ -6,7 +6,7 @@ plugins {
 sourceCompatibility = 1.8
 
 dependencies {
-    api project(':ast-compiler')
+    api project(':compiler-ast')
 
     implementation deps.kotlin.stdlib
     implementation deps.autoCommon
@@ -20,7 +20,7 @@ dependencies {
 
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
-    testImplementation project(':stub-compiler')
+    testImplementation project(':tests:compiler')
 }
 
 test {
