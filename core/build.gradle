@@ -9,7 +9,7 @@ sourceCompatibility = 1.8
 
 
 dependencies {
-    api project(':models-java')
+    api project(':ast')
 
     implementation deps.kotlin.stdlib
     implementation project(':lib')
