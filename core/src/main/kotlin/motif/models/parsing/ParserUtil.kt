@@ -15,8 +15,8 @@
  */
 package motif.models.parsing
 
-import motif.models.java.IrMethod
-import motif.models.java.IrParameter
+import motif.ast.IrMethod
+import motif.ast.IrParameter
 import motif.models.motif.dependencies.Dependency
 
 interface ParserUtil {

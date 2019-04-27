@@ -18,7 +18,7 @@ package motif.compiler
 import motif.Scope
 import motif.compiler.codegen.Generator
 import motif.compiler.errors.ErrorHandler
-import motif.compiler.ir.CompilerType
+import motif.ast.compiler.CompilerType
 import motif.models.errors.MotifErrors
 import motif.models.graph.GraphFactory
 import javax.annotation.processing.AbstractProcessor

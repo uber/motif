@@ -15,8 +15,8 @@
  */
 package motif.models.motif.dependencies
 
-import motif.models.java.IrAnnotation
-import motif.models.java.IrType
+import motif.ast.IrAnnotation
+import motif.ast.IrType
 
 class Dependency(
         val type: IrType,

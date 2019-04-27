@@ -22,7 +22,7 @@ import com.squareup.javapoet.TypeSpec
 import dagger.BindsInstance
 import dagger.Component
 import motif.ScopeImpl
-import motif.compiler.ir.CompilerType
+import motif.ast.compiler.CompilerType
 import motif.internal.DaggerScope
 import motif.models.graph.Graph
 import motif.models.graph.Scope

@@ -18,7 +18,7 @@ package motif.compiler.codegen
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import motif.compiler.ir.CompilerMethodParameter
+import motif.ast.compiler.CompilerMethodParameter
 import motif.models.graph.Graph
 import motif.models.graph.Scope
 import motif.models.motif.dependencies.Dependency

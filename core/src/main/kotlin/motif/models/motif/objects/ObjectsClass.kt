@@ -15,7 +15,7 @@
  */
 package motif.models.motif.objects
 
-import motif.models.java.IrType
+import motif.ast.IrType
 
 class ObjectsClass(
         val type: IrType,

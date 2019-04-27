@@ -23,9 +23,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementFactory
-import motif.intellij.ir.IntelliJType
+import motif.ast.intellij.IntelliJType
 import motif.models.graph.GraphFactory
-import motif.models.java.IrType
+import motif.ast.IrType
 import kotlin.system.measureTimeMillis
 
 class ProcessGraphAction : AnAction() {

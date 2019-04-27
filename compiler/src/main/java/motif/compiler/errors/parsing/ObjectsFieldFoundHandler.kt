@@ -16,7 +16,7 @@
 package motif.compiler.errors.parsing
 
 import motif.compiler.errors.ErrorHandler
-import motif.compiler.ir.CompilerClass
+import motif.ast.compiler.CompilerClass
 import motif.models.errors.ObjectsFieldFound
 import javax.lang.model.element.Element
 

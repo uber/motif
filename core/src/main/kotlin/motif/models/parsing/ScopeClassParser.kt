@@ -15,8 +15,8 @@
  */
 package motif.models.parsing
 
-import motif.models.java.IrClass
-import motif.models.java.IrType
+import motif.ast.IrClass
+import motif.ast.IrType
 import motif.models.errors.InvalidScopeMethod
 import motif.models.errors.ScopeMustBeAnInterface
 import motif.models.motif.ScopeClass

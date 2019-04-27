@@ -19,7 +19,7 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
 import motif.models.errors.DuplicateFactoryMethodsError;
-import motif.models.java.IrType;
+import motif.ast.IrType;
 import motif.models.motif.objects.FactoryMethod;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

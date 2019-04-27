@@ -16,7 +16,7 @@
 package motif.models.graph
 
 import motif.models.errors.*
-import motif.models.java.IrType
+import motif.ast.IrType
 import motif.models.motif.dependencies.RequiredDependencies
 
 class Graph(

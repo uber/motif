@@ -15,7 +15,7 @@
  */
 package motif.models.motif.dependencies
 
-import motif.models.java.IrType
+import motif.ast.IrType
 
 class ExplicitDependencies(
         val java: IrType,

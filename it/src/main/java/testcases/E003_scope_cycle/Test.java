@@ -18,7 +18,7 @@ package testcases.E003_scope_cycle;
 import com.google.common.truth.Truth;
 import motif.models.errors.MotifError;
 import motif.models.errors.ScopeCycleError;
-import motif.models.java.IrType;
+import motif.ast.IrType;
 
 import java.util.stream.Collectors;
 

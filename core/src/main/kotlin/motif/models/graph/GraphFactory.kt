@@ -17,7 +17,7 @@ package motif.models.graph
 
 import motif.models.errors.MotifError
 import motif.models.errors.ScopeCycleError
-import motif.models.java.IrType
+import motif.ast.IrType
 import motif.models.motif.ScopeClass
 import motif.models.motif.SourceSet
 import motif.models.parsing.SourceSetParser

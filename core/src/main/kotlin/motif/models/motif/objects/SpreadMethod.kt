@@ -15,7 +15,7 @@
  */
 package motif.models.motif.objects
 
-import motif.models.java.IrMethod
+import motif.ast.IrMethod
 import motif.models.motif.dependencies.Dependency
 import motif.models.motif.dependencies.RequiredDependency
 
