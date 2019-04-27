@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>com.uber.motif</id>
+    <name>Motif Plugin</name>
+    <version>0.0.1</version>
+    <vendor email="leland@uber.com" url="https://www.uber.com/">Uber</vendor>
+
+    <description><![CDATA[
+      Motif plugin.<br>
+    ]]></description>
+
+    <idea-version since-build="163"/>
+
+    <change-notes><![CDATA[
+      Release 0.0.1: Initial release.<br>
+    ]]>
+    </change-notes>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileBasedIndex implementation="motif.intellij.ScopeIndex"/>
+    </extensions>
+    <actions>
+        <action id="motif.intellij.ProcessGraphAction" class="motif.intellij.ProcessGraphAction"
+                text="Process Graph">
+            <add-to-group group-id="RefactoringMenu" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
