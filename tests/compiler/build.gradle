@@ -8,7 +8,6 @@ dependencies {
     implementation deps.autoCommon
     implementation deps.kotlin.stdlib
     implementation deps.javapoet
-    implementation project(':compiler')
-    implementation project(':core')
+    implementation project(':compiler-ast')
     implementation project(':lib')
 }
