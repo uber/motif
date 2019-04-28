@@ -21,7 +21,6 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import motif.Scope
-import motif.compiler.codegen.JavaPoetUtil
 import motif.ast.compiler.CompilerClass
 import motif.ast.compiler.CompilerMethod
 import java.util.*
@@ -33,9 +32,9 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
-class StubProcessor : AbstractProcessor(), JavaPoetUtil {
+class StubProcessor : AbstractProcessor() {
 
-    override val env: ProcessingEnvironment by lazy { processingEnv }
+    private val env: ProcessingEnvironment by lazy { processingEnv }
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
@@ -81,5 +80,15 @@ class StubProcessor : AbstractProcessor(), JavaPoetUtil {
                 }
 
         return builder.build()
+    }
+
+    private fun scopeImpl(scopeType: DeclaredType): ClassName {
+        val scopeClassName = ClassName.get(scopeType) as ClassName
+        val prefix = scopeClassName.simpleNames().joinToString("")
+        return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
+    }
+
+    private fun ClassName.qualifiedName(): String {
+        return "${packageName()}.${simpleNames().joinToString(".")}"
     }
 }

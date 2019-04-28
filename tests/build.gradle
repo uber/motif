@@ -8,6 +8,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     annotationProcessor project(':tests:compiler')
+    annotationProcessor deps.daggerCompiler
     implementation project(':core')
     implementation project(':compiler')
     implementation project(':lib')
