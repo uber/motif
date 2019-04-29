@@ -25,7 +25,8 @@ class Dependency(
     private val key = Key(type, qualifier)
 
     private val compareKey: String by lazy {
-        "${type.hashCode()}-${qualifier?.hashCode()}"
+        val qualifierString = qualifier?.let { "$it " } ?: ""
+        "${type.qualifiedName}$qualifierString"
     }
 
     override fun compareTo(other: Dependency): Int {
