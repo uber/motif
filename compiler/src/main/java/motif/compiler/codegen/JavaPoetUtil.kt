@@ -31,6 +31,7 @@ import motif.models.motif.dependencies.RequiredDependency
 import motif.models.motif.objects.FactoryMethod
 import motif.models.motif.objects.ObjectsClass
 import motif.models.motif.objects.SpreadMethod
+import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
@@ -123,9 +124,9 @@ interface JavaPoetUtil : ParserUtil {
         return this
     }
 
-    fun RequiredDependencies.methodSpecBuilders(): Map<Dependency, MethodSpec.Builder> {
+    fun RequiredDependencies.methodSpecBuilders(): SortedMap<Dependency, MethodSpec.Builder> {
         return nameScope {
-            list.associateBy({ it.dependency }) { it.dependency.methodSpecBuilder() }
+            list.associateBy({ it.dependency }) { it.dependency.methodSpecBuilder() }.toSortedMap()
         }
     }
 

@@ -10,7 +10,6 @@ dependencies {
     annotationProcessor project(':tests:compiler')
     annotationProcessor deps.daggerCompiler
     implementation project(':core')
-    implementation project(':compiler')
     implementation project(':lib')
     implementation deps.kotlin.stdlib
     implementation deps.test.truth
