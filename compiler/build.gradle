@@ -24,7 +24,7 @@ dependencies {
 }
 
 test {
-    inputs.files(file("$rootDir/it/src"))
+    inputs.files(file("$rootDir/tests/src"))
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
