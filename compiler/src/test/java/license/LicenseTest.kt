@@ -25,18 +25,6 @@ class LicenseTest {
 
     @Rule @JvmField val temporaryFolder = TemporaryFolder()
 
-    private val modules = sequenceOf(
-            "lib",
-            "compiler",
-            "samples/sample",
-            "samples/sample-kotlin",
-            "samples/sample-lib",
-            "samples/dagger-comparison",
-            "plugin",
-            "ir",
-            "it",
-            "stub-compiler")
-
     private val licenseText = """
         /*
          * Copyright (c) 2018 Uber Technologies, Inc.
@@ -57,7 +45,13 @@ class LicenseTest {
 
     @Test
     fun test() {
-        val missingLicenses = modules.flatMap { File("../$it/src").walk() }
+        val srcDirs = File("..").walk()
+                .filter { file ->
+                    file.name == "src"
+                            && file.isDirectory
+                            && file.resolveSibling("build.gradle").exists()
+                }
+        val missingLicenses = srcDirs.flatMap { srcDir -> srcDir.walk() }
                 .filter { it.extension == "java" || it.extension == "kt" }
                 .filter { !it.ensureLicense() }
                 .toList()
