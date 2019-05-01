@@ -125,8 +125,17 @@ class ObjectsClassParser : ParserUtil {
 
         val returnType: IrType = method.returnType
         val returnClass: IrClass = returnType.resolveClass() ?: throw TypeNotSpreadable(objectsClass, method, returnType)
-        val methods: List<SpreadMethod> = returnClass.methods
+
+        val factoryMethods = returnClass.methods
                 .filter { !it.isVoid() && it.isPublic() && !it.hasParameters() }
+
+        factoryMethods
+                .find { it.annotations.any { it.type.simpleName == "Nullable" } }
+                ?.let {
+                    throw NullableSpreadMethodError(returnClass, it)
+                }
+
+        val methods: List<SpreadMethod> = factoryMethods
                 .map {
                     val sourceDependency = method.returnedDependency()
                     val source = RequiredDependency(sourceDependency, false, setOf(scopeClass.type))
