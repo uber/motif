@@ -53,6 +53,7 @@ abstract class ErrorHandler<T> {
                 is VoidDependenciesMethod -> VoidDependenciesMethodHandler().error(error)
                 is DependencyMethodWithParameters -> DependencyMethodWithParametersHandler().error(error)
                 is MissingInjectAnnotation -> MissingInjectAnnotationHandler().error(error)
+                is NullableSpreadMethodError -> NullableSpreadMethodHandler().error(error)
             }
         }
     }

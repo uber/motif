@@ -136,3 +136,12 @@ class NotExposedDynamicError(
 
     override val debugString = javaClass.name
 }
+
+/**
+ * Produced whenever a @Spread annotation is used on a class with nullable methods.
+ */
+class NullableSpreadMethodError(val spreadable: IrClass, val method: IrMethod) : MotifError() {
+
+    override val debugString = "${spreadable.qualifiedName} has @Nullable methods."
+
+}
