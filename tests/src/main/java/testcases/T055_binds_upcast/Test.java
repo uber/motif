@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T054_binds_wildcards;
+package testcases.T055_binds_upcast;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -21,11 +21,6 @@ public class Test {
 
     public static void run() {
         Scope scope = new ScopeImpl();
-        assertThat(scope.b1()).isInstanceOf(A.class);
-        assertThat(scope.b2()).isInstanceOf(A.class);
-        assertThat(scope.b3()).isInstanceOf(A.class);
-        assertThat(scope.a1()).isInstanceOf(A.class);
-        assertThat(scope.a2()).isInstanceOf(A.class);
-        assertThat(scope.a3()).isInstanceOf(A.class);
+        assertThat(scope.a()).isInstanceOf(A.class);
     }
 }
