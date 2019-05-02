@@ -81,9 +81,12 @@ class CompilerType(
             return type
         }
 
-        val superType = MoreTypes.nonObjectSuperclass(env.typeUtils, env.elementUtils, type).orNull() ?: return null
-
-        return getMatchingSuperType(baseType, superType)
+        return env.typeUtils.directSupertypes(type)
+                .asSequence()
+                .mapNotNull { superType ->
+                    getMatchingSuperType(baseType, superType as DeclaredType)
+                }
+                .firstOrNull()
     }
 
     override fun equals(other: Any?): Boolean {
