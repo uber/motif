@@ -22,9 +22,13 @@ public interface Scope {
 
     A<? super Integer> a2();
 
+    A a3();
+
     B<? extends Integer> b1();
 
     B<? super Integer> b2();
+
+    B b3();
 
     @motif.Objects
     abstract class Objects {
@@ -34,9 +38,13 @@ public interface Scope {
 
         abstract B<? super Integer> b2(A<Integer> a);
 
+        abstract B b3(A<Integer> a);
+
         abstract A<? extends Integer> a1(A<Integer> a);
 
         abstract A<? super Integer> a2(A<Integer> a);
+
+        abstract A a3(A<Integer> a);
     }
 
     @motif.Dependencies

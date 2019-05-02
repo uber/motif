@@ -67,6 +67,10 @@ class CompilerType(
 
         val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
 
+        if (baseMirror.typeArguments.isEmpty()) {
+            return true
+        }
+
         if (matchingType.typeArguments.size != baseMirror.typeArguments.size) {
             return false
         }
