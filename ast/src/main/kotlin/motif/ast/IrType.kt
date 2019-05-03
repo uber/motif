@@ -21,8 +21,26 @@ interface IrType : IrEquivalence {
     val isVoid: Boolean
 
     val simpleName: String
-        get() = qualifiedName.substringAfterLast('.')
+        get() = simpleName(qualifiedName)
 
     fun resolveClass(): IrClass?
     fun isAssignableTo(type: IrType): Boolean
+}
+
+private val SEPARATORS = setOf(',', ' ', '<', '>')
+
+internal fun simpleName(qualifiedName: String): String {
+    val sb = StringBuilder()
+    var skipRest = false
+    qualifiedName.reversed().forEach { c ->
+        if (SEPARATORS.contains(c)) {
+            skipRest = false
+        }
+        if (c == '.') {
+            skipRest = true
+        } else if (!skipRest) {
+            sb.append(c)
+        }
+    }
+    return sb.reversed().toString()
 }

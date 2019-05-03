@@ -29,6 +29,9 @@ interface IrClass : IrAnnotated, IrHasModifiers {
     val qualifiedName: String
         get() = type.qualifiedName
 
+    val simpleName: String
+        get() = type.simpleName
+
     fun hasNonDefaultConstructor(): Boolean {
         return constructors.any { it.hasParameters() }
     }

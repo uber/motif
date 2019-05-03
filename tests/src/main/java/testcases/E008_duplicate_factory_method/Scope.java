@@ -18,6 +18,8 @@ package testcases.E008_duplicate_factory_method;
 @motif.Scope
 public interface Scope {
 
+    String s();
+
     @motif.Objects
     class Objects {
 
