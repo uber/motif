@@ -1,0 +1,14 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
+}
+
+sourceCompatibility = 1.8
+
+
+dependencies {
+    implementation deps.kotlin.stdlib
+    implementation project(':core2')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
