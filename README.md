@@ -1,6 +1,6 @@
 # Motif
 
-[![Build Status](https://travis-ci.org/uber/motif.svg?branch=master)](https://travis-ci.org/uber/motif)
+[![Build Status](https://travis-ci.com/uber/motif.svg?branch=master)](https://travis-ci.com/uber/motif)
 
 Motif is a DI library that offers a simple API optimized for nested scopes. Under the hood it generates [Dagger](https://google.github.io/dagger/) code.
 
