@@ -34,6 +34,7 @@ pluginManagement {
 rootProject.name = 'motif'
 include 'lib'
 include 'compiler'
+include 'compiler2'
 include 'compiler-ast'
 include 'samples:sample'
 include 'samples:sample-lib'

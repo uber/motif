@@ -1,0 +1,28 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
+}
+
+sourceCompatibility = 1.8
+
+dependencies {
+    implementation deps.kotlin.stdlib
+    implementation deps.autoCommon
+    implementation deps.commonsCodec
+    implementation deps.javapoet
+    implementation deps.dagger
+    implementation deps.daggerCompiler
+    implementation project(':lib')
+    implementation project(':compiler-ast')
+    implementation project(':core2')
+    implementation project(':errormessage')
+
+    testImplementation deps.test.truth
+    testImplementation deps.test.compileTesting
+}
+
+test {
+    inputs.files(file("$rootDir/tests/src"))
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
