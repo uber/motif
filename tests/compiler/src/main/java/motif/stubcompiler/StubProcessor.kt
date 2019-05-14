@@ -29,6 +29,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
@@ -63,6 +64,7 @@ class StubProcessor : AbstractProcessor() {
         }
         val builder = TypeSpec.classBuilder(scopeImplClassName)
                 .addMethod(MethodSpec.constructorBuilder().build())
+                .addType(TypeSpec.interfaceBuilder("Dependencies").build())
 
         if (scopeType.asElement().kind == ElementKind.INTERFACE) {
             builder.addSuperinterface(scopeClassName)

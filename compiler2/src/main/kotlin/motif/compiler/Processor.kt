@@ -15,18 +15,20 @@
  */
 package motif.compiler
 
+import com.google.auto.common.BasicAnnotationProcessor
+import com.google.common.collect.SetMultimap
 import com.squareup.javapoet.JavaFile
+import motif.Scope
 import motif.ast.compiler.CompilerClass
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.TypeKind
 import javax.tools.Diagnostic
 
-class Processor : AbstractProcessor() {
+class Processor : BasicAnnotationProcessor() {
 
     lateinit var graph: ResolvedGraph
 
@@ -34,38 +36,40 @@ class Processor : AbstractProcessor() {
         return SourceVersion.latestSupported()
     }
 
-    override fun getSupportedAnnotationTypes(): Set<String> {
-        return setOf(motif.Scope::class.java.name)
+    override fun initSteps(): Iterable<ProcessingStep> {
+        return listOf<ProcessingStep>(Step())
     }
 
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        if (roundEnv.processingOver()) {
-            return true
-        }
-        process(roundEnv)
-        return true
-    }
+    private inner class Step : ProcessingStep {
 
-    private fun process(roundEnv: RoundEnvironment) {
-        val initialScopeClasses = roundEnv.getElementsAnnotatedWith(motif.Scope::class.java)
-                .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
-        if (initialScopeClasses.isEmpty()) {
-            return
+        override fun annotations(): Set<Class<out Annotation>> {
+            return setOf(motif.Scope::class.java)
         }
 
-        this.graph = ResolvedGraph.create(initialScopeClasses)
+        override fun process(elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>): Set<Element> {
+            val scopeElements = elementsByAnnotation[Scope::class.java]
+            val initialScopeClasses = scopeElements
+                    .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
+            if (initialScopeClasses.isEmpty()) {
+                return emptySet()
+            }
 
-        if (graph.errors.isNotEmpty()) {
-            val errorMessage = ErrorMessage.toString(graph)
-            processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, errorMessage)
-            return
-        }
+            this@Processor.graph = ResolvedGraph.create(initialScopeClasses)
 
-        val scopeImpls = ScopeImpl.create(processingEnv, graph)
+            if (graph.errors.isNotEmpty()) {
+                val errorMessage = ErrorMessage.toString(graph)
+                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, errorMessage)
+                return emptySet()
+            }
 
-        scopeImpls.forEach { scopeImpl ->
-            val spec = scopeImpl.spec ?: return@forEach
-            JavaFile.builder(scopeImpl.packageName, spec).build().writeTo(processingEnv.filer)
+            val scopeImpls = ScopeImpl.create(processingEnv, graph)
+
+            scopeImpls.forEach { scopeImpl ->
+                val spec = scopeImpl.spec ?: return@forEach
+                JavaFile.builder(scopeImpl.packageName, spec).build().writeTo(processingEnv.filer)
+            }
+
+            return emptySet()
         }
     }
 }
