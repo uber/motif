@@ -15,57 +15,55 @@
  */
 package motif.compiler
 
+import com.google.auto.common.BasicAnnotationProcessor
+import com.google.common.collect.SetMultimap
 import motif.Scope
+import motif.ast.compiler.CompilerType
 import motif.compiler.codegen.Generator
 import motif.compiler.errors.ErrorHandler
-import motif.ast.compiler.CompilerType
 import motif.models.errors.MotifErrors
 import motif.models.graph.GraphFactory
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.Element
 import javax.tools.Diagnostic
 
-class Processor : AbstractProcessor() {
+class Processor : BasicAnnotationProcessor() {
 
     // For testing only.
     var errors: MotifErrors? = null
-
-    private val hasErrors: Boolean
-        get() = !(errors?.isEmpty() ?: true)
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
     }
 
-    override fun getSupportedAnnotationTypes(): Set<String> {
-        return setOf(Scope::class.java.name)
+    override fun initSteps(): Iterable<BasicAnnotationProcessor.ProcessingStep> {
+        return listOf<BasicAnnotationProcessor.ProcessingStep>(Step())
     }
 
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        if (roundEnv.processingOver() || hasErrors) {
-            return true
+    private inner class Step : BasicAnnotationProcessor.ProcessingStep {
+
+        override fun annotations(): Set<Class<out Annotation>> {
+            return setOf(motif.Scope::class.java)
         }
-        process(roundEnv)
-        return true
-    }
 
-    private fun process(roundEnv: RoundEnvironment) {
-        val scopeTypes = roundEnv.getElementsAnnotatedWith(Scope::class.java)
-                .map { CompilerType(processingEnv, it.asType()) }
-                .toSet()
-        val graph = GraphFactory.create(scopeTypes)
-        val errors = graph.errors
-        this.errors = errors
+        override fun process(elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>): Set<Element> {
+            val scopeTypes = elementsByAnnotation[Scope::class.java]
+                    .map { CompilerType(processingEnv, it.asType()) }
+                    .toSet()
+            val graph = GraphFactory.create(scopeTypes)
+            val errors = graph.errors
+            this@Processor.errors = errors
 
-        if (errors.isEmpty()) {
-            Generator(processingEnv, graph).generate()
-        } else {
-            errors.forEach { error ->
-                val errorMessage = ErrorHandler.handle(error)
-                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${errorMessage.message}\n", errorMessage.element)
+            if (errors.isEmpty()) {
+                Generator(processingEnv, graph).generate()
+            } else {
+                errors.forEach { error ->
+                    val errorMessage = ErrorHandler.handle(error)
+                    processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, "\n${errorMessage.message}\n", errorMessage.element)
+                }
             }
+
+            return emptySet()
         }
     }
 }
