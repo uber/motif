@@ -289,7 +289,10 @@ private class ResolvedScopeFactory(
                     val existingSources = builder.getSources(sink)
                     if (exposeCondition(source, sink)) {
                         if (existingSources.isNotEmpty()) {
-                            errors.add(AlreadySatisfiedError(scope, source, existingSources.toList()))
+                            val nonOverridingExistingSources = existingSources.filterNot(Source::isOverriding)
+                            if (nonOverridingExistingSources.isNotEmpty()) {
+                                errors.add(AlreadySatisfiedError(scope, source, nonOverridingExistingSources.toList()))
+                            }
                         } else {
                             putNodeEdge(sink, source)
                         }
