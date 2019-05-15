@@ -74,10 +74,10 @@ fun parameterSpec(type: Type, name: String): ParameterSpec {
 }
 
 val IrClass.typeName: ClassName
-    get() = type.typeName
+    get() = type.typeName as ClassName
 
-val IrType.typeName: ClassName
-    get() = ClassName.get((this as CompilerType).mirror) as ClassName
+val IrType.typeName: TypeName
+    get() = ClassName.get((this as CompilerType).mirror)
 
 val Type.mirror: TypeMirror
     get() = (type as CompilerType).mirror
