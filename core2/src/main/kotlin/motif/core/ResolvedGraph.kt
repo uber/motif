@@ -296,7 +296,7 @@ private class ResolvedScopeFactory(
                         } else {
                             putNodeEdge(sink, source)
                         }
-                        builder.put(sink, source)
+                        builder.satisfy(sink, source)
                     } else {
                         if (existingSources.isEmpty()) {
                             errors.add(UnexposedSourceError(source, sink))
@@ -312,14 +312,11 @@ private class ResolvedScopeFactory(
 
 private class Sinks(
         private val hidden: Map<Sink, List<Source>>,
-        private val map: Map<Sink, List<Source>>) {
+        private val map: Map<Sink, List<Source>>,
+        val unsatisfiedSinks: Set<Sink>) {
 
     val sinks: Set<Sink> by lazy {
         map.keys
-    }
-
-    val unsatisfiedSinks: Set<Sink> by lazy {
-        map.filterValues { it.isEmpty() }.keys
     }
 
     fun getSources(sink: Sink): List<Source> {
@@ -327,15 +324,11 @@ private class Sinks(
     }
 
     fun toBuilder(): Builder {
-        val mutableMap = mutableMapOf<Sink, MutableList<Source>>()
-        map.forEach { sink, sources ->
-            mutableMap[sink] = sources.toMutableList()
-        }
-        return Builder(hidden.toMutableMap(), mutableMap)
+        return Builder(this)
     }
 
     operator fun plus(other: Sinks): Sinks {
-        return Sinks(hidden + other.hidden, map + other.map)
+        return Sinks(hidden + other.hidden, map + other.map, unsatisfiedSinks + other.unsatisfiedSinks)
     }
 
     private operator fun Map<Sink, List<Source>>.plus(other: Map<Sink, List<Source>>): Map<Sink, List<Source>> {
@@ -346,34 +339,41 @@ private class Sinks(
         return mutableMap
     }
 
-    class Builder(
-            private val hidden: MutableMap<Sink, List<Source>>,
-            private val map: MutableMap<Sink, MutableList<Source>>) {
+    class Builder(sinks: Sinks) {
+
+        private val unsatisfiedSinks = sinks.unsatisfiedSinks.toMutableSet()
+        private val hidden = sinks.hidden.toMutableMap()
+        private val map = mutableMapOf<Sink, MutableList<Source>>().apply {
+            sinks.map.forEach { sink, sources ->
+                this[sink] = sources.toMutableList()
+            }
+        }
 
         fun getSources(sink: Sink): List<Source> {
             return map.getValue(sink)
         }
 
-        fun put(sink: Sink, source: Source) {
+        fun satisfy(sink: Sink, source: Source) {
+            unsatisfiedSinks.remove(sink)
             map.getValue(sink).add(source)
         }
 
         fun hide(sink: Sink) {
             val sources = map.remove(sink)!!
-            hidden[sink] = sources
+            hidden.merge(sink, sources) { a, b -> a + b }
         }
 
         fun build(): Sinks {
-            return Sinks(hidden, map)
+            return Sinks(hidden, map, unsatisfiedSinks)
         }
     }
 
     companion object {
 
-        val EMPTY = Sinks(emptyMap(), emptyMap())
+        val EMPTY = Sinks(emptyMap(), emptyMap(), emptySet())
 
         fun fromSinks(sinks: List<Sink>): Sinks {
-            return Sinks(mapOf(), sinks.associateWith { listOf<Source>() })
+            return Sinks(emptyMap(), sinks.associateWith { listOf<Source>() }, sinks.toSet())
         }
     }
 }
