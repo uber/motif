@@ -22,7 +22,7 @@ import motif.models.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
-class ChildImpl(val child: Child, val impl: ScopeImpl) {
+class ChildImpl(val child: Child, val dependencies: Dependencies, val implTypeName: TypeName) {
 
     fun getParameter(type: Type): ChildMethod.Parameter? {
         return child.method.parameters.find { parameter -> parameter.type == type }
@@ -31,7 +31,6 @@ class ChildImpl(val child: Child, val impl: ScopeImpl) {
 
 class ScopeImpl(
         val spec: TypeSpec?,
-        val typeName: TypeName,
         val packageName: String,
         val dependencies: Dependencies) {
 
@@ -47,18 +46,14 @@ private class ScopeImplFactory(
         private val env: ProcessingEnvironment,
         private val graph: ResolvedGraph,
         private val scope: Scope,
+        private val scopeImplTypeName: ClassName,
+        private val dependencies: Dependencies,
         private val childImpls: List<ChildImpl>) {
 
     private val scopeTypeName = scope.clazz.typeName
-    private val scopeImplTypeName = scopeImplName(scopeTypeName)
     private val packageName = scopeImplTypeName.packageName()
 
     fun create(): ScopeImpl {
-        val dependencies = Dependencies.create(graph, scope, scopeImplTypeName)
-        if (alreadyGenerated()) {
-            return ScopeImpl(null, scopeImplTypeName, packageName, dependencies)
-        }
-
         val objectsImpl = ObjectsImpl.create(env, scope, scopeImplTypeName)
         val module = Module.create(scope, objectsImpl, scopeImplTypeName)
         val component = Component.create(graph, scope, dependencies, module, childImpls, scopeTypeName, scopeImplTypeName)
@@ -80,12 +75,7 @@ private class ScopeImplFactory(
         objectsImpl?.let { typeSpec.addType(it.spec) }
         typeSpec.addType(module.spec)
 
-        return ScopeImpl(typeSpec.build(), scopeImplTypeName, packageName, dependencies)
-    }
-
-    private fun alreadyGenerated(): Boolean {
-        val scopeImplName = scopeImplTypeName.toString()
-        return env.elementUtils.getTypeElement(scopeImplName) != null
+        return ScopeImpl(typeSpec.build(), packageName, dependencies)
     }
 
     private fun scopeImplAnnotation(scope: Scope, dependencies: Dependencies): AnnotationSpec {
@@ -173,8 +163,8 @@ private class ScopeImplFactory(
         val child = childImpl.child
         val methodSpec = overrideWithFinalParamsSpec(child.method.method)
                 .addModifiers(Modifier.PUBLIC)
-        val returnStatement: CodeBlock = if (childImpl.impl.dependencies.isEmpty()) {
-            CodeBlock.of("return new \$T()", childImpl.impl.typeName)
+        val returnStatement: CodeBlock = if (childImpl.dependencies.isEmpty()) {
+            CodeBlock.of("return new \$T()", childImpl.implTypeName)
         } else {
             childMethodReturnStatement(component, componentField, childImpl)
         }
@@ -186,8 +176,8 @@ private class ScopeImplFactory(
             component: Component,
             componentField: FieldSpec,
             childImpl: ChildImpl): CodeBlock {
-        val childImplTypeName = childImpl.impl.typeName
-        val childDependencies = childImpl.impl.dependencies
+        val childImplTypeName = childImpl.implTypeName
+        val childDependencies = childImpl.dependencies
         val dependenciesTypeName = childDependencies.typeName
 
         val dependenciesImplSpec = TypeSpec.anonymousClassBuilder("")
@@ -237,11 +227,6 @@ private class ScopeImplFactory(
         }
     }
 
-    private fun scopeImplName(scopeClassName: ClassName): ClassName {
-        val prefix = scopeClassName.simpleNames().joinToString("")
-        return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
-    }
-
     private fun daggerComponentName(scopeImplTypeName: ClassName, component: Component): ClassName {
         val simpleName = component.typeName.simpleNames().joinToString("_")
         return scopeImplTypeName.peerClass("Dagger$simpleName")
@@ -252,24 +237,45 @@ private class ScopeImplsFactory(
         private val env: ProcessingEnvironment,
         private val graph: ResolvedGraph) {
 
-    private val scopeImpls: MutableMap<Scope, ScopeImpl> = mutableMapOf()
+    private val dependencies = mutableMapOf<Scope, Dependencies>()
+    private val implTypeNames = mutableMapOf<Scope, ClassName>()
 
     fun getScopeImpls(): List<ScopeImpl> {
-        graph.scopes.forEach { getScopeImpl(it) }
-        return scopeImpls.values.toList()
-    }
-
-    private fun getScopeImpl(scope: Scope): ScopeImpl {
-        return scopeImpls.computeIfAbsent(scope) { computeScopeImpl(scope) }
-    }
-
-    private fun computeScopeImpl(scope: Scope): ScopeImpl {
-        val childImpls = graph.getChildren(scope)
-                .map { child ->
-                    val impl = getScopeImpl(child.scope)
-                    ChildImpl(child, impl)
+        return graph.scopes
+                .filter { scope ->
+                    val scopeImplName = getImplTypeName(scope)
+                    env.elementUtils.getTypeElement(scopeImplName.toString()) == null
                 }
-        return ScopeImplFactory(env, graph, scope, childImpls).create()
+                .map { scope ->
+                    val childImpls = graph.getChildren(scope)
+                            .map { child ->
+                                val childImplTypeName = getImplTypeName(child.scope)
+                                val dependencies = getDependencies(child.scope)
+                                ChildImpl(child, dependencies, childImplTypeName)
+                            }
+                    ScopeImplFactory(
+                            env,
+                            graph,
+                            scope,
+                            getImplTypeName(scope),
+                            getDependencies(scope),
+                            childImpls).create()
+                }
+    }
+
+    private fun getDependencies(scope: Scope): Dependencies {
+        return dependencies.computeIfAbsent(scope) {
+            val implTypeName = getImplTypeName(scope)
+            Dependencies.create(graph, scope, implTypeName)
+        }
+    }
+
+    private fun getImplTypeName(scope: Scope): ClassName {
+        return implTypeNames.computeIfAbsent(scope) {
+            val scopeTypeName = scope.clazz.typeName
+            val prefix = scopeTypeName.simpleNames().joinToString("")
+            ClassName.get(scopeTypeName.packageName(), "${prefix}Impl")
+        }
     }
 
     companion object {
@@ -279,3 +285,4 @@ private class ScopeImplsFactory(
         }
     }
 }
+
