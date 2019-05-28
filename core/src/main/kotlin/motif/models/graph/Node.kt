@@ -105,19 +105,31 @@ class Node(
     }
 
     val duplicateFactoryMethods: List<DuplicateFactoryMethod> by lazy {
-        val visibleFactoryMethods: Map<Dependency, List<FactoryMethod>> = (scopeClass.factoryMethods + ancestorFactoryMethods)
-                .groupBy { it.providedDependency }
-
-        scopeClass.factoryMethods.mapNotNull { factoryMethod ->
-            val visibleFactoryMethodList = visibleFactoryMethods[factoryMethod.providedDependency] ?: throw IllegalStateException()
-            if (visibleFactoryMethodList.size > 1) {
-                DuplicateFactoryMethod(
-                        factoryMethod,
-                        (visibleFactoryMethodList - factoryMethod).map { it.scopeType }.toSet())
-            } else {
-                null
-            }
+        fun List<FactoryMethod>.dependencyMap(): Map<Dependency, List<FactoryMethod>> {
+            return flatMap { factoryMethod ->
+                factoryMethod.providedDependencies.map { providedDependency ->
+                    providedDependency to factoryMethod
+                }
+            }.groupBy(keySelector = { it.first }, valueTransform = { it.second })
         }
+        val factoryMethods = scopeClass.factoryMethods.dependencyMap()
+        val ancestorFactoryMethods = ancestorFactoryMethods.dependencyMap().run {
+            val explicitDependencies = scopeClass.explicitDependencies ?: return@run this
+            filterKeys { it in explicitDependencies.dependencies }
+        }
+
+        factoryMethods
+                .flatMap { (dependency, factoryMethods) ->
+                    val allDependencyFactoryMethods = factoryMethods + ancestorFactoryMethods.getOrDefault(dependency, emptyList())
+                    factoryMethods.mapNotNull { factoryMethod ->
+                        val conflictingFactoryMethods = allDependencyFactoryMethods - factoryMethod
+                        if (conflictingFactoryMethods.isEmpty()) {
+                            null
+                        } else {
+                            DuplicateFactoryMethod(factoryMethod, conflictingFactoryMethods.map { it.scopeType }.toSet())
+                        }
+                    }
+                }
     }
 
     val children: List<Node> = scopeChildren.map { it.node }
