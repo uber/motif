@@ -124,9 +124,9 @@ interface JavaPoetUtil : ParserUtil {
         return this
     }
 
-    fun RequiredDependencies.methodSpecBuilders(): SortedMap<Dependency, MethodSpec.Builder> {
+    fun RequiredDependencies.methodSpecBuilders(addQualifier: Boolean = true): SortedMap<Dependency, MethodSpec.Builder> {
         return nameScope {
-            list.associateBy({ it.dependency }) { it.dependency.methodSpecBuilder() }.toSortedMap()
+            list.associateBy({ it.dependency }) { it.dependency.methodSpecBuilder(addQualifier) }.toSortedMap()
         }
     }
 
@@ -143,24 +143,32 @@ interface JavaPoetUtil : ParserUtil {
         return NameScope(env).block()
     }
 
+    fun RequiredDependency.parameterSpec(name: String): ParameterSpec {
+        return ParameterSpec.builder(dependency.typeName, name)
+                .apply { dependency.qualifier?.let { addAnnotation(it.spec()) } }
+                .build()
+    }
+
+    fun IrAnnotation.spec(): AnnotationSpec {
+        return AnnotationSpec.get(cir.mirror)
+    }
+
     class NameScope(override val env: ProcessingEnvironment) : JavaPoetUtil {
 
         private val names = UniqueNameSet()
 
-        fun Dependency.methodSpecBuilder(): MethodSpec.Builder {
+        fun Dependency.methodSpecBuilder(addQualifier: Boolean = true): MethodSpec.Builder {
             return MethodSpec.methodBuilder(name())
                     .returns(typeName)
-                    .apply { qualifier?.let { addAnnotation(it.spec()) } }
+                    .apply {
+                        if (addQualifier) {
+                            qualifier?.let { addAnnotation(it.spec()) }
+                        }
+                    }
         }
 
         fun RequiredDependency.parameterSpec(): ParameterSpec {
-            return ParameterSpec.builder(dependency.typeName, dependency.name())
-                    .apply { dependency.qualifier?.let { addAnnotation(it.spec()) } }
-                    .build()
-        }
-
-        fun IrAnnotation.spec(): AnnotationSpec {
-            return AnnotationSpec.get(cir.mirror)
+            return parameterSpec(dependency.name())
         }
 
         fun Dependency.name(): String {

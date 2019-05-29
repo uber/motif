@@ -15,6 +15,7 @@
  */
 package motif.compiler.codegen
 
+import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
@@ -39,13 +40,19 @@ class ChildMethodFactory(
         val executable = childMethod.cir
         val childScopeImplName = scopeImpl(executable.returnType.cir.mirror as DeclaredType)
         val childDependenciesName = childScopeImplName.nestedClass(GENERATED_DEPENDENCIES_NAME)
+        val childRequiredDependencies: RequiredDependencies = graph.getDependencies(executable.returnType)
+                ?: throw IllegalStateException("Could not find Dependenencies for child: ${executable.returnType}")
+        val returnStatement = if (childRequiredDependencies.list.isEmpty()) {
+            CodeBlock.of("return new \$T()", childScopeImplName)
+        } else {
+            CodeBlock.of("return new \$T(\$L)",
+                    childScopeImplName,
+                    childMethod.childDependenciesImpl(scope, childDependenciesName))
+        }
 
         return executable.overrideWithFinalParams()
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement(
-                        "return new \$T(\$L)",
-                        childScopeImplName,
-                        childMethod.childDependenciesImpl(scope, childDependenciesName))
+                .addStatement(returnStatement)
                 .build()
     }
 
@@ -71,7 +78,7 @@ class ChildMethodFactory(
         val childRequiredDependencies: RequiredDependencies = graph.getDependencies(childType)
                 ?: throw IllegalStateException("Could not find Dependenencies for child: $childType")
 
-        val methods: List<MethodSpec> = childRequiredDependencies.methodSpecBuilders()
+        val methods: List<MethodSpec> = childRequiredDependencies.methodSpecBuilders(false)
                 .map { (dependency, builder) ->
                     builder
                             .addModifiers(Modifier.PUBLIC)

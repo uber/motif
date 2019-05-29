@@ -96,7 +96,7 @@ class ModuleFactory(
     }
 
     private fun MethodSpec.Builder.build(method: SpreadMethod): MethodSpec {
-        val spreadParameter = nameScope { method.source.parameterSpec() }
+        val spreadParameter = method.source.parameterSpec("source")
         addParameter(spreadParameter)
         addStatement("return \$N.\$N()", spreadParameter, method.cir.name)
         return build()
