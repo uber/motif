@@ -70,7 +70,7 @@ class Component private constructor(
                 children: List<ChildImpl>): SortedMap<Type, MethodSpec> {
             val nameScope = NameScope()
             val requiredTypes = (scope.accessMethods.map { it.returnType } +
-                    children.flatMap { childImpl -> graph.getChildUnsatisfied(childImpl.child).map { it.type } })
+                    children.flatMap { childImpl -> graph.getChildUnsatisfied(childImpl.childEdge).map { it.type } })
                     .toSet()
             return requiredTypes.associate { type ->
                 val methodSpec = methodSpec(nameScope, type)

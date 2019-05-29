@@ -27,9 +27,9 @@ interface ResolvedGraph {
 
     val errors: List<MotifError>
 
-    fun getChildren(scope: Scope): List<Child>
+    fun getChildEdges(scope: Scope): List<ScopeEdge>
 
-    fun getChildUnsatisfied(child: Child): List<Sink>
+    fun getChildUnsatisfied(scopeEdge: ScopeEdge): List<Sink>
 
     fun getUnsatisfied(scope: Scope): List<Sink>
 
@@ -55,7 +55,7 @@ interface ResolvedGraph {
 private class ResolvedScope(
         val scope: Scope,
         val sinks: Sinks,
-        val childSinks: Map<Child, Sinks>,
+        val childSinks: Map<ScopeEdge, Sinks>,
         val errors: List<MotifError>) {
 
     companion object {
@@ -67,9 +67,9 @@ private class ResolvedScope(
 }
 
 /**
- * [ResolvedScope] for a child Scope along with the corresponding parent's [Child] model.
+ * [ResolvedScope] for a childEdge Scope along with the corresponding parent's [ScopeEdge] model.
  */
-private class ResolvedChild(val child: Child, val resolved: ResolvedScope) {
+private class ResolvedChild(val childEdge: ScopeEdge, val resolved: ResolvedScope) {
 
     val sinks: Sinks = resolved.sinks
 }
@@ -78,8 +78,8 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
 
     override val scopes = listOf<Scope>()
     override val errors = listOf(error)
-    override fun getChildren(scope: Scope) = emptyList<Child>()
-    override fun getChildUnsatisfied(child: Child) = listOf<Sink>()
+    override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
+    override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = listOf<Sink>()
     override fun getUnsatisfied(scope: Scope) = emptyList<Sink>()
     override fun getSources(sink: Sink) = emptyList<Source>()
 }
@@ -88,25 +88,25 @@ private class ResolvedGraphImpl(
         private val scopeGraph: ScopeGraph,
         private val sinks: Sinks,
         private val scopeSinks: Map<Scope, Sinks>,
-        private val childSinks: Map<Child, Sinks>,
+        private val childSinks: Map<ScopeEdge, Sinks>,
         override val errors: List<MotifError>) : ResolvedGraph {
 
     private val unsatisfiedSinks: Map<Scope, List<Sink>> by lazy {
         scopeSinks.mapValues { (_, sinks) -> sinks.unsatisfiedSinks.toList().sortedBy { it.type } }
     }
 
-    private val childUnsatisfiedSinks: Map<Child, List<Sink>> by lazy {
+    private val childUnsatisfiedSinks: Map<ScopeEdge, List<Sink>> by lazy {
         childSinks.mapValues { (_, sinks) -> sinks.unsatisfiedSinks.toList().sortedBy { it.type } }
     }
 
     override val scopes = scopeGraph.scopes
 
-    override fun getChildren(scope: Scope): List<Child> {
-        return scopeGraph.getChildren(scope)
+    override fun getChildEdges(scope: Scope): List<ScopeEdge> {
+        return scopeGraph.getChildEdges(scope)
     }
 
-    override fun getChildUnsatisfied(child: Child): List<Sink> {
-        return childUnsatisfiedSinks.getValue(child)
+    override fun getChildUnsatisfied(scopeEdge: ScopeEdge): List<Sink> {
+        return childUnsatisfiedSinks.getValue(scopeEdge)
     }
 
     override fun getUnsatisfied(scope: Scope): List<Sink> {
@@ -133,7 +133,7 @@ private class ResolvedGraphImpl(
  *
  * [ResolvedGraphFactory.resolveChildren]
  * resolveChildren(scope):
- *   return scope.children.map { child -> resolveScope(child} }
+ *   return scope.children.map { childEdge -> resolveScope(childEdge} }
  *
  * [ResolvedScopeFactory]
  * resolveScope(scope, resolvedChildren)
@@ -149,7 +149,7 @@ private class ResolvedGraphFactory(private val scopeGraph: ScopeGraph) {
 
         val sinks = resolvedRoots.fold(Sinks.EMPTY) { acc, resolved -> acc + resolved.sinks }
         val scopeSinks = resolvedScopes.map { (scope, resolved) -> scope to resolved.sinks }.toMap()
-        val childSinks: Map<Child, Sinks> = resolvedScopes.map { it.value.childSinks }.fold(mapOf()) { acc, map -> acc + map }
+        val childSinks: Map<ScopeEdge, Sinks> = resolvedScopes.map { it.value.childSinks }.fold(mapOf()) { acc, map -> acc + map }
         val errors: List<MotifError> = resolvedScopes.values.fold(emptyList()) { acc, resolved -> acc + resolved.errors }
 
         return ResolvedGraphImpl(
@@ -170,9 +170,9 @@ private class ResolvedGraphFactory(private val scopeGraph: ScopeGraph) {
     }
 
     private fun resolveChildren(scope: Scope): List<ResolvedChild> {
-        return scopeGraph.getChildren(scope).map { child ->
-            val resolved = getResolved(child.scope)
-            ResolvedChild(child, resolved)
+        return scopeGraph.getChildEdges(scope).map { childEdge ->
+            val resolved = getResolved(childEdge.child)
+            ResolvedChild(childEdge, resolved)
         }
     }
 }
@@ -194,7 +194,7 @@ private class ResolvedScopeFactory(
         scopeSinks = scopeSinks.satisfy(scopeSources)
 
         val childSinks = resolvedChildren.associateBy(
-                keySelector = { it.child },
+                keySelector = { it.childEdge },
                 valueTransform = { childSinks(it) })
 
         val resolvedChildSinks = childSinks.values.map {
@@ -222,9 +222,9 @@ private class ResolvedScopeFactory(
     }
 
     private fun childSinks(resolvedChild: ResolvedChild): Sinks {
-        val parameterSources = resolvedChild.child.method.parameters.map { ChildParameterSource(it) }
+        val parameterSources = resolvedChild.childEdge.method.parameters.map { ChildParameterSource(it) }
         return resolvedChild.sinks.satisfy(parameterSources) { source, sink ->
-            sink.scope == resolvedChild.child.scope || source.isExposed
+            sink.scope == resolvedChild.childEdge.child || source.isExposed
         }
     }
 
