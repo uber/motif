@@ -16,16 +16,16 @@
 package motif.compiler
 
 import com.squareup.javapoet.*
-import motif.core.Child
+import motif.core.ScopeEdge
 import motif.core.ResolvedGraph
 import motif.models.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
-class ChildImpl(val child: Child, val dependencies: Dependencies, val implTypeName: TypeName) {
+class ChildImpl(val childEdge: ScopeEdge, val dependencies: Dependencies, val implTypeName: TypeName) {
 
     fun getParameter(type: Type): ChildMethod.Parameter? {
-        return child.method.parameters.find { parameter -> parameter.type == type }
+        return childEdge.method.parameters.find { parameter -> parameter.type == type }
     }
 }
 
@@ -160,8 +160,8 @@ private class ScopeImplFactory(
             component: Component,
             componentField: FieldSpec,
             childImpl: ChildImpl): MethodSpec {
-        val child = childImpl.child
-        val methodSpec = overrideWithFinalParamsSpec(child.method.method)
+        val childEdge = childImpl.childEdge
+        val methodSpec = overrideWithFinalParamsSpec(childEdge.method.method)
                 .addModifiers(Modifier.PUBLIC)
         val returnStatement: CodeBlock = if (childImpl.dependencies.isEmpty()) {
             CodeBlock.of("return new \$T()", childImpl.implTypeName)
@@ -247,11 +247,11 @@ private class ScopeImplsFactory(
                     env.elementUtils.getTypeElement(scopeImplName.toString()) == null
                 }
                 .map { scope ->
-                    val childImpls = graph.getChildren(scope)
-                            .map { child ->
-                                val childImplTypeName = getImplTypeName(child.scope)
-                                val dependencies = getDependencies(child.scope)
-                                ChildImpl(child, dependencies, childImplTypeName)
+                    val childEdges = graph.getChildEdges(scope)
+                            .map { childEdge ->
+                                val childImplTypeName = getImplTypeName(childEdge.child)
+                                val dependencies = getDependencies(childEdge.child)
+                                ChildImpl(childEdge, dependencies, childImplTypeName)
                             }
                     ScopeImplFactory(
                             env,
@@ -259,7 +259,7 @@ private class ScopeImplsFactory(
                             scope,
                             getImplTypeName(scope),
                             getDependencies(scope),
-                            childImpls).create()
+                            childEdges).create()
                 }
     }
 
