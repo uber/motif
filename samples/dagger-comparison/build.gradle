@@ -29,6 +29,6 @@ android {
 }
 
 dependencies {
-    annotationProcessor project(':compiler2')
+    annotationProcessor project(':compiler')
     implementation project(':lib')
 }

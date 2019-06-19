@@ -15,7 +15,7 @@ version '0.0.1' // Plugin version
 
 dependencies {
     compile project(':lib')
-    compile project(':core2')
+    compile project(':core')
     compile project(':intellij-ast')
 
     compile deps.kotlin.reflection

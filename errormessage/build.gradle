@@ -8,7 +8,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     implementation deps.kotlin.stdlib
-    implementation project(':core2')
+    implementation project(':core')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

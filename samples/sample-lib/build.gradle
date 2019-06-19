@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    annotationProcessor project(':compiler2')
+    annotationProcessor project(':compiler')
     annotationProcessor deps.roomCompiler
     api project(':lib')
     api deps.roomRx

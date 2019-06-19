@@ -14,7 +14,7 @@ dependencies {
     implementation deps.daggerCompiler
     implementation project(':lib')
     implementation project(':compiler-ast')
-    implementation project(':core2')
+    implementation project(':core')
     implementation project(':errormessage')
 
     testImplementation deps.test.truth
