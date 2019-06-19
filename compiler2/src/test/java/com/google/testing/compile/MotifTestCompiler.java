@@ -104,15 +104,12 @@ public class MotifTestCompiler {
         }
     }
 
-    // TODO Remove Test.java filter after deletion of old test code.
     private static List<JavaFileObject> javaFileObjects(File dir) throws IOException {
-        boolean skipTest = new File(dir, "ERROR.txt").exists();
         return Files.walk(dir.toPath())
                 .map(Path::toFile)
                 .filter(file -> !file.isDirectory()
                         && file.getName().endsWith(".java")
-                        && !file.getName().endsWith("ScopeImpl.java")
-                        && (!skipTest || !file.getName().equals("Test.java")))
+                        && !file.getName().endsWith("ScopeImpl.java"))
                 .map(file -> {
                     try {
                         return JavaFileObjects.forResource(file.toURI().toURL());

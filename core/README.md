@@ -1,1 +1,0 @@
-Intermediate representation of Motif-specific model definitions.

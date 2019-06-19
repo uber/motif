@@ -12,7 +12,8 @@ intellij {
 
 dependencies {
     compile project(':lib')
-    compile project(':core')
+    compile project(':ast')
+    compile project(':errormessage')
 
     compile deps.kotlin.reflection
 

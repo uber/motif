@@ -23,9 +23,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementFactory
-import motif.ast.intellij.IntelliJType
-import motif.models.graph.GraphFactory
-import motif.ast.IrType
+import motif.ast.IrClass
+import motif.ast.intellij.IntelliJClass
+import motif.core.ResolvedGraph
+import motif.errormessage.ErrorMessage
 import kotlin.system.measureTimeMillis
 
 class ProcessGraphAction : AnAction() {
@@ -35,16 +36,13 @@ class ProcessGraphAction : AnAction() {
 
         val duration = measureTimeMillis {
             val scopeClasses: List<PsiClass> = ScopeIndex.getInstance().getScopeClasses(project)
-            val scopeAnnotatedTypes: Set<IrType> = scopeClasses
+            val scopeAnnotatedClasses: List<IrClass> = scopeClasses
                     .map { psiClass ->
                         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(psiClass)
-                        IntelliJType(project, psiClassType)
+                        IntelliJClass(project, psiClassType)
                     }
-                    .toSet()
-            val graph = GraphFactory.create(scopeAnnotatedTypes)
-            graph.errors.forEach { error ->
-                log(error.debugString)
-            }
+            val graph = ResolvedGraph.create(scopeAnnotatedClasses)
+            log(ErrorMessage.toString(graph))
         }
 
         log("Processed graph in ${duration}ms.")

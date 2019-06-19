@@ -154,13 +154,6 @@ public class TestHarness {
         assertThat(compilation).succeeded();
 
         try {
-            testClass.getField("loadedClasses");
-            // Skip buck loaded classes test. No longer supported.
-            // TODO Remove T031 after old compiler is removed.
-            return;
-        } catch (NoSuchFieldException ignore) {}
-
-        try {
             testClass.getMethod("run").invoke(null);
         } catch (InvocationTargetException e) {
             throw e.getCause();
