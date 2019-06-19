@@ -1,1 +1,0 @@
-This package handle building the graph from the Motif models in the `motif.models.motif` package.
