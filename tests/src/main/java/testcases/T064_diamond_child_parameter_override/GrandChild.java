@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
+package testcases.T064_diamond_child_parameter_override;
 
-import motif.models.*
+import motif.Scope;
 
-sealed class ProcessingError : MotifError
+@Scope
+public interface GrandChild {
 
-class ScopeCycleError(val path: List<Scope>) : ProcessingError()
-class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
-class UnusedDependencyError(val method: Dependencies.Method) : ProcessingError()
-class DependencyCycleError(val path: List<Node>) : ProcessingError()
-class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+    String string();
+}

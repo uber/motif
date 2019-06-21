@@ -23,11 +23,6 @@
       TYPE:   @javax.inject.Named("a") java.lang.String
       METHOD: testcases.E005_dependencies_cycle.Scope.Objects.string
   
-    -> [FACTORY METHOD PARAMETER]
-         TYPE:      @javax.inject.Named("a") java.lang.String
-         METHOD:    testcases.E005_dependencies_cycle.Scope.Objects.string
-         PARAMETER: a
-  
     -> [FACTORY METHOD RETURN TYPE]
          TYPE:   @javax.inject.Named("a") java.lang.String
          METHOD: testcases.E005_dependencies_cycle.Scope.Objects.string

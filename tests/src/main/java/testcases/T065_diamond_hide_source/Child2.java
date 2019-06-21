@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
+package testcases.T065_diamond_hide_source;
 
-import motif.models.*
+import motif.Expose;
+import motif.Scope;
 
-sealed class ProcessingError : MotifError
+@Scope
+public interface Child2 {
 
-class ScopeCycleError(val path: List<Scope>) : ProcessingError()
-class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
-class UnusedDependencyError(val method: Dependencies.Method) : ProcessingError()
-class DependencyCycleError(val path: List<Node>) : ProcessingError()
-class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+    GrandChild grandChild();
+
+    @motif.Objects
+    class Objects {
+
+        @Expose
+        String string() {
+            return "c";
+        }
+    }
+
+    @motif.Dependencies
+    interface Dependencies {}
+}

@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
-
-import motif.models.*
+package motif.models
 
 /**
  * Represents the site of a request for a dependency ([Sink]) or the site at which

@@ -20,17 +20,7 @@
   Unable to satisfy dependency:
   
     [ACCESS METHOD]
-      TYPE:   java.lang.Integer
-      METHOD: testcases.E016_missing_dependencies_multilevel.Grandchild.integer
-  
-  ------------------------------------
-  
-  [UNSATISFIED DEPENDENCY]
-  
-  Unable to satisfy dependency:
-  
-    [ACCESS METHOD]
       TYPE:   java.lang.String
-      METHOD: testcases.E016_missing_dependencies_multilevel.Child.string
+      METHOD: testcases.E050_unsatisfied_dependency_no_duplicates.Grandchild.string
   
   ====================================

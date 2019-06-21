@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
+package testcases.E050_unsatisfied_dependency_no_duplicates;
 
-import motif.models.*
+@motif.Scope
+public interface Scope {
 
-sealed class ProcessingError : MotifError
+    Child child();
 
-class ScopeCycleError(val path: List<Scope>) : ProcessingError()
-class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
-class UnusedDependencyError(val method: Dependencies.Method) : ProcessingError()
-class DependencyCycleError(val path: List<Node>) : ProcessingError()
-class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+    @motif.Dependencies
+    interface Dependencies {}
+}

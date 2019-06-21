@@ -39,6 +39,8 @@ class Scope internal constructor(val clazz: IrClass) {
 
     val dependencies: Dependencies? = Dependencies.fromScope(this)
 
+    val source = ScopeSource(this)
+
     companion object {
 
         fun fromClasses(scopeClasses: List<IrClass>): List<Scope> {

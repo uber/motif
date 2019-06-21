@@ -15,7 +15,7 @@
  */
 package motif.errormessage
 
-import motif.core.*
+import motif.models.*
 
 object NodeHandler {
 
