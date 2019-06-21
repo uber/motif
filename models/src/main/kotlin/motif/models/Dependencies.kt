@@ -31,6 +31,8 @@ class Dependencies(val clazz: IrClass, val scope: Scope) {
                 Method(this, method, type)
             }
 
+    val types: List<Type> = methods.map { it.returnType }
+
     class Method(val dependencies: Dependencies, val method: IrMethod, val returnType: Type) {
 
         val qualifiedName: String by lazy {

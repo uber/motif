@@ -23,19 +23,9 @@
       TYPE:   @javax.inject.Named("b") java.lang.String
       METHOD: testcases.E025_dependency_cycle_3.Scope.Objects.b
   
-    -> [FACTORY METHOD PARAMETER]
-         TYPE:      @javax.inject.Named("c") java.lang.String
-         METHOD:    testcases.E025_dependency_cycle_3.Scope.Objects.b
-         PARAMETER: c
-  
     -> [FACTORY METHOD RETURN TYPE]
          TYPE:   @javax.inject.Named("c") java.lang.String
          METHOD: testcases.E025_dependency_cycle_3.Scope.Objects.c
-  
-    -> [FACTORY METHOD PARAMETER]
-         TYPE:      @javax.inject.Named("b") java.lang.String
-         METHOD:    testcases.E025_dependency_cycle_3.Scope.Objects.c
-         PARAMETER: b
   
     -> [FACTORY METHOD RETURN TYPE]
          TYPE:   @javax.inject.Named("b") java.lang.String

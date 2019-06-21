@@ -47,6 +47,8 @@ class AccessMethod(val method: IrMethod, val scope: Scope) : ScopeMethod() {
     val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
 
     val returnType = Type.fromReturnType(method)
+
+    val sink = AccessMethodSink(this)
 }
 
 /**
@@ -60,6 +62,8 @@ class ChildMethod(
     val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
 
     val parameters: List<Parameter> = method.parameters.map { Parameter(this, it) }
+
+    val sources: List<ChildParameterSource> = parameters.map(::ChildParameterSource)
 
     class Parameter(val method: ChildMethod, val parameter: IrParameter) {
 

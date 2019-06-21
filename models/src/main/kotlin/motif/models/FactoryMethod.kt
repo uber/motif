@@ -44,6 +44,10 @@ sealed class FactoryMethod(
         null
     }
 
+    val spreadSources: List<SpreadSource> = spread?.methods?.map(::SpreadSource) ?: emptyList()
+    val sources: List<Source> by lazy { spreadSources + FactoryMethodSource(this) }
+    val sinks: List<FactoryMethodSink> by lazy { parameters.map(::FactoryMethodSink) }
+
     val name = method.name
     val qualifiedName: String by lazy { "${objects.qualifiedName}.${method.name}" }
 

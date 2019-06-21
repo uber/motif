@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
+package testcases.T063_diamond_expose_to_grandchild;
 
-import motif.models.*
+import static com.google.common.truth.Truth.assertThat;
 
-sealed class ProcessingError : MotifError
+public class Test {
 
-class ScopeCycleError(val path: List<Scope>) : ProcessingError()
-class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
-class UnusedDependencyError(val method: Dependencies.Method) : ProcessingError()
-class DependencyCycleError(val path: List<Node>) : ProcessingError()
-class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+    public static void run() {
+        Scope scope = new ScopeImpl();
+        assertThat(scope.childA().grandChild().string()).isEqualTo("s");
+        assertThat(scope.childB().grandChild().string()).isEqualTo("s");
+    }
+}
