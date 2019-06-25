@@ -15,6 +15,7 @@
  */
 package motif.ast.intellij
 
+import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
@@ -28,8 +29,20 @@ class IntelliJAnnotation(
         private val project: Project,
         private val psiAnnotation: PsiAnnotation) : IrAnnotation {
 
+    private val stringValue: String? by lazy {
+        getStringConstantValue(project, psiAnnotation, "value")
+    }
+
+    private val qualifiedName: String by lazy {
+        psiAnnotation.qualifiedName!!
+    }
+
+    private val key: Key by lazy {
+        Key(qualifiedName, stringValue)
+    }
+
     override val type: IrType by lazy {
-        val qualifiedName: String = psiAnnotation.nameReferenceElement!!.qualifiedName
+        val qualifiedName: String = psiAnnotation.qualifiedName!!
         val annotationClass: PsiClass = JavaPsiFacade.getInstance(project).findClass(qualifiedName, GlobalSearchScope.allScope(project))!!
         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(annotationClass)
         IntelliJType(project, psiClassType)
@@ -42,15 +55,40 @@ class IntelliJAnnotation(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-
         other as IntelliJAnnotation
-
-        if (psiAnnotation.text != other.psiAnnotation.text) return false
-
-        return true
+        return key == other.key
     }
 
     override fun hashCode(): Int {
-        return psiAnnotation.text.hashCode()
+        return key.hashCode()
     }
+
+    override fun toString(): String {
+        return psiAnnotation.qualifiedName!!
+    }
+
+    companion object {
+
+        private fun getStringConstantValue(
+                project: Project,
+                annotation: PsiAnnotation,
+                attributeName: String): String? {
+            val value = annotation.findAttributeValue(attributeName) ?: return null
+
+            AnnotationUtil.getStringAttributeValue(value)?.let { return it }
+
+            if (value !is PsiReferenceExpression) return null
+
+            val referenceTarget = value.resolve() ?: return null
+
+            if (referenceTarget !is PsiField) return null
+
+            val constant = JavaPsiFacade.getInstance(project).constantEvaluationHelper
+                    .computeConstantExpression(referenceTarget.initializer) ?: return null
+
+            return constant as? String
+        }
+    }
+
+    private data class Key(val qualifiedName: String, val value: String?)
 }

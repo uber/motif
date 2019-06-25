@@ -4,8 +4,8 @@ plugins {
 }
 
 intellij {
-    version 'IC-2018.1'
-    plugins = []
+    version 'IC-2018.3'
+    plugins = ['android']
     pluginName 'MyPlugin'
     updateSinceUntilBuild = false
 }
@@ -22,4 +22,8 @@ dependencies {
 
     testCompile deps.test.junit
     testCompile deps.test.assertj
+}
+
+runIde {
+    maxHeapSize = "2g"
 }

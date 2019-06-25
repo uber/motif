@@ -20,7 +20,7 @@ import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 
-class IrTest : LightCodeInsightFixtureTestCase() {
+class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
 
     lateinit var psiElementFactory: PsiElementFactory
 

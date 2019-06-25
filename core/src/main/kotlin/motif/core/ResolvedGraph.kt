@@ -23,6 +23,8 @@ import motif.models.*
  */
 interface ResolvedGraph {
 
+    val roots: List<Scope>
+
     val scopes: List<Scope>
 
     val errors: List<MotifError>
@@ -105,10 +107,11 @@ private class ResolvedGraphFactory(private val scopeGraph: ScopeGraph) {
 
 private class ErrorGraph(error: MotifError) : ResolvedGraph {
 
-    override val scopes = listOf<Scope>()
+    override val roots = emptyList<Scope>()
+    override val scopes = emptyList<Scope>()
     override val errors = listOf(error)
     override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
-    override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = listOf<Sink>()
+    override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = emptyList<Sink>()
     override fun getUnsatisfied(scope: Scope) = emptyList<Sink>()
     override fun getSources(sink: Sink) = emptyList<Source>()
 }
@@ -119,23 +122,17 @@ private class ValidResolvedGraph(
         private val childStates: Map<ScopeEdge, State>,
         private val graphState: State) : ResolvedGraph {
 
-    override val scopes: List<Scope> = scopeGraph.scopes
+    override val roots = scopeGraph.roots
 
-    override val errors: List<MotifError> = graphState.errors
+    override val scopes = scopeGraph.scopes
 
-    override fun getChildEdges(scope: Scope): Iterable<ScopeEdge> {
-        return scopeGraph.getChildEdges(scope)
-    }
+    override val errors = graphState.errors
 
-    override fun getChildUnsatisfied(scopeEdge: ScopeEdge): Iterable<Sink> {
-        return childStates.getValue(scopeEdge).unsatisfied
-    }
+    override fun getChildEdges(scope: Scope) = scopeGraph.getChildEdges(scope)
 
-    override fun getUnsatisfied(scope: Scope): Iterable<Sink> {
-        return scopeStates.getValue(scope).unsatisfied
-    }
+    override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = childStates.getValue(scopeEdge).unsatisfied
 
-    override fun getSources(sink: Sink): Iterable<Source> {
-        return graphState.sinkToSources.getValue(sink)
-    }
+    override fun getUnsatisfied(scope: Scope) = scopeStates.getValue(scope).unsatisfied
+
+    override fun getSources(sink: Sink) = graphState.sinkToSources.getValue(sink)
 }
