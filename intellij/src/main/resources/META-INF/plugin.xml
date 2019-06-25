@@ -18,12 +18,6 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileBasedIndex implementation="motif.intellij.ScopeIndex"/>
+        <toolWindow id="Motif" anchor="right" factoryClass="motif.intellij.MotifPanelFactory"/>
     </extensions>
-    <actions>
-        <action id="motif.intellij.ProcessGraphAction" class="motif.intellij.ProcessGraphAction"
-                text="Process Graph">
-            <add-to-group group-id="RefactoringMenu" anchor="first"/>
-        </action>
-    </actions>
 </idea-plugin>
