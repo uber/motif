@@ -265,7 +265,7 @@ Motif sacrifices flexibility in favor of an opinionated API optimized specifical
 
 Below is a comparison between a Dagger and a Motif version of such an example.
 
-#### Dagger ([Full Example](https://github.com/uber/motif/tree/master/dagger-comparison/src/main/java/motif/daggercomparison/dagger))
+#### Dagger ([Full Example](https://github.com/uber/motif/tree/master/samples/dagger-comparison/src/main/java/motif/daggercomparison/dagger))
 
 ```java
 @RootComponent.Scope
@@ -325,7 +325,7 @@ Even for a comfortable Dagger user, it may take a few rounds of recompilation an
 * Scoped vs unscoped
 * @Component.Builder vs generated API
 
-#### Motif ([Full Example](https://github.com/uber/motif/tree/master/dagger-comparison/src/main/java/motif/daggercomparison/motif))
+#### Motif ([Full Example](https://github.com/uber/motif/tree/master/samples/dagger-comparison/src/main/java/motif/daggercomparison/motif))
 
 ```java
 @Scope
