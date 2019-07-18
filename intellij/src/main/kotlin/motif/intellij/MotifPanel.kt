@@ -29,19 +29,28 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.Label
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.ui.update.MergingUpdateQueue
+import com.intellij.util.ui.update.Update
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.models.FactoryMethod
 import motif.models.Scope
 import java.awt.Component
+import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
@@ -51,16 +60,27 @@ class MotifPanel(
         private val project: Project
 ) : SimpleToolWindowPanel(true, true) {
 
-    private val root = DefaultMutableTreeNode()
-    private val model = DefaultTreeModel(root)
-    private val tree = Tree(model)
-    private val structure = MotifTreeStructure(project)
+    private val graphFactory = GraphFactory(project)
+    private val mergingUpdateQueue = MergingUpdateQueue(
+            "motif-panel",
+            100,
+            true,
+            null,
+            null,
+            null,
+            false)
+    private val changedElements = LinkedBlockingQueue<PsiElement>()
+
+    private val rootNode = MotifRootNode(project)
+    private val model = DefaultTreeModel(DefaultMutableTreeNode().apply { userObject = rootNode })
+    private val tree = Tree(model).apply { cellRenderer = MotifCellRenderer(project) }
+    private val structure = MotifTreeStructure(project, rootNode)
     private val builder = MotifTreeBuilder(tree, model, structure)
     private val scrollPane = JBScrollPane(tree)
 
+    private var graphInvalidator: GraphInvalidator? = null
+
     init {
-        root.userObject = structure.rootElement
-        tree.cellRenderer = MotifCellRenderer(project)
         val refreshAction = object : AnAction("Refresh", "Refresh", AllIcons.Actions.Refresh) {
 
             override fun actionPerformed(e: AnActionEvent) {
@@ -71,12 +91,39 @@ class MotifPanel(
                 .createActionToolbar("Motif Panel Actions", DefaultActionGroup(refreshAction), true)
         setContent(scrollPane)
         setToolbar(actionToolbar.component)
+        PsiManager.getInstance(project).addPsiTreeChangeListener(ChildChangeListener { element ->
+            changedElements.add(element)
+            mergingUpdateQueue.queue(object : Update("check-graph", false) {
+
+                override fun run() {
+                    val graphInvalidator = graphInvalidator ?: return
+                    ApplicationManager.getApplication().runReadAction {
+                        val changedElements = mutableListOf<PsiElement>().apply { changedElements.drainTo(this) }
+                        if (changedElements.any(graphInvalidator::shouldInvalidate)) {
+                            log("INVALID")
+                        } else {
+                            log("OK")
+                        }
+                    }
+                }
+            })
+        })
     }
 
     private fun refresh() {
-        ApplicationManager.getApplication().invokeLater {
-            builder.queueUpdate()
-        }
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Refresh") {
+
+            override fun run(indicator: ProgressIndicator) {
+                ApplicationManager.getApplication().runReadAction {
+                    val graph = graphFactory.compute()
+                    graphInvalidator = GraphInvalidator(project, graph)
+                    rootNode.graph = graph
+                    ApplicationManager.getApplication().invokeLater {
+                        builder.queueUpdate()
+                    }
+                }
+            }
+        })
     }
 }
 
@@ -87,12 +134,11 @@ class MotifTreeBuilder(
 ) : AbstractTreeBuilder(tree, model, treeStructure, null, false)
 
 class MotifTreeStructure(
-        private val project: Project
+        private val project: Project,
+        private val rootNode: MotifRootNode
 ) : AbstractTreeStructureBase(project) {
 
-    override fun getRootElement(): Any {
-        return MotifRootNode(project)
-    }
+    override fun getRootElement() = rootNode
 
     override fun commit() = PsiDocumentManager.getInstance(myProject).commitAllDocuments()
 
@@ -103,12 +149,12 @@ class MotifTreeStructure(
 
 class MotifRootNode(project: Project) : AbstractTreeNode<String>(project, "root") {
 
-    private val graphFactory = GraphFactory(project)
+    var graph: ResolvedGraph? = null
 
     override fun update(presentation: PresentationData) {}
 
     override fun getChildren(): List<ScopeNode> {
-        val graph: ResolvedGraph = graphFactory.compute()
+        val graph = this.graph ?: return emptyList()
         if (graph.errors.isNotEmpty()) {
             log(ErrorMessage.toString(graph))
         }
@@ -169,7 +215,7 @@ class MotifPanelFactory : ToolWindowFactory {
     }
 }
 
-private fun log(o: Any?) {
+fun log(o: Any?) {
     Notifications.Bus.notify(
             Notification("Motif", "Motif Tree", o.toString(), NotificationType.INFORMATION))
 }

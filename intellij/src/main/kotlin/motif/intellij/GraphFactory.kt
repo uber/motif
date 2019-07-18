@@ -80,7 +80,7 @@ class GraphFactory(private val project: Project) {
     }
 
     private fun getClasses(psiClass: PsiClass): List<PsiClass> {
-        return listOf(psiClass) + psiClass.allInnerClasses.flatMap(this::getClasses)
+        return listOf(psiClass) + psiClass.innerClasses.flatMap(this::getClasses)
     }
 
     private fun isScopeClass(psiClass: PsiClass): Boolean {
