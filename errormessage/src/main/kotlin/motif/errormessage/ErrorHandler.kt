@@ -39,6 +39,7 @@ internal interface ErrorHandler {
                     is VoidFactoryMethod -> VoidFactoryMethodHandler(error)
                     is NullableFactoryMethod -> NullableFactoryMethodHandler(error)
                     is NullableParameter -> NullableParameterHandler(error)
+                    is NullableDynamicDependency -> NullableDynamicDependencyHandler(error)
                     is InvalidFactoryMethod -> InvalidFactoryMethodHandler(error)
                     is UnspreadableType -> UnspreadableTypeHandler(error)
                     is NoSuitableConstructor -> NoSuitableConstructorHandler(error)
