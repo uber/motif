@@ -29,6 +29,7 @@ class ObjectsConstructorFound(val scope: Scope, val objectClass: IrClass) : Pars
 class VoidFactoryMethod(val objects: Objects, val method: IrMethod) : ParsingError()
 class NullableFactoryMethod(val objects: Objects, val method: IrMethod) : ParsingError()
 class NullableParameter(val scope: Scope, val owner: IrClass, val method: IrMethod, val parameter: IrParameter) : ParsingError()
+class NullableDynamicDependency(val scope: Scope, val method: IrMethod, val parameter: IrParameter) : ParsingError()
 class InvalidFactoryMethod(val objects: Objects, val method: IrMethod) : ParsingError()
 class UnspreadableType(val objects: Objects, val method: IrMethod, val type: IrType) : ParsingError()
 class NoSuitableConstructor(val objects: Objects, val method: IrMethod, val type: IrType) : ParsingError()

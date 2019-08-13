@@ -27,6 +27,9 @@ sealed class ScopeMethod {
         fun fromScopeMethod(scope: Scope, method: IrMethod): ScopeMethod {
             val returnClass: IrClass? = method.returnType.resolveClass()
             if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
+                method.parameters.find { it.isNullable() }?.let { nullableParameter ->
+                    throw NullableDynamicDependency(scope, method, nullableParameter)
+                }
                 return ChildMethod(method, scope, returnClass)
             }
 
