@@ -21,30 +21,29 @@ import motif.ast.IrMethod
 /**
  * [Wiki](https://github.com/uber/motif/wiki#dependencies)
  */
-class Dependencies(val clazz: IrClass, val scope: Scope) {
+class Dependencies(val clazz: IrClass) {
 
     val methods: List<Method> = clazz.methods
             .map { method ->
-                if (method.isVoid()) throw VoidDependenciesMethod(scope, clazz, method)
-                if (method.hasParameters()) throw DependencyMethodWithParameters(scope, clazz, method)
+                if (method.isVoid()) throw VoidDependenciesMethod(clazz, method)
+                if (method.hasParameters()) throw DependencyMethodWithParameters(clazz, method)
+                if (method.isNullable()) throw NullableDependencyMethod(clazz, method)
                 val type = Type.fromReturnType(method)
                 Method(this, method, type)
             }
 
+    private val methodMap = methods.associateBy { it.returnType }
+
     val types: List<Type> = methods.map { it.returnType }
+
+    fun getMethod(type: Type): Method? {
+        return methodMap[type]
+    }
 
     class Method(val dependencies: Dependencies, val method: IrMethod, val returnType: Type) {
 
         val qualifiedName: String by lazy {
             "${dependencies.clazz.qualifiedName}.${method.name}"
-        }
-    }
-
-    companion object {
-
-        fun fromScope(scope: Scope): Dependencies? {
-            val dependenciesClass = scope.clazz.annotatedInnerClass(motif.Dependencies::class) ?: return null
-            return Dependencies(dependenciesClass, scope)
         }
     }
 }

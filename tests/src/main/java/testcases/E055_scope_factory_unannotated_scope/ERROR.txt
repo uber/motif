@@ -15,10 +15,14 @@
               Motif Errors
   ====================================
   
-  [VOID DEPENDENCIES METHOD]
+  [UNANNOTATED SCOPE FACTORY SCOPE]
   
-  Dependency methods must be non-void:
+  ScopeFactory Scope type argument is not annotated with @Scope:
   
-    void testcases.E034_void_dependencies_method.Scope.Dependencies.a
+    [SCOPE FACTORY]
+      testcases.E055_scope_factory_unannotated_scope.FooScopeFactory
+  
+    [SCOPE]
+      testcases.E055_scope_factory_unannotated_scope.FooScope
   
   ====================================

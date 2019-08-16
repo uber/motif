@@ -37,25 +37,25 @@ class Scope internal constructor(val clazz: IrClass) {
 
     val factoryMethods: List<FactoryMethod> = objects?.factoryMethods ?: emptyList()
 
-    val dependencies: Dependencies? = Dependencies.fromScope(this)
+    val dependencies: Dependencies? = clazz.annotatedInnerClass(motif.Dependencies::class)?.let { Dependencies(it) }
 
     val source = ScopeSource(this)
 
     companion object {
 
         fun fromClasses(scopeClasses: List<IrClass>): List<Scope> {
-            return ScopeFactory(scopeClasses).create()
+            return ScopeBuilder(scopeClasses).build()
         }
     }
 }
 
-private class ScopeFactory(
+private class ScopeBuilder(
         private val initialScopeClasses: List<IrClass>) {
 
     private val scopeMap: MutableMap<IrType, Scope> = mutableMapOf()
     private val visited: MutableSet<IrType> = mutableSetOf()
 
-    fun create(): List<Scope> {
+    fun build(): List<Scope> {
         initialScopeClasses.forEach(this::visit)
         return scopeMap.values.toList()
     }

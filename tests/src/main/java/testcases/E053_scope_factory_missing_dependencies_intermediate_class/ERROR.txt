@@ -15,10 +15,12 @@
               Motif Errors
   ====================================
   
-  [VOID DEPENDENCIES METHOD]
+  [UNSATISFIED DEPENDENCY]
   
-  Dependency methods must be non-void:
+  Unable to satisfy dependency:
   
-    void testcases.E034_void_dependencies_method.Scope.Dependencies.a
+    [ACCESS METHOD]
+      TYPE:   java.lang.String
+      METHOD: testcases.E053_scope_factory_missing_dependencies_intermediate_class.FooScope.string
   
   ====================================

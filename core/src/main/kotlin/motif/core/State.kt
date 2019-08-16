@@ -70,11 +70,11 @@ internal class State(
         }
     }
 
-    fun setDependencies(dependencies: Dependencies) {
+    fun setDependencies(scope: Scope, dependencies: Dependencies) {
         val declaredTypes: Set<Type> = dependencies.types.toSet()
         val requiredButNotDeclared: List<Sink> = unsatisfied.filter { !declaredTypes.contains(it.type) }
         requiredButNotDeclared.forEach {
-            errors.add(UnsatisfiedDependencyError(dependencies.scope, it))
+            errors.add(UnsatisfiedDependencyError(scope, it))
             unsatisfied.remove(it)
         }
 

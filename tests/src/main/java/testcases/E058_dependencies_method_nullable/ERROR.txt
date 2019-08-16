@@ -15,10 +15,13 @@
               Motif Errors
   ====================================
   
-  [VOID DEPENDENCIES METHOD]
+  [NULLABLE DEPENDENCY METHOD]
   
-  Dependency methods must be non-void:
+  Dependency method may not be nullable:
   
-    void testcases.E034_void_dependencies_method.Scope.Dependencies.a
+    @Nullable String testcases.E058_dependencies_method_nullable.FooDependencies.s
+  
+  Suggestions:
+    * Consider using Optional<...> instead.
   
   ====================================

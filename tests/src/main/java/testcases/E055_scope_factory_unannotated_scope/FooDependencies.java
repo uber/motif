@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package testcases.E055_scope_factory_unannotated_scope;
 
-import motif.models.DependencyMethodWithParameters
-
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
-
-    override val name = "DEPENDENCY METHOD PARAMETER"
-
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency methods must be parameterless:
-
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
-}
+public interface FooDependencies {}

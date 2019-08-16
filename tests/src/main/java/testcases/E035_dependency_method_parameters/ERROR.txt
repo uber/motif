@@ -17,7 +17,7 @@
   
   [DEPENDENCY METHOD PARAMETER]
   
-  Methods on @Dependencies-annotated interfaces must be parameterless:
+  Dependency methods must be parameterless:
   
     testcases.E035_dependency_method_parameters.Scope.Dependencies.s
   

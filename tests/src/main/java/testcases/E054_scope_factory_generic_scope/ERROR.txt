@@ -15,10 +15,14 @@
               Motif Errors
   ====================================
   
-  [VOID DEPENDENCIES METHOD]
+  [INVALID SCOPE FACTORY TYPE ARGUMENT]
   
-  Dependency methods must be non-void:
+  ScopeFactory type argument is invalid:
   
-    void testcases.E034_void_dependencies_method.Scope.Dependencies.a
+    [SCOPE FACTORY]
+      testcases.E054_scope_factory_generic_scope.FooScopeFactory<T>
+  
+    [TYPE ARGUMENT]
+      T
   
   ====================================

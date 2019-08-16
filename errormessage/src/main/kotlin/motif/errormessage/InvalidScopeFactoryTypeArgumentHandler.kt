@@ -15,17 +15,21 @@
  */
 package motif.errormessage
 
-import motif.models.DependencyMethodWithParameters
+import motif.models.InvalidScopeFactoryTypeArgument
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+class InvalidScopeFactoryTypeArgumentHandler(private val error: InvalidScopeFactoryTypeArgument) : ErrorHandler {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
+    override val name = "INVALID SCOPE FACTORY TYPE ARGUMENT"
 
     override fun StringBuilder.handle() {
         appendln("""
-            Dependency methods must be parameterless:
+            ScopeFactory type argument is invalid:
 
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
+              [SCOPE FACTORY]
+                ${error.scopeFactoryClass.qualifiedName}
+
+              [TYPE ARGUMENT]
+                ${error.typeArgument.qualifiedName}
         """.trimIndent())
     }
 }

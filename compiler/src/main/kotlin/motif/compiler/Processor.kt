@@ -19,11 +19,13 @@ import com.google.auto.common.BasicAnnotationProcessor
 import com.google.common.collect.SetMultimap
 import com.squareup.javapoet.JavaFile
 import motif.Scope
+import motif.ScopeFactoryMarkerAccess
 import motif.ast.compiler.CompilerClass
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
+import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
 
@@ -48,18 +50,23 @@ class Processor : BasicAnnotationProcessor() {
     private inner class Step : ProcessingStep {
 
         override fun annotations(): Set<Class<out Annotation>> {
-            return setOf(motif.Scope::class.java)
+            return setOf(motif.Scope::class.java, ScopeFactoryMarkerAccess.annotation)
         }
 
         override fun process(elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>): Set<Element> {
             val scopeElements = elementsByAnnotation[Scope::class.java]
             val initialScopeClasses = scopeElements
                     .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
-            if (initialScopeClasses.isEmpty()) {
+
+            val scopeFactoryClasses = elementsByAnnotation[ScopeFactoryMarkerAccess.annotation]
+                    .filter { Modifier.ABSTRACT !in it.modifiers }
+                    .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
+
+            if (initialScopeClasses.isEmpty() && scopeFactoryClasses.isEmpty()) {
                 return emptySet()
             }
 
-            this@Processor.graph = ResolvedGraph.create(initialScopeClasses)
+            this@Processor.graph = ResolvedGraph.create(initialScopeClasses, scopeFactoryClasses)
 
             if (graph.errors.isNotEmpty()) {
                 val errorMessage = ErrorMessage.toString(graph)

@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package motif;
 
-import motif.models.DependencyMethodWithParameters
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Target;
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
-
-    override val name = "DEPENDENCY METHOD PARAMETER"
-
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency methods must be parameterless:
-
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
-}
+@Inherited
+@Target(ElementType.TYPE)
+@interface ScopeFactoryMarker {}

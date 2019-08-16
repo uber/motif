@@ -15,17 +15,20 @@
  */
 package motif.errormessage
 
-import motif.models.DependencyMethodWithParameters
+import motif.models.NullableDependencyMethod
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+class NullableDependencyMethodHandler(private val error: NullableDependencyMethod) : ErrorHandler {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
+    override val name = "NULLABLE DEPENDENCY METHOD"
 
     override fun StringBuilder.handle() {
         appendln("""
-            Dependency methods must be parameterless:
+            Dependency method may not be nullable:
 
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
+              @Nullable ${error.method.returnType.simpleName} ${error.dependenciesClass.qualifiedName}.${error.method.name}
+
+            Suggestions:
+              * Consider using Optional<...> instead.
         """.trimIndent())
     }
 }

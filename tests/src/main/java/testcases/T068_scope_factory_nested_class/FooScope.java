@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package testcases.T068_scope_factory_nested_class;
 
-import motif.models.DependencyMethodWithParameters
+import motif.ScopeFactory;
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+@motif.Scope
+public interface FooScope {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
+    String string();
 
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency methods must be parameterless:
+    interface Dependencies {
 
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
+        String string();
     }
+
+    class Factory extends ScopeFactory<FooScope, Dependencies> {}
 }

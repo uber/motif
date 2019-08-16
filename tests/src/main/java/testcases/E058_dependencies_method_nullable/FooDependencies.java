@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package testcases.E058_dependencies_method_nullable;
 
-import motif.models.DependencyMethodWithParameters
+import javax.annotation.Nullable;
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+public interface FooDependencies {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
-
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency methods must be parameterless:
-
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+    @Nullable
+    String s();
 }

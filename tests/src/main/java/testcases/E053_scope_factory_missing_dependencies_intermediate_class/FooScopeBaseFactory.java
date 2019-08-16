@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package testcases.E053_scope_factory_missing_dependencies_intermediate_class;
 
-import motif.models.DependencyMethodWithParameters
+import motif.ScopeFactory;
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
-
-    override val name = "DEPENDENCY METHOD PARAMETER"
-
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency methods must be parameterless:
-
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
-}
+public abstract class FooScopeBaseFactory<T> extends ScopeFactory<T, FooDependencies> {}

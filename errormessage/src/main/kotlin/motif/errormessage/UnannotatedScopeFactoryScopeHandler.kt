@@ -15,17 +15,21 @@
  */
 package motif.errormessage
 
-import motif.models.DependencyMethodWithParameters
+import motif.models.UnannotatedScopeFactoryScope
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+class UnannotatedScopeFactoryScopeHandler(private val error: UnannotatedScopeFactoryScope) : ErrorHandler {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
+    override val name = "UNANNOTATED SCOPE FACTORY SCOPE"
 
     override fun StringBuilder.handle() {
         appendln("""
-            Dependency methods must be parameterless:
+            ScopeFactory Scope type argument is not annotated with @Scope:
 
-              ${error.dependenciesClass.qualifiedName}.${error.method.name}
+              [SCOPE FACTORY]
+                ${error.scopeFactoryClass.qualifiedName}
+
+              [SCOPE]
+                ${error.scopeClass.qualifiedName}
         """.trimIndent())
     }
 }

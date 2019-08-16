@@ -27,6 +27,8 @@ interface ResolvedGraph {
 
     val scopes: List<Scope>
 
+    val scopeFactories: List<ScopeFactory>
+
     val errors: List<MotifError>
 
     fun getScope(scopeClass: IrClass): Scope?
@@ -41,13 +43,14 @@ interface ResolvedGraph {
 
     companion object {
 
-        fun create(initialScopeClasses: List<IrClass>): ResolvedGraph {
-            val scopes = try {
-                Scope.fromClasses(initialScopeClasses)
+        fun create(initialScopeClasses: List<IrClass>, scopeFactoryClasses: List<IrClass>): ResolvedGraph {
+            val scopeGraph = try {
+                val scopeFactories = scopeFactoryClasses.map { ScopeFactory(it) }
+                val scopes = Scope.fromClasses(initialScopeClasses + scopeFactories.map { it.scopeClass })
+                ScopeGraph.create(scopes, scopeFactories)
             } catch (e: ParsingError) {
                 return ErrorGraph(e)
             }
-            val scopeGraph = ScopeGraph.create(scopes)
             scopeGraph.scopeCycleError?.let { return ErrorGraph(it) }
             return ResolvedGraphFactory(scopeGraph).create()
         }
@@ -93,7 +96,8 @@ private class ResolvedGraphFactory(private val scopeGraph: ScopeGraph) {
         val scopeSource = scope.source
         state.addSource(scopeSource)
 
-        scope.dependencies?.let { state.setDependencies(it) }
+        scope.dependencies?.let { state.setDependencies(scope, it) }
+        scopeGraph.getFactories(scope).forEach { state.setDependencies(scope, it.dependencies) }
 
         scope.factoryMethods.forEach { factoryMethod ->
             factoryMethod.sources.forEach { source ->
@@ -111,6 +115,7 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
 
     override val roots = emptyList<Scope>()
     override val scopes = emptyList<Scope>()
+    override val scopeFactories = emptyList<ScopeFactory>()
     override val errors = listOf(error)
     override fun getScope(scopeClass: IrClass) = null
     override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
@@ -128,6 +133,8 @@ private class ValidResolvedGraph(
     override val roots = scopeGraph.roots
 
     override val scopes = scopeGraph.scopes
+
+    override val scopeFactories = scopeGraph.scopeFactories
 
     override val errors = graphState.errors
 

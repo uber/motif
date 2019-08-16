@@ -40,6 +40,7 @@ internal interface ErrorHandler {
                     is NullableFactoryMethod -> NullableFactoryMethodHandler(error)
                     is NullableParameter -> NullableParameterHandler(error)
                     is NullableDynamicDependency -> NullableDynamicDependencyHandler(error)
+                    is NullableDependencyMethod -> NullableDependencyMethodHandler(error)
                     is InvalidFactoryMethod -> InvalidFactoryMethodHandler(error)
                     is UnspreadableType -> UnspreadableTypeHandler(error)
                     is NoSuitableConstructor -> NoSuitableConstructorHandler(error)
@@ -48,6 +49,8 @@ internal interface ErrorHandler {
                     is VoidDependenciesMethod -> VoidDependenciesMethodHandler(error)
                     is DependencyMethodWithParameters -> DependencyMethodWithParametersHandler(error)
                     is NullableSpreadMethod -> NullableSpreadMethodHandler(error)
+                    is InvalidScopeFactoryTypeArgument -> InvalidScopeFactoryTypeArgumentHandler(error)
+                    is UnannotatedScopeFactoryScope -> UnannotatedScopeFactoryScopeHandler(error)
                 }
                 is ProcessingError -> when (error) {
                     is ScopeCycleError -> ScopeCycleHandler(error)
