@@ -15,11 +15,9 @@
  */
 package motif.ast.intellij
 
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
-import com.intellij.psi.PsiElementFactory
-import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.*
 import motif.ast.*
 import java.lang.IllegalStateException
 import kotlin.collections.filter
@@ -29,12 +27,22 @@ class IntelliJClass(
         private val project: Project,
         private val psiClassType: PsiClassType) : IrUtil, IrClass {
 
+    private val jvmPsiConversionHelper = ServiceManager.getService(project, JvmPsiConversionHelper::class.java)
+
     val psiClass: PsiClass by lazy {
         psiClassType.resolve()
                 ?: throw IllegalStateException(psiClassType.className)
     }
 
     override val type: IrType by lazy { IntelliJType(project, psiClassType) }
+
+    override val superclass: IrType by lazy { IntelliJType(project, psiClass.superClassType as PsiClassType) }
+
+    override val typeArguments: List<IrType> by lazy {
+        psiClassType.typeArguments()
+                .map { jvmPsiConversionHelper.convertType(it) }
+                .map { IntelliJType(project, it) }
+    }
 
     override val kind: IrClass.Kind by lazy {
         if (psiClass.isInterface) {

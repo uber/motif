@@ -13,6 +13,9 @@ dependencies {
     implementation deps.autoCommon
 
     api project(':ast')
+
+    testImplementation deps.test.truth
+    testImplementation deps.test.compileTesting
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

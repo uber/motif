@@ -36,6 +36,10 @@ class CompilerClass(
 
     override val type: IrType by lazy { CompilerType(env, declaredType) }
 
+    override val superclass: IrType by lazy { CompilerType(env, typeElement.superclass as DeclaredType) }
+
+    override val typeArguments: List<IrType> by lazy { declaredType.typeArguments.map { CompilerType(env, it) } }
+
     override val kind: IrClass.Kind by lazy {
         when (typeElement.kind) {
             ElementKind.CLASS -> IrClass.Kind.CLASS

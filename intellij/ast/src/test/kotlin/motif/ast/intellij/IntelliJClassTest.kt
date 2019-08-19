@@ -16,6 +16,7 @@
 package motif.ast.intellij
 
 import com.intellij.psi.PsiElementFactory
+import com.intellij.psi.PsiTypeVariable
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -168,6 +169,33 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
         val stringBazType = createIntelliJType("motif.intellij.Baz<String>")
 
         assertThat(fooClass.type.isAssignableTo(stringBazType)).isTrue()
+    }
+
+    fun testSupertypeTypeArguments() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo extends Bar<String> {}
+            
+            class Bar<T> {}
+        """.trimIndent())
+
+        val superClass = fooClass.superclass.resolveClass() as IntelliJClass
+        assertThat(superClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
+    }
+
+    fun testSupertypeTypeArguments_typeVariable() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo<T> extends Bar<T> {}
+            
+            class Bar<T> {}
+        """.trimIndent())
+
+        val superClass = fooClass.superclass.resolveClass() as IntelliJClass
+        val typeArgument = superClass.typeArguments.single() as IntelliJType
+        assertThat(typeArgument.psiType.presentableText).isEqualTo("T")
     }
 
     private fun createIntelliJClass(@Language("JAVA") classText: String): IntelliJClass {
