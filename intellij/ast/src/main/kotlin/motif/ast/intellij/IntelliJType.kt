@@ -28,7 +28,7 @@ import kotlin.text.contains
 
 class IntelliJType(
         private val project: Project,
-        private val psiType: PsiType) : IrType {
+        val psiType: PsiType) : IrType {
 
     override val qualifiedName: String by lazy {
         val canonicalText: String = GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(true)

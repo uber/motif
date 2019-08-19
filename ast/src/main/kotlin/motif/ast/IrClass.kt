@@ -20,6 +20,8 @@ import kotlin.reflect.KClass
 interface IrClass : IrAnnotated, IrHasModifiers {
 
     val type: IrType
+    val superclass: IrType
+    val typeArguments: List<IrType>
     val kind: Kind
     val methods: List<IrMethod>
     val nestedClasses: List<IrClass>
