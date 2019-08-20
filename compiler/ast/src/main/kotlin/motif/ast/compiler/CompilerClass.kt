@@ -18,10 +18,7 @@ package motif.ast.compiler
 import com.google.auto.common.MoreElements
 import motif.ast.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.Modifier
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.*
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
@@ -32,11 +29,16 @@ class CompilerClass(
         override val env: ProcessingEnvironment,
         val declaredType: DeclaredType) : IrUtil, IrClass {
 
-    private val typeElement: TypeElement by lazy { declaredType.asElement() as TypeElement }
+    val typeElement: TypeElement by lazy { declaredType.asElement() as TypeElement }
 
     override val type: IrType by lazy { CompilerType(env, declaredType) }
 
-    override val superclass: IrType by lazy { CompilerType(env, typeElement.superclass as DeclaredType) }
+    override val superclass: IrType? by lazy {
+        val superType = env.typeUtils.directSupertypes(declaredType).firstOrNull {
+            it.kind == TypeKind.DECLARED && (it as DeclaredType).asElement().kind == ElementKind.CLASS
+        } ?: return@lazy null
+        CompilerType(env, superType as DeclaredType)
+    }
 
     override val typeArguments: List<IrType> by lazy { declaredType.typeArguments.map { CompilerType(env, it) } }
 

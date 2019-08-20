@@ -20,6 +20,7 @@ import com.intellij.psi.PsiTypeVariable
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
+import org.junit.Test
 
 class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
 
@@ -180,8 +181,25 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Bar<T> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass.resolveClass() as IntelliJClass
+        val superClass = fooClass.superclass!!.resolveClass() as IntelliJClass
         assertThat(superClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
+    }
+
+    @Test
+    fun testSupertypeTypeArguments_intermediateClass() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo extends Bar<String> {}
+            
+            class Bar<T> extends Baz<T> {}
+            
+            class Baz<T> {}
+        """.trimIndent())
+
+        val barClass = fooClass.superclass!!.resolveClass() as IntelliJClass
+        val bazClass = barClass.superclass!!.resolveClass() as IntelliJClass
+        assertThat(bazClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
     }
 
     fun testSupertypeTypeArguments_typeVariable() {
@@ -193,9 +211,34 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Bar<T> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass.resolveClass() as IntelliJClass
-        val typeArgument = superClass.typeArguments.single() as IntelliJType
-        assertThat(typeArgument.psiType.presentableText).isEqualTo("T")
+        val superClass = fooClass.superclass!!.resolveClass() as IntelliJClass
+        assertThat(superClass.typeArguments).isEmpty()
+    }
+
+    fun testObjectSuperclass() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo {}
+        """.trimIndent())
+
+        val objectClass = fooClass.superclass!!.resolveClass()!!
+        assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
+        assertThat(objectClass.superclass).isNull()
+    }
+
+    fun testSuperclassOnlyInterface() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo implements Bar {}
+            
+            interface Bar {}
+        """.trimIndent())
+
+        val objectClass = fooClass.superclass!!.resolveClass()!!
+        assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
+        assertThat(objectClass.superclass).isNull()
     }
 
     private fun createIntelliJClass(@Language("JAVA") classText: String): IntelliJClass {
