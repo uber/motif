@@ -29,6 +29,8 @@ interface ResolvedGraph {
 
     val errors: List<MotifError>
 
+    fun getScope(scopeClass: IrClass): Scope?
+
     fun getChildEdges(scope: Scope): Iterable<ScopeEdge>
 
     fun getChildUnsatisfied(scopeEdge: ScopeEdge): Iterable<Sink>
@@ -110,6 +112,7 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
     override val roots = emptyList<Scope>()
     override val scopes = emptyList<Scope>()
     override val errors = listOf(error)
+    override fun getScope(scopeClass: IrClass) = null
     override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = emptyList<Sink>()
     override fun getUnsatisfied(scope: Scope) = emptyList<Sink>()
@@ -127,6 +130,8 @@ private class ValidResolvedGraph(
     override val scopes = scopeGraph.scopes
 
     override val errors = graphState.errors
+
+    override fun getScope(scopeClass: IrClass) = scopeGraph.getScope(scopeClass)
 
     override fun getChildEdges(scope: Scope) = scopeGraph.getChildEdges(scope)
 

@@ -16,9 +16,12 @@
 package motif.compiler
 
 import com.squareup.javapoet.*
-import motif.core.ScopeEdge
 import motif.core.ResolvedGraph
-import motif.models.*
+import motif.core.ScopeEdge
+import motif.models.AccessMethod
+import motif.models.ChildMethod
+import motif.models.Scope
+import motif.models.Type
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Modifier
 
@@ -30,19 +33,11 @@ class ChildImpl(val childEdge: ScopeEdge, val dependencies: Dependencies, val im
 }
 
 class ScopeImpl(
-        val spec: TypeSpec?,
-        val packageName: String,
-        val dependencies: Dependencies) {
+        override val spec: TypeSpec,
+        override val packageName: String,
+        val dependencies: Dependencies) : GeneratedClass
 
-    companion object {
-
-        fun create(env: ProcessingEnvironment, graph: ResolvedGraph): List<ScopeImpl> {
-            return ScopeImplsFactory.create(env, graph)
-        }
-    }
-}
-
-private class ScopeImplFactory(
+class ScopeImplFactory(
         private val env: ProcessingEnvironment,
         private val graph: ResolvedGraph,
         private val scope: Scope,
@@ -230,59 +225,6 @@ private class ScopeImplFactory(
     private fun daggerComponentName(scopeImplTypeName: ClassName, component: Component): ClassName {
         val simpleName = component.typeName.simpleNames().joinToString("_")
         return scopeImplTypeName.peerClass("Dagger$simpleName")
-    }
-}
-
-private class ScopeImplsFactory(
-        private val env: ProcessingEnvironment,
-        private val graph: ResolvedGraph) {
-
-    private val dependencies = mutableMapOf<Scope, Dependencies>()
-    private val implTypeNames = mutableMapOf<Scope, ClassName>()
-
-    fun getScopeImpls(): List<ScopeImpl> {
-        return graph.scopes
-                .filter { scope ->
-                    val scopeImplName = getImplTypeName(scope)
-                    env.elementUtils.getTypeElement(scopeImplName.toString()) == null
-                }
-                .map { scope ->
-                    val childEdges = graph.getChildEdges(scope)
-                            .map { childEdge ->
-                                val childImplTypeName = getImplTypeName(childEdge.child)
-                                val dependencies = getDependencies(childEdge.child)
-                                ChildImpl(childEdge, dependencies, childImplTypeName)
-                            }
-                    ScopeImplFactory(
-                            env,
-                            graph,
-                            scope,
-                            getImplTypeName(scope),
-                            getDependencies(scope),
-                            childEdges).create()
-                }
-    }
-
-    private fun getDependencies(scope: Scope): Dependencies {
-        return dependencies.computeIfAbsent(scope) {
-            val implTypeName = getImplTypeName(scope)
-            Dependencies.create(graph, scope, implTypeName)
-        }
-    }
-
-    private fun getImplTypeName(scope: Scope): ClassName {
-        return implTypeNames.computeIfAbsent(scope) {
-            val scopeTypeName = scope.clazz.typeName
-            val prefix = scopeTypeName.simpleNames().joinToString("")
-            ClassName.get(scopeTypeName.packageName(), "${prefix}Impl")
-        }
-    }
-
-    companion object {
-
-        fun create(env: ProcessingEnvironment, graph: ResolvedGraph): List<ScopeImpl> {
-            return ScopeImplsFactory(env, graph).getScopeImpls()
-        }
     }
 }
 

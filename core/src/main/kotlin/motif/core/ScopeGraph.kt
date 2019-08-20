@@ -15,6 +15,7 @@
  */
 package motif.core
 
+import motif.ast.IrClass
 import motif.ast.IrType
 import motif.models.ChildMethod
 import motif.models.Scope
@@ -42,9 +43,13 @@ internal class ScopeGraph private constructor(val scopes: List<Scope>) {
         return childEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
     }
 
+    fun getScope(scopeClass: IrClass): Scope? {
+        return scopeMap[scopeClass.type]
+    }
+
     private fun createChildren(scope: Scope): List<ScopeEdge> {
         return scope.childMethods.map { method ->
-            val childScope = scopeMap[method.childScopeClass.type]
+            val childScope = getScope(method.childScopeClass)
                     ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
             ScopeEdge(scope, childScope, method)
         }

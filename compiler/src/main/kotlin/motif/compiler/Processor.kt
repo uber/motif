@@ -62,11 +62,10 @@ class Processor : BasicAnnotationProcessor() {
                 return emptySet()
             }
 
-            val scopeImpls = ScopeImpl.create(processingEnv, graph)
+            val generatedClasses = CodeGenerator.generate(processingEnv, graph)
 
-            scopeImpls.forEach { scopeImpl ->
-                val spec = scopeImpl.spec ?: return@forEach
-                JavaFile.builder(scopeImpl.packageName, spec).build().writeTo(processingEnv.filer)
+            generatedClasses.forEach { generatedClass ->
+                JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)
             }
 
             return emptySet()
