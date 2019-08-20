@@ -38,8 +38,25 @@ class CompilerClassTest {
             class Foo extends Bar<String> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass.resolveClass() as CompilerClass
+        val superClass = fooClass.superclass!!.resolveClass() as CompilerClass
         assertThat(superClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
+    }
+
+    @Test
+    fun testSupertypeTypeArguments_intermediateClass() {
+        val fooClass = createClass("test.Foo", """
+            package test;
+            
+            class Baz<T> {}
+            
+            class Bar<T> extends Baz<T> {}
+            
+            class Foo extends Bar<String> {}
+        """.trimIndent())
+
+        val barClass = fooClass.superclass!!.resolveClass() as CompilerClass
+        val bazClass = barClass.superclass!!.resolveClass() as CompilerClass
+        assertThat(bazClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
     }
 
     @Test
@@ -52,9 +69,36 @@ class CompilerClassTest {
             class Foo<T> extends Bar<T> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass.resolveClass() as CompilerClass
-        val typeArgument = superClass.typeArguments.single() as CompilerType
-        assertThat(typeArgument.mirror.kind).isSameInstanceAs(TypeKind.TYPEVAR)
+        val superClass = fooClass.superclass!!.resolveClass() as CompilerClass
+        assertThat(superClass.typeArguments).isEmpty()
+    }
+
+    @Test
+    fun testObjectSuperclass() {
+        val fooClass = createClass("test.Foo", """
+            package test;
+            
+            class Foo {}
+        """.trimIndent())
+
+        val objectClass = fooClass.superclass!!.resolveClass()!!
+        assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
+        assertThat(objectClass.superclass).isNull()
+    }
+
+    @Test
+    fun testSuperclassOnlyInterface() {
+        val fooClass = createClass("test.Foo", """
+            package test;
+            
+            interface Bar {}
+            
+            class Foo implements Bar {}
+        """.trimIndent())
+
+        val objectClass = fooClass.superclass!!.resolveClass()!!
+        assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
+        assertThat(objectClass.superclass).isNull()
     }
 
     private fun createClass(qualifiedName: String, @Language("JAVA") text: String): CompilerClass {
