@@ -19,7 +19,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
 import motif.ast.*
-import kotlin.collections.map
 
 class IntelliJMethod(
         private val project: Project,
@@ -33,6 +32,8 @@ class IntelliJMethod(
     override val returnType: IrType by lazy { IntelliJType(project, substitutor.substitute(psiMethod.returnType!!)) }
 
     override val name: String by lazy { psiMethod.name }
+
+    override val isConstructor: Boolean by lazy { psiMethod.isConstructor }
 
     override val annotations: List<IrAnnotation> by lazy { psiMethod.modifierList.irAnnotations(project) }
 
