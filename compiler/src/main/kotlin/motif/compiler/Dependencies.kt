@@ -15,13 +15,12 @@
  */
 package motif.compiler
 
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeName
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
+import motif.ast.IrClass
+import motif.ast.IrMethod
+import motif.ast.IrType
 import motif.core.ResolvedGraph
-import motif.models.Scope
-import motif.models.Type
+import motif.models.*
 import java.util.*
 import javax.lang.model.element.Modifier
 
@@ -61,14 +60,15 @@ class Dependencies private constructor(
             val typeName = scopeImplTypeName.nestedClass("Dependencies")
 
             val methods: SortedMap<Type, Method> = sinks
-                    .map { it.type }
-                    .toSet()
-                    .associateWith { type ->
+                    .groupBy { it.type }
+                    .map { (type, sinks) ->
                         val methodSpec = methodSpec(nameScope, type)
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                .addJavadoc(getJavadoc(sinks))
                                 .build()
                         Method(type, methodSpec)
                     }
+                    .associateBy { it.type }
                     .toSortedMap()
 
             val typeSpec = TypeSpec.interfaceBuilder(typeName)
@@ -77,6 +77,43 @@ class Dependencies private constructor(
                     .build()
 
             return Dependencies(typeSpec, typeName, methods)
+        }
+
+        private fun getJavadoc(sinks: List<Sink>): CodeBlock {
+            val sinkList = sinks.map { sink ->
+                val (callerType, callerMethod) = when (sink) {
+                    is FactoryMethodSink -> Pair(sink.parameter.owner.type, sink.parameter.method)
+                    is AccessMethodSink -> Pair(sink.scope.clazz.type, sink.accessMethod.method)
+                }
+
+                CodeBlock.builder()
+                        .add("<li>{@link \$L#", removeGenericSignature(callerType.qualifiedName))
+                        .add(getMethodReference(callerType, callerMethod))
+                        .add("</li>")
+                        .build()
+            }
+
+            return CodeBlock
+                    .builder()
+                    .add("<ul>\nRequested from:\n")
+                    .add(CodeBlock.join(sinkList, "\n"))
+                    .add("\n</ul>\n")
+                    .build()
+        }
+
+        private fun getMethodReference(callerType: IrType, callerMethod: IrMethod): CodeBlock {
+            val methodName = if (callerMethod.isConstructor) callerType.simpleName else callerMethod.name
+
+            val paramList = callerMethod
+                    .parameters
+                    .map { removeGenericSignature(it.type.qualifiedName) }
+                    .joinToString()
+
+            return CodeBlock.of("\$N(\$L)", methodName, paramList)
+        }
+
+        private fun removeGenericSignature(name: String): String {
+            return name.takeWhile { it != '<' }
         }
     }
 }

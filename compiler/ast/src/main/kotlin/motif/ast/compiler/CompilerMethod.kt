@@ -20,6 +20,7 @@ import motif.ast.IrMethod
 import motif.ast.IrModifier
 import motif.ast.IrType
 import javax.annotation.processing.ProcessingEnvironment
+import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
@@ -31,6 +32,8 @@ class CompilerMethod(
         val element: ExecutableElement) : IrMethod, IrUtil {
 
     override val name: String = element.simpleName.toString()
+
+    override val isConstructor: Boolean = element.kind == ElementKind.CONSTRUCTOR
 
     override val annotations: List<IrAnnotation> by lazy {
         element.irAnnotations()
