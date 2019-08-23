@@ -29,7 +29,7 @@ class Scope internal constructor(val clazz: IrClass) {
 
     val objects: Objects? = Objects.fromScope(this)
 
-    private val scopeMethods = clazz.methods.map { method -> ScopeMethod.fromScopeMethod(this, method) }
+    val scopeMethods = clazz.methods.map { method -> ScopeMethod.fromScopeMethod(this, method) }
 
     val accessMethods: List<AccessMethod> = scopeMethods.mapNotNull { method -> method as? AccessMethod }
 
