@@ -91,18 +91,18 @@ val Type.typeName: TypeName
 val Type.qualifierSpec: AnnotationSpec?
     get() = qualifierMirror?.let { AnnotationSpec.get(it) }
 
-class NameScope {
+class NameScope(blacklist: Iterable<String> = emptySet()) {
 
-    private val names = UniqueNameSet()
+    private val names = UniqueNameSet(blacklist)
 
     fun name(type: Type): String {
         return names.unique(Names.safeName(type.mirror, type.qualifierMirror))
     }
 }
 
-private class UniqueNameSet {
+private class UniqueNameSet(blacklist: Iterable<String>) {
 
-    private val used: MutableSet<String> = mutableSetOf()
+    private val used: MutableSet<String> = blacklist.toMutableSet()
 
     fun unique(base: String): String {
         var name = base

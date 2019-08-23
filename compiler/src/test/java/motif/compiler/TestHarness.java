@@ -15,6 +15,7 @@
  */
 package motif.compiler;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.google.common.truth.Truth;
 import com.google.testing.compile.Compilation;
@@ -49,18 +50,20 @@ import static com.google.testing.compile.CompilationSubject.assertThat;
 @RunWith(Parameterized.class)
 public class TestHarness {
 
-    @Parameterized.Parameters(name = "{2}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         File sourceRoot = new File("../tests/src/main/java/");
         File testCaseRoot = new File(sourceRoot, "testcases");
         File externalRoot = new File(sourceRoot, "external");
         File[] testCaseDirs = testCaseRoot.listFiles(TestHarness::isTestDir);
         if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + testCaseRoot);
-        return Arrays.stream(testCaseDirs)
-                .map(file -> {
-                    File externalDir = new File(externalRoot, file.getName());
-                    return new Object[]{file.getAbsoluteFile(), externalDir, file.getName()};
-                })
+        return ImmutableList.of(true, false).stream()
+                .flatMap(noDagger -> Arrays.stream(testCaseDirs)
+                        .map(file -> {
+                            File externalDir = new File(externalRoot, file.getName());
+                            String displayName = file.getName() + (noDagger ? "_nodagger" : "");
+                            return new Object[]{displayName, file.getAbsoluteFile(), externalDir, file.getName(), noDagger};
+                        }))
                 .collect(Collectors.toList());
     }
 
@@ -78,16 +81,18 @@ public class TestHarness {
     private final File testCaseDir;
     private final File externalDir;
     private final String testClassName;
+    private final boolean noDagger;
     private final File humanReadableFile;
     private final boolean isErrorTest;
 
     private File externalOutputDir;
 
     @SuppressWarnings("unused")
-    public TestHarness(File testCaseDir, File externalDir, String testName) {
+    public TestHarness(String displayName, File testCaseDir, File externalDir, String testName, boolean noDagger) {
         this.testCaseDir = testCaseDir;
         this.externalDir = externalDir;
         this.testClassName = "testcases." + testName + ".Test";
+        this.noDagger = noDagger;
         this.humanReadableFile = new File(testCaseDir, "ERROR.txt");
         this.isErrorTest = testName.startsWith("E");
     }
@@ -104,7 +109,8 @@ public class TestHarness {
                     null,
                     externalOutputDir,
                     shouldProcess ? new Processor() : null,
-                    externalDir);
+                    externalDir,
+                    noDagger);
             assertThat(externalCompilation).succeeded();
         }
 
@@ -113,7 +119,8 @@ public class TestHarness {
                 externalOutputDir,
                 null,
                 processor,
-                testCaseDir);
+                testCaseDir,
+                noDagger);
 
         if (isErrorTest) {
             runErrorTest(compilation, processor.graph);

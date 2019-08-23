@@ -29,12 +29,13 @@ interface GeneratedClass {
 
 class CodeGenerator(
         private val env: ProcessingEnvironment,
-        private val graph: ResolvedGraph) {
+        private val graph: ResolvedGraph,
+        private val compilerOptions: CompilerOptions) {
 
     private val dependencies = mutableMapOf<Scope, Dependencies>()
     private val implTypeNames = mutableMapOf<Scope, ClassName>()
 
-    private fun getScopeImpls(): List<ScopeImpl> {
+    private fun getScopeImpls(): List<GeneratedClass> {
         return graph.scopes
                 .filter { scope ->
                     val scopeImplName = getImplTypeName(scope)
@@ -47,13 +48,22 @@ class CodeGenerator(
                                 val dependencies = getDependencies(childEdge.child)
                                 ChildImpl(childEdge, dependencies, childImplTypeName)
                             }
-                    ScopeImplFactory(
-                            env,
-                            graph,
-                            scope,
-                            getImplTypeName(scope),
-                            getDependencies(scope),
-                            childEdges).create()
+                    if (compilerOptions.noDagger) {
+                        motif.compiler.codegenv2.ScopeImplGenerator(
+                                env,
+                                scope,
+                                getImplTypeName(scope),
+                                getDependencies(scope),
+                                childEdges).create()
+                    } else {
+                        ScopeImplFactory(
+                                env,
+                                graph,
+                                scope,
+                                getImplTypeName(scope),
+                                getDependencies(scope),
+                                childEdges).create()
+                    }
                 }
     }
 
@@ -74,8 +84,8 @@ class CodeGenerator(
 
     companion object {
 
-        fun generate(env: ProcessingEnvironment, graph: ResolvedGraph): List<GeneratedClass> {
-            return CodeGenerator(env, graph).getScopeImpls()
+        fun generate(env: ProcessingEnvironment, graph: ResolvedGraph, compilerOptions: CompilerOptions): List<GeneratedClass> {
+            return CodeGenerator(env, graph, compilerOptions).getScopeImpls()
         }
     }
 }

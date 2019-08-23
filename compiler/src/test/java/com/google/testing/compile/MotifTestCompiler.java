@@ -39,7 +39,8 @@ public class MotifTestCompiler {
             @Nullable File classpathDir,
             @Nullable File outDir,
             @Nullable Processor motifProcessor,
-            File dir) throws IOException {
+            File dir,
+            boolean noDagger) throws IOException {
         List<JavaFileObject> files = javaFileObjects(dir);
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
 
@@ -58,6 +59,9 @@ public class MotifTestCompiler {
         }
         if (outDir != null) {
             optionsBuilder.add("-d", outDir.getAbsolutePath());
+        }
+        if (noDagger) {
+            optionsBuilder.add("-Anodagger=true");
         }
 
         JavaCompiler.CompilationTask task = compiler.getTask(

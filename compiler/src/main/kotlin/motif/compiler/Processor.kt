@@ -25,8 +25,9 @@ import motif.errormessage.ErrorMessage
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeKind
 import javax.tools.Diagnostic
+
+private const val OPTION_NO_DAGGER = "nodagger"
 
 class Processor : BasicAnnotationProcessor() {
 
@@ -38,6 +39,10 @@ class Processor : BasicAnnotationProcessor() {
 
     override fun initSteps(): Iterable<ProcessingStep> {
         return listOf<ProcessingStep>(Step())
+    }
+
+    override fun getSupportedOptions(): Set<String> {
+        return setOf(OPTION_NO_DAGGER)
     }
 
     private inner class Step : ProcessingStep {
@@ -62,7 +67,9 @@ class Processor : BasicAnnotationProcessor() {
                 return emptySet()
             }
 
-            val generatedClasses = CodeGenerator.generate(processingEnv, graph)
+            val noDagger = processingEnv.options.getOrDefault(OPTION_NO_DAGGER, null) == "true"
+            val compilerOptions = CompilerOptions(noDagger = noDagger)
+            val generatedClasses = CodeGenerator.generate(processingEnv, graph, compilerOptions)
 
             generatedClasses.forEach { generatedClass ->
                 JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)

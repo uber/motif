@@ -22,6 +22,8 @@ import motif.ast.IrParameter
 
 sealed class ScopeMethod {
 
+    abstract val method: IrMethod
+
     companion object {
 
         fun fromScopeMethod(scope: Scope, method: IrMethod): ScopeMethod {
@@ -45,7 +47,7 @@ sealed class ScopeMethod {
 /**
  * [Wiki](https://github.com/uber/motif/wiki#access-methods)
  */
-class AccessMethod(val method: IrMethod, val scope: Scope) : ScopeMethod() {
+class AccessMethod(override val method: IrMethod, val scope: Scope) : ScopeMethod() {
 
     val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
 
@@ -58,7 +60,7 @@ class AccessMethod(val method: IrMethod, val scope: Scope) : ScopeMethod() {
  * [Wiki](https://github.com/uber/motif/wiki#child-methods)
  */
 class ChildMethod(
-        val method: IrMethod,
+        override val method: IrMethod,
         val scope: Scope,
         val childScopeClass: IrClass) : ScopeMethod() {
 
