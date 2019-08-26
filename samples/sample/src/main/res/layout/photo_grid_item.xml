@@ -17,5 +17,4 @@
         android:layout_height="match_parent"
         android:background="?attr/selectableItemBackground"/>
 
-
 </motif.sample.app.photo_grid_item.PhotoGridItemView>

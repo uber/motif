@@ -16,7 +16,6 @@
 package motif.sample.app.photo_grid_item;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
-import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxbinding3.view.RxView;
+
+import kotlin.Unit;
 import motif.sample.R;
 import motif.sample.lib.db.Photo;
 
@@ -62,7 +65,7 @@ public class PhotoGridItemView extends FrameLayout {
         ButterKnife.bind(this);
     }
 
-    Observable<Object> clicks() {
+    Observable<Unit> clicks() {
         return RxView.clicks(touchView);
     }
 

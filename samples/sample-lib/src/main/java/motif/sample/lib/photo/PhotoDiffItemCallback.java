@@ -15,8 +15,7 @@
  */
 package motif.sample.lib.photo;
 
-
-import android.support.v7.util.DiffUtil;
+import androidx.recyclerview.widget.DiffUtil;
 
 import motif.sample.lib.db.Photo;
 

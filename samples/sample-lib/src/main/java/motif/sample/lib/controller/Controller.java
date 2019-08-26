@@ -16,18 +16,19 @@
 package motif.sample.lib.controller;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.AutoDisposeConverter;
-import io.reactivex.subjects.MaybeSubject;
+
+import io.reactivex.subjects.CompletableSubject;
 
 public class Controller<V extends View> {
-
-    private static final Object DISPOSE = new Object();
 
     private final View.OnAttachStateChangeListener attachListener = new View.OnAttachStateChangeListener() {
         @Override
@@ -43,7 +44,7 @@ public class Controller<V extends View> {
     };
 
     protected final V view;
-    private final MaybeSubject<Object> disposeMaybe = MaybeSubject.create();
+    private final CompletableSubject disposeCompletable = CompletableSubject.create();
 
     private State state = State.UNATTACHED;
 
@@ -88,13 +89,13 @@ public class Controller<V extends View> {
     }
 
     public <T> AutoDisposeConverter<T> autoDispose() {
-        return AutoDispose.autoDisposable(disposeMaybe);
+        return AutoDispose.autoDisposable(disposeCompletable);
     }
 
     public void detach() {
         if (state != State.ATTACHED) return;
         onDetach();
-        disposeMaybe.onSuccess(DISPOSE);
+        disposeCompletable.onComplete();
         state = State.DETACHED;
     }
 

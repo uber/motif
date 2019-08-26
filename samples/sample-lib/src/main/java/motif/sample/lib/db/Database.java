@@ -17,7 +17,9 @@ package motif.sample.lib.db;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.RequiresPermission;
+
+import androidx.annotation.RequiresPermission;
+
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
