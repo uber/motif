@@ -21,25 +21,25 @@ version = VERSION_NAME
 group = GROUP
 
 def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
+    return VERSION_NAME.contains('SNAPSHOT') == false
 }
 
 def getReleaseRepositoryUrl() {
     return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL :
-            "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 }
 
 def getSnapshotRepositoryUrl() {
     return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL :
-            "https://oss.sonatype.org/content/repositories/snapshots/"
+            'https://oss.sonatype.org/content/repositories/snapshots/'
 }
 
 def getRepositoryUsername() {
-    return hasProperty('SONATYPE_NEXUS_USERNAME') ? SONATYPE_NEXUS_USERNAME : ""
+    return hasProperty('SONATYPE_NEXUS_USERNAME') ? SONATYPE_NEXUS_USERNAME : ''
 }
 
 def getRepositoryPassword() {
-    return hasProperty('SONATYPE_NEXUS_PASSWORD') ? SONATYPE_NEXUS_PASSWORD : ""
+    return hasProperty('SONATYPE_NEXUS_PASSWORD') ? SONATYPE_NEXUS_PASSWORD : ''
 }
 
 def kotlinAndroidArtifactTasks() {
@@ -49,7 +49,7 @@ def kotlinAndroidArtifactTasks() {
 
     dokka {
         externalDocumentationLink {
-            url = new URL("http://reactivex.io/RxJava/2.x/javadoc/")
+            url = new URL('http://reactivex.io/RxJava/2.x/javadoc/')
         }
 
         outputFormat = 'html'
@@ -77,7 +77,7 @@ def kotlinArtifactTasks() {
 
     dokka {
         externalDocumentationLink {
-            url = new URL("http://reactivex.io/RxJava/2.x/javadoc/")
+            url = new URL('http://reactivex.io/RxJava/2.x/javadoc/')
         }
 
         outputFormat = 'html'
@@ -189,7 +189,7 @@ afterEvaluate { project ->
     }
 
     signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        required { isReleaseBuild() && gradle.taskGraph.hasTask('uploadArchives') }
         sign configurations.archives
     }
 

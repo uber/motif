@@ -26,6 +26,6 @@ public class Test {
         Child child = scope.child();
         assertThat(child.string()).isEqualTo("c");
 
-        assertThat(scope.child()).isNotSameAs(child);
+        assertThat(scope.child()).isNotSameInstanceAs(child);
     }
 }

@@ -20,8 +20,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.ImageColumns;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 
 import java.util.Iterator;
 
