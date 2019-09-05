@@ -31,6 +31,11 @@ data class Type(val type: IrType, val qualifier: IrAnnotation?) : Comparable<Typ
         "$qualifierString${type.qualifiedName}"
     }
 
+    val simpleName: String by lazy {
+        val qualifierString = qualifier?.let { "$it " } ?: ""
+        "$qualifierString${type.simpleName}"
+    }
+
     override fun compareTo(other: Type): Int {
         return compareKey.compareTo(other.compareKey)
     }

@@ -31,11 +31,11 @@ internal class State(
         val sourceToSinks: SetMultiMap<Source, Sink> = setMultiMap(),
         val unsatisfied: MutableSet<Sink> = mutableSetOf(),
         val errors: MutableList<MotifError> = mutableListOf(),
-        private val sinks: SetMultiMap<Type, Sink> = setMultiMap(),
+        val sinks: SetMultiMap<Type, Sink> = setMultiMap(),
         private val exposeNeeded: MutableSet<Sink> = mutableSetOf(),
         private val visibleSinks: SetMultiMap<Sink, Source> = setMultiMap()) {
 
-    private val edges = LinkedHashMap<Source, List<Sink>>()
+    val edges = LinkedHashMap<Source, List<Sink>>()
 
     fun addSinks(sink: Iterable<Sink>) {
         sink.forEach(this::addSink)
