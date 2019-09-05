@@ -17,6 +17,7 @@ dependencies {
     implementation project(':core')
     implementation project(':errormessage')
 
+    testImplementation project(':viewmodel')
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
 }

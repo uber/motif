@@ -60,7 +60,6 @@ class Dependencies private constructor(
             val typeName = scopeImplTypeName.nestedClass("Dependencies")
 
             val methods: SortedMap<Type, Method> = sinks
-                    .groupBy { it.type }
                     .map { (type, sinks) ->
                         val methodSpec = methodSpec(nameScope, type)
                                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)

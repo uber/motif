@@ -35,9 +35,17 @@ interface ResolvedGraph {
 
     fun getChildUnsatisfied(scopeEdge: ScopeEdge): Iterable<Sink>
 
-    fun getUnsatisfied(scope: Scope): Iterable<Sink>
+    fun getUnsatisfied(scope: Scope): Map<Type, List<Sink>>
 
-    fun getSources(sink: Sink): Iterable<Source>
+    fun getSources(scope: Scope): Iterable<Source>
+
+    fun getSinks(type: Type): Iterable<Sink>
+
+    fun getProviders(sink: Sink): Iterable<Source>
+
+    fun getConsumers(source: Source): Iterable<Sink>
+
+    fun getRequired(source: Source): Iterable<Sink>
 
     companion object {
 
@@ -115,8 +123,12 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
     override fun getScope(scopeClass: IrClass) = null
     override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = emptyList<Sink>()
-    override fun getUnsatisfied(scope: Scope) = emptyList<Sink>()
-    override fun getSources(sink: Sink) = emptyList<Source>()
+    override fun getUnsatisfied(scope: Scope) = emptyMap<Type, List<Sink>>()
+    override fun getSources(scope: Scope) = emptyList<Source>()
+    override fun getSinks(type: Type) = emptyList<Sink>()
+    override fun getProviders(sink: Sink) = emptyList<Source>()
+    override fun getConsumers(source: Source) = emptyList<Sink>()
+    override fun getRequired(source: Source) = emptyList<Sink>()
 }
 
 private class ValidResolvedGraph(
@@ -137,7 +149,15 @@ private class ValidResolvedGraph(
 
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = childStates.getValue(scopeEdge).unsatisfied
 
-    override fun getUnsatisfied(scope: Scope) = scopeStates.getValue(scope).unsatisfied
+    override fun getUnsatisfied(scope: Scope) = scopeStates.getValue(scope).unsatisfied.groupBy { it.type }
 
-    override fun getSources(sink: Sink) = graphState.sinkToSources.getValue(sink)
+    override fun getSources(scope: Scope) = scopeStates.getValue(scope).sourceToSinks.keys.filter { it.scope == scope }
+
+    override fun getSinks(type: Type) = graphState.sinks.getValue(type)
+
+    override fun getProviders(sink: Sink) = graphState.sinkToSources.getValue(sink)
+
+    override fun getConsumers(source: Source) = graphState.sourceToSinks.getValue(source)
+
+    override fun getRequired(source: Source) = scopeStates.getValue(source.scope).edges[source] ?: emptyList()
 }

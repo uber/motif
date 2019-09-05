@@ -47,6 +47,7 @@ include 'models'
 include 'ast'
 include 'tests'
 include 'tests:compiler'
+include 'viewmodel'
 
 project(':compiler-ast').projectDir = file('compiler/ast')
 project(':intellij-ast').projectDir = file('intellij/ast')
