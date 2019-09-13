@@ -68,8 +68,13 @@ class Processor : BasicAnnotationProcessor() {
             }
 
             val noDagger = processingEnv.options.getOrDefault(OPTION_NO_DAGGER, null) == "true"
-            val compilerOptions = CompilerOptions(noDagger = noDagger)
-            val generatedClasses = CodeGenerator.generate(processingEnv, graph, compilerOptions)
+
+            if (noDagger) {
+                motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph)
+                return emptySet()
+            }
+
+            val generatedClasses = CodeGenerator.generate(processingEnv, graph)
 
             generatedClasses.forEach { generatedClass ->
                 JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)
