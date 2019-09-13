@@ -10,6 +10,7 @@ dependencies {
     implementation deps.autoCommon
     implementation deps.commonsCodec
     implementation deps.javapoet
+    implementation deps.kotlinpoet
     implementation deps.dagger
     implementation deps.daggerCompiler
     implementation project(':lib')

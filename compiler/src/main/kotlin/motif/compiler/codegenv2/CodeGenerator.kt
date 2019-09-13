@@ -13,6 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.compiler
+package motif.compiler.codegenv2
 
-data class CompilerOptions(val noDagger: Boolean)
+import motif.core.ResolvedGraph
+import javax.annotation.processing.ProcessingEnvironment
+
+object CodeGenerator {
+
+    fun generate(env: ProcessingEnvironment, graph: ResolvedGraph) {
+        ScopeImplFactory.create(env, graph)
+                .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
+                .forEach { javaFile ->
+                    javaFile.writeTo(env.filer)
+                }
+    }
+}
