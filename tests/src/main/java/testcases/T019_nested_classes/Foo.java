@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T020_naming_collisions;
+package testcases.T019_nested_classes;
 
-import static com.google.common.truth.Truth.assertThat;
+public class Foo {
 
-public class Test {
+    @motif.Scope
+    public interface Scope {
 
-    public static void run() {
-        Foo.Parent parent = new FooGrandparentImpl().p();
-        Foo.ChildA a = parent.a();
-        Foo.ChildB b = parent.b();
-        Foo.ChildC c = parent.c();
-        Foo.ChildD d = parent.d();
+        String string();
 
-        assertThat(a.string()).isEqualTo("a");
-        assertThat(b.string()).isEqualTo("b");
-        assertThat(c.c()).isNotNull();
-        assertThat(d.d()).isNotNull();
+        @motif.Objects
+        abstract class Objects {
+
+            String string() {
+                return "s";
+            }
+        }
+
+        @motif.Dependencies
+        interface Dependencies {}
     }
 }

@@ -40,9 +40,10 @@ ext.deps = [
                 ]
         ],
         "kotlin": [
-                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-                reflection: "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
-
+                compiler: "org.jetbrains.kotlin:kotlin-compiler-embeddable:${versions.kotlin}",
+                kapt: "org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:${versions.kotlin}",
+                reflection: "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
+                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
         ],
         "rx": [
                 android: 'io.reactivex.rxjava2:rxandroid:2.1.1',
@@ -60,6 +61,7 @@ ext.deps = [
                 junit: 'junit:junit:4.12',
                 truth: 'com.google.truth:truth:1.0',
                 compileTesting: 'com.google.testing.compile:compile-testing:0.18',
+                compileTestingKotlin: 'com.github.tschuchortdev:kotlin-compile-testing:1.2.1',
                 assertj: 'org.assertj:assertj-core:3.13.2'
         ],
         dagger: "com.google.dagger:dagger:${versions.dagger}",

@@ -20,24 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class Test {
 
     public static void run() {
-        Scope scope = new TestScopeImpl();
+        Foo.Scope scope = new FooScopeImpl();
         assertThat(scope.string()).isEqualTo("s");
-    }
-
-    @motif.Scope
-    public interface Scope {
-
-        String string();
-
-        @motif.Objects
-        abstract class Objects {
-
-            String string() {
-                return "s";
-            }
-        }
-
-        @motif.Dependencies
-        interface Dependencies {}
     }
 }

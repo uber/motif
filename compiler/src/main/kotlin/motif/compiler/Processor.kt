@@ -28,11 +28,13 @@ import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
 
-private const val OPTION_MODE = "motif.mode"
+const val OPTION_KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
+const val OPTION_MODE = "motif.mode"
 
 enum class Mode {
     DAGGER, // Generate Dagger-based (Java) implementation
     JAVA,   // Generate pure Java implementation
+    KOTLIN, // Generate pure Kotlin implementation
 }
 
 class Processor : BasicAnnotationProcessor() {
@@ -48,7 +50,7 @@ class Processor : BasicAnnotationProcessor() {
     }
 
     override fun getSupportedOptions(): Set<String> {
-        return setOf(OPTION_MODE)
+        return setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
     }
 
     private inner class Step : ProcessingStep {
@@ -100,6 +102,6 @@ class Processor : BasicAnnotationProcessor() {
     }
 
     private fun generateV2(mode: Mode?, graph: ResolvedGraph) {
-        motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph)
+        motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph, mode)
     }
 }

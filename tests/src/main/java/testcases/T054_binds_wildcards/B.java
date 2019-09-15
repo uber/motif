@@ -15,4 +15,4 @@
  */
 package testcases.T054_binds_wildcards;
 
-interface B<T> {}
+public interface B<T> {}

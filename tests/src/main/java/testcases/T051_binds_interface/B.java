@@ -15,4 +15,4 @@
  */
 package testcases.T051_binds_interface;
 
-interface B {}
+public interface B {}

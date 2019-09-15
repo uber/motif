@@ -1,0 +1,1 @@
+Kapt does not support processing code that depends on generated code. Skip this test for Kotlin code generation.

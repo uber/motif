@@ -15,4 +15,4 @@
  */
 package testcases.T052_binds_interface_generic;
 
-interface B<T> {}
+public interface B<T> {}

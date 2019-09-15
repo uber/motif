@@ -15,4 +15,4 @@
  */
 package testcases.T053_binds_bounded_type_parameters;
 
-interface B<T extends Number> {}
+public interface B<T extends Number> {}

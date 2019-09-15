@@ -15,12 +15,13 @@
  */
 package motif.compiler;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
-import com.google.common.truth.Truth;
-import com.google.testing.compile.Compilation;
-import com.google.testing.compile.MotifTestCompiler;
+import com.tschuchort.compiletesting.KotlinCompilation;
+import com.tschuchort.compiletesting.SourceFile;
+import dagger.internal.codegen.ComponentProcessor;
+import kotlin.text.StringsKt;
 import motif.core.ResolvedGraph;
+import motif.errormessage.ErrorMessage;
 import motif.viewmodel.TestRenderer;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -29,43 +30,60 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.annotation.Nullable;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 @RunWith(Parameterized.class)
 public class TestHarness {
 
-    @Parameterized.Parameters(name = "{0}")
+    private static final File SOURCE_ROOT = new File("../tests/src/main/java/");
+    private static final File TEST_CASE_ROOT = new File(SOURCE_ROOT, "testcases");
+    private static final File EXTERNAL_ROOT = new File(SOURCE_ROOT, "external");
+
+    private static class TestParameters {
+
+        final File testDirectory;
+        final Mode mode;
+
+        public TestParameters(File testDirectory, Mode mode) {
+            this.testDirectory = testDirectory;
+            this.mode = mode;
+        }
+    }
+
+    @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data() {
-        File sourceRoot = new File("../tests/src/main/java/");
-        File testCaseRoot = new File(sourceRoot, "testcases");
-        File externalRoot = new File(sourceRoot, "external");
-        File[] testCaseDirs = testCaseRoot.listFiles(TestHarness::isTestDir);
-        if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + testCaseRoot);
-        return ImmutableList.of(true, false).stream()
-                .flatMap(noDagger -> Arrays.stream(testCaseDirs)
-                        .map(file -> {
-                            File externalDir = new File(externalRoot, file.getName());
-                            String displayName = file.getName() + (noDagger ? "_nodagger" : "");
-                            return new Object[]{displayName, file.getAbsoluteFile(), externalDir, file.getName(), noDagger};
-                        }))
+        File[] testCaseDirs = TEST_CASE_ROOT.listFiles(TestHarness::isTestDir);
+        if (testCaseDirs == null) throw new IllegalStateException("Could not find test case directories: " + TEST_CASE_ROOT);
+        return Arrays.stream(Mode.values())
+                .flatMap(mode -> Arrays.stream(testCaseDirs).map(file -> new TestParameters(file, mode)))
+                .filter(parameters -> !skipTest(parameters.mode, parameters.testDirectory))
+                .map(parameters -> {
+                    String displayName = parameters.testDirectory.getName() + "_" + parameters.mode;
+                    return new Object[]{parameters, displayName};
+                })
                 .collect(Collectors.toList());
+    }
+
+    private static boolean skipTest(Mode mode, File testDirectory) {
+        if (mode == Mode.KOTLIN && skipKotlin(testDirectory)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean skipKotlin(File testDirectory) {
+        return new File(testDirectory, "SKIP_KOTLIN").exists();
     }
 
     private static boolean isTestDir(File file) {
@@ -77,24 +95,21 @@ public class TestHarness {
 
     @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private final MotifTestCompiler compiler = new MotifTestCompiler();
-
+    private final Mode mode;
     private final File testCaseDir;
     private final File externalDir;
     private final String testClassName;
-    private final boolean noDagger;
     private final File errorFile;
     private final File graphFile;
     private final boolean isErrorTest;
 
-    private File externalOutputDir;
-
     @SuppressWarnings("unused")
-    public TestHarness(String displayName, File testCaseDir, File externalDir, String testName, boolean noDagger) {
-        this.testCaseDir = testCaseDir;
-        this.externalDir = externalDir;
+    public TestHarness(TestParameters parameters, String displayName) {
+        String testName = parameters.testDirectory.getName();
+        this.mode = parameters.mode;
+        this.testCaseDir = new File(TEST_CASE_ROOT, testName);
+        this.externalDir = new File(EXTERNAL_ROOT, testName);
         this.testClassName = "testcases." + testName + ".Test";
-        this.noDagger = noDagger;
         this.errorFile = new File(testCaseDir, "ERROR.txt");
         this.graphFile = new File(testCaseDir, "GRAPH.txt");
         this.isErrorTest = testName.startsWith("E");
@@ -102,67 +117,124 @@ public class TestHarness {
 
     @Test
     public void test() throws Throwable {
-        File[] externalDirContents = externalDir.listFiles();
-        boolean hasExternalSources = externalDirContents != null && externalDirContents.length > 0;
-        externalOutputDir = hasExternalSources ? temporaryFolder.newFolder() : null;
+        Map<String, String> options = new HashMap<>();
+        options.put("motif.mode", mode.name().toLowerCase());
 
-        if (externalOutputDir != null) {
+        File externalClassesDir = null;
+        File[] externalDirContents = externalDir.listFiles();
+        if (externalDirContents != null && externalDirContents.length > 0) {
             boolean shouldProcess = !new File(externalDir, "DO_NOT_PROCESS").exists();
-            Compilation externalCompilation = compiler.compile(
-                    null,
-                    externalOutputDir,
-                    shouldProcess ? new Processor() : null,
-                    externalDir,
-                    noDagger);
-            assertThat(externalCompilation).succeeded();
+            KotlinCompilation.Result externalResult = compile(
+                    getFiles(externalDir),
+                    Collections.emptyList(),
+                    options,
+                    shouldProcess ? new Processor() : null);
+            assertSucceeded(externalResult);
+            externalClassesDir = externalResult.getOutputDirectory();
         }
 
+        List<File> classpaths = externalClassesDir == null
+                ? Collections.emptyList()
+                : Collections.singletonList(externalClassesDir);
         Processor processor = new Processor();
-        Compilation compilation = compiler.compile(
-                externalOutputDir,
-                null,
-                processor,
-                testCaseDir,
-                noDagger);
+
+        KotlinCompilation.Result result = compile(
+                getFiles(testCaseDir),
+                classpaths,
+                options,
+                processor);
 
         if (isErrorTest) {
-            runErrorTest(compilation);
+            runErrorTest(result);
         } else {
-            runSuccessTest(compilation, processor.graph);
+            assertSucceeded(result);
+
+            ClassLoader classLoader;
+            if (externalClassesDir == null) {
+                classLoader = result.getClassLoader();
+            } else {
+                classLoader = new URLClassLoader(
+                        new URL[]{
+                                result.getOutputDirectory().toURI().toURL(),
+                                externalClassesDir.toURI().toURL()
+                        }, getClass().getClassLoader());
+            }
+            Class<?> testClass = classLoader.loadClass(testClassName);
+
+            if (testClass.getAnnotation(Ignore.class) == null) {
+                runSuccessTest(testClass, processor.graph);
+            }
         }
     }
 
-    private void runErrorTest(Compilation compilation) throws IOException {
-        assertThat(compilation).failed();
+    private void assertSucceeded(KotlinCompilation.Result result) {
+        if (result.getExitCode() != KotlinCompilation.ExitCode.OK) {
+            assertWithMessage(result.getMessages()).fail();
+        }
+    }
 
-        List<Diagnostic<? extends JavaFileObject>> diagnostics = compilation.diagnostics().asList();
-        Truth.assertThat(diagnostics).hasSize(1);
-        Diagnostic diagnostic = diagnostics.get(0);
+    private void assertFailed(KotlinCompilation.Result result) {
+        if (result.getExitCode() == KotlinCompilation.ExitCode.OK) {
+            assertWithMessage("Expected compilation to fail but encountered no errors.").fail();
+        }
+    }
+
+    private KotlinCompilation.Result compile(
+            List<File> sourceFiles,
+            List<File> classpaths,
+            Map<String, String> aptArgs,
+            @Nullable Processor motifProcessor) {
+        KotlinCompilation compilation = new KotlinCompilation();
+        compilation.setAnnotationProcessors(getProcessors(motifProcessor));
+        compilation.setSources(sourceFiles.stream()
+                .map(SourceFile.Companion::fromPath)
+                .collect(Collectors.toList()));
+        compilation.setInheritClassPath(true);
+        compilation.setClasspaths(classpaths);
+        compilation.setKaptArgs(aptArgs);
+        compilation.setVerbose(false);
+
+        return compilation.compile();
+    }
+
+    private List<File> getFiles(File dir) throws IOException {
+        return getFiles(dir, file -> (file.getName().endsWith(".java") || file.getName().endsWith(".kt")) && !file.getName().equals("ScopeImpl.java"));
+    }
+
+    private List<File> getFiles(File dir, Predicate<File> filter) throws IOException {
+        return java.nio.file.Files.walk(dir.toPath())
+                .map(Path::toFile)
+                .filter(file -> !file.isDirectory() && filter.test(file))
+                .collect(Collectors.toList());
+    }
+
+    private List<javax.annotation.processing.Processor> getProcessors(@Nullable Processor motifProcessor) {
+        List<javax.annotation.processing.Processor> processors = new ArrayList<>();
+        processors.add(new ComponentProcessor());
+        if (motifProcessor != null) {
+            processors.add(motifProcessor);
+        }
+        return processors;
+    }
+
+    private void runErrorTest(KotlinCompilation.Result result) throws IOException {
+        assertFailed(result);
 
         String expectedErrorString = getExistingErrorString();
-        String actualErrorString = getActualErrorString(diagnostic);
+        String actualErrorString = getActualErrorString(result);
 
         if (!expectedErrorString.equals(actualErrorString)) {
             try (BufferedWriter out = new BufferedWriter(new FileWriter(errorFile))) {
                 out.write(actualErrorString);
             }
-            Truth.assertWithMessage("Error message has changed. The ERROR.txt file has been " +
+            assertWithMessage("Error message has changed. The ERROR.txt file has been " +
                     "automatically updated by this test:\n" +
                     "  1. Verify that the changes are correct.\n" +
                     "  2. Commit the changes to source control.\n").fail();
         }
     }
 
-    private void runSuccessTest(Compilation compilation, ResolvedGraph graph) throws Throwable {
-        assertThat(compilation).succeeded();
-        Class<?> testClass = loadTestClass(compilation);
-
-        if (testClass.getAnnotation(Ignore.class) != null) {
-            return;
-        }
-
-        assertThat(compilation).succeeded();
-
+    private void runSuccessTest(Class<?> testClass, ResolvedGraph graph) throws Throwable {
         try {
             testClass.getMethod("run").invoke(null);
         } catch (InvocationTargetException e) {
@@ -176,7 +248,7 @@ public class TestHarness {
             try (BufferedWriter out = new BufferedWriter(new FileWriter(graphFile))) {
                 out.write(actualGraphString);
             }
-            Truth.assertWithMessage("Graph representation has changed. The GRAPH.txt file has been " +
+            assertWithMessage("Graph representation has changed. The GRAPH.txt file has been " +
                     "automatically updated by this test:\n" +
                     "  1. Verify that the changes are correct.\n" +
                     "  2. Commit the changes to source control.\n").fail();
@@ -210,8 +282,8 @@ public class TestHarness {
         }
     }
 
-    private String getActualErrorString(Diagnostic diagnostic) {
-        String message = diagnostic.getMessage(Locale.getDefault());
+    private String getActualErrorString(KotlinCompilation.Result result) {
+        String message = getMessage(result);
         String header =
                 "########################################################################\n" +
                 "#                                                                      #\n" +
@@ -228,22 +300,24 @@ public class TestHarness {
         return header + message + "\n";
     }
 
+    private String getMessage(KotlinCompilation.Result result) {
+        String resultMessage = result.getMessages();
+        String header = toCompilerMessage(ErrorMessage.Companion.getHeader());
+        String footer = toCompilerMessage(ErrorMessage.Companion.getFooter());
+        resultMessage = StringsKt.substringAfter(resultMessage, header, resultMessage);
+        resultMessage = StringsKt.substringBefore(resultMessage, footer, resultMessage);
+        return "\n" + header + resultMessage + footer;
+    }
+
+    private String toCompilerMessage(String message) {
+        return StringsKt.prependIndent(message.trim(), "  ");
+    }
+
     private String getExistingErrorString() throws IOException {
         if (errorFile.exists()) {
             return Files.asCharSource(errorFile, Charset.defaultCharset()).read();
         } else {
             return "";
         }
-    }
-
-    private Class<?> loadTestClass(Compilation compilation) throws ClassNotFoundException, MalformedURLException {
-        ClassLoader classLoader;
-        if (externalOutputDir == null) {
-            classLoader = new CompilationClassLoader(compilation);
-        } else {
-            ClassLoader externalClassLoader = new URLClassLoader(new URL[]{externalOutputDir.toURI().toURL()});
-            classLoader = new CompilationClassLoader(externalClassLoader, compilation);
-        }
-        return classLoader.loadClass(testClassName);
     }
 }
