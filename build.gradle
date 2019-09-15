@@ -23,5 +23,8 @@ subprojects {
     repositories {
         jcenter()
         google()
+        // Required until the following is resolved:
+        // https://github.com/tschuchortdev/kotlin-compile-testing/issues/2
+        maven { url 'https://jitpack.io' }
     }
 }

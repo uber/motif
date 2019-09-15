@@ -15,16 +15,50 @@
  */
 package motif.compiler.codegenv2
 
+import motif.compiler.Mode
+import motif.compiler.OPTION_KAPT_KOTLIN_GENERATED
+import motif.compiler.OPTION_MODE
 import motif.core.ResolvedGraph
+import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 
 object CodeGenerator {
 
-    fun generate(env: ProcessingEnvironment, graph: ResolvedGraph) {
+    fun generate(env: ProcessingEnvironment, graph: ResolvedGraph, mode: Mode?) {
+        val kaptKotlinGeneratedDir = env.options[OPTION_KAPT_KOTLIN_GENERATED]
+        if (mode == Mode.JAVA) {
+            generateJava(env, graph)
+        } else if (mode == Mode.KOTLIN) {
+            if (kaptKotlinGeneratedDir == null) {
+                throw IllegalStateException("-A$OPTION_MODE=${Mode.KOTLIN.name.toLowerCase()} " +
+                        "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
+            }
+            generateKotlin(env, graph, kaptKotlinGeneratedDir)
+        } else {
+            if (kaptKotlinGeneratedDir == null) {
+                generateJava(env, graph)
+            } else {
+                generateKotlin(env, graph, kaptKotlinGeneratedDir)
+            }
+        }
+    }
+
+    private fun generateJava(env: ProcessingEnvironment, graph: ResolvedGraph) {
         ScopeImplFactory.create(env, graph)
                 .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
                 .forEach { javaFile ->
                     javaFile.writeTo(env.filer)
+                }
+    }
+
+    private fun generateKotlin(
+            env: ProcessingEnvironment,
+            graph: ResolvedGraph,
+            kaptKotlinGeneratedDir: String) {
+        ScopeImplFactory.create(env, graph)
+                .map { scopeImpl -> KotlinCodeGenerator.generate(scopeImpl) }
+                .forEach { fileSpec ->
+                    fileSpec.writeTo(File(kaptKotlinGeneratedDir))
                 }
     }
 }

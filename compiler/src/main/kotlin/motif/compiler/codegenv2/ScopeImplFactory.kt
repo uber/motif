@@ -199,7 +199,9 @@ class ScopeImplFactory private constructor(
             return spread.methods.map { method ->
                 SpreadProviderMethod(
                         getProviderMethodName(method.returnType),
+                        method.method.isStatic(),
                         method.returnType.type.typeName,
+                        method.sourceType.type.typeName,
                         getProviderMethodName(method.sourceType),
                         method.name)
             }

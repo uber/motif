@@ -1,3 +1,6 @@
+* `-Amotif.mode=[dagger|java|kotlin]` for different code generation modes. Default is `java` for Java annotation processing and `kotlin` for Kapt.
+* -Anodagger no longer has any effect
+
 # 0.1.3
 
 * Add Javadocs mentioning original consumers of generated Dependencies methods

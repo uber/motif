@@ -7,6 +7,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflection
     implementation deps.autoCommon
     implementation deps.commonsCodec
     implementation deps.javapoet
@@ -21,6 +22,7 @@ dependencies {
     testImplementation project(':viewmodel')
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
+    testImplementation deps.test.compileTestingKotlin
 }
 
 test {

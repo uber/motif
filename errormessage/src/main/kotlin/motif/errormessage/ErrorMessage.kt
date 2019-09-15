@@ -22,8 +22,7 @@ class ErrorMessage(val name: String, val text: String) {
 
     companion object {
 
-        fun toString(graph: ResolvedGraph): String {
-            val header = """
+        val header = """
 
             ====================================
                         Motif Errors
@@ -31,10 +30,13 @@ class ErrorMessage(val name: String, val text: String) {
 
 
             """.trimIndent()
-            val footer = """
+
+        val footer = """
 
             ====================================
             """.trimIndent()
+
+        fun toString(graph: ResolvedGraph): String {
             val content: String = graph.errors.joinToString(
                     "\n------------------------------------\n\n") { error ->
                 val message = ErrorMessage.get(graph, error)

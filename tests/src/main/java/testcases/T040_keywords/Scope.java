@@ -43,5 +43,3 @@ public interface Scope {
     @motif.Dependencies
     interface Dependencies {}
 }
-
-class Abstract {}

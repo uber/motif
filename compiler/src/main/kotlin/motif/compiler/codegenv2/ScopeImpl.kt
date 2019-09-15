@@ -19,7 +19,6 @@ import com.squareup.kotlinpoet.asTypeName
 import motif.ast.compiler.CompilerAnnotation
 import motif.ast.compiler.CompilerMethod
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 /**
@@ -309,7 +308,9 @@ class CallProviders(
  */
 class SpreadProviderMethod(
         val name: String,
+        val isStatic: Boolean,
         val returnTypeName: TypeName,
+        val sourceTypeName: TypeName,
         val sourceProviderMethodName: String,
         val spreadMethodName: String)
 
@@ -399,7 +400,7 @@ class TypeName private constructor(private val mirror: TypeMirror) {
     }
 
     val kt: com.squareup.kotlinpoet.TypeName by lazy {
-        mirror.asTypeName()
+        KotlinTypeWorkaround.javaToKotlinType(mirror)
     }
 
     val className: ClassName by lazy { ClassName.get(j) }
@@ -415,10 +416,11 @@ class TypeName private constructor(private val mirror: TypeMirror) {
 class ClassName private constructor(val j: com.squareup.javapoet.ClassName) {
 
     val kt: com.squareup.kotlinpoet.ClassName by lazy {
-        com.squareup.kotlinpoet.ClassName(
+        val className = com.squareup.kotlinpoet.ClassName(
                 j.packageName(),
                 j.simpleNames().first(),
                 *j.simpleNames().drop(1).toTypedArray())
+        KotlinTypeWorkaround.javaToKotlinType(className) as com.squareup.kotlinpoet.ClassName
     }
 
     fun nestedClass(name: String): ClassName {
