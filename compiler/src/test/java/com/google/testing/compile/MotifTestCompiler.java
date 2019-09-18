@@ -61,7 +61,7 @@ public class MotifTestCompiler {
             optionsBuilder.add("-d", outDir.getAbsolutePath());
         }
         if (noDagger) {
-            optionsBuilder.add("-Anodagger=true");
+            optionsBuilder.add("-Amotif.mode=java");
         }
 
         JavaCompiler.CompilationTask task = compiler.getTask(
