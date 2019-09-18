@@ -22,12 +22,18 @@ import motif.Scope
 import motif.ast.compiler.CompilerClass
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
 
-private const val OPTION_NO_DAGGER = "nodagger"
+private const val OPTION_MODE = "motif.mode"
+
+enum class Mode {
+    DAGGER, // Generate Dagger-based (Java) implementation
+    JAVA,   // Generate pure Java implementation
+}
 
 class Processor : BasicAnnotationProcessor() {
 
@@ -42,7 +48,7 @@ class Processor : BasicAnnotationProcessor() {
     }
 
     override fun getSupportedOptions(): Set<String> {
-        return setOf(OPTION_NO_DAGGER)
+        return setOf(OPTION_MODE)
     }
 
     private inner class Step : ProcessingStep {
@@ -67,20 +73,33 @@ class Processor : BasicAnnotationProcessor() {
                 return emptySet()
             }
 
-            val noDagger = processingEnv.options.getOrDefault(OPTION_NO_DAGGER, null) == "true"
-
-            if (noDagger) {
-                motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph)
-                return emptySet()
+            val mode: Mode? = try {
+                Mode.valueOf(processingEnv.options[OPTION_MODE]?.toUpperCase() ?: "")
+            } catch (ignore: IllegalArgumentException) {
+                null
             }
 
-            val generatedClasses = CodeGenerator.generate(processingEnv, graph)
-
-            generatedClasses.forEach { generatedClass ->
-                JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)
+            val generate: (mode: Mode?, graph: ResolvedGraph) -> Unit = if (mode == Mode.DAGGER) {
+                this@Processor::generateDagger
+            } else {
+                this@Processor::generateV2
             }
+
+            generate(mode, graph)
 
             return emptySet()
         }
+    }
+
+    private fun generateDagger(mode: Mode?, graph: ResolvedGraph) {
+        val generatedClasses = CodeGenerator.generate(processingEnv, graph)
+
+        generatedClasses.forEach { generatedClass ->
+            JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)
+        }
+    }
+
+    private fun generateV2(mode: Mode?, graph: ResolvedGraph) {
+        motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph)
     }
 }

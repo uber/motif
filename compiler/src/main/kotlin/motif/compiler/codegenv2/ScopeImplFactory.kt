@@ -39,7 +39,7 @@ class ScopeImplFactory private constructor(
     private val dependencyMethods = mutableMapOf<Scope, List<DependencyMethodData>>()
 
     private fun create(): List<ScopeImpl> = graph.scopes
-            .filter { scope -> env.elementUtils.getTypeElement(scope.implClassName.toString()) == null }
+            .filter { scope -> env.elementUtils.getTypeElement(scope.implClassName.j.toString()) == null }
             .map { scope ->  Factory(scope).create() }
 
     private inner class Factory(private val scope: Scope) {
