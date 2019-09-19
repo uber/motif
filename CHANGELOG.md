@@ -1,3 +1,5 @@
+# 0.2.0
+
 * `-Amotif.mode=[dagger|java|kotlin]` for different code generation modes. Default is `java` for Java annotation processing and `kotlin` for Kapt.
 * -Anodagger no longer has any effect
 
