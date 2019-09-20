@@ -20,11 +20,6 @@
 
   ==== Provides ====
 
-    ---- A<String> | Objects.a ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.a(a)
-
     ---- A | Objects.a ----
       [ Required ]
         A<String>
@@ -32,6 +27,11 @@
             * Scope | Objects.a
       [ Consumed By ]
         * Scope | Scope.a()
+
+    ---- A<String> | Objects.a ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Objects.a(a)
 
     ---- Scope | implicit ----
       [ Required ]

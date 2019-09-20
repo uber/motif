@@ -20,25 +20,25 @@
 
   ==== Provides ====
 
-    ---- B | Objects.grandparent ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.b()
-
     ---- @javax.inject.Named("grandparent") String | Objects.stringGrandparent ----
       [ Required ]
       [ Consumed By ]
         * Scope | Scope.grandparent()
+
+    ---- @javax.inject.Named("parent") String | Objects.stringParent ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Scope.parent()
 
     ---- A | Objects.parent ----
       [ Required ]
       [ Consumed By ]
         * Scope | Scope.a()
 
-    ---- @javax.inject.Named("parent") String | Objects.stringParent ----
+    ---- B | Objects.grandparent ----
       [ Required ]
       [ Consumed By ]
-        * Scope | Scope.parent()
+        * Scope | Scope.b()
 
     ---- Scope | implicit ----
       [ Required ]

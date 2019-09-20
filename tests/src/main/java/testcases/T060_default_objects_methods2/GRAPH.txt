@@ -20,15 +20,15 @@
 
   ==== Provides ====
 
-    ---- String | Objects.string ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.string()
-
     ---- int | Objects.i ----
       [ Required ]
       [ Consumed By ]
         * Scope | Scope.i()
+
+    ---- String | Objects.string ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Scope.string()
 
     ---- Scope | implicit ----
       [ Required ]

@@ -25,11 +25,11 @@
       [ Consumed By ]
         * Child | Child.a()
 
-    ---- Spreadable | Objects.spreadable ----
+    ---- Scope | implicit ----
       [ Required ]
       [ Consumed By ]
 
-    ---- Scope | implicit ----
+    ---- Spreadable | Objects.spreadable ----
       [ Required ]
       [ Consumed By ]
 

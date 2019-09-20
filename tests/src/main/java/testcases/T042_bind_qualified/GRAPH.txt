@@ -20,14 +20,6 @@
 
   ==== Provides ====
 
-    ---- @javax.inject.Named("s") String | Objects.s ----
-      [ Required ]
-        String
-          [ Provided By ]
-            * Scope | Objects.unqualified
-      [ Consumed By ]
-        * Scope | Scope.s()
-
     ---- String | Objects.unqualified ----
       [ Required ]
         @javax.inject.Named("a") String
@@ -48,6 +40,14 @@
       [ Required ]
       [ Consumed By ]
         * Scope | Objects.a(b)
+
+    ---- @javax.inject.Named("s") String | Objects.s ----
+      [ Required ]
+        String
+          [ Provided By ]
+            * Scope | Objects.unqualified
+      [ Consumed By ]
+        * Scope | Scope.s()
 
     ---- Scope | implicit ----
       [ Required ]

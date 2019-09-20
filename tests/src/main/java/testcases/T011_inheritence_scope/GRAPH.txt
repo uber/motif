@@ -20,15 +20,15 @@
 
   ==== Provides ====
 
-    ---- String | Objects.string ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.parent()
-
     ---- Integer | Objects.integer ----
       [ Required ]
       [ Consumed By ]
         * Scope | Scope.grandparent()
+
+    ---- String | Objects.string ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Scope.parent()
 
     ---- Scope | implicit ----
       [ Required ]

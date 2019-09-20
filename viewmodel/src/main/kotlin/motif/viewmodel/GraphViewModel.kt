@@ -33,7 +33,7 @@ private class GraphViewModelFactory(private val graph: ResolvedGraph) {
     private val scopeViewModels = mutableMapOf<Scope, ScopeViewModel>()
 
     fun create(): GraphViewModel {
-        val rootScopes = graph.roots.map(this::getScopeViewModel)
+        val rootScopes = graph.roots.map(this::getScopeViewModel).sortedBy { it.scope.qualifiedName }
         return GraphViewModel(rootScopes)
     }
 
@@ -42,21 +42,26 @@ private class GraphViewModelFactory(private val graph: ResolvedGraph) {
     }
 
     private fun createScopeViewModel(scope: Scope): ScopeViewModel {
-        val children = graph.getChildEdges(scope).map { edge -> getScopeViewModel(edge.child) }
-        val providedDependencies = graph.getSources(scope).filter { it !is ChildParameterSource }.map(this::createProvidedDependency)
+        val children = graph.getChildEdges(scope)
+                .map { edge -> getScopeViewModel(edge.child) }
+                .sortedBy { it.scope.qualifiedName }
+        val providedDependencies = graph.getSources(scope)
+                .filter { it !is ChildParameterSource }
+                .map(this::createProvidedDependency)
+                .sortedBy { it.source.type }
         val requiredDependencies = createRequiredDependencies(scope)
 
         return ScopeViewModel(scope, children, providedDependencies, requiredDependencies)
     }
 
     private fun createProvidedDependency(source: Source): ProvidedDependency {
-        val consumedBy = graph.getConsumers(source).toList()
+        val consumedBy = graph.getConsumers(source).toList().sortedBy { it.type }
         val requiredDependencies = graph.getRequired(source).map(this::createRequiredDependency)
         return ProvidedDependency(source, consumedBy, requiredDependencies)
     }
 
     private fun createRequiredDependency(sink: Sink): RequiredDependency {
-        val providedBy = graph.getProviders(sink).toList()
+        val providedBy = graph.getProviders(sink).toList().sortedBy { it.type }
         return RequiredDependency(sink.type, providedBy, listOf(sink))
     }
 
@@ -77,7 +82,7 @@ private class GraphViewModelFactory(private val graph: ResolvedGraph) {
                 throw IllegalStateException("No sink found for given Type: $type")
             }
 
-            RequiredDependency(type, sources.toList(), sinks)
-        }
+            RequiredDependency(type, sources.toList().sortedBy { it.type }, sinks)
+        }.sortedBy { it.type }
     }
 }

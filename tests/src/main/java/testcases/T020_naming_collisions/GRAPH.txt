@@ -20,16 +20,6 @@
 
   ==== Provides ====
 
-    ---- SomeDependency | Objects.c ----
-      [ Required ]
-      [ Consumed By ]
-        * ChildC | ChildC.c()
-
-    ---- SomeDependency | Objects.d ----
-      [ Required ]
-      [ Consumed By ]
-        * ChildD | ChildD.d()
-
     ---- @javax.inject.Named("A") String | Objects.a ----
       [ Required ]
       [ Consumed By ]
@@ -43,6 +33,16 @@
     ---- Grandparent | implicit ----
       [ Required ]
       [ Consumed By ]
+
+    ---- SomeDependency | Objects.c ----
+      [ Required ]
+      [ Consumed By ]
+        * ChildC | ChildC.c()
+
+    ---- SomeDependency | Objects.d ----
+      [ Required ]
+      [ Consumed By ]
+        * ChildD | ChildD.d()
 
    --------
   | Parent |

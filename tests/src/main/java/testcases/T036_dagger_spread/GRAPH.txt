@@ -20,11 +20,6 @@
 
   ==== Provides ====
 
-    ---- @javax.inject.Named("motif") String | Objects.motif ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.motif()
-
     ---- String | Objects.string ----
       [ Required ]
         @javax.inject.Named("dagger") String
@@ -40,6 +35,11 @@
             * Scope | implicit
       [ Consumed By ]
         * Scope | Objects.string(dagger)
+
+    ---- @javax.inject.Named("motif") String | Objects.motif ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Scope.motif()
 
     ---- Component | Objects.component ----
       [ Required ]

@@ -20,11 +20,6 @@
 
   ==== Provides ====
 
-    ---- @javax.inject.Named("i") int | Objects.i ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.i(i)
-
     ---- int | Objects.i ----
       [ Required ]
         @javax.inject.Named("i") int
@@ -32,6 +27,11 @@
             * Scope | Objects.i
       [ Consumed By ]
         * Scope | Scope.i()
+
+    ---- @javax.inject.Named("i") int | Objects.i ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Objects.i(i)
 
     ---- Scope | implicit ----
       [ Required ]

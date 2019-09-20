@@ -20,6 +20,11 @@
 
   ==== Provides ====
 
+    ---- Integer | Objects.integer ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Objects.string(i)
+
     ---- String | Objects.string ----
       [ Required ]
         Integer
@@ -27,11 +32,6 @@
             * Scope | Objects.integer
       [ Consumed By ]
         * Scope | Scope.string()
-
-    ---- Integer | Objects.integer ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.string(i)
 
     ---- Scope | implicit ----
       [ Required ]
