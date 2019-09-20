@@ -25,11 +25,6 @@
 
   ==== Provides ====
 
-    ---- @javax.inject.Named("motif") String | Objects.string ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.string(motif)
-
     ---- String | Objects.string ----
       [ Required ]
         @javax.inject.Named("motif") String
@@ -39,6 +34,11 @@
           [ Provided By ]
       [ Consumed By ]
         * Scope | Scope.string()
+
+    ---- @javax.inject.Named("motif") String | Objects.string ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Objects.string(motif)
 
     ---- Scope | implicit ----
       [ Required ]

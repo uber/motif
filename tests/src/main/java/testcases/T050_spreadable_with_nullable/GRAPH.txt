@@ -25,11 +25,11 @@
       [ Consumed By ]
         * Scope | Scope.a()
 
-    ---- Spreadable | Objects.spreadable ----
+    ---- Scope | implicit ----
       [ Required ]
       [ Consumed By ]
 
-    ---- Scope | implicit ----
+    ---- Spreadable | Objects.spreadable ----
       [ Required ]
       [ Consumed By ]
 

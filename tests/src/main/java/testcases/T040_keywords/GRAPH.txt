@@ -20,15 +20,15 @@
 
   ==== Provides ====
 
-    ---- byte | Objects.b ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.b()
-
     ---- boolean | Objects.bool ----
       [ Required ]
       [ Consumed By ]
         * Scope | Scope.bool()
+
+    ---- byte | Objects.b ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Scope.b()
 
     ---- Abstract | Objects.abs ----
       [ Required ]
