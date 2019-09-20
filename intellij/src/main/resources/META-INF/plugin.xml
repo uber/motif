@@ -15,6 +15,7 @@
     ]]>
     </change-notes>
 
+    <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">

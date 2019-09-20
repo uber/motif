@@ -43,8 +43,8 @@ class IntelliJAnnotation(
     }
 
     override val type: IrType by lazy {
-        val qualifiedName: String = psiAnnotation.qualifiedName!!
-        val annotationClass: PsiClass = JavaPsiFacade.getInstance(project).findClass(qualifiedName, GlobalSearchScope.allScope(project))!!
+        val nameReferenceElement = psiAnnotation.nameReferenceElement
+        val annotationClass: PsiClass = nameReferenceElement?.resolve() as? PsiClass ?: throw IllegalStateException("$nameReferenceElement")
         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(annotationClass)
         IntelliJType(project, psiClassType)
     }
@@ -73,7 +73,8 @@ class IntelliJAnnotation(
     }
 
     override fun toString(): String {
-        return psiAnnotation.qualifiedName!!
+        val value = stringValue?.let { "(\"$it\")" } ?: ""
+        return "@${psiAnnotation.qualifiedName!!}$value"
     }
 
     companion object {

@@ -15,6 +15,7 @@
  */
 package motif.ast.intellij
 
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
@@ -57,7 +58,9 @@ class IntelliJClass(
 
     override val methods: List<IrMethod> by lazy {
         psiClass.visibleSignatures
-                .filter { it.method.containingClass?.qualifiedName != "java.lang.Object" }
+                .filter {
+                    it.method.containingClass?.qualifiedName != "java.lang.Object"
+                            && !it.method.hasModifier(JvmModifier.PRIVATE) }
                 .map { IntelliJMethod(project, it.method, it.substitutor) }
     }
 

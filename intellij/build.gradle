@@ -1,11 +1,11 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.4.8"
+    id "org.jetbrains.intellij" version "0.4.10"
     id 'org.jetbrains.kotlin.jvm'
 }
 
 intellij {
     version 'IC-2018.3'
-    plugins = ['android']
+    plugins = []
     pluginName 'MyPlugin'
     updateSinceUntilBuild = false
 }
@@ -20,8 +20,9 @@ dependencies {
 
     compile deps.kotlin.reflection
 
-    testCompile deps.test.junit
-    testCompile deps.test.assertj
+    testCompile deps.test.truth
+    testCompile project(':intellij:testing')
+    testCompile project(':viewmodel')
 }
 
 runIde {

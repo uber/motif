@@ -54,11 +54,16 @@ class GraphFactory(private val project: Project) {
         val psiFile = psiManager.findFile(virtualFile) ?: return emptyList()
         val javaFile = psiFile as? PsiJavaFile ?: return emptyList()
         return javaFile.classes
+                .flatMap(this::getClasses)
                 .filter(this::isScopeClass)
                 .map(psiElementFactory::createType)
                 .map { type ->
                     IntelliJClass(project, type)
                 }
+    }
+
+    private fun getClasses(psiClass: PsiClass): List<PsiClass> {
+        return listOf(psiClass) + psiClass.allInnerClasses.flatMap(this::getClasses)
     }
 
     private fun isScopeClass(psiClass: PsiClass): Boolean {
