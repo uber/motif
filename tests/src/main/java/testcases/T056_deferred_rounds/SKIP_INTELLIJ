@@ -1,0 +1,1 @@
+IntelliJ plugin has full graph knowledge and does not rely on multiple processing rounds. This test is not applicable for IntelliJ models.

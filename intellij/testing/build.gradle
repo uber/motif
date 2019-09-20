@@ -1,0 +1,15 @@
+plugins {
+    id "org.jetbrains.intellij"
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+intellij {
+    version 'IC-2018.3'
+    plugins = []
+    pluginName 'MyPlugin'
+    updateSinceUntilBuild = false
+}
+
+dependencies {
+    compile deps.test.truth
+}

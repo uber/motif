@@ -15,13 +15,13 @@
  */
 package motif.ast.intellij
 
-import com.intellij.codeInsight.AnnotationUtil
-import com.intellij.openapi.project.Project
-import com.intellij.psi.*
+import com.intellij.pom.java.LanguageLevel
+import com.intellij.psi.PsiElementFactory
+import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import motif.intellij.testing.InternalJdk
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
-import javax.inject.Named
 
 class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
 
@@ -31,6 +31,12 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
         super.setUp()
 
         psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+    }
+
+    override fun getProjectDescriptor(): LightProjectDescriptor {
+        return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
+            override fun getSdk() = InternalJdk.instance
+        }
     }
 
     override fun getTestDataPath(): String {

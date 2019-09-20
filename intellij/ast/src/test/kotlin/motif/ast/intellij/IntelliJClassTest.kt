@@ -15,9 +15,11 @@
  */
 package motif.ast.intellij
 
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiElementFactory
-import com.intellij.psi.PsiTypeVariable
+import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import motif.intellij.testing.InternalJdk
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.Test
@@ -30,6 +32,12 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
         super.setUp()
 
         psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+    }
+
+    override fun getProjectDescriptor(): LightProjectDescriptor {
+        return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
+            override fun getSdk() = InternalJdk.instance
+        }
     }
 
     override fun getTestDataPath(): String {

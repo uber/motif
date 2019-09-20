@@ -1,10 +1,10 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.4.8"
+    id "org.jetbrains.intellij" version "0.4.10"
     id 'org.jetbrains.kotlin.jvm'
 }
 
 intellij {
-    version 'IC-2018.1'
+    version 'IC-2018.3'
     plugins = []
     pluginName 'MyPlugin'
     updateSinceUntilBuild = false
@@ -19,4 +19,5 @@ dependencies {
 
     testCompile deps.test.junit
     testCompile deps.test.assertj
+    testCompile project(':intellij:testing')
 }
