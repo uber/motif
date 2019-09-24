@@ -22,21 +22,21 @@
 
     ---- String | Objects.s ----
       [ Required ]
-        @testcases.T007_custom_qualifier_with_nested_annotation.CustomQualifier(field=@testcases.T007_custom_qualifier_with_nested_annotation.Field("a")) String
+        @testcases.T006_custom_qualifier_with_string_value.CustomQualifier("a") String
           [ Provided By ]
             * Scope | Objects.a
-        @testcases.T007_custom_qualifier_with_nested_annotation.CustomQualifier(field=@testcases.T007_custom_qualifier_with_nested_annotation.Field("b")) String
+        @testcases.T006_custom_qualifier_with_string_value.CustomQualifier("b") String
           [ Provided By ]
             * Scope | Objects.b
       [ Consumed By ]
         * Scope | Scope.string()
 
-    ---- @testcases.T007_custom_qualifier_with_nested_annotation.CustomQualifier(field=@testcases.T007_custom_qualifier_with_nested_annotation.Field("a")) String | Objects.a ----
+    ---- @testcases.T006_custom_qualifier_with_string_value.CustomQualifier("a") String | Objects.a ----
       [ Required ]
       [ Consumed By ]
         * Scope | Objects.s(a)
 
-    ---- @testcases.T007_custom_qualifier_with_nested_annotation.CustomQualifier(field=@testcases.T007_custom_qualifier_with_nested_annotation.Field("b")) String | Objects.b ----
+    ---- @testcases.T006_custom_qualifier_with_string_value.CustomQualifier("b") String | Objects.b ----
       [ Required ]
       [ Consumed By ]
         * Scope | Objects.s(b)

@@ -15,10 +15,7 @@
  */
 package motif.models
 
-import motif.ast.IrClass
-import motif.ast.IrMethod
-import motif.ast.IrParameter
-import motif.ast.IrType
+import motif.ast.*
 
 sealed class ParsingError : RuntimeException(), MotifError
 
@@ -38,3 +35,4 @@ class NotAssignableBindsMethod(val objects: Objects, val method: IrMethod, val r
 class VoidDependenciesMethod(val scope: Scope, val dependenciesClass: IrClass, val method: IrMethod) : ParsingError()
 class DependencyMethodWithParameters(val scope: Scope, val dependenciesClass: IrClass, val method: IrMethod) : ParsingError()
 class NullableSpreadMethod(val objects: Objects, val factoryMethod: IrMethod, val spreadClass: IrClass, val spreadMethod: IrMethod) : ParsingError()
+class InvalidQualifier(val annotated: IrAnnotated, val annotationType: IrType) : ParsingError()

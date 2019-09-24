@@ -15,7 +15,6 @@
  */
 package motif.ast
 
-import javax.inject.Qualifier
 import kotlin.reflect.KClass
 
 interface IrAnnotated {
@@ -24,13 +23,6 @@ interface IrAnnotated {
 
     fun hasAnnotation(annotationClass: KClass<out Annotation>): Boolean {
         return annotations.any { it.matchesClass(annotationClass) }
-    }
-
-    fun getQualifier(): IrAnnotation? {
-        return annotations.find { annotation ->
-            val annotationClass: IrClass = annotation.type.resolveClass() ?: return@find false
-            annotationClass.hasAnnotation(Qualifier::class)
-        }
     }
 
     fun isNullable(): Boolean {

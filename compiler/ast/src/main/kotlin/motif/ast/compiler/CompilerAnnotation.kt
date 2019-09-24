@@ -18,10 +18,12 @@ package motif.ast.compiler
 import com.google.auto.common.AnnotationMirrors
 import com.google.common.base.Equivalence
 import motif.ast.IrAnnotation
+import motif.ast.IrMethod
 import motif.ast.IrType
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.ExecutableType
 import kotlin.reflect.KClass
 
 class CompilerAnnotation(
@@ -36,6 +38,13 @@ class CompilerAnnotation(
     private val pretty: String by lazy { mirror.toString() }
 
     override val type: IrType = CompilerType(env, mirror.annotationType)
+
+    override val members: List<IrMethod> by lazy {
+        mirror.elementValues.keys.map {
+            val executableType = env.typeUtils.asMemberOf(mirror.annotationType, it) as ExecutableType
+            CompilerMethod(env, mirror.annotationType, executableType, it)
+        }
+    }
 
     override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
         return annotationClass.java.name == className

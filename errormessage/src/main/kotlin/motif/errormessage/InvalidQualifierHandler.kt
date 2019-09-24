@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T007_custom_qualifier_with_nested_annotation;
+package motif.errormessage
 
-import static com.google.common.truth.Truth.assertThat;
+import motif.models.InvalidQualifier
 
-public class Test {
+internal class InvalidQualifierHandler(private val error: InvalidQualifier) : ErrorHandler {
 
-    public static void run() {
-        Scope scope = new ScopeImpl();
-        assertThat(scope.string()).isEqualTo("ab");
+    override val name = "INVALID QUALIFIER"
+
+    override fun StringBuilder.handle() {
+        appendln("""
+            Qualifier must define either no members or a single value member of type String:
+
+              ${error.annotationType.qualifiedName}
+        """.trimIndent())
     }
 }

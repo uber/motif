@@ -1,3 +1,5 @@
+* Only allow memberless qualifiers or qualifiers with a single String `value` member
+
 # 0.2.0
 
 * `-Amotif.mode=[dagger|java|kotlin]` for different [code generation modes](https://github.com/uber/motif/wiki#code-generation-mode)
