@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T006_custom_qualifier_with_fields;
+package testcases.E054_custom_qualifier_with_multiple_members;
 
 import javax.inject.Qualifier;
 
 @Qualifier
 public @interface CustomQualifier {
 
-    String first();
+    String value();
 
-    String second();
+    String other();
 }

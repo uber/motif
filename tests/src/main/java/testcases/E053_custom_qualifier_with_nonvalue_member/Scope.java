@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.E053_custom_qualifier_with_nonvalue_member;
 
-import kotlin.reflect.KClass
+@motif.Scope
+public interface Scope {
 
-interface IrAnnotation : IrEquivalence {
+    @motif.Objects
+    class Objects {
 
-    val type: IrType
+        @CustomQualifier(other = "a")
+        String a() {
+            return "a";
+        }
+    }
 
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+    @motif.Dependencies
+    interface Dependencies {}
 }

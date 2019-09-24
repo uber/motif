@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import motif.ast.IrAnnotation
+import motif.ast.IrMethod
 import motif.ast.IrType
 import kotlin.jvm.java
 import kotlin.jvm.javaClass
@@ -46,6 +47,14 @@ class IntelliJAnnotation(
         val annotationClass: PsiClass = JavaPsiFacade.getInstance(project).findClass(qualifiedName, GlobalSearchScope.allScope(project))!!
         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(annotationClass)
         IntelliJType(project, psiClassType)
+    }
+
+    override val members: List<IrMethod> by lazy {
+        psiAnnotation.parameterList.attributes
+                .map {
+                    it.reference!!.resolve() as PsiMethod
+                }
+                .map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
     }
 
     override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {

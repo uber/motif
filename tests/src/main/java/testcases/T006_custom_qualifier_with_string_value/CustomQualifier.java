@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T007_custom_qualifier_with_nested_annotation;
+package testcases.T006_custom_qualifier_with_string_value;
 
 import javax.inject.Qualifier;
 
 @Qualifier
 public @interface CustomQualifier {
 
-    Field field();
+    String value();
 }

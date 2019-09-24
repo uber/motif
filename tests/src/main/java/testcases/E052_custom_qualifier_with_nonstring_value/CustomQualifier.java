@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.E052_custom_qualifier_with_nonstring_value;
 
-import kotlin.reflect.KClass
+import javax.inject.Qualifier;
 
-interface IrAnnotation : IrEquivalence {
+@Qualifier
+public @interface CustomQualifier {
 
-    val type: IrType
-
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+    int value();
 }

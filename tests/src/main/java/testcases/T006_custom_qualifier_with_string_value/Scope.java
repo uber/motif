@@ -13,14 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T006_custom_qualifier_with_fields;
+package testcases.T006_custom_qualifier_with_string_value;
 
-import static com.google.common.truth.Truth.assertThat;
+@motif.Scope
+public interface Scope {
 
-public class Test {
+    String string();
 
-    public static void run() {
-        Scope scope = new ScopeImpl();
-        assertThat(scope.string()).isEqualTo("ab");
+    @motif.Objects
+    class Objects {
+
+        String s(
+                @CustomQualifier("a") String a,
+                @CustomQualifier("b") String b) {
+            return a + b;
+        }
+
+        @CustomQualifier("a")
+        String a() {
+            return "a";
+        }
+
+        @CustomQualifier("b")
+        String b() {
+            return "b";
+        }
     }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }

@@ -13,33 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T007_custom_qualifier_with_nested_annotation;
+package testcases.E053_custom_qualifier_with_nonvalue_member;
 
-@motif.Scope
-public interface Scope {
+import javax.inject.Qualifier;
 
-    String string();
+@Qualifier
+public @interface CustomQualifier {
 
-    @motif.Objects
-    class Objects {
-
-        String s(
-                @CustomQualifier(field = @Field("a")) String a,
-                @CustomQualifier(field = @Field("b")) String b) {
-            return a + b;
-        }
-
-        @CustomQualifier(field = @Field("a"))
-        String a() {
-            return "a";
-        }
-
-        @CustomQualifier(field = @Field("b"))
-        String b() {
-            return "b";
-        }
-    }
-
-    @motif.Dependencies
-    interface Dependencies {}
+    String other();
 }

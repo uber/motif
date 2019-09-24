@@ -13,9 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T007_custom_qualifier_with_nested_annotation;
+package testcases.E054_custom_qualifier_with_multiple_members;
 
-public @interface Field {
+@motif.Scope
+public interface Scope {
 
-    String value();
+    @motif.Objects
+    class Objects {
+
+        @CustomQualifier(value = "a", other = "a")
+        String a() {
+            return "a";
+        }
+    }
+
+    @motif.Dependencies
+    interface Dependencies {}
 }
