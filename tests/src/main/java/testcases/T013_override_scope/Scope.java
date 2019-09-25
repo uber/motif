@@ -15,8 +15,10 @@
  */
 package testcases.T013_override_scope;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope extends ScopeParent {
+public interface Scope extends Creatable<Scope.Dependencies>, ScopeParent {
 
     @Override
     String o();
@@ -29,6 +31,5 @@ public interface Scope extends ScopeParent {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,16 +15,17 @@
  */
 package testcases.T026_child_dynamic_dependency;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(@Named("p") String parent);
 
     @motif.Objects
     class Objects {}
 
-    @motif.Dependencies
     interface Dependencies {}
 }

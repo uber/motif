@@ -15,6 +15,7 @@
  */
 package motif.ast.intellij
 
+import com.google.common.truth.Truth
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiElementFactory
 import com.intellij.testFramework.LightProjectDescriptor
@@ -189,7 +190,7 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Bar<T> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass!!.resolveClass() as IntelliJClass
+        val superClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
         assertThat(superClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
     }
 
@@ -205,8 +206,8 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Baz<T> {}
         """.trimIndent())
 
-        val barClass = fooClass.superclass!!.resolveClass() as IntelliJClass
-        val bazClass = barClass.superclass!!.resolveClass() as IntelliJClass
+        val barClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
+        val bazClass = barClass.supertypes.single().resolveClass() as IntelliJClass
         assertThat(bazClass.typeArguments.map { it.qualifiedName }).containsExactly("java.lang.String")
     }
 
@@ -219,7 +220,7 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Bar<T> {}
         """.trimIndent())
 
-        val superClass = fooClass.superclass!!.resolveClass() as IntelliJClass
+        val superClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
         assertThat(superClass.typeArguments).isEmpty()
     }
 
@@ -230,9 +231,9 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             class Foo {}
         """.trimIndent())
 
-        val objectClass = fooClass.superclass!!.resolveClass()!!
+        val objectClass = fooClass.supertypes.single().resolveClass()!!
         assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
-        assertThat(objectClass.superclass).isNull()
+        assertThat(objectClass.supertypes).isEmpty()
     }
 
     fun testSuperclassOnlyInterface() {
@@ -244,9 +245,24 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
             interface Bar {}
         """.trimIndent())
 
-        val objectClass = fooClass.superclass!!.resolveClass()!!
-        assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
-        assertThat(objectClass.superclass).isNull()
+        val superTypes = fooClass.supertypes.map { it.qualifiedName }
+        assertThat(superTypes).containsExactly("java.lang.Object", "test.Bar")
+    }
+
+    @Test
+    fun testSupertypeMultipleInterfaces() {
+        val fooClass = createIntelliJClass("""
+            package test;
+            
+            class Foo implements Bar, Baz {}
+            
+            interface Bar {}
+            
+            interface Baz {}
+        """.trimIndent())
+
+        val superTypes = fooClass.supertypes.map { it.qualifiedName }
+        assertThat(superTypes).containsExactly("java.lang.Object", "test.Bar", "test.Baz")
     }
 
     private fun createIntelliJClass(@Language("JAVA") classText: String): IntelliJClass {

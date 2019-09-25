@@ -15,12 +15,13 @@
  */
 package testcases.E013_missing_dependencies_multiple_scopes;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     ChildA a();
     ChildB b();
 
-    @motif.Dependencies
     interface Dependencies {}
 }

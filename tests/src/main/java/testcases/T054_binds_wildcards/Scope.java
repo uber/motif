@@ -15,8 +15,10 @@
  */
 package testcases.T054_binds_wildcards;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     A<? extends Integer> a1();
 
@@ -47,6 +49,5 @@ public interface Scope {
         abstract A a3(A<Integer> a);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

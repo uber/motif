@@ -15,12 +15,15 @@
  */
 package testcases.T027_nonstandard_objects_name;
 
+import motif.Creatable;
+import motif.Objects;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
-    @motif.Objects
+    @Objects
     class MyObjects {
 
         String string() {
@@ -28,6 +31,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,10 +15,12 @@
  */
 package testcases.T019_nested_classes;
 
+import motif.Creatable;
+
 public class Foo {
 
     @motif.Scope
-    public interface Scope {
+    public interface Scope extends Creatable<Scope.Dependencies> {
 
         String string();
 
@@ -30,7 +32,6 @@ public class Foo {
             }
         }
 
-        @motif.Dependencies
         interface Dependencies {}
-    }
+}
 }

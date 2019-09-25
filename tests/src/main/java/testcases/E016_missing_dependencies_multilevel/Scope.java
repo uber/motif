@@ -15,11 +15,12 @@
  */
 package testcases.E016_missing_dependencies_multilevel;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,10 +15,11 @@
  */
 package testcases.T064_diamond_child_parameter_override;
 
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child1 child1();
     Child2 child2();
@@ -32,6 +33,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

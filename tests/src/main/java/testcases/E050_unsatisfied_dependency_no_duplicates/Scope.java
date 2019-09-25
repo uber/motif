@@ -15,11 +15,12 @@
  */
 package testcases.E050_unsatisfied_dependency_no_duplicates;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
-    @motif.Dependencies
     interface Dependencies {}
 }

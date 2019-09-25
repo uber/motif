@@ -15,11 +15,12 @@
  */
 package testcases.T065_diamond_hide_source;
 
+import motif.Creatable;
 import motif.Expose;
 import motif.Scope;
 
 @Scope
-public interface Child2 {
+public interface Child2 extends Creatable<Child2.Dependencies> {
 
     GrandChild grandChild();
 
@@ -32,6 +33,5 @@ public interface Child2 {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

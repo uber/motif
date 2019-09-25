@@ -15,12 +15,13 @@
  */
 package testcases.T017_spread;
 
+import motif.Creatable;
 import motif.Spread;
 
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     @Named("a")
     String a();
@@ -35,6 +36,5 @@ public interface Scope {
         abstract Spreadable spreadable();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -38,3 +38,4 @@ class DependencyMethodWithParameters(val scope: Scope, val dependenciesClass: Ir
 class NullableSpreadMethod(val objects: Objects, val factoryMethod: IrMethod, val spreadClass: IrClass, val spreadMethod: IrMethod) : ParsingError()
 class InvalidQualifier(val annotated: IrAnnotated, val annotation: IrAnnotation) : ParsingError()
 class DuplicatedChildParameterSource(val scope: Scope, val childScopeMethod: ChildMethod, val duplicatedParameters: List<ChildMethod.Parameter>) : ParsingError()
+class DuplicatedDependenciesMethod(val scope: Scope, val duplicatedMethods: List<Dependencies.Method>) : ParsingError()

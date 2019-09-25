@@ -254,7 +254,10 @@ class ScopeImplFactory private constructor(
                     abstractMethods)
         }
 
-        private fun dependencies(): Dependencies {
+        private fun dependencies(): Dependencies? {
+            if (scope.dependencies != null) {
+                return null
+            }
             val methods = getDependencyMethodData(scope).map { methodData ->
                 val qualifier = methodData.returnType.qualifier?.let { annotation ->
                     Qualifier(annotation as CompilerAnnotation)
@@ -309,12 +312,17 @@ class ScopeImplFactory private constructor(
 
     private fun createDependencyMethods(scope: Scope): List<DependencyMethodData> {
         val nameScope = NameScope()
+        fun getName(type: Type): String {
+            val dependencies = scope.dependencies ?: return nameScope.name(type)
+            val method = dependencies.methodByType[type] ?: throw IllegalStateException("Could not find Dependencies method for type: $type")
+            return method.method.name
+        }
         return graph.getUnsatisfied(scope)
                 .toSortedMap()
                 .entries
                 .map { (type, sinks) ->
                     DependencyMethodData(
-                            nameScope.name(type),
+                            getName(type),
                             type.type.typeName,
                             type,
                             sinks)
@@ -339,7 +347,7 @@ class ScopeImplFactory private constructor(
 
     private val Scope.dependenciesClassName: ClassName
         get() = dependenciesClassNames.computeIfAbsent(this) {
-            implClassName.nestedClass("Dependencies")
+            dependencies?.clazz?.typeName ?: implClassName.nestedClass("Dependencies")
         }
 
     private val Scope.objectsClassName: ClassName?

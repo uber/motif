@@ -13,6 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.T069_creatable_no_generated_dependencies;
 
-public @interface Dependencies {}
+import static com.google.common.truth.Truth.assertThat;
+
+public class Test {
+
+    public static void run() {
+        Scope scope = new ScopeImpl(new Scope.Dependencies() {
+            @Override
+            public String s() {
+                return "s";
+            }
+        });
+        assertThat(scope.string()).isEqualTo("s");
+    }
+}

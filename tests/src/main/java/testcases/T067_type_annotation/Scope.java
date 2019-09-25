@@ -15,11 +15,13 @@
  */
 package testcases.T067_type_annotation;
 
+import motif.Creatable;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String s();
 
@@ -32,7 +34,6 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }
 

@@ -16,10 +16,8 @@
 package motif.stubcompiler
 
 import com.google.auto.common.MoreElements
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
+import motif.Creatable
 import motif.Scope
 import motif.ast.compiler.CompilerClass
 import motif.ast.compiler.CompilerMethod
@@ -29,9 +27,11 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.util.ElementFilter
 
 class StubProcessor : AbstractProcessor() {
 
@@ -66,6 +66,12 @@ class StubProcessor : AbstractProcessor() {
                 .addMethod(MethodSpec.constructorBuilder().build())
                 .addType(TypeSpec.interfaceBuilder("Dependencies").build())
 
+        dependenciesType(scopeType)?.let { dependenciesType ->
+            builder.addMethod(MethodSpec.constructorBuilder()
+                    .addParameter(TypeName.get(dependenciesType), "dependencies")
+                    .build())
+        }
+
         if (scopeType.asElement().kind == ElementKind.INTERFACE) {
             builder.addSuperinterface(scopeClassName)
         } else {
@@ -82,6 +88,13 @@ class StubProcessor : AbstractProcessor() {
                 }
 
         return builder.build()
+    }
+
+    private fun dependenciesType(scopeType: DeclaredType): DeclaredType? {
+        val scopeElement = (scopeType.asElement() as? TypeElement) ?: return null
+        val superInterface = scopeElement.interfaces.firstOrNull() as? DeclaredType ?: return null
+        if (Creatable::class.java.simpleName !in superInterface.asElement().simpleName.toString()) return null
+        return superInterface.typeArguments.singleOrNull() as? DeclaredType ?: return null
     }
 
     private fun scopeImpl(scopeType: DeclaredType): ClassName {

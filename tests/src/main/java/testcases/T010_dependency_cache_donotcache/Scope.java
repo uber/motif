@@ -15,12 +15,13 @@
  */
 package testcases.T010_dependency_cache_donotcache;
 
+import motif.Creatable;
 import motif.DoNotCache;
 
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
@@ -43,7 +44,6 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }
 

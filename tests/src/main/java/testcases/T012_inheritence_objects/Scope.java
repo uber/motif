@@ -15,10 +15,12 @@
  */
 package testcases.T012_inheritence_objects;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     A a();
     B b();
@@ -32,6 +34,5 @@ public interface Scope {
     @motif.Objects
     abstract class Objects extends ObjectsParent<A, B> {}
 
-    @motif.Dependencies
     interface Dependencies {}
 }

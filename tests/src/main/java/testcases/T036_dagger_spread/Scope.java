@@ -15,12 +15,13 @@
  */
 package testcases.T036_dagger_spread;
 
+import motif.Creatable;
 import motif.Spread;
 
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
@@ -48,6 +49,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

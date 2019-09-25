@@ -15,8 +15,10 @@
  */
 package testcases.E054_custom_qualifier_with_multiple_members;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     @motif.Objects
     class Objects {
@@ -27,6 +29,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

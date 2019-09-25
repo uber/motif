@@ -23,7 +23,7 @@ internal class DependencyMethodWithParametersHandler(private val error: Dependen
 
     override fun StringBuilder.handle() {
         appendln("""
-            Methods on @Dependencies-annotated interfaces must be parameterless:
+            Methods on dependencies interfaces must be parameterless:
 
               ${error.dependenciesClass.qualifiedName}.${error.method.name}
         """.trimIndent())

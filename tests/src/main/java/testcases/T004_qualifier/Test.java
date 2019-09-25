@@ -23,7 +23,4 @@ public class Test {
         Scope scope = new ScopeImpl();
         assertThat(scope.string()).isEqualTo("ab");
     }
-
-    @motif.Dependencies
-    interface Dependencies {}
 }

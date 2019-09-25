@@ -33,11 +33,8 @@ class CompilerClass(
 
     override val type: IrType by lazy { CompilerType(env, declaredType) }
 
-    override val superclass: IrType? by lazy {
-        val superType = env.typeUtils.directSupertypes(declaredType).firstOrNull {
-            it.kind == TypeKind.DECLARED && (it as DeclaredType).asElement().kind == ElementKind.CLASS
-        } ?: return@lazy null
-        CompilerType(env, superType as DeclaredType)
+    override val supertypes: List<IrType> by lazy {
+        env.typeUtils.directSupertypes(declaredType).map { CompilerType(env, it) }
     }
 
     override val typeArguments: List<IrType> by lazy { declaredType.typeArguments.map { CompilerType(env, it) } }

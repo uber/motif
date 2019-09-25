@@ -15,8 +15,10 @@
  */
 package testcases.T040_keywords;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     byte b();
 
@@ -40,6 +42,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

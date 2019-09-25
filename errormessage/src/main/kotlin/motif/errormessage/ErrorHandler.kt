@@ -51,6 +51,7 @@ internal interface ErrorHandler {
                     is NullableSpreadMethod -> NullableSpreadMethodHandler(error)
                     is InvalidQualifier -> InvalidQualifierHandler(error)
                     is DuplicatedChildParameterSource -> DuplicatedChildParameterSourceHandler(error)
+                    is DuplicatedDependenciesMethod -> DuplicatedDependenciesMethodHandler(error)
                 }
                 is ProcessingError -> when (error) {
                     is ScopeCycleError -> ScopeCycleHandler(error)

@@ -15,12 +15,13 @@
  */
 package testcases.T025_child_dependency_from_parent;
 
+import motif.Creatable;
 import motif.Expose;
 
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -34,6 +35,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

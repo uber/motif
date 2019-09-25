@@ -15,8 +15,10 @@
  */
 package testcases.T023_factory_method_binds_dependencies;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     B b();
 
@@ -29,6 +31,5 @@ public interface Scope {
         abstract C c();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

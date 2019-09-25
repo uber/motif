@@ -15,10 +15,11 @@
  */
 package testcases.T047_dynamic_dependency_named_component;
 
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(Integer component);
 
@@ -31,6 +32,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

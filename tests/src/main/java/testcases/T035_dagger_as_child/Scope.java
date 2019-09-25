@@ -15,10 +15,12 @@
  */
 package testcases.T035_dagger_as_child;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope extends Component.Parent {
+public interface Scope extends Creatable<Scope.Dependencies>, Component.Parent {
 
     @motif.Objects
     class Objects {
@@ -29,6 +31,5 @@ public interface Scope extends Component.Parent {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

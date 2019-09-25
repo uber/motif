@@ -15,12 +15,13 @@
  */
 package testcases.E046_diamond_unsatisfied_sink;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child1 child1();
     Child2 child2();
 
-    @motif.Dependencies
     interface Dependencies {}
 }

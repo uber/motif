@@ -193,20 +193,18 @@ ChildScope childScope = mainScope.child();
 
 ## Root Scopes
 
-If Motif finds a nested interface annotated with `@Dependencies` on a Scope, it uses that interface to define exactly what this scope needs from its parent. This is required in order for Motif to tell you when you have unsatisfied dependencies. The recommended pattern is to always declare an empty `@Dependencies` interface on root Scopes:
+By extending `Creatable<D>` you can specify exactly the dependencies you expect from the parent `Scope`. This allows
+Motif to report missing dependencies at compile time.
 
 ```java
 @motif.Scope
-interface MainScope {
+interface MainScope extends Creatable<MainDependencies> {
 
     // ...
-
-    @motif.Dependencies
-    interface Dependencies {}
 }
-```
 
-With the root `Dependencies` interface in place, Motif will report any missing dependencies at build time. Without it, missing dependencies will still cause the build to fail, but the error messages will be less intuitive.
+interface MainDependencies {}
+```
 
 ## Convenience APIs
 

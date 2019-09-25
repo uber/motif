@@ -37,9 +37,8 @@ class IntelliJClass(
 
     override val type: IrType by lazy { IntelliJType(project, psiClassType) }
 
-    override val superclass: IrType? by lazy {
-        val superType = psiClassType.superTypes.firstOrNull() ?: return@lazy null
-        IntelliJType(project, superType)
+    override val supertypes: List<IrType> by lazy {
+        psiClassType.superTypes.map { IntelliJType(project, it) }
     }
 
     override val typeArguments: List<IrType> by lazy {

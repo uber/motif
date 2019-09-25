@@ -15,8 +15,10 @@
  */
 package testcases.T014_override_objects;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     A a();
 
@@ -26,6 +28,5 @@ public interface Scope {
         abstract A b();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

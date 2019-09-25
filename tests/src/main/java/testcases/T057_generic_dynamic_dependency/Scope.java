@@ -15,13 +15,14 @@
  */
 package testcases.T057_generic_dynamic_dependency;
 
+import motif.Creatable;
+
 import java.util.function.Supplier;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(Supplier<String> parent);
 
-    @motif.Dependencies
     interface Dependencies {}
 }

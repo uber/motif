@@ -15,20 +15,22 @@
  */
 package testcases.T058_dynamic_dependency_overrides_expose;
 
+import motif.Creatable;
+import motif.Expose;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(String string);
 
     @motif.Objects
     class Objects {
 
-        @motif.Expose
+        @Expose
         String string() {
             return "s";
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

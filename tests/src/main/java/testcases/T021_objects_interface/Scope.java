@@ -15,8 +15,10 @@
  */
 package testcases.T021_objects_interface;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Dependency dependency();
 
@@ -26,6 +28,5 @@ public interface Scope {
         Dependency dependency();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }
