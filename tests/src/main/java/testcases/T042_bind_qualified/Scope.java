@@ -15,10 +15,12 @@
  */
 package testcases.T042_bind_qualified;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     @Named("s")
     String s();
@@ -40,6 +42,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

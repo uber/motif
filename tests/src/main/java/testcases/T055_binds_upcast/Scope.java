@@ -15,8 +15,10 @@
  */
 package testcases.T055_binds_upcast;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     A a();
 
@@ -27,6 +29,5 @@ public interface Scope {
         abstract A a(A<String> a);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

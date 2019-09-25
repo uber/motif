@@ -16,10 +16,11 @@
 package testcases.E010_duplicate_factory_method_cross_module;
 
 import external.E010_duplicate_factory_method_cross_module.Child;
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -32,6 +33,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

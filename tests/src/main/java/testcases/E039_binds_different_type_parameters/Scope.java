@@ -15,8 +15,10 @@
  */
 package testcases.E039_binds_different_type_parameters;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     B<String> b();
 
@@ -27,6 +29,5 @@ public interface Scope {
         abstract B<String> b(A<Integer> a);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,8 +15,10 @@
  */
 package testcases.E017_not_exposed;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -28,6 +30,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

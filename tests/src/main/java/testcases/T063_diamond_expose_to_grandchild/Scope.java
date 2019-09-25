@@ -15,10 +15,11 @@
  */
 package testcases.T063_diamond_expose_to_grandchild;
 
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     ChildA childA();
 
@@ -33,6 +34,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

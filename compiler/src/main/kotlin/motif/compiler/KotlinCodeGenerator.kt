@@ -40,7 +40,7 @@ object KotlinCodeGenerator {
             addFunction(scopeProviderMethod.spec())
             factoryProviderMethods.forEach { addFunctions(it.specs()) }
             dependencyProviderMethods.forEach { addFunction(it.spec()) }
-            addType(dependencies.spec())
+            dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
         }.build()
     }

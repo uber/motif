@@ -287,9 +287,8 @@ class ModelsSmokeTest : BaseTest() {
                     package test;
 
                     @motif.Scope
-                    interface FooScope {
+                    interface FooScope extends motif.Creatable<FooScope.Dependencies> {
 
-                      @motif.Dependencies
                       interface Dependencies {
                         String string();
                       }

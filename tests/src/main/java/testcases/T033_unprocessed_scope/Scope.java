@@ -16,10 +16,11 @@
 package testcases.T033_unprocessed_scope;
 
 import external.T033_unprocessed_scope.Child;
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -32,6 +33,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

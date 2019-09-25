@@ -15,8 +15,10 @@
  */
 package testcases.E043_binds_invalid_wildcard_super;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     A<? extends Integer> a();
 
@@ -25,6 +27,5 @@ public interface Scope {
         abstract A<Integer> a(A<? super Integer> a);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

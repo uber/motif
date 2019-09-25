@@ -15,10 +15,12 @@
  */
 package testcases.E040_binds_different_primitives;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     int i();
 
@@ -33,6 +35,5 @@ public interface Scope {
         abstract int i(@Named("i") long i);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,8 +15,10 @@
  */
 package testcases.E008_duplicate_factory_method;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String s();
 
@@ -32,6 +34,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

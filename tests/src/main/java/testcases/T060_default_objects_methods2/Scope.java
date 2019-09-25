@@ -15,8 +15,10 @@
  */
 package testcases.T060_default_objects_methods2;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
@@ -25,6 +27,5 @@ public interface Scope {
     @motif.Objects
     interface Objects extends StringObjects, IntObjects {}
 
-    @motif.Dependencies
     interface Dependencies {}
 }

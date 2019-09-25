@@ -15,14 +15,17 @@
  */
 package testcases.T020_naming_collisions;
 
+import motif.Creatable;
 import motif.Expose;
+import motif.Objects;
 import motif.Scope;
+import testcases.T020_naming_collisions.c.SomeDependency;
 
 import javax.inject.Named;
 
 public class Foo {
     @Scope
-    public interface Grandparent {
+    public interface Grandparent extends Creatable<Grandparent.Dependencies> {
 
         Parent p();
 
@@ -30,7 +33,7 @@ public class Foo {
         abstract class Objects {
 
             @Expose
-            abstract testcases.T020_naming_collisions.c.SomeDependency c();
+            abstract SomeDependency c();
 
             @Expose
             abstract testcases.T020_naming_collisions.d.SomeDependency d();
@@ -48,9 +51,8 @@ public class Foo {
             }
         }
 
-        @motif.Dependencies
         interface Dependencies {}
-    }
+}
 
     @Scope
     public interface Parent {
@@ -76,7 +78,7 @@ public class Foo {
     @Scope
     public interface ChildC {
 
-        testcases.T020_naming_collisions.c.SomeDependency c();
+        SomeDependency c();
     }
 
     @Scope

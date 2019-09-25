@@ -41,7 +41,7 @@ object JavaCodeGenerator {
             addMethod(scopeProviderMethod.spec())
             factoryProviderMethods.forEach { addMethods(it.specs()) }
             dependencyProviderMethods.forEach { addMethod(it.spec()) }
-            addType(dependencies.spec())
+            dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
         }.build()
     }

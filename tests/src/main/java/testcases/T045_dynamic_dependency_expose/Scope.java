@@ -15,13 +15,13 @@
  */
 package testcases.T045_dynamic_dependency_expose;
 
+import motif.Creatable;
 import motif.Expose;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(@Expose String string);
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -15,10 +15,11 @@
  */
 package testcases.T046_spread_static_spreadable_method;
 
+import motif.Creatable;
 import motif.Spread;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String a();
 
@@ -29,6 +30,5 @@ public interface Scope {
         abstract Spreadable spreadable();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

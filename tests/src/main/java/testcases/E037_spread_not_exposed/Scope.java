@@ -15,10 +15,11 @@
  */
 package testcases.E037_spread_not_exposed;
 
+import motif.Creatable;
 import motif.Spread;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -29,6 +30,5 @@ public interface Scope {
         abstract Spreadable spreadable();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

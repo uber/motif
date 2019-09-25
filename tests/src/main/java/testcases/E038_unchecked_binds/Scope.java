@@ -15,8 +15,10 @@
  */
 package testcases.E038_unchecked_binds;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     B<String> b();
 
@@ -27,6 +29,5 @@ public interface Scope {
         abstract B<String> b(A a);
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

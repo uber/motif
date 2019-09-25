@@ -15,8 +15,10 @@
  */
 package testcases.E026_factory_method_missing_constructor_inject;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     @motif.Objects
     abstract class Objects {
@@ -28,6 +30,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

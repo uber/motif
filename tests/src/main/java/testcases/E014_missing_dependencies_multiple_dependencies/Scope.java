@@ -15,13 +15,14 @@
  */
 package testcases.E014_missing_dependencies_multiple_dependencies;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
     Integer integer();
 
-    @motif.Dependencies
     interface Dependencies {}
 }

@@ -39,7 +39,7 @@ class ScopeImpl(
         val factoryProviderMethods: List<FactoryProviderMethod>,
         val dependencyProviderMethods: List<DependencyProviderMethod>,
         val objectsImpl: ObjectsImpl?,
-        val dependencies: Dependencies)
+        val dependencies: Dependencies?)
 
 /**
  * ```
@@ -122,7 +122,7 @@ class AccessMethodImpl(
  * ```
  * @Override
  * public ChildScope childScope([ ChildMethpdImplParameters ]) {
- *   return [ ChildDependenciesImpl ];
+ *   return new ChildScopeImpl([ ChildDependenciesImpl ]);
  * }
  * ```
  */

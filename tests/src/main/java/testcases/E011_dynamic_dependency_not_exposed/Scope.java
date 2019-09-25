@@ -15,11 +15,12 @@
  */
 package testcases.E011_dynamic_dependency_not_exposed;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(String string);
 
-    @motif.Dependencies
     interface Dependencies {}
 }

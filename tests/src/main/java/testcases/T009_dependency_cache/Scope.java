@@ -15,10 +15,12 @@
  */
 package testcases.T009_dependency_cache;
 
+import motif.Creatable;
+
 import javax.inject.Named;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String string();
 
@@ -40,7 +42,6 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }
 

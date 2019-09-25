@@ -15,11 +15,12 @@
  */
 package testcases.E048_duplicate_factory_method_spread2;
 
+import motif.Creatable;
 import motif.Expose;
 import motif.Spread;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child();
 
@@ -33,6 +34,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

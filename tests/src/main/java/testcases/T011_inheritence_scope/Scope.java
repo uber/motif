@@ -15,8 +15,10 @@
  */
 package testcases.T011_inheritence_scope;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope extends ScopeParent<String, Integer> {
+public interface Scope extends Creatable<Scope.Dependencies>, ScopeParent<String, Integer> {
 
     @motif.Objects
     class Objects {
@@ -30,6 +32,5 @@ public interface Scope extends ScopeParent<String, Integer> {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

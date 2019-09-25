@@ -15,6 +15,7 @@
  */
 package motif.models
 
+import motif.Creatable
 import motif.ast.IrClass
 import motif.ast.IrMethod
 
@@ -31,6 +32,15 @@ class Dependencies(val clazz: IrClass, val scope: Scope) {
                 Method(this, method, type)
             }
 
+    val methodByType: Map<Type, Method> = methods.groupBy { it.returnType }
+            .mapValues { (type, methods) ->
+                if (methods.size > 1) {
+                    throw DuplicatedDependenciesMethod(scope, methods)
+                }
+                methods.first()
+            }
+            .toSortedMap()
+
     val types: List<Type> = methods.map { it.returnType }
 
     class Method(val dependencies: Dependencies, val method: IrMethod, val returnType: Type) {
@@ -43,8 +53,24 @@ class Dependencies(val clazz: IrClass, val scope: Scope) {
     companion object {
 
         fun fromScope(scope: Scope): Dependencies? {
-            val dependenciesClass = scope.clazz.annotatedInnerClass(motif.Dependencies::class) ?: return null
+            val creatable = findCreatableSuperinterface(scope.clazz) ?: return null
+            val dependenciesType = creatable.typeArguments.singleOrNull() ?: return null
+            val dependenciesClass = dependenciesType.resolveClass() ?: return null
             return Dependencies(dependenciesClass, scope)
+        }
+
+        private fun findCreatableSuperinterface(clazz: IrClass): IrClass? {
+            if (clazz.qualifiedName.takeWhile { it != '<' } == Creatable::class.java.name) {
+                return clazz
+            }
+
+            clazz.supertypes
+                    .mapNotNull { it.resolveClass() }
+                    .forEach { superinterface ->
+                        findCreatableSuperinterface(superinterface)?.let { return it }
+                    }
+
+            return null
         }
     }
 }

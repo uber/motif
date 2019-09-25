@@ -15,14 +15,15 @@
  */
 package testcases.E002_nonstandard_dependencies_name;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.MyDependencies> {
 
     String string();
 
     @motif.Objects
     class Objects {}
 
-    @motif.Dependencies
     interface MyDependencies {}
 }

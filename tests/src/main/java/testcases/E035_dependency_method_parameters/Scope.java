@@ -15,12 +15,12 @@
  */
 package testcases.E035_dependency_method_parameters;
 
-@motif.Scope
-public interface Scope {
+import motif.Creatable;
 
-    @motif.Dependencies
-    interface Dependencies {
+@motif.Scope
+public interface Scope extends Creatable<Scope.Dependencies> {
+  interface Dependencies {
 
         String s(String s);
-    }
+  }
 }

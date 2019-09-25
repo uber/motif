@@ -15,11 +15,12 @@
  */
 package testcases.E044_dynamic_dependency_duplicate_factory_method;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     Child child(String s);
 
-    @motif.Dependencies
     interface Dependencies {}
 }

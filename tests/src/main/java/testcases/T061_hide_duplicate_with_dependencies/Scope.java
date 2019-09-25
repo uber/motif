@@ -15,11 +15,11 @@
  */
 package testcases.T061_hide_duplicate_with_dependencies;
 
+import motif.Creatable;
 import motif.Expose;
-import motif.Spread;
 
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     String s();
 
@@ -34,6 +34,5 @@ public interface Scope {
         }
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }

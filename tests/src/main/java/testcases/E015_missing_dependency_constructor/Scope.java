@@ -15,14 +15,15 @@
  */
 package testcases.E015_missing_dependency_constructor;
 
+import motif.Creatable;
+
 @motif.Scope
-public interface Scope {
+public interface Scope extends Creatable<Scope.Dependencies> {
 
     @motif.Objects
     abstract class Objects {
         abstract A a();
     }
 
-    @motif.Dependencies
     interface Dependencies {}
 }
