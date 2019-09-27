@@ -31,7 +31,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -101,6 +104,7 @@ public class TestHarness {
     private final String testClassName;
     private final File errorFile;
     private final File graphFile;
+    private final File proguardFile;
     private final boolean isErrorTest;
 
     @SuppressWarnings("unused")
@@ -112,6 +116,7 @@ public class TestHarness {
         this.testClassName = "testcases." + testName + ".Test";
         this.errorFile = new File(testCaseDir, "ERROR.txt");
         this.graphFile = new File(testCaseDir, "GRAPH.txt");
+        this.proguardFile = new File(testCaseDir, "config.pro");
         this.isErrorTest = testName.startsWith("E");
     }
 
@@ -149,13 +154,22 @@ public class TestHarness {
         } else {
             assertSucceeded(result);
 
+            File proguardedClasses = ProGuard.run(
+                    externalClassesDir,
+                    result.getOutputDirectory(),
+                    proguardFile);
+
             ClassLoader classLoader;
             if (externalClassesDir == null) {
-                classLoader = result.getClassLoader();
+                classLoader = new URLClassLoader(
+                        new URL[]{
+                                proguardedClasses.toURI().toURL()
+                        },
+                        getClass().getClassLoader());
             } else {
                 classLoader = new URLClassLoader(
                         new URL[]{
-                                result.getOutputDirectory().toURI().toURL(),
+                                proguardedClasses.toURI().toURL(),
                                 externalClassesDir.toURI().toURL()
                         }, getClass().getClassLoader());
             }

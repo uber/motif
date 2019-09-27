@@ -20,6 +20,7 @@ dependencies {
     implementation project(':errormessage')
 
     testImplementation project(':viewmodel')
+    testImplementation deps.proguard
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
     testImplementation deps.test.compileTestingKotlin
