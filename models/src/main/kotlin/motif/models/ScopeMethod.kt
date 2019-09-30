@@ -32,7 +32,12 @@ sealed class ScopeMethod {
                 method.parameters.find { it.isNullable() }?.let { nullableParameter ->
                     throw NullableDynamicDependency(scope, method, nullableParameter)
                 }
-                return ChildMethod(method, scope, returnClass)
+                val childMethod = ChildMethod(method, scope, returnClass)
+                val duplicatedParameterTypes = childMethod.parameters - childMethod.parameters.distinctBy { it.type }
+                if (duplicatedParameterTypes.isNotEmpty()) {
+                    throw DuplicatedChildParameterSource(scope, childMethod, duplicatedParameterTypes)
+                }
+                return childMethod
             }
 
             if (!method.hasParameters() && !method.isVoid()) {

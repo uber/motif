@@ -1,3 +1,6 @@
+# 0.2.1-SNAPSHOT
+
+* Fix motif allowing multiple parameters of same type for a child method
 * Only allow memberless qualifiers or qualifiers with a single String `value` member
 
 # 0.2.0
