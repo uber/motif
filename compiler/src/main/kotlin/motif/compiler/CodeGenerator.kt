@@ -15,67 +15,47 @@
  */
 package motif.compiler
 
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.TypeSpec
 import motif.core.ResolvedGraph
-import motif.models.Scope
+import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 
-interface GeneratedClass {
+object CodeGenerator {
 
-    val packageName: String
-    val spec: TypeSpec
-}
+    fun generate(env: ProcessingEnvironment, graph: ResolvedGraph, mode: Mode?) {
+        val kaptKotlinGeneratedDir = env.options[OPTION_KAPT_KOTLIN_GENERATED]
+        if (mode == Mode.JAVA) {
+            generateJava(env, graph)
+        } else if (mode == Mode.KOTLIN) {
+            if (kaptKotlinGeneratedDir == null) {
+                throw IllegalStateException("-A$OPTION_MODE=${Mode.KOTLIN.name.toLowerCase()} " +
+                        "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
+            }
+            generateKotlin(env, graph, kaptKotlinGeneratedDir)
+        } else {
+            if (kaptKotlinGeneratedDir == null) {
+                generateJava(env, graph)
+            } else {
+                generateKotlin(env, graph, kaptKotlinGeneratedDir)
+            }
+        }
+    }
 
-class CodeGenerator(
-        private val env: ProcessingEnvironment,
-        private val graph: ResolvedGraph) {
-
-    private val dependencies = mutableMapOf<Scope, Dependencies>()
-    private val implTypeNames = mutableMapOf<Scope, ClassName>()
-
-    private fun getScopeImpls(): List<GeneratedClass> {
-        return graph.scopes
-                .filter { scope ->
-                    val scopeImplName = getImplTypeName(scope)
-                    env.elementUtils.getTypeElement(scopeImplName.toString()) == null
-                }
-                .map { scope ->
-                    val childEdges = graph.getChildEdges(scope)
-                            .map { childEdge ->
-                                val childImplTypeName = getImplTypeName(childEdge.child)
-                                val dependencies = getDependencies(childEdge.child)
-                                ChildImpl(childEdge, dependencies, childImplTypeName)
-                            }
-                    ScopeImplFactory(
-                            env,
-                            graph,
-                            scope,
-                            getImplTypeName(scope),
-                            getDependencies(scope),
-                            childEdges).create()
+    private fun generateJava(env: ProcessingEnvironment, graph: ResolvedGraph) {
+        ScopeImplFactory.create(env, graph)
+                .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
+                .forEach { javaFile ->
+                    javaFile.writeTo(env.filer)
                 }
     }
 
-    private fun getDependencies(scope: Scope): Dependencies {
-        return dependencies.computeIfAbsent(scope) {
-            val implTypeName = getImplTypeName(scope)
-            Dependencies.create(graph, scope, implTypeName)
-        }
-    }
-
-    private fun getImplTypeName(scope: Scope): ClassName {
-        return implTypeNames.computeIfAbsent(scope) {
-            val scopeTypeName = scope.clazz.typeName
-            val prefix = scopeTypeName.simpleNames().joinToString("")
-            ClassName.get(scopeTypeName.packageName(), "${prefix}Impl")
-        }
-    }
-
-    companion object {
-
-        fun generate(env: ProcessingEnvironment, graph: ResolvedGraph): List<GeneratedClass> {
-            return CodeGenerator(env, graph).getScopeImpls()
-        }
+    private fun generateKotlin(
+            env: ProcessingEnvironment,
+            graph: ResolvedGraph,
+            kaptKotlinGeneratedDir: String) {
+        ScopeImplFactory.create(env, graph)
+                .map { scopeImpl -> KotlinCodeGenerator.generate(scopeImpl) }
+                .forEach { fileSpec ->
+                    fileSpec.writeTo(File(kaptKotlinGeneratedDir))
+                }
     }
 }

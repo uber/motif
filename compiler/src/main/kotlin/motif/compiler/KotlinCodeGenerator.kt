@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.compiler.codegenv2
+package motif.compiler
 
 import com.squareup.kotlinpoet.*
 import motif.internal.None

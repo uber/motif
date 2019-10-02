@@ -17,12 +17,10 @@ package motif.compiler
 
 import com.google.auto.common.BasicAnnotationProcessor
 import com.google.common.collect.SetMultimap
-import com.squareup.javapoet.JavaFile
 import motif.Scope
 import motif.ast.compiler.CompilerClass
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
@@ -32,7 +30,6 @@ const val OPTION_KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
 const val OPTION_MODE = "motif.mode"
 
 enum class Mode {
-    DAGGER, // Generate Dagger-based (Java) implementation
     JAVA,   // Generate pure Java implementation
     KOTLIN, // Generate pure Kotlin implementation
 }
@@ -81,27 +78,9 @@ class Processor : BasicAnnotationProcessor() {
                 null
             }
 
-            val generate: (mode: Mode?, graph: ResolvedGraph) -> Unit = if (mode == Mode.DAGGER) {
-                this@Processor::generateDagger
-            } else {
-                this@Processor::generateV2
-            }
-
-            generate(mode, graph)
+            CodeGenerator.generate(processingEnv, graph, mode)
 
             return emptySet()
         }
-    }
-
-    private fun generateDagger(mode: Mode?, graph: ResolvedGraph) {
-        val generatedClasses = CodeGenerator.generate(processingEnv, graph)
-
-        generatedClasses.forEach { generatedClass ->
-            JavaFile.builder(generatedClass.packageName, generatedClass.spec).build().writeTo(processingEnv.filer)
-        }
-    }
-
-    private fun generateV2(mode: Mode?, graph: ResolvedGraph) {
-        motif.compiler.codegenv2.CodeGenerator.generate(processingEnv, graph, mode)
     }
 }
