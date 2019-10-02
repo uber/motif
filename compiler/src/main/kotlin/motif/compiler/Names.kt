@@ -16,87 +16,24 @@
 package motif.compiler
 
 import com.google.auto.common.AnnotationMirrors
-import com.squareup.javapoet.*
-import motif.ast.IrClass
-import motif.ast.IrMethod
-import motif.ast.IrType
 import motif.ast.compiler.CompilerAnnotation
-import motif.ast.compiler.CompilerMethod
 import motif.ast.compiler.CompilerType
 import motif.models.Type
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.*
 import javax.lang.model.util.SimpleElementVisitor8
 import javax.lang.model.util.SimpleTypeVisitor8
-
-fun overrideSpec(env: ProcessingEnvironment, method: IrMethod): MethodSpec.Builder {
-    val compilerMethod = method as CompilerMethod
-    return MethodSpec.overriding(compilerMethod.element, compilerMethod.owner, env.typeUtils)
-}
-
-fun overrideWithFinalParamsSpec(method: IrMethod): MethodSpec.Builder {
-    val builder = MethodSpec.methodBuilder(method.name)
-            .addAnnotation(Override::class.java)
-            .returns(method.returnType.typeName)
-
-    method.parameters
-            .map {
-                ParameterSpec.builder(it.type.typeName, it.name)
-                        .addModifiers(Modifier.FINAL)
-                        .build()
-            }
-            .forEach { builder.addParameter(it) }
-
-    return builder
-}
-
-fun methodSpec(nameScope: NameScope, type: Type): MethodSpec.Builder {
-    val name = nameScope.name(type)
-    val spec = MethodSpec.methodBuilder(name)
-    spec.returns(type.typeName)
-    type.qualifierSpec?.let { spec.addAnnotation(it) }
-    return spec
-}
-
-fun parameterSpec(nameScope: NameScope, type: Type): ParameterSpec {
-    val name = nameScope.name(type)
-    return parameterSpec(type, name)
-}
-
-fun parameterSpec(type: Type, name: String): ParameterSpec {
-    val spec = ParameterSpec.builder(type.typeName, name)
-    type.qualifierSpec?.let { spec.addAnnotation(it) }
-    return spec.build()
-}
-
-val IrClass.typeName: ClassName
-    get() = type.typeName as ClassName
-
-val IrType.typeName: TypeName
-    get() = ClassName.get((this as CompilerType).mirror)
-
-val Type.mirror: TypeMirror
-    get() = (type as CompilerType).mirror
-
-val Type.qualifierMirror: AnnotationMirror?
-    get() = (qualifier as? CompilerAnnotation)?.mirror
-
-val Type.typeName: TypeName
-    get() = ClassName.get(mirror)
-
-val Type.qualifierSpec: AnnotationSpec?
-    get() = qualifierMirror?.let { AnnotationSpec.get(it) }
 
 class NameScope(blacklist: Iterable<String> = emptySet()) {
 
     private val names = UniqueNameSet(blacklist)
 
     fun name(type: Type): String {
-        return names.unique(Names.safeName(type.mirror, type.qualifierMirror))
+        return names.unique(Names.safeName(
+                (type.type as CompilerType).mirror,
+                (type.qualifier as? CompilerAnnotation)?.mirror))
     }
 }
 

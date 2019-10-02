@@ -1,5 +1,6 @@
 # 0.2.1-SNAPSHOT
 
+* Remove option to generate a Dagger-based implementation
 * Fix motif allowing multiple parameters of same type for a child method
 * Only allow memberless qualifiers or qualifiers with a single String `value` member
 
