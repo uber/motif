@@ -19,13 +19,15 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import motif.ScopeFactory;
 
 public class RootActivity extends Activity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RootScope rootScope = new RootFactoryImpl().create(this);
+        RootFactory rootFactory = ScopeFactory.create(RootFactory.class);
+        RootScope rootScope = rootFactory.create(this);
         setContentView(rootScope.view());
     }
 }

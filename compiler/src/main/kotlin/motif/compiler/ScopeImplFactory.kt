@@ -22,6 +22,7 @@ import motif.ast.compiler.CompilerMethod
 import motif.ast.compiler.CompilerType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
+import motif.internal.Constants
 import motif.models.*
 import javax.annotation.processing.ProcessingEnvironment
 
@@ -342,7 +343,7 @@ class ScopeImplFactory private constructor(
         get() = scopeImplClassNames.computeIfAbsent(this) { scope ->
             val scopeClassName = scope.clazz.typeName
             val prefix = scopeClassName.kt.simpleNames.joinToString("")
-            ClassName.get(scopeClassName.kt.packageName, "${prefix}Impl")
+            ClassName.get(scopeClassName.kt.packageName, "$prefix${Constants.SCOPE_IMPL_SUFFIX}")
         }
 
     private val Scope.dependenciesClassName: ClassName

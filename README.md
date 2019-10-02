@@ -15,6 +15,15 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 | [![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://search.maven.org/artifact/com.uber.motif/motif-compiler)<br>[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://search.maven.org/artifact/com.uber.motif/motif) | <pre>annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'<br>implementation 'com.uber.motif:motif:x.y.z'</pre> |
 |-|:-|
 
+## Proguard
+
+```proguard
+-keepnames @motif.Scope interface *
+-keepnames @motif.ScopeImpl class * {
+    <init>(...);
+}
+```
+
 ## The Basics
 
 This is a Motif Scope. It serves as a container for objects that can be created by this Scope:
@@ -204,6 +213,13 @@ interface MainScope extends Creatable<MainDependencies> {
 }
 
 interface MainDependencies {}
+```
+
+Extending `Creatable<D>` also enables instantiation of a "root" `Scope` without referencing generated code using Motif's `ScopeFactory.create` API:
+
+```java
+MainDependencies dependencies = ...;
+MainScope mainScope = ScopeFactory.create(MainScope.class, dependencies)
 ```
 
 ## Convenience APIs
