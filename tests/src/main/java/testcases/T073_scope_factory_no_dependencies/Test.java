@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.sample.app.root;
+package testcases.T073_scope_factory_no_dependencies;
 
-import android.content.Context;
-import motif.Creatable;
-import motif.NoDependencies;
-import motif.Scope;
+import motif.ScopeFactory;
 
-/**
- * This is a convenience Scope defined simply to build the RootScope. This additional layer is useful since RootScope
- * requires a Context that must be provided from outside of the graph. RootFactory itself does not require any
- * dependencies of its own and can be instantiated in RootActivity via ScopeFactory.create(RootFactory.class).
- */
-@Scope
-public interface RootFactory extends Creatable<NoDependencies> {
+import static com.google.common.truth.Truth.assertThat;
 
-    RootScope create(Context context);
+public class Test {
+
+
+    public static void run() {
+        Scope scope = ScopeFactory.create(Scope.class);
+        assertThat(scope.string()).isEqualTo("s");
+    }
 }

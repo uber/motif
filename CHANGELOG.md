@@ -1,5 +1,6 @@
 # 0.2.2-SNAPSHOT
 
+* Replace `@motif.Dependencies` API with `ScopeFactory.create`. See https://github.com/uber/motif/issues/125 for details.
 * Do not use computeIfAbsent in ScopeFactory in order to avoid ConcurrentModificationException in the IntelliJ plugin
 * Allow graph processing to continue even when a ParsingError is encountered. A malformed Scope will simply not be included in the ResolvedGraph.
 * New `ResolvedGraph.getParentEdges(Scope)` and `ResolvedGraph.getScope(IrType)` APIs
