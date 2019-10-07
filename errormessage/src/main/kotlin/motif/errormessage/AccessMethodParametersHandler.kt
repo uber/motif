@@ -15,17 +15,20 @@
  */
 package motif.errormessage
 
-import motif.models.InvalidScopeMethod
+import motif.models.AccessMethodParameters
 
-internal class InvalidScopeMethodHandler(private val error: InvalidScopeMethod) : ErrorHandler {
+internal class AccessMethodParametersHandler(private val error: AccessMethodParameters) : ErrorHandler {
 
-    override val name = "INVALID SCOPE METHOD"
+    override val name = "ACCESS METHOD PARAMETERS"
 
     override fun StringBuilder.handle() {
         appendln("""
-            Scope method is invalid:
+            Access methods must be parameterless:
 
               ${error.scope.qualifiedName}.${error.method.name}
+            
+            Suggestions:
+              * If this method was intended to be a child method, ensure that the return type is a Scope.
         """.trimIndent())
     }
 }

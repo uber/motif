@@ -20,7 +20,8 @@ import motif.ast.*
 sealed class ParsingError : RuntimeException(), MotifError
 
 class ScopeMustBeAnInterface(val scopeClass: IrClass) : ParsingError()
-class InvalidScopeMethod(val scope: Scope, val method: IrMethod) : ParsingError()
+class VoidScopeMethod(val scope: Scope, val method: IrMethod) : ParsingError()
+class AccessMethodParameters(val scope: Scope, val method: IrMethod) : ParsingError()
 class ObjectsFieldFound(val scope: Scope, val objectClass: IrClass) : ParsingError()
 class ObjectsConstructorFound(val scope: Scope, val objectClass: IrClass) : ParsingError()
 class VoidFactoryMethod(val objects: Objects, val method: IrMethod) : ParsingError()

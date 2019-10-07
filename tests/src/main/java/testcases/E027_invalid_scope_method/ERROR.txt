@@ -15,9 +15,9 @@
               Motif Errors
   ====================================
   
-  [INVALID SCOPE METHOD]
+  [VOID SCOPE METHOD]
   
-  Scope method is invalid:
+  Scope methods must be non-void:
   
     testcases.E027_invalid_scope_method.Scope.invalid
   

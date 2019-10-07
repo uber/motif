@@ -33,7 +33,8 @@ internal interface ErrorHandler {
             return when (error) {
                 is ParsingError -> when (error) {
                     is ScopeMustBeAnInterface -> ScopeMustBeAnInterfaceHandler(error)
-                    is InvalidScopeMethod -> InvalidScopeMethodHandler(error)
+                    is VoidScopeMethod -> VoidScopeMethodHandler(error)
+                    is AccessMethodParameters -> AccessMethodParametersHandler(error)
                     is ObjectsFieldFound -> ObjectsFieldFoundHandler(error)
                     is ObjectsConstructorFound -> ObjectsConstructorFoundHandler(error)
                     is VoidFactoryMethod -> VoidFactoryMethodHandler(error)
