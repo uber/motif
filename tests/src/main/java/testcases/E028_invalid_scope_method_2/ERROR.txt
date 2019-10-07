@@ -15,10 +15,13 @@
               Motif Errors
   ====================================
   
-  [INVALID SCOPE METHOD]
+  [ACCESS METHOD PARAMETERS]
   
-  Scope method is invalid:
+  Access methods must be parameterless:
   
     testcases.E028_invalid_scope_method_2.Scope.invalid
+  
+  Suggestions:
+    * If this method was intended to be a child method, ensure that the return type is a Scope.
   
   ====================================

@@ -40,11 +40,15 @@ sealed class ScopeMethod {
                 return childMethod
             }
 
-            if (!method.hasParameters() && !method.isVoid()) {
-                return AccessMethod(method, scope)
+            if (method.hasParameters()) {
+                throw AccessMethodParameters(scope, method)
             }
 
-            throw InvalidScopeMethod(scope, method)
+            if (method.isVoid()) {
+                throw VoidScopeMethod(scope, method)
+            }
+
+            return AccessMethod(method, scope)
         }
     }
 }
