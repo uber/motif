@@ -120,7 +120,7 @@ private object NameVisitor : SimpleTypeVisitor8<String, Void>() {
     }
 
     override fun visitError(t: ErrorType, p: Void?): String {
-        return visitDeclared(t, p)
+        throw IllegalStateException("Could not generate name for ErrorType: $t. Check your code for missing imports or typos.")
     }
 
     override fun visitArray(t: ArrayType, p: Void?): String {
