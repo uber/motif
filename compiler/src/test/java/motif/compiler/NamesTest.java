@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.testing.compile.Compiler.javac;
 
 public class NamesTest {
@@ -93,6 +94,26 @@ public class NamesTest {
     public void customQualifier() {
         String name = getSafeName("@Foo String");
         assertThat(name).isEqualTo("fooString");
+    }
+
+    @Test
+    public void errorType() {
+        try {
+            getSafeName("DoesNotExist");
+            assertWithMessage("Expected Exception to be thrown.");
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("DoesNotExist");
+        }
+    }
+
+    @Test
+    public void errorType_typeArgument() {
+        try {
+            getSafeName("java.util.HashMap<DoesNotExist, Integer>");
+            assertWithMessage("Expected Exception to be thrown.");
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("DoesNotExist");
+        }
     }
 
     private static String getSafeName(String classString) {
