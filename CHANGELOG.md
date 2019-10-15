@@ -1,5 +1,6 @@
-# 0.2.1-SNAPSHOT
+# 0.2.1
 
+* Improve error message when generate name for ErrorTypes
 * Improve invalid Scope method error messages
 * Remove option to generate a Dagger-based implementation
 * Fix motif allowing multiple parameters of same type for a child method
