@@ -1,3 +1,5 @@
+# 0.2.2-SNAPSHOT
+
 # 0.2.1
 
 * Improve error message when generate name for ErrorTypes
