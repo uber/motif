@@ -18,6 +18,8 @@ package motif.core
 import motif.ast.IrClass
 import motif.ast.IrType
 import motif.models.ChildMethod
+import motif.models.ErrorScope
+import motif.models.ParsingError
 import motif.models.Scope
 
 class ScopeEdge(val parent: Scope, val child: Scope, val method: ChildMethod)
@@ -38,6 +40,8 @@ internal class ScopeGraph private constructor(val scopes: List<Scope>) {
     val roots: List<Scope> = parentEdges.filter { it.value.isEmpty() }.map { it.key }
 
     val scopeCycleError: ScopeCycleError? = calculateCycle()
+
+    val parsingErrors: List<ParsingError> = scopes.filterIsInstance<ErrorScope>().map { it.parsingError }
 
     fun getChildEdges(scope: Scope): List<ScopeEdge> {
         return childEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")

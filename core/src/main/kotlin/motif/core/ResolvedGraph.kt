@@ -50,11 +50,7 @@ interface ResolvedGraph {
     companion object {
 
         fun create(initialScopeClasses: List<IrClass>): ResolvedGraph {
-            val scopes = try {
-                Scope.fromClasses(initialScopeClasses)
-            } catch (e: ParsingError) {
-                return ErrorGraph(e)
-            }
+            val scopes = Scope.fromClasses(initialScopeClasses)
             val scopeGraph = ScopeGraph.create(scopes)
             scopeGraph.scopeCycleError?.let { return ErrorGraph(it) }
             return ResolvedGraphFactory(scopeGraph).create()
@@ -141,7 +137,7 @@ private class ValidResolvedGraph(
 
     override val scopes = scopeGraph.scopes
 
-    override val errors = graphState.errors
+    override val errors = scopeGraph.parsingErrors + graphState.errors
 
     override fun getScope(scopeClass: IrClass) = scopeGraph.getScope(scopeClass)
 
