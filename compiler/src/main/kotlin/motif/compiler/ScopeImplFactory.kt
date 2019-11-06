@@ -43,7 +43,7 @@ class ScopeImplFactory private constructor(
 
     private inner class Factory(private val scope: Scope) {
 
-        private val methodNameScope = NameScope(blacklist = scope.scopeMethods.map { it.method.name })
+        private val methodNameScope = NameScope(blacklist = scope.clazz.methods.map { it.name })
         private val fieldNameScope = NameScope(blacklist = listOf(OBJECTS_FIELD_NAME, DEPENDENCIES_FIELD_NAME))
 
         private val providerMethodNames = mutableMapOf<Type, String>()

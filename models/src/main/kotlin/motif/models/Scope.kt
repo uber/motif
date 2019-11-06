@@ -21,25 +21,17 @@ import motif.ast.IrType
 /**
  * [Wiki](https://github.com/uber/motif/wiki#scope)
  */
-class Scope internal constructor(val clazz: IrClass) {
+sealed class Scope(val clazz: IrClass) {
 
+    val source by lazy { ScopeSource(this) }
     val simpleName: String by lazy { clazz.simpleName }
-
     val qualifiedName: String by lazy { clazz.qualifiedName }
 
-    val objects: Objects? = Objects.fromScope(this)
-
-    val scopeMethods = clazz.methods.map { method -> ScopeMethod.fromScopeMethod(this, method) }
-
-    val accessMethods: List<AccessMethod> = scopeMethods.mapNotNull { method -> method as? AccessMethod }
-
-    val childMethods: List<ChildMethod> = scopeMethods.mapNotNull { method -> method as? ChildMethod }
-
-    val factoryMethods: List<FactoryMethod> = objects?.factoryMethods ?: emptyList()
-
-    val dependencies: Dependencies? = Dependencies.fromScope(this)
-
-    val source = ScopeSource(this)
+    abstract val objects: Objects?
+    abstract val accessMethods: List<AccessMethod>
+    abstract val childMethods: List<ChildMethod>
+    abstract val factoryMethods: List<FactoryMethod>
+    abstract val dependencies: Dependencies?
 
     companion object {
 
@@ -47,6 +39,33 @@ class Scope internal constructor(val clazz: IrClass) {
             return ScopeFactory(scopeClasses).create()
         }
     }
+}
+
+class ErrorScope internal constructor(clazz: IrClass, val parsingError: ParsingError) : Scope(clazz) {
+    override val objects: Objects? = null
+    override val accessMethods: List<AccessMethod> = emptyList()
+    override val childMethods: List<ChildMethod> = emptyList()
+    override val factoryMethods: List<FactoryMethod> = emptyList()
+    override val dependencies: Dependencies? = null
+}
+
+class ValidScope internal constructor(clazz: IrClass) : Scope(clazz) {
+
+    init {
+        if (clazz.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(clazz)
+    }
+
+    override val objects: Objects? = Objects.fromScope(this)
+
+    private val scopeMethods = clazz.methods.map { method -> ScopeMethod.fromScopeMethod(this, method) }
+
+    override val accessMethods: List<AccessMethod> = scopeMethods.mapNotNull { method -> method as? AccessMethod }
+
+    override val childMethods: List<ChildMethod> = scopeMethods.mapNotNull { method -> method as? ChildMethod }
+
+    override val factoryMethods: List<FactoryMethod> = objects?.factoryMethods ?: emptyList()
+
+    override val dependencies: Dependencies? = Dependencies.fromScope(this)
 }
 
 private class ScopeFactory(
@@ -61,15 +80,18 @@ private class ScopeFactory(
     }
 
     private fun visit(scopeClass: IrClass) {
-        if (scopeClass.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(scopeClass)
-
         val scopeType = scopeClass.type
 
         if (visited.contains(scopeType)) return
+
         visited.add(scopeType)
 
         if (!scopeMap.containsKey(scopeType)) {
-            val scope = Scope(scopeClass)
+            val scope = try {
+                ValidScope(scopeClass)
+            } catch (e: ParsingError) {
+                ErrorScope(scopeClass, e)
+            }
             scope.childMethods.forEach { childMethod ->
                 visit(childMethod.childScopeClass)
             }
