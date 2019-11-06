@@ -150,7 +150,7 @@ public class TestHarness {
                 processor);
 
         if (isErrorTest) {
-            runErrorTest(result);
+            runErrorTest(result, processor.graph);
         } else {
             assertSucceeded(result);
 
@@ -231,7 +231,7 @@ public class TestHarness {
         return processors;
     }
 
-    private void runErrorTest(KotlinCompilation.Result result) throws IOException {
+    private void runErrorTest(KotlinCompilation.Result result, ResolvedGraph graph) throws Throwable {
         assertFailed(result);
 
         String expectedErrorString = getExistingErrorString();
@@ -246,6 +246,8 @@ public class TestHarness {
                     "  1. Verify that the changes are correct.\n" +
                     "  2. Commit the changes to source control.\n").fail();
         }
+
+        runGraphTest(graph);
     }
 
     private void runSuccessTest(Class<?> testClass, ResolvedGraph graph) throws Throwable {
@@ -255,6 +257,10 @@ public class TestHarness {
             throw e.getCause();
         }
 
+        runGraphTest(graph);
+    }
+
+    private void runGraphTest(ResolvedGraph graph) throws Throwable {
         String expectedGraphString = getExistingGraphString();
         String actualGraphString = getActualGraphString(graph);
 
