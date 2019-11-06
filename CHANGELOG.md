@@ -1,5 +1,7 @@
 # 0.2.2-SNAPSHOT
 
+* Do not use computeIfAbsent in ScopeFactory in order to avoid ConcurrentModificationException in the IntelliJ plugin
+
 # 0.2.1
 
 * Improve error message when generate name for ErrorTypes
