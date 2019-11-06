@@ -16,7 +16,6 @@
 package motif.viewmodel
 
 import motif.core.ResolvedGraph
-import motif.errormessage.ErrorMessage
 import motif.models.*
 
 object TestRenderer {
@@ -24,15 +23,11 @@ object TestRenderer {
     @JvmStatic
     fun render(graph: ResolvedGraph): String {
         val graphViewModel = GraphViewModel.create(graph)
-        return if (graph.errors.isEmpty()) {
-            StringBuilder().apply {
-                graphViewModel.rootScopes.forEach { rootScopeViewModel ->
-                    renderScope(0, rootScopeViewModel)
-                }
-            }.toString()
-        } else {
-            ErrorMessage.toString(graph)
-        }
+        return StringBuilder().apply {
+            graphViewModel.rootScopes.forEach { rootScopeViewModel ->
+                renderScope(0, rootScopeViewModel)
+            }
+        }.toString()
     }
 
     private fun StringBuilder.renderScope(indent: Int, scopeViewModel: ScopeViewModel) {
