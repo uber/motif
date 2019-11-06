@@ -68,12 +68,12 @@ private class ScopeFactory(
         if (visited.contains(scopeType)) return
         visited.add(scopeType)
 
-        scopeMap.computeIfAbsent(scopeType) {
+        if (!scopeMap.containsKey(scopeType)) {
             val scope = Scope(scopeClass)
             scope.childMethods.forEach { childMethod ->
                 visit(childMethod.childScopeClass)
             }
-            scope
+            scopeMap[scopeType] = scope
         }
     }
 }
