@@ -16,13 +16,11 @@
 package motif.intellij
 
 import com.google.common.truth.Truth.assertThat
-import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.Parameterized
 import com.intellij.testFramework.PsiTestUtil
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import motif.Scope
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
@@ -40,7 +38,7 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
-class TestHarness : LightCodeInsightFixtureTestCase() {
+class TestHarness : LightJavaCodeInsightFixtureTestCase() {
 
     @get:Rule val rule = IntelliJRule()
 
@@ -71,7 +69,7 @@ class TestHarness : LightCodeInsightFixtureTestCase() {
         val path = clazz.java.protectionDomain.codeSource.location.path
         val file = File(path)
         val libName = file.name
-        PsiTestUtil.addLibrary(myFixture.projectDisposable, myModule, libName, file.parent, libName)
+        PsiTestUtil.addLibrary(myFixture.projectDisposable, module, libName, file.parent, libName)
     }
 
     @Test

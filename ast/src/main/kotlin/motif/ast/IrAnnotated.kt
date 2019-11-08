@@ -26,6 +26,6 @@ interface IrAnnotated {
     }
 
     fun isNullable(): Boolean {
-        return annotations.any { it.type.simpleName == "Nullable" }
+        return annotations.any { it.className.endsWith("Nullable") }
     }
 }

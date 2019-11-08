@@ -2,6 +2,7 @@
 
 * Do not use computeIfAbsent in ScopeFactory in order to avoid ConcurrentModificationException in the IntelliJ plugin
 * Allow graph processing to continue even when a ParsingError is encountered. A malformed Scope will simply not be included in the ResolvedGraph.
+* Handle implicit Kotlin Nullability annotations.
 
 # 0.2.1
 

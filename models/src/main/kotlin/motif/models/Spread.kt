@@ -29,7 +29,7 @@ class Spread(val clazz: IrClass, val factoryMethod: FactoryMethod) {
     val methods: List<Method> = clazz.methods
             .filter { method -> isSpreadMethod(method) }
             .onEach { method ->
-                if (method.annotations.any { it.type.simpleName == "Nullable" }) {
+                if (method.isNullable()) {
                     throw NullableSpreadMethod(factoryMethod.objects, factoryMethod.method, clazz, method)
                 }
             }

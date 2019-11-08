@@ -4,8 +4,8 @@ plugins {
 }
 
 intellij {
-    version 'IC-2018.3'
-    plugins = []
+    version 'IC-2019.2'
+    plugins = [ 'java', 'Kotlin' ]
     pluginName 'MyPlugin'
     updateSinceUntilBuild = false
 }
