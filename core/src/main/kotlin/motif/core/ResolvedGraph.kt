@@ -39,6 +39,8 @@ interface ResolvedGraph {
 
     fun getSources(scope: Scope): Iterable<Source>
 
+    fun getSinks(scope: Scope): Iterable<Sink>
+
     fun getSinks(type: Type): Iterable<Sink>
 
     fun getProviders(sink: Sink): Iterable<Source>
@@ -122,6 +124,7 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
     override fun getUnsatisfied(scope: Scope) = emptyMap<Type, List<Sink>>()
     override fun getSources(scope: Scope) = emptyList<Source>()
     override fun getSinks(type: Type) = emptyList<Sink>()
+    override fun getSinks(scope: Scope) = emptyList<Sink>()
     override fun getProviders(sink: Sink) = emptyList<Source>()
     override fun getConsumers(source: Source) = emptyList<Sink>()
     override fun getRequired(source: Source) = emptyList<Sink>()
@@ -132,6 +135,8 @@ private class ValidResolvedGraph(
         private val scopeStates: Map<Scope, State>,
         private val childStates: Map<ScopeEdge, State>,
         private val graphState: State) : ResolvedGraph {
+
+    private val scopeSinks = mutableMapOf<Scope, Set<Sink>>()
 
     override val roots = scopeGraph.roots
 
@@ -150,6 +155,12 @@ private class ValidResolvedGraph(
     override fun getSources(scope: Scope) = scopeStates.getValue(scope).sourceToSinks.keys.filter { it.scope == scope }
 
     override fun getSinks(type: Type) = graphState.sinks.getValue(type)
+
+    override fun getSinks(scope: Scope) = scopeSinks.computeIfAbsent(scope) {
+        scopeStates.getValue(scope).sinks.values.flatMap { sinks ->
+            sinks.filter { sink -> sink.scope == scope }
+        }.toSet()
+    }
 
     override fun getProviders(sink: Sink) = graphState.sinkToSources.getValue(sink)
 
