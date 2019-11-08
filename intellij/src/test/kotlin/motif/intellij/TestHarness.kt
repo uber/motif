@@ -16,10 +16,13 @@
 package motif.intellij
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.intellij.pom.java.LanguageLevel
+import com.intellij.psi.PsiJavaFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.Parameterized
 import com.intellij.testFramework.PsiTestUtil
+import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import motif.Scope
 import motif.core.ResolvedGraph
@@ -38,7 +41,7 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
-class TestHarness : LightJavaCodeInsightFixtureTestCase() {
+class TestHarness : LightCodeInsightFixtureTestCase() {
 
     @get:Rule val rule = IntelliJRule()
 
@@ -77,24 +80,30 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
         val testFiles = testDir.walk()
         val externalFiles = EXTERNAL_ROOT.resolve(testDir.name).walk()
         (testFiles + externalFiles)
-                .filter { !it.isDirectory && it.name.endsWith(".java") }
+                .filter { !it.isDirectory }
                 .forEach { sourceFile ->
-                    myFixture.addClass(sourceFile.readText())
+                    when {
+                        sourceFile.name.endsWith(".java") -> myFixture.addClass(sourceFile.readText())
+                        sourceFile.name.endsWith(".kt") -> myFixture.addFileToProject(sourceFile.name, sourceFile.readText())
+                    }
                 }
         val graph = GraphFactory(project).compute()
-
-        val graphFile = testDir.resolve("GRAPH.txt")
-        if (graphFile.exists()) {
-            val expectedGraphText = graphFile.readText()
-            val actualGraphText = getActualGraphString(graph)
-            assertThat(actualGraphText).isEqualTo(expectedGraphText)
-        }
 
         val errorFile = testDir.resolve("ERROR.txt")
         if (errorFile.exists()) {
             val expectedErrorText = errorFile.readText()
             val actualErrorText = getActualErrorString(graph)
             assertThat(actualErrorText).isEqualTo(expectedErrorText)
+        } else if (graph.errors.isNotEmpty()) {
+            val errorText = getActualErrorString(graph)
+            assertWithMessage("Expected valid graph but errors found:\n\n$errorText").fail()
+        }
+
+        val graphFile = testDir.resolve("GRAPH.txt")
+        if (graphFile.exists()) {
+            val expectedGraphText = graphFile.readText()
+            val actualGraphText = getActualGraphString(graph)
+            assertThat(actualGraphText).isEqualTo(expectedGraphText)
         }
     }
 

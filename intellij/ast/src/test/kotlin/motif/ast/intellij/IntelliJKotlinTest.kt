@@ -16,20 +16,13 @@
 package motif.ast.intellij
 
 import com.intellij.pom.java.LanguageLevel
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementFactory
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import motif.intellij.testing.InternalJdk
 import org.assertj.core.api.Assertions.assertThat
-import org.intellij.lang.annotations.Language
-import org.jetbrains.kotlin.nj2k.postProcessing.type
-import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.uast.UClass
-import org.jetbrains.uast.toUElement
 import org.jetbrains.uast.toUElementOfType
 
 class IntelliJKotlinTest : LightCodeInsightFixtureTestCase() {

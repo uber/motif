@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.KE001_nullable_parameter
 
-import kotlin.reflect.KClass
+@motif.Scope
+interface Scope {
 
-interface IrAnnotation : IrEquivalence {
+    @motif.Objects
+    class Objects {
 
-    val className: String?
-
-    val type: IrType?
-
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+        fun string(): String? {
+            return "s"
+        }
+    }
 }

@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.KT001_basic_scope;
 
-import kotlin.reflect.KClass
+import static com.google.common.truth.Truth.assertThat;
 
-interface IrAnnotation : IrEquivalence {
+public class Test {
 
-    val className: String?
-
-    val type: IrType?
-
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+    public static void run() {
+        Scope scope = new ScopeImpl();
+        assertThat(scope.string()).isEqualTo("s");
+    }
 }

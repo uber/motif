@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.KE002_nullable_constructor_parameter
 
-import kotlin.reflect.KClass
+@motif.Scope
+interface Scope {
 
-interface IrAnnotation : IrEquivalence {
+    @motif.Objects
+    abstract class Objects {
 
-    val className: String?
+        abstract fun foo(): Foo
 
-    val type: IrType?
-
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+        fun string(): String {
+            return "s"
+        }
+    }
 }
