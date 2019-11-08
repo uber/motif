@@ -31,7 +31,7 @@ class IntelliJMethod(
 
     override val returnType: IrType by lazy { IntelliJType(project, substitutor.substitute(psiMethod.returnType!!)) }
 
-    override val name: String by lazy { psiMethod.name }
+    override val name: String by lazy { if (isConstructor) "<init>" else psiMethod.name }
 
     override val isConstructor: Boolean by lazy { psiMethod.isConstructor }
 

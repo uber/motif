@@ -34,8 +34,8 @@ class IntelliJAnnotation(
         getStringConstantValue(project, psiAnnotation, "value")
     }
 
-    override val className: String by lazy {
-        psiAnnotation.qualifiedName!!
+    override val className: String? by lazy {
+        psiAnnotation.qualifiedName
     }
 
     private val key: Key by lazy {
@@ -74,7 +74,7 @@ class IntelliJAnnotation(
 
     override fun toString(): String {
         val value = stringValue?.let { "(\"$it\")" } ?: ""
-        return "@${psiAnnotation.qualifiedName!!}$value"
+        return "@$className$value"
     }
 
     companion object {
@@ -100,5 +100,5 @@ class IntelliJAnnotation(
         }
     }
 
-    private data class Key(val className: String, val value: String?)
+    private data class Key(val className: String?, val value: String?)
 }

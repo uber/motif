@@ -29,6 +29,11 @@ import motif.Scope
 import motif.ast.IrClass
 import motif.ast.intellij.IntelliJClass
 import motif.core.ResolvedGraph
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.toUElementOfType
 import kotlin.system.measureTimeMillis
 
 class GraphFactory(private val project: Project) {
@@ -52,14 +57,26 @@ class GraphFactory(private val project: Project) {
 
     private fun getScopeClasses(virtualFile: VirtualFile): List<IrClass> {
         val psiFile = psiManager.findFile(virtualFile) ?: return emptyList()
-        val javaFile = psiFile as? PsiJavaFile ?: return emptyList()
-        return javaFile.classes
+        val psiClasses: Iterable<PsiClass> = when (psiFile) {
+            is PsiJavaFile -> getScopeClasses(psiFile)
+            is KtFile -> getScopeClasses(psiFile)
+            else -> return emptyList()
+        }
+        return psiClasses
                 .flatMap(this::getClasses)
                 .filter(this::isScopeClass)
                 .map(psiElementFactory::createType)
                 .map { type ->
                     IntelliJClass(project, type)
                 }
+    }
+
+    private fun getScopeClasses(psiFile: PsiJavaFile): Iterable<PsiClass> {
+        return psiFile.classes.toList()
+    }
+
+    private fun getScopeClasses(psiFile: KtFile): Iterable<PsiClass> {
+        return psiFile.declarations.filterIsInstance<KtClass>().map { it.toUElement(UClass::class.java)!!.javaPsi }
     }
 
     private fun getClasses(psiClass: PsiClass): List<PsiClass> {

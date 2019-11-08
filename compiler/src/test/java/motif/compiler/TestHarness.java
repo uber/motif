@@ -93,7 +93,10 @@ public class TestHarness {
         String filename = file.getName();
         return file.isDirectory()
                 && file.listFiles().length > 0
-                && (filename.startsWith("T") || filename.startsWith("E"));
+                && (filename.startsWith("T")
+                || filename.startsWith("KT")
+                || filename.startsWith("E")
+                || filename.startsWith("KE"));
     }
 
     @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -117,7 +120,7 @@ public class TestHarness {
         this.errorFile = new File(testCaseDir, "ERROR.txt");
         this.graphFile = new File(testCaseDir, "GRAPH.txt");
         this.proguardFile = new File(testCaseDir, "config.pro");
-        this.isErrorTest = testName.startsWith("E");
+        this.isErrorTest = testName.startsWith("E") || testName.startsWith("KE");
     }
 
     @Test

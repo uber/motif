@@ -3,12 +3,14 @@ plugins {
 }
 
 apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
 
 sourceCompatibility = 1.8
 
 dependencies {
-    annotationProcessor project(':tests:compiler')
-    annotationProcessor deps.daggerCompiler
+    kapt project(':tests:compiler')
+    kapt deps.daggerCompiler
     implementation project(':core')
     implementation project(':lib')
     implementation deps.kotlin.stdlib

@@ -60,7 +60,8 @@ class IntelliJClass(
         psiClass.visibleSignatures
                 .filter {
                     it.method.containingClass?.qualifiedName != "java.lang.Object"
-                            && !it.method.hasModifier(JvmModifier.PRIVATE) }
+                            && !it.method.hasModifier(JvmModifier.PRIVATE)
+                            && !it.isConstructor}
                 .map { IntelliJMethod(project, it.method, it.substitutor) }
     }
 
@@ -78,10 +79,15 @@ class IntelliJClass(
     }
 
     override val constructors: List<IrMethod> by lazy {
-        psiClass.constructors.map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
+        val substitutor = psiClassType.resolveGenerics().substitutor
+        psiClass.constructors.map { IntelliJMethod(project, it, substitutor) }
     }
 
-    override val annotations: List<IrAnnotation> by lazy { psiClass.modifierList!!.irAnnotations(project) }
+    override val annotations: List<IrAnnotation> by lazy { try {
+        psiClass.modifierList!!.irAnnotations(project)
+    } catch (e: Exception) {
+        throw e
+    }}
 
     override val modifiers: Set<IrModifier> by lazy { psiClass.irModifiers() }
 }

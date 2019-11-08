@@ -13,17 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.ast
+package testcases.KT002_constructor_factory_method
 
-import kotlin.reflect.KClass
-
-interface IrAnnotation : IrEquivalence {
-
-    val className: String?
-
-    val type: IrType?
-
-    val members: List<IrMethod>
-
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
-}
+class Foo(val string: String)
