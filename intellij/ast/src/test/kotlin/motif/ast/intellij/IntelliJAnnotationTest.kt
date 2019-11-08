@@ -235,6 +235,17 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
         assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
     }
 
+    fun testClassName() {
+        val fooAnnotation = getClassAnnotation("""
+            package test;
+
+            @javax.inject.Named("a")
+            class Foo {}
+        """.trimIndent())
+
+        assertThat(fooAnnotation.className).isEqualTo("javax.inject.Named")
+    }
+
     private fun createAnnotationClass(@Language("JAVA") classText: String): IntelliJClass {
         val psiClass = myFixture.addClass(classText)
         return IntelliJClass(project, psiElementFactory.createType(psiClass))

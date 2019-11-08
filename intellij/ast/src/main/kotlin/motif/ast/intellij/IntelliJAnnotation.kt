@@ -34,17 +34,17 @@ class IntelliJAnnotation(
         getStringConstantValue(project, psiAnnotation, "value")
     }
 
-    private val qualifiedName: String by lazy {
+    override val className: String by lazy {
         psiAnnotation.qualifiedName!!
     }
 
     private val key: Key by lazy {
-        Key(qualifiedName, stringValue)
+        Key(className, stringValue)
     }
 
-    override val type: IrType by lazy {
+    override val type: IrType? by lazy {
         val nameReferenceElement = psiAnnotation.nameReferenceElement
-        val annotationClass: PsiClass = nameReferenceElement?.resolve() as? PsiClass ?: throw IllegalStateException("$nameReferenceElement")
+        val annotationClass: PsiClass = nameReferenceElement?.resolve() as? PsiClass ?: return@lazy null
         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(annotationClass)
         IntelliJType(project, psiClassType)
     }
@@ -100,5 +100,5 @@ class IntelliJAnnotation(
         }
     }
 
-    private data class Key(val qualifiedName: String, val value: String?)
+    private data class Key(val className: String, val value: String?)
 }

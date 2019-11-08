@@ -55,19 +55,19 @@ data class Type(val type: IrType, val qualifier: IrAnnotation?) : Comparable<Typ
 
         private fun IrAnnotated.getQualifier(): IrAnnotation? {
             val qualifier = annotations.find { annotation ->
-                val annotationClass: IrClass = annotation.type.resolveClass() ?: return@find false
+                val annotationClass: IrClass = annotation.type?.resolveClass() ?: return@find false
                 annotationClass.hasAnnotation(Qualifier::class)
             } ?: return null
 
             val members = qualifier.members
             if (members.size > 1) {
-                throw InvalidQualifier(this, qualifier.type)
+                throw InvalidQualifier(this, qualifier)
             }
 
             if (members.size == 1) {
                 val member = members[0]
                 if (member.name != "value" || member.returnType.qualifiedName != "java.lang.String") {
-                    throw InvalidQualifier(this, qualifier.type)
+                    throw InvalidQualifier(this, qualifier)
                 }
             }
 

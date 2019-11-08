@@ -30,11 +30,12 @@ class CompilerAnnotation(
         env: ProcessingEnvironment,
         val mirror: AnnotationMirror) : IrAnnotation {
 
-    private val key: Equivalence.Wrapper<AnnotationMirror> = AnnotationMirrors.equivalence().wrap(mirror)
-    private val className: String by lazy {
+    override val className: String by lazy {
         val typeElement = mirror.annotationType.asElement() as TypeElement
         typeElement.qualifiedName.toString()
     }
+
+    private val key: Equivalence.Wrapper<AnnotationMirror> = AnnotationMirrors.equivalence().wrap(mirror)
     private val pretty: String by lazy { mirror.toString() }
 
     override val type: IrType = CompilerType(env, mirror.annotationType)

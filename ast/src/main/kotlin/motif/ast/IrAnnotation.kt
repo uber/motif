@@ -19,7 +19,9 @@ import kotlin.reflect.KClass
 
 interface IrAnnotation : IrEquivalence {
 
-    val type: IrType
+    val className: String
+
+    val type: IrType?
 
     val members: List<IrMethod>
 
