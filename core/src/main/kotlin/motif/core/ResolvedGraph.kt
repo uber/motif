@@ -16,6 +16,7 @@
 package motif.core
 
 import motif.ast.IrClass
+import motif.ast.IrType
 import motif.models.*
 
 /**
@@ -29,9 +30,11 @@ interface ResolvedGraph {
 
     val errors: List<MotifError>
 
-    fun getScope(scopeClass: IrClass): Scope?
+    fun getScope(scopeType: IrType): Scope?
 
     fun getChildEdges(scope: Scope): Iterable<ScopeEdge>
+
+    fun getParentEdges(scope: Scope): Iterable<ScopeEdge>
 
     fun getChildUnsatisfied(scopeEdge: ScopeEdge): Iterable<Sink>
 
@@ -118,8 +121,9 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
     override val roots = emptyList<Scope>()
     override val scopes = emptyList<Scope>()
     override val errors = listOf(error)
-    override fun getScope(scopeClass: IrClass) = null
+    override fun getScope(scopeType: IrType) = null
     override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
+    override fun getParentEdges(scope: Scope) = emptyList<ScopeEdge>()
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = emptyList<Sink>()
     override fun getUnsatisfied(scope: Scope) = emptyMap<Type, List<Sink>>()
     override fun getSources(scope: Scope) = emptyList<Source>()
@@ -144,9 +148,11 @@ private class ValidResolvedGraph(
 
     override val errors = scopeGraph.parsingErrors + graphState.errors
 
-    override fun getScope(scopeClass: IrClass) = scopeGraph.getScope(scopeClass)
+    override fun getScope(scopeType: IrType) = scopeGraph.getScope(scopeType)
 
     override fun getChildEdges(scope: Scope) = scopeGraph.getChildEdges(scope)
+
+    override fun getParentEdges(scope: Scope) = scopeGraph.getParentEdges(scope)
 
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = childStates.getValue(scopeEdge).unsatisfied
 

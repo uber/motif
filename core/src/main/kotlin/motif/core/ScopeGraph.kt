@@ -47,13 +47,17 @@ internal class ScopeGraph private constructor(val scopes: List<Scope>) {
         return childEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
     }
 
-    fun getScope(scopeClass: IrClass): Scope? {
-        return scopeMap[scopeClass.type]
+    fun getParentEdges(scope: Scope): List<ScopeEdge> {
+        return parentEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
+    }
+
+    fun getScope(scopeType: IrType): Scope? {
+        return scopeMap[scopeType]
     }
 
     private fun createChildren(scope: Scope): List<ScopeEdge> {
         return scope.childMethods.map { method ->
-            val childScope = getScope(method.childScopeClass)
+            val childScope = getScope(method.childScopeClass.type)
                     ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
             ScopeEdge(scope, childScope, method)
         }
