@@ -35,7 +35,12 @@ class CompilerType(
     }
 
     override val qualifiedName: String by lazy {
-        mirror.toString()
+        val candidate = mirror.toString()
+        return@lazy if (candidate.startsWith('(')) {
+            candidate.substringAfter(":: ").dropLast(1)
+        } else {
+            candidate
+        }
     }
 
     override val isVoid: Boolean by lazy {

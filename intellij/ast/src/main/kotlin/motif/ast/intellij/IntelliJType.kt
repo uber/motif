@@ -31,7 +31,7 @@ class IntelliJType(
         val psiType: PsiType) : IrType {
 
     override val qualifiedName: String by lazy {
-        GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(true)
+        GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(false)
     }
 
     override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
