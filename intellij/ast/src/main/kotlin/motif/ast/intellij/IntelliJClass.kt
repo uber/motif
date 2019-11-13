@@ -57,11 +57,13 @@ class IntelliJClass(
     }
 
     override val methods: List<IrMethod> by lazy {
+        val resolverHelper = PsiResolveHelper.SERVICE.getInstance(project)
         psiClass.visibleSignatures
                 .filter {
                     it.method.containingClass?.qualifiedName != "java.lang.Object"
                             && !it.method.hasModifier(JvmModifier.PRIVATE)
-                            && !it.isConstructor}
+                            && !it.isConstructor
+                            && resolverHelper.isAccessible(it.method, psiClass, null) }
                 .map { IntelliJMethod(project, it.method, it.substitutor) }
     }
 

@@ -28,3 +28,7 @@ dependencies {
 runIde {
     maxHeapSize = "2g"
 }
+
+test {
+    inputs.files(file("$rootDir/tests/src"))
+}
