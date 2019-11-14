@@ -18,7 +18,6 @@ package motif.ast.intellij
 import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
-import com.intellij.psi.search.GlobalSearchScope
 import motif.ast.IrAnnotation
 import motif.ast.IrMethod
 import motif.ast.IrType
@@ -34,6 +33,10 @@ class IntelliJAnnotation(
         getStringConstantValue(project, psiAnnotation, "value")
     }
 
+    private val annotationClass: PsiClass? by lazy {
+        psiAnnotation.nameReferenceElement?.resolve() as? PsiClass
+    }
+
     override val className: String? by lazy {
         psiAnnotation.qualifiedName
     }
@@ -43,18 +46,14 @@ class IntelliJAnnotation(
     }
 
     override val type: IrType? by lazy {
-        val nameReferenceElement = psiAnnotation.nameReferenceElement
-        val annotationClass: PsiClass = nameReferenceElement?.resolve() as? PsiClass ?: return@lazy null
+        val annotationClass = annotationClass ?: return@lazy null
         val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(annotationClass)
         IntelliJType(project, psiClassType)
     }
 
     override val members: List<IrMethod> by lazy {
-        psiAnnotation.parameterList.attributes
-                .map {
-                    it.reference!!.resolve() as PsiMethod
-                }
-                .map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
+        val annotationClass = annotationClass ?: return@lazy emptyList<IrMethod>()
+        annotationClass.methods.map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
     }
 
     override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
