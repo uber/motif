@@ -15,6 +15,7 @@
  */
 package motif.core
 
+import motif.ast.IrType
 import motif.models.*
 
 private typealias SetMultiMap<K, V> = MutableMap<K, LinkedHashSet<V>>
@@ -32,6 +33,8 @@ internal class State(
         val unsatisfied: MutableSet<Sink> = mutableSetOf(),
         val errors: MutableList<MotifError> = mutableListOf(),
         val sinks: SetMultiMap<Type, Sink> = setMultiMap(),
+        val irTypeToSinks: SetMultiMap<IrType, Sink> = setMultiMap(),
+        val irTypeToSources: SetMultiMap<IrType, Source> = setMultiMap(),
         private val exposeNeeded: MutableSet<Sink> = mutableSetOf(),
         private val visibleSinks: SetMultiMap<Sink, Source> = setMultiMap()) {
 
@@ -49,6 +52,7 @@ internal class State(
         sinkToSources[sink] = LinkedHashSet()
         visibleSinks[sink] = LinkedHashSet()
         sinks.computeIfAbsent(sink.type) { LinkedHashSet() }.add(sink)
+        irTypeToSinks.computeIfAbsent(sink.type.type) { LinkedHashSet() }.add(sink)
         unsatisfied.add(sink)
     }
 
@@ -68,6 +72,8 @@ internal class State(
         matchingSinks.forEach { matchingSink ->
             satisfy(matchingSink, source)
         }
+
+        irTypeToSources.computeIfAbsent(source.type.type) { LinkedHashSet() }.add(source)
     }
 
     fun setDependencies(dependencies: Dependencies) {
@@ -112,6 +118,8 @@ internal class State(
                 unsatisfied.toMutableSet(),
                 errors.toMutableList(),
                 sinks.copy(),
+                irTypeToSinks.copy(),
+                irTypeToSources.copy(),
                 exposeNeeded.toMutableSet(),
                 visibleSinks.copy())
     }
@@ -152,6 +160,8 @@ internal class State(
                     states.map { it.unsatisfied }.merge(),
                     states.map { it.errors }.merge(),
                     states.map { it.sinks }.merge(),
+                    states.map { it.irTypeToSinks }.merge(),
+                    states.map { it.irTypeToSources }.merge(),
                     states.map { it.exposeNeeded }.merge(),
                     states.map { it.visibleSinks }.merge())
         }
