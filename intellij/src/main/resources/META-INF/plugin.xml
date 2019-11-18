@@ -19,7 +19,33 @@
     <depends>org.jetbrains.kotlin</depends>
     <depends>com.intellij.modules.lang</depends>
 
+    <project-components>
+        <component>
+            <implementation-class>motif.intellij.MotifProjectComponent</implementation-class>
+            <option name="workspace" value="true"/>
+        </component>
+    </project-components>
+
+    <actions>
+        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="View scope Motif graph" text="View scope Motif graph">
+            <keyboard-shortcut first-keystroke="control shift S" keymap="$default"/>
+        </action>
+
+        <group id="MotifEditor" popup="true" text="Motif">
+            <reference ref="View scope Motif graph"/>
+            <add-to-group anchor="first" group-id="EditorPopupMenu"/>
+        </group>
+
+        <group id="MotifProject" popup="true" text="Motif">
+            <reference ref="View scope Motif graph"/>
+            <add-to-group anchor="first" group-id="ProjectViewPopupMenu"/>
+            <add-to-group anchor="first" group-id="StructureViewPopupMenu"/>
+        </group>
+    </actions>
+
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Motif" anchor="right" factoryClass="motif.intellij.MotifPanelFactory"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="motif.intellij.provider.ScopeHierarchyLineMarkerProvider"/>
     </extensions>
+
 </idea-plugin>
