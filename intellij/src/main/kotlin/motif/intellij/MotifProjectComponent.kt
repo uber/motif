@@ -1,0 +1,154 @@
+/*
+ * Copyright (c) 2018-2019 Uber Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package motif.intellij
+
+import com.intellij.codeInsight.daemon.LineMarkerProviders
+import com.intellij.lang.Language
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowAnchor
+import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.ui.content.Content
+import com.intellij.ui.content.ContentFactory
+import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.provider.ScopeNavigationLineMarkerProvider
+import motif.intellij.ui.MotifErrorPanel
+import motif.intellij.ui.MotifScopePanel
+
+class MotifProjectComponent(val project: Project) : ProjectComponent {
+
+    companion object {
+        const val TOOL_WINDOW_ID: String = "Motif"
+        const val TOOL_WINDOW_TITLE: String = "Scopes"
+        const val TAB_NAME_ERRORS: String = "Errors"
+        const val TAB_NAME_SCOPES: String = "Scopes"
+        const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
+        const val LABEL_GRAPH_INIT: String = "Initializing Motif Graph"
+
+        fun getInstance(project: Project): MotifProjectComponent {
+            return project.getComponent(MotifProjectComponent::class.java)
+        }
+    }
+
+    private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
+    private var scopePanel: MotifScopePanel? = null
+    private var error: MotifErrorPanel? = null
+    private var errorContent: Content? = null
+    private var isRefreshing: Boolean = false
+
+    override fun projectOpened() {
+        DumbService.getInstance(project).runWhenSmart {
+            ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_INIT) {
+                override fun run(indicator: ProgressIndicator) {
+                    ApplicationManager.getApplication().runReadAction {
+                        val graph: ResolvedGraph = graphFactory.compute()
+                        onGraphUpdated(graph)
+                    }
+                }
+            })
+        }
+    }
+
+    fun refreshGraph() {
+        if (isRefreshing) {
+            return
+        }
+        isRefreshing = true
+
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_REFRESH) {
+            override fun run(indicator: ProgressIndicator) {
+                ApplicationManager.getApplication().runReadAction {
+                    val updateGraph: ResolvedGraph = graphFactory.compute()
+                    onGraphUpdated(updateGraph)
+                    isRefreshing = false
+                }
+            }
+        })
+    }
+
+    fun onSelectedScope(element: PsiElement) {
+        if (element !is PsiClass || !isMotifScopeClass(element)) {
+            return
+        }
+        scopePanel?.setSelectedScope(element)
+    }
+
+    private fun onGraphUpdated(graph: ResolvedGraph) {
+        ApplicationManager.getApplication().invokeLater {
+            val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
+            if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
+                val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
+                toolWindow.title = TOOL_WINDOW_TITLE
+
+                scopePanel = MotifScopePanel(project, graph)
+                val scopesContent: Content = ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
+                scopesContent.isCloseable = false
+                toolWindow.contentManager.addContent(scopesContent)
+
+                error = MotifErrorPanel(project, graph)
+            } else {
+                scopePanel?.onGraphUpdated(graph)
+                error?.onGraphUpdated(graph)
+            }
+
+            // Update the visibility of the error tab
+            updateErrorTabVisibility(graph)
+
+            // Propagate changes to line markers provider
+            val language: Language? = Language.findLanguageByID("JAVA")
+            language?.let {
+                for (lineMarkerProvider in LineMarkerProviders.INSTANCE.allForLanguage(it)) {
+                    if (lineMarkerProvider is ScopeNavigationLineMarkerProvider) {
+                        lineMarkerProvider.onGraphUpdated(graph)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateErrorTabVisibility(graph: ResolvedGraph) {
+        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+        if (graph.errors.isEmpty()) {
+            errorContent?.let { toolWindow.contentManager.removeContent(it, true) }
+            errorContent = null
+        } else {
+            val content: Content = errorContent ?: createErrorContent(toolWindow)
+            toolWindow.contentManager.setSelectedContent(content)
+        }
+    }
+
+    private fun createErrorContent(toolWindow: ToolWindow): Content {
+        val errorContent = ContentFactory.SERVICE.getInstance().createContent(error, TAB_NAME_ERRORS, true)
+        errorContent.isCloseable = false
+        toolWindow.contentManager.addContent(errorContent)
+        this.errorContent = errorContent
+        return errorContent
+    }
+
+    interface Listener {
+
+        fun onGraphUpdated(graph: ResolvedGraph)
+    }
+}
