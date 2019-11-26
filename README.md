@@ -12,7 +12,7 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 
 ## Gradle
 
-| [![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://search.maven.org/artifact/com.uber.motif/motif-compiler)<br>[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://search.maven.org/artifact/com.uber.motif/motif) | <pre>annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'<br>compile 'com.uber.motif:motif:x.y.z'</pre> |
+| [![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://search.maven.org/artifact/com.uber.motif/motif-compiler)<br>[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://search.maven.org/artifact/com.uber.motif/motif) | <pre>annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'<br>implementation 'com.uber.motif:motif:x.y.z'</pre> |
 |-|:-|
 
 ## The Basics
