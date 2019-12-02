@@ -166,11 +166,11 @@ private class ValidResolvedGraph(
 
     override fun getSources(scope: Scope) = scopeStates.getValue(scope).sourceToSinks.keys.filter { it.scope == scope }
 
-    override fun getSinks(type: Type) = graphState.sinks.getValue(type)
+    override fun getSinks(type: Type) = graphState.sinks[type] ?: emptySet<Sink>()
 
-    override fun getSinks(irType: IrType) = graphState.irTypeToSinks.getValue(irType)
+    override fun getSinks(irType: IrType) = graphState.irTypeToSinks[irType] ?: emptySet<Sink>()
 
-    override fun getSources(irType: IrType) = graphState.irTypeToSources.getValue(irType)
+    override fun getSources(irType: IrType) = graphState.irTypeToSources[irType] ?: emptySet<Source>()
 
     override fun getSinks(scope: Scope) = scopeSinks.computeIfAbsent(scope) {
         scopeStates.getValue(scope).sinks.values.flatMap { sinks ->
