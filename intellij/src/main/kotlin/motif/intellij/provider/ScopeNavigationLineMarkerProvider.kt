@@ -15,6 +15,7 @@
  */
 package motif.intellij.provider
 
+import com.google.common.collect.Iterables
 import com.intellij.codeHighlighting.Pass.UPDATE_ALL
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -38,6 +39,11 @@ import motif.intellij.ScopeHierarchyUtils.Companion.isMotifChildScopeMethod
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.models.Scope
 import java.awt.event.MouseEvent
+import com.intellij.ui.awt.RelativePoint
+import com.intellij.openapi.ui.popup.PopupStep
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.ListPopup
 
 /*
  * {@LineMarkerProvider} used to display navigation icons in gutter to navigate to parent/children of Motif scopes.
@@ -49,7 +55,6 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
         const val LABEL_NAVIGATE_CHILD_SCOPE: String = "Navigate to child Scope."
         const val MESSAGE_NAVIGATION_NO_SCOPE: String = "Provided class doesn't have a corresponding Motif scope. Please refresh graph manually and try again."
         const val MESSAGE_NAVIGATION_PARENT_ROOT: String = "Can't navigate to parent scope because scope is a root scope."
-        const val MESSAGE_NAVIGATION_MULTIPLE_PARENTS: String = "This scope has multiple parents. This operation is not supported yet."
         const val MESSAGE_TITLE: String = "Motif"
     }
 
@@ -89,21 +94,24 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
                     Messages.showInfoMessage(MESSAGE_NAVIGATION_NO_SCOPE, MESSAGE_TITLE)
                     return
                 }
-                val parentEdgesIterator: Iterator<ScopeEdge> = graph.getParentEdges(scope).iterator()
-                if (!parentEdgesIterator.hasNext()) {
-                    Messages.showInfoMessage(MESSAGE_NAVIGATION_PARENT_ROOT, MESSAGE_TITLE)
-                    return
-                }
-                val parentEdge: ScopeEdge = parentEdgesIterator.next()
-                if (parentEdgesIterator.hasNext()) {
-                    // TODO : Support multiple parents and display a listbox
-                    Messages.showInfoMessage(MESSAGE_NAVIGATION_MULTIPLE_PARENTS, MESSAGE_TITLE)
-                    return
-                }
+                val scopeEdges: Array<ScopeEdge> = Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java)
+                when (scopeEdges.size) {
+                    0 -> Messages.showInfoMessage(MESSAGE_NAVIGATION_PARENT_ROOT, MESSAGE_TITLE)
+                    1 -> navigateToParent(scopeEdges[0])
+                    else -> {
+                        val mouseEvent: MouseEvent = event ?: return
+                        val listPopup: ListPopup = JBPopupFactory.getInstance().createListPopup(object : BaseListPopupStep<ScopeEdge>("Select Parent Scope", scopeEdges.toMutableList()) {
+                            override fun getTextFor(value: ScopeEdge): String {
+                                return value.parent.clazz.simpleName
+                            }
 
-                val navigationElement: PsiElement = (parentEdge.parent.clazz as IntelliJClass).psiClass.navigationElement
-                if (navigationElement is Navigatable && (navigationElement as Navigatable).canNavigate()) {
-                    navigationElement.navigate(true)
+                            override fun onChosen(selectedValue: ScopeEdge?, finalChoice: Boolean): PopupStep<*>? {
+                                selectedValue?.let { navigateToParent(it) }
+                                return super.onChosen(selectedValue, finalChoice)
+                            }
+                        })
+                        listPopup.show(RelativePoint(mouseEvent))
+                    }
                 }
             } else if (element is PsiMethod) {
                 val classElement = PsiTreeUtil.getParentOfType(element, PsiClass::class.java)
@@ -116,6 +124,13 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
                         }
                     }
                 }
+            }
+        }
+
+        private fun navigateToParent(scopeEdge: ScopeEdge) {
+            val navigationElement: PsiElement = (scopeEdge.parent.clazz as IntelliJClass).psiClass.navigationElement
+            if (navigationElement is Navigatable && (navigationElement as Navigatable).canNavigate()) {
+                navigationElement.navigate(true)
             }
         }
     }
