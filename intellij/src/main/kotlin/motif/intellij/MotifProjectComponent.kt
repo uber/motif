@@ -62,6 +62,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
     private var scopePanel: MotifScopePanel? = null
     private var errorPanel: MotifErrorPanel? = null
     private var usagePanel: MotifUsagePanel? = null
+    private var scopeContent: Content? = null
     private var usageContent: Content? = null
     private var errorContent: Content? = null
     private var isRefreshing: Boolean = false
@@ -101,6 +102,8 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             return
         }
         scopePanel?.setSelectedScope(element)
+        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+        scopeContent?.let { toolWindow.contentManager.setSelectedContent(it) }
     }
 
     fun onSelectedClass(element: PsiElement) {
@@ -123,9 +126,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 toolWindow.title = TOOL_WINDOW_TITLE
 
                 scopePanel = MotifScopePanel(project, graph)
-                val scopesContent: Content = ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
-                scopesContent.isCloseable = false
-                toolWindow.contentManager.addContent(scopesContent)
+                scopeContent = ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
+                scopeContent?.isCloseable = false
+                scopeContent?.let { toolWindow.contentManager.addContent(it) }
 
                 errorPanel = MotifErrorPanel(project, graph)
                 usagePanel = MotifUsagePanel(project, graph)
