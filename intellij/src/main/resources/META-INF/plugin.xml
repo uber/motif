@@ -27,19 +27,30 @@
     </project-components>
 
     <actions>
-        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="View scope Motif graph" text="View scope Motif graph">
+        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="motif_graph" text="View Scope Graph">
             <keyboard-shortcut first-keystroke="control shift S" keymap="$default"/>
+        </action>
+        <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object" icon="/images/graph.png" id="motif_usage" text="Find Usages">
+            <keyboard-shortcut first-keystroke="control shift U" keymap="$default"/>
         </action>
 
         <group id="MotifEditor" popup="true" text="Motif">
-            <reference ref="View scope Motif graph"/>
+            <reference ref="motif_usage"/>
             <add-to-group anchor="first" group-id="EditorPopupMenu"/>
+        </group>
+        <group id="MotifGraphEditor">
+            <reference ref="motif_graph"/>
+            <add-to-group anchor="first" group-id="MotifEditor"/>
         </group>
 
         <group id="MotifProject" popup="true" text="Motif">
-            <reference ref="View scope Motif graph"/>
+            <reference ref="motif_graph"/>
             <add-to-group anchor="first" group-id="ProjectViewPopupMenu"/>
             <add-to-group anchor="first" group-id="StructureViewPopupMenu"/>
+        </group>
+        <group id="MotifUsageProject">
+            <reference ref="motif_usage"/>
+            <add-to-group anchor="last" group-id="MotifProject"/>
         </group>
     </actions>
 

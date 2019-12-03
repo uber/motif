@@ -18,11 +18,15 @@ package motif.intellij.hierarchy
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElementFactory
+import com.intellij.psi.PsiType
+import motif.ast.IrType
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJMethod
+import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
-import motif.core.ScopeEdge
 import motif.errormessage.ErrorMessage
+import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.descriptor.*
 import motif.models.*
 
@@ -99,6 +103,30 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                 graph.errors.forEach { error ->
                     val errorMessage: ErrorMessage = ErrorMessage.get(graph, error)
                     descriptors.add(ScopeHierarchyErrorDescriptor(myProject, graph, descriptor, error, errorMessage))
+                }
+            }
+            is ScopeHierarchyUsageSectionDescriptor -> {
+                val countSources: Int = ScopeHierarchyUtils.getUsageCount(project, graph, descriptor.clazz, includeSources = true, includeSinks = false)
+                val countSinks: Int = ScopeHierarchyUtils.getUsageCount(project, graph, descriptor.clazz, includeSources = false, includeSinks = true)
+                if (countSources > 0) {
+                    descriptors.add(ScopeHierarchyUsageSourcesSectionDescriptor(myProject, graph, descriptor, descriptor.clazz))
+                }
+                if (countSinks > 0) {
+                    descriptors.add(ScopeHierarchyUsageSinksSectionDescriptor(myProject, graph, descriptor, descriptor.clazz))
+                }
+            }
+            is ScopeHierarchyUsageSourcesSectionDescriptor -> {
+                val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(descriptor.clazz)
+                val type: IrType = IntelliJType(project, elementType)
+                graph.getSources(type).forEach { source ->
+                    descriptors.add(ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source))
+                }
+            }
+            is ScopeHierarchyUsageSinksSectionDescriptor -> {
+                val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(descriptor.clazz)
+                val type: IrType = IntelliJType(project, elementType)
+                graph.getSinks(type).forEach { sink ->
+                    descriptors.add(ScopeHierarchySinkDetailsDescriptor(myProject, graph, descriptor, sink))
                 }
             }
         }

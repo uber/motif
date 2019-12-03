@@ -20,6 +20,8 @@ import com.intellij.psi.*
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import motif.ast.IrType
+import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
 import motif.models.Scope
@@ -51,6 +53,30 @@ class ScopeHierarchyUtils {
                 }
             }
             return false
+        }
+
+        /*
+         * Returns the number of usage for the given class.
+         */
+        fun getUsageCount(project: Project, graph: ResolvedGraph, clazz: PsiClass, includeSources: Boolean = true, includeSinks: Boolean = true): Int {
+            var count = 0
+            val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(clazz)
+            val type: IrType = IntelliJType(project, elementType)
+            if (includeSources) {
+                graph.getSources(type).forEach { _ -> count++ }
+            }
+            if (includeSinks) {
+                graph.getSinks(type).forEach { _ -> count++ }
+            }
+            return count
+        }
+
+        fun getUsageString(count: Int): String {
+            return when (count) {
+                0 -> "No usage"
+                1 -> "1 usage"
+                else -> "$count usages"
+            }
         }
 
         /*
