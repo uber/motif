@@ -17,6 +17,8 @@ package motif.intellij
 
 import com.intellij.codeInsight.daemon.LineMarkerProviders
 import com.intellij.lang.Language
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.progress.ProgressIndicator
@@ -33,9 +35,11 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.actions.MotifUsageAction
 import motif.intellij.provider.ScopeNavigationLineMarkerProvider
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
+import motif.intellij.ui.MotifUsagePanel
 
 class MotifProjectComponent(val project: Project) : ProjectComponent {
 
@@ -44,6 +48,8 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val TOOL_WINDOW_TITLE: String = "Scopes"
         const val TAB_NAME_ERRORS: String = "Errors"
         const val TAB_NAME_SCOPES: String = "Scopes"
+        const val TAB_NAME_USAGE: String = "Usage"
+        const val ACTION_MOTIF_USAGE: String = "motif_usage"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
         const val LABEL_GRAPH_INIT: String = "Initializing Motif Graph"
 
@@ -54,7 +60,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
     private var scopePanel: MotifScopePanel? = null
-    private var error: MotifErrorPanel? = null
+    private var errorPanel: MotifErrorPanel? = null
+    private var usagePanel: MotifUsagePanel? = null
+    private var usageContent: Content? = null
     private var errorContent: Content? = null
     private var isRefreshing: Boolean = false
 
@@ -95,6 +103,18 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         scopePanel?.setSelectedScope(element)
     }
 
+    fun onSelectedClass(element: PsiElement) {
+        if (element !is PsiClass) {
+            return
+        }
+        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+        if (toolWindow.contentManager.findContent(TAB_NAME_USAGE) == null) {
+            usageContent = createUsageContent(toolWindow)
+        }
+        usagePanel?.setSelectedClass(element)
+        usageContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+    }
+
     private fun onGraphUpdated(graph: ResolvedGraph) {
         ApplicationManager.getApplication().invokeLater {
             val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
@@ -107,10 +127,12 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 scopesContent.isCloseable = false
                 toolWindow.contentManager.addContent(scopesContent)
 
-                error = MotifErrorPanel(project, graph)
+                errorPanel = MotifErrorPanel(project, graph)
+                usagePanel = MotifUsagePanel(project, graph)
             } else {
                 scopePanel?.onGraphUpdated(graph)
-                error?.onGraphUpdated(graph)
+                errorPanel?.onGraphUpdated(graph)
+                usagePanel?.onGraphUpdated(graph)
             }
 
             // Update the visibility of the error tab
@@ -124,6 +146,12 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                         lineMarkerProvider.onGraphUpdated(graph)
                     }
                 }
+            }
+
+            // Propagate changes to actions
+            val usageAction: AnAction = ActionManager.getInstance().getAction(ACTION_MOTIF_USAGE)
+            if (usageAction is MotifUsageAction) {
+                usageAction.onGraphUpdated(graph)
             }
         }
     }
@@ -140,11 +168,19 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
     }
 
     private fun createErrorContent(toolWindow: ToolWindow): Content {
-        val errorContent = ContentFactory.SERVICE.getInstance().createContent(error, TAB_NAME_ERRORS, true)
-        errorContent.isCloseable = false
-        toolWindow.contentManager.addContent(errorContent)
-        this.errorContent = errorContent
-        return errorContent
+        val content = ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
+        content.isCloseable = false
+        toolWindow.contentManager.addContent(content)
+        this.errorContent = content
+        return content
+    }
+
+    private fun createUsageContent(toolWindow: ToolWindow): Content {
+        val content: Content = ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
+        content.isCloseable = true
+        toolWindow.contentManager.addContent(content)
+        this.usageContent = content
+        return content
     }
 
     interface Listener {
