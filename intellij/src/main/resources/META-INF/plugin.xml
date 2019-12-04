@@ -27,10 +27,10 @@
     </project-components>
 
     <actions>
-        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="motif_graph" text="View Scope Ancestors">
+        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" id="motif_graph" text="View Scope Ancestors">
             <keyboard-shortcut first-keystroke="control shift S" keymap="$default"/>
         </action>
-        <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object" icon="/images/graph.png" id="motif_usage" text="Find Usages">
+        <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object" id="motif_usage" text="Find Usages">
             <keyboard-shortcut first-keystroke="control shift U" keymap="$default"/>
         </action>
 

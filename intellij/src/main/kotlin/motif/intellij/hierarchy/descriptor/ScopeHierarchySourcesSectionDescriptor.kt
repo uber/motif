@@ -36,7 +36,7 @@ open class ScopeHierarchySourcesSectionDescriptor(
         val label: String = if (useLabel) "Provides" else scope.simpleName
         val count: Int = graph.getSources(scope).count()
         text.ending.addText(label)
-        text.ending.addText(" " + ScopeHierarchyUtils.getUsageString(count), getPackageNameAttributes())
+        text.ending.addText(" " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
     }
 }
 
