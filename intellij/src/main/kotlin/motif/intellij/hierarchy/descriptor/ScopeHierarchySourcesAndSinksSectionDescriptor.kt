@@ -16,32 +16,25 @@
 package motif.intellij.hierarchy.descriptor
 
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
-import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
-import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
-import motif.models.ErrorScope
 import motif.models.Scope
-import java.awt.Color
-import java.awt.Font
+import java.awt.Font.BOLD
 
-/*
- * Node descriptor used to render a Motif scope.
- */
-class ScopeHierarchyScopeDescriptor(
+open class ScopeHierarchySourcesAndSinksSectionDescriptor(
         project: Project,
         graph: ResolvedGraph,
         parentDescriptor: HierarchyNodeDescriptor?,
-        private val clazz: PsiClass,
-        val scope: Scope,
-        isBase: Boolean) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, clazz, isBase) {
+        element: PsiElement,
+        val scope: Scope)
+    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
     override fun updateText(text: CompositeAppearance) {
-        val textAttr: TextAttributes = getDefaultTextAttributes(scope is ErrorScope)
-        text.ending.addText(clazz.name, textAttr)
-        text.ending.addText(" (" + clazz.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
+        text.ending.addText(" (" + scope.qualifiedName + ")", getPackageNameAttributes())
     }
 }
+

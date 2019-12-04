@@ -53,8 +53,8 @@ open class ScopeHierarchySourceDescriptor(
     }
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(source.type.simpleName)
-        myHighlightedText.ending.addText(" (" + source.type.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(source.type.simpleName)
+        text.ending.addText(" (" + source.type.qualifiedName + ")", getPackageNameAttributes())
     }
 
     override fun getLegend(): String? {

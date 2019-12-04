@@ -29,8 +29,8 @@ open class ScopeHierarchySourceDetailsDescriptor(
     : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(source.scope.simpleName)
-        myHighlightedText.ending.addText(" (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(source.scope.simpleName)
+        text.ending.addText(" (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
     }
 }
 

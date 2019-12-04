@@ -48,8 +48,8 @@ open class ScopeHierarchySinkDescriptor(
     }
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(sink.type.simpleName)
-        myHighlightedText.ending.addText(" (" + sink.type.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(sink.type.simpleName)
+        text.ending.addText(" (" + sink.type.qualifiedName + ")", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

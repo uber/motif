@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils
 import motif.models.Scope
 
 open class ScopeHierarchySourcesSectionDescriptor(
@@ -27,11 +28,15 @@ open class ScopeHierarchySourcesSectionDescriptor(
         graph: ResolvedGraph,
         parentDescriptor: HierarchyNodeDescriptor?,
         element: PsiElement,
-        val scope: Scope)
+        val scope: Scope,
+        private val useLabel: Boolean = false)
     : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(scope.simpleName)
+        val label: String = if (useLabel) "Provides" else scope.simpleName
+        val count: Int = graph.getSources(scope).count()
+        text.ending.addText(label)
+        text.ending.addText(" " + ScopeHierarchyUtils.getUsageString(count), getPackageNameAttributes())
     }
 }
 
