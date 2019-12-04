@@ -138,8 +138,14 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 usagePanel?.onGraphUpdated(graph)
             }
 
-            // Update the visibility of the error tab
-            updateErrorTabVisibility(graph)
+            // (re) add error tab only when errors are present
+            if (graph.errors.isNotEmpty()) {
+                val toolWindow: ToolWindow = toolWindowManager.getToolWindow(TOOL_WINDOW_ID)
+                if (toolWindow.contentManager.findContent(TAB_NAME_ERRORS) == null) {
+                    errorContent = createErrorContent(toolWindow)
+                }
+                errorContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+            }
 
             // Propagate changes to line markers provider
             val language: Language? = Language.findLanguageByID("JAVA")
@@ -159,20 +165,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         }
     }
 
-    private fun updateErrorTabVisibility(graph: ResolvedGraph) {
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        if (graph.errors.isEmpty()) {
-            errorContent?.let { toolWindow.contentManager.removeContent(it, true) }
-            errorContent = null
-        } else {
-            val content: Content = errorContent ?: createErrorContent(toolWindow)
-            toolWindow.contentManager.setSelectedContent(content)
-        }
-    }
-
     private fun createErrorContent(toolWindow: ToolWindow): Content {
         val content = ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
-        content.isCloseable = false
+        content.isCloseable = true
         toolWindow.contentManager.addContent(content)
         this.errorContent = content
         return content
