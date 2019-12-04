@@ -1,3 +1,5 @@
+# 0.3.1-SNAPSHOT
+
 # 0.3.0
 
 * Replace `@motif.Dependencies` API with `ScopeFactory.create`. See https://github.com/uber/motif/issues/125 for details.
