@@ -36,12 +36,12 @@ import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import java.awt.event.MouseEvent
 
 /*
- * {@LineMarkerProvider} used to display icon in gutter to navigate to give motif scope in scope hierarchy panel.
+ * {@LineMarkerProvider} used to display icon in gutter to navigate to motif scope ancestors hierarchy.
  */
 class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
 
     companion object {
-        const val LABEL_LOCATE_SCOPE: String = "Locate in Scope hierarchy."
+        const val LABEL_ANCESTORS_SCOPE: String = "View Scope Ancestors."
     }
 
     override fun collectSlowLineMarkers(psiElements: List<PsiElement>,
@@ -57,7 +57,7 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
         }
         val identifier: PsiIdentifier = element.nameIdentifier ?: return null
         return LineMarkerInfo(element, identifier.textRange, AllIcons.Actions.Show, UPDATE_ALL,
-                ConstantFunction<PsiElement, String>(LABEL_LOCATE_SCOPE), ScopeHierarchyHandler(element.project), LEFT)
+                ConstantFunction<PsiElement, String>(LABEL_ANCESTORS_SCOPE), ScopeHierarchyHandler(element.project), LEFT)
     }
 
     private class ScopeHierarchyHandler(val project: Project) : GutterIconNavigationHandler<PsiElement> {
@@ -65,13 +65,13 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
             val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
             if (element is PsiClass) {
                 toolWindow.activate {
-                    MotifProjectComponent.getInstance(project).onSelectedScope(element)
+                    MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)
                 }
             } else if (element is PsiMethod) {
                 if (element.returnType is PsiClassReferenceType) {
                     val returnElementClass: PsiClass = (element.returnType as PsiClassReferenceType).resolve() ?: return
                     toolWindow.activate {
-                        MotifProjectComponent.getInstance(project).onSelectedScope(returnElementClass)
+                        MotifProjectComponent.getInstance(project).onSelectedAncestorScope(returnElementClass)
                     }
                 }
             }

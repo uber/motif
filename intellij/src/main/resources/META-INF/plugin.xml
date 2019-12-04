@@ -27,7 +27,7 @@
     </project-components>
 
     <actions>
-        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="motif_graph" text="View Scope Graph">
+        <action class="motif.intellij.actions.MotifGraphAction" description="Display Motif graph for this scope" icon="/images/graph.png" id="motif_graph" text="View Scope Ancestors">
             <keyboard-shortcut first-keystroke="control shift S" keymap="$default"/>
         </action>
         <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object" icon="/images/graph.png" id="motif_usage" text="Find Usages">

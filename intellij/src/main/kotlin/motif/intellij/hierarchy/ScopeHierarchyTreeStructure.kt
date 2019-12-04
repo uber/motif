@@ -48,12 +48,17 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
         when (descriptor) {
             is ScopeHierarchyRootDescriptor -> {
                 graph.roots.forEach { scope ->
-                    descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (scope.clazz as IntelliJClass).psiClass, scope, false))
+                    descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (scope.clazz as IntelliJClass).psiClass, scope))
+                }
+            }
+            is ScopeHierarchyScopeAncestorDescriptor -> {
+                graph.getParentEdges(descriptor.scope).forEach { edge ->
+                    descriptors.add(ScopeHierarchyScopeAncestorDescriptor(myProject, graph, descriptor, (edge.parent.clazz as IntelliJClass).psiClass, edge.parent))
                 }
             }
             is ScopeHierarchyScopeDescriptor -> {
                 graph.getChildEdges(descriptor.scope).forEach { edge ->
-                    descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (edge.child.clazz as IntelliJClass).psiClass, edge.child, false))
+                    descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (edge.child.clazz as IntelliJClass).psiClass, edge.child))
                 }
             }
             is ScopeHierarchySourcesSectionDescriptor -> {

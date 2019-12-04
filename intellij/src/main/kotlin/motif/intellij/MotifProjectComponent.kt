@@ -47,8 +47,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val TOOL_WINDOW_ID: String = "Motif"
         const val TOOL_WINDOW_TITLE: String = "Scopes"
         const val TAB_NAME_ERRORS: String = "Errors"
-        const val TAB_NAME_SCOPES: String = "Scopes"
+        const val TAB_NAME_SCOPES: String = "All Scopes"
         const val TAB_NAME_USAGE: String = "Usage"
+        const val TAB_NAME_ANCESTOR: String = "Ancestors"
         const val ACTION_MOTIF_USAGE: String = "motif_usage"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
         const val LABEL_GRAPH_INIT: String = "Initializing Motif Graph"
@@ -60,11 +61,13 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
     private var scopePanel: MotifScopePanel? = null
-    private var errorPanel: MotifErrorPanel? = null
-    private var usagePanel: MotifUsagePanel? = null
     private var scopeContent: Content? = null
-    private var usageContent: Content? = null
+    private var errorPanel: MotifErrorPanel? = null
     private var errorContent: Content? = null
+    private var usagePanel: MotifUsagePanel? = null
+    private var usageContent: Content? = null
+    private var ancestorPanel: MotifScopePanel? = null
+    private var ancestorContent: Content? = null
     private var isRefreshing: Boolean = false
 
     override fun projectOpened() {
@@ -118,6 +121,18 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         usageContent?.let { toolWindow.contentManager.setSelectedContent(it) }
     }
 
+    fun onSelectedAncestorScope(element: PsiElement) {
+        if (element !is PsiClass) {
+            return
+        }
+        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+        if (toolWindow.contentManager.findContent(TAB_NAME_ANCESTOR) == null) {
+            ancestorContent = createAncestorContent(toolWindow)
+        }
+        ancestorPanel?.setSelectedScope(element)
+        ancestorContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+    }
+
     private fun onGraphUpdated(graph: ResolvedGraph) {
         ApplicationManager.getApplication().invokeLater {
             val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
@@ -132,10 +147,12 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
                 errorPanel = MotifErrorPanel(project, graph)
                 usagePanel = MotifUsagePanel(project, graph)
+                ancestorPanel = MotifScopePanel(project, graph)
             } else {
                 scopePanel?.onGraphUpdated(graph)
                 errorPanel?.onGraphUpdated(graph)
                 usagePanel?.onGraphUpdated(graph)
+                ancestorPanel?.onGraphUpdated(graph)
             }
 
             // (re) add error tab only when errors are present
@@ -169,7 +186,6 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         val content = ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
         content.isCloseable = true
         toolWindow.contentManager.addContent(content)
-        this.errorContent = content
         return content
     }
 
@@ -177,7 +193,13 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         val content: Content = ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
         content.isCloseable = true
         toolWindow.contentManager.addContent(content)
-        this.usageContent = content
+        return content
+    }
+
+    private fun createAncestorContent(toolWindow: ToolWindow): Content {
+        val content: Content = ContentFactory.SERVICE.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
+        content.isCloseable = true
+        toolWindow.contentManager.addContent(content)
         return content
     }
 
