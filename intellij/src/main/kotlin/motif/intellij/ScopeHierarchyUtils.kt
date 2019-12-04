@@ -79,6 +79,14 @@ class ScopeHierarchyUtils {
             }
         }
 
+        fun getObjectString(count: Int): String {
+            return when (count) {
+                0 -> "No object"
+                1 -> "1 object"
+                else -> "$count objects"
+            }
+        }
+
         fun formatMultilineText(text: String): String {
             return "<html>" + text.replace("\n", "<br>") + "</html>"
         }

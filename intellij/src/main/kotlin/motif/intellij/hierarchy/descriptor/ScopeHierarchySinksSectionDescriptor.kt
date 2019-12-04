@@ -36,7 +36,7 @@ open class ScopeHierarchySinksSectionDescriptor(
         val label: String = if (useLabel) "Consumes" else scope.simpleName
         val count: Int = graph.getSinks(scope).count()
         text.ending.addText(label)
-        text.ending.addText(" " + ScopeHierarchyUtils.getUsageString(count), getPackageNameAttributes())
+        text.ending.addText(" " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
     }
 }
 
