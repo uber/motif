@@ -79,6 +79,10 @@ class ScopeHierarchyUtils {
             }
         }
 
+        fun formatMultilineText(text: String): String {
+            return "<html>" + text.replace("\n", "<br>") + "</html>"
+        }
+
         /*
          * Returns all the paths, starting from root scopes, leading to the provided scope.
          */

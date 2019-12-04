@@ -36,12 +36,12 @@ import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
+import motif.intellij.ScopeHierarchyUtils.Companion.formatMultilineText
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
 import motif.intellij.hierarchy.descriptor.*
 import motif.models.Scope
-import java.awt.GridLayout
 import java.text.MessageFormat
 import java.util.*
 import javax.swing.JLabel
@@ -130,7 +130,7 @@ class ScopePropertyHierarchyBrowser(
                         node.userObject as? ScopeHierarchyNodeDescriptor ?: return@addTreeSelectionListener
                 val text: String? = descriptor.getLegend()
                 if (text != null) {
-                    legendLabel?.text = "<html>$text</html>"
+                    legendLabel?.text = formatMultilineText(text)
                     legendLabel?.show()
                 } else {
                     legendLabel?.hide()
