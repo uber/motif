@@ -29,8 +29,8 @@ open class ScopeHierarchySinkDetailsDescriptor(
     : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(sink.scope.simpleName)
-        myHighlightedText.ending.addText(" (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(sink.scope.simpleName)
+        text.ending.addText(" (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
     }
 }
 

@@ -66,6 +66,7 @@ class ScopePropertyHierarchyBrowser(
     enum class PropertyHierarchyType {
         CONSUME,
         PROVIDE,
+        CONSUME_AND_PROVIDE,
         DEPENDENCIES
     }
 
@@ -158,6 +159,10 @@ class ScopePropertyHierarchyBrowser(
                 }
                 PropertyHierarchyType.PROVIDE -> {
                     val descriptor: HierarchyNodeDescriptor = ScopeHierarchySourcesSectionDescriptor(project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
+                    ScopeHierarchyTreeStructure(project, graph, descriptor)
+                }
+                PropertyHierarchyType.CONSUME_AND_PROVIDE -> {
+                    val descriptor: HierarchyNodeDescriptor = ScopeHierarchySourcesAndSinksSectionDescriptor(project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
                     ScopeHierarchyTreeStructure(project, graph, descriptor)
                 }
                 PropertyHierarchyType.DEPENDENCIES -> {

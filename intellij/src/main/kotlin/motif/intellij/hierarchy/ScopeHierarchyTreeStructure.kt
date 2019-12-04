@@ -72,6 +72,10 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                     descriptors.add(ScopeHierarchySimpleDescriptor(myProject, graph, descriptor, descriptor.element, LABEL_SCOPE_NO_CONSUME))
                 }
             }
+            is ScopeHierarchySourcesAndSinksSectionDescriptor -> {
+                descriptors.add(ScopeHierarchySourcesSectionDescriptor(myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
+                descriptors.add(ScopeHierarchySinksSectionDescriptor(myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
+            }
             is ScopeHierarchyDependenciesSectionDescriptor -> {
                 val dependencies: Dependencies? = descriptor.scope.dependencies
                 if (dependencies != null && dependencies.methods.isNotEmpty()) {

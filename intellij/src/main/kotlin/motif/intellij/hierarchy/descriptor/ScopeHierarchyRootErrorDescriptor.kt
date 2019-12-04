@@ -32,9 +32,9 @@ open class ScopeHierarchyRootErrorDescriptor(
 
     override fun updateText(text: CompositeAppearance) {
         if (graph.errors.isEmpty()) {
-            myHighlightedText.ending.addText("No Errors!")
+            text.ending.addText("No Errors!")
         } else {
-            myHighlightedText.ending.addText("" + graph.errors.size + " errors")
+            text.ending.addText("" + graph.errors.size + " errors")
         }
     }
 

@@ -120,7 +120,7 @@ open class ScopeHierarchyErrorDescriptor(
     }
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(errorMessage.name)
+        text.ending.addText(errorMessage.name)
     }
 
     override fun getIcon(element: PsiElement): Icon? {

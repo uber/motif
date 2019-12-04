@@ -31,8 +31,8 @@ open class ScopeHierarchyDependencyDescriptor(
     : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
     override fun updateText(text: CompositeAppearance) {
-        myHighlightedText.ending.addText(method.returnType.simpleName)
-        myHighlightedText.ending.addText(" (" + method.returnType.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(method.returnType.simpleName)
+        text.ending.addText(" (" + method.returnType.qualifiedName + ")", getPackageNameAttributes())
     }
 }
 

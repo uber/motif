@@ -27,12 +27,14 @@ import motif.intellij.hierarchy.ScopeHierarchyBrowser
 import motif.intellij.ScopeHierarchyUtils
 import motif.models.Scope
 import java.awt.BorderLayout
+import java.awt.Component
 import javax.swing.JPanel
 import javax.swing.JSplitPane
 
 class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeHierarchyBrowser.Listener, MotifProjectComponent.Listener {
 
     companion object {
+        const val USE_TABS: Boolean = false;
         const val TAB_NAME_CONSUMES: String = "Consumes"
         const val TAB_NAME_PROVIDES: String = "Provides"
         const val TAB_NAME_DEPENDENCIES: String = "Dependencies"
@@ -43,6 +45,7 @@ class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeH
     private val scopeBrowser: ScopeHierarchyBrowser
     private val provideBrowser: ScopePropertyHierarchyBrowser
     private val consumeBrowser: ScopePropertyHierarchyBrowser
+    private val consumeAndProvideBrowser: ScopePropertyHierarchyBrowser
     private val dependenciesBrowser: ScopePropertyHierarchyBrowser
 
     init {
@@ -55,6 +58,7 @@ class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeH
 
         consumeBrowser = buildPropertyHierarchyBrowser(project, graph, rootElement, PropertyHierarchyType.CONSUME)
         provideBrowser = buildPropertyHierarchyBrowser(project, graph, rootElement, PropertyHierarchyType.PROVIDE)
+        consumeAndProvideBrowser = buildPropertyHierarchyBrowser(project, graph, rootElement, PropertyHierarchyType.CONSUME_AND_PROVIDE)
         dependenciesBrowser = buildPropertyHierarchyBrowser(project, graph, rootElement, PropertyHierarchyType.DEPENDENCIES)
 
         tabs = JBTabbedPane()
@@ -62,7 +66,8 @@ class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeH
         tabs.addTab(TAB_NAME_PROVIDES, provideBrowser)
         tabs.addTab(TAB_NAME_DEPENDENCIES, dependenciesBrowser)
 
-        splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, scopeBrowser, tabs)
+        val bottomComponent: Component = if (USE_TABS) tabs else consumeAndProvideBrowser
+        splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, scopeBrowser, bottomComponent)
         splitPane.dividerLocation = 250
         add(splitPane)
     }
@@ -70,6 +75,7 @@ class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeH
     override fun onGraphUpdated(graph: ResolvedGraph) {
         provideBrowser.onGraphUpdated(graph)
         consumeBrowser.onGraphUpdated(graph)
+        consumeAndProvideBrowser.onGraphUpdated(graph)
         dependenciesBrowser.onGraphUpdated(graph)
         scopeBrowser.onGraphUpdated(graph)
     }
@@ -87,6 +93,7 @@ class MotifScopePanel(project: Project, graph: ResolvedGraph) : JPanel(), ScopeH
     override fun onSelectedScopeChanged(element: PsiElement, scope: Scope) {
         provideBrowser.setSelectedScope(element)
         consumeBrowser.setSelectedScope(element)
+        consumeAndProvideBrowser.setSelectedScope(element)
         dependenciesBrowser.setSelectedScope(element)
     }
 
