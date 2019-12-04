@@ -21,6 +21,7 @@ import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
+import motif.intellij.ScopeHierarchyUtils.Companion.formatMultilineText
 import motif.intellij.hierarchy.ErrorHierarchyBrowser
 import motif.models.MotifError
 import java.awt.BorderLayout
@@ -58,7 +59,7 @@ class MotifErrorPanel(project: Project, graph: ResolvedGraph)
     }
 
     override fun onSelectedErrorChanged(element: PsiElement, error: MotifError, errorMessage: ErrorMessage) {
-        errorDetails.text = "<html>" + errorMessage.text.replace("\n", "<br>") + "</html>"
+        errorDetails.text = formatMultilineText(errorMessage.text)
     }
 }
 

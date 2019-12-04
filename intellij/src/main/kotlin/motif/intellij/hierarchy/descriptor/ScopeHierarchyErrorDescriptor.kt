@@ -128,7 +128,7 @@ open class ScopeHierarchyErrorDescriptor(
     }
 
     override fun getLegend(): String? {
-        return errorMessage.text.replace("\n", "<br>")
+        return errorMessage.text
     }
 }
 
