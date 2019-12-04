@@ -27,7 +27,7 @@ import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 
 /*
- * {@AnAction} used to trigger navigation to a particular scope in the scope hierarchy window.
+ * {@AnAction} used to trigger displaying  a particular scope ancestors hierarchy.
  */
 class MotifGraphAction : AnAction() {
 
@@ -39,7 +39,7 @@ class MotifGraphAction : AnAction() {
 
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Motif")
         toolWindow.activate {
-            MotifProjectComponent.getInstance(project).onSelectedScope(element)
+            MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)
         }
     }
 

@@ -23,7 +23,6 @@ import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages.showInfoMessage
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementFactory
@@ -36,9 +35,9 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
-import motif.intellij.ScopeHierarchyUtils.Companion.getMotifScopePaths
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyRootDescriptor
+import motif.intellij.hierarchy.descriptor.ScopeHierarchyScopeAncestorDescriptor
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyScopeDescriptor
 import motif.models.Scope
 import java.text.MessageFormat
@@ -77,11 +76,6 @@ class ScopeHierarchyBrowser(
 
     override fun getActionPlace(): String {
         return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
-    }
-
-    override fun appendActions(actionGroup: DefaultActionGroup, helpID: String?) {
-        super.appendActions(actionGroup, helpID)
-        actionGroup.add(ResetAction())
     }
 
     override fun getComparator(): Comparator<NodeDescriptor<Any>>? {
@@ -126,29 +120,13 @@ class ScopeHierarchyBrowser(
                     graph,
                     ScopeHierarchyRootDescriptor(myProject, graph, psiElement))
         } else if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
-            // Display a subset of the graph based on the provided scope
+            // Display the scope ancestors hierarchy
             val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(psiElement)
             val type: IrType = IntelliJType(project, scopeType)
             graph.getScope(type)?.let { scope ->
-                var lastDescriptor: HierarchyNodeDescriptor? = null
-                var rootDescriptor: HierarchyNodeDescriptor? = null
-                getMotifScopePaths(scope, graph).forEach { scopes ->
-                    lastDescriptor = null
-                    scopes.reverse()
-                    scopes.forEach {
-                        val clazz = (it.clazz as IntelliJClass).psiClass
-                        val isBase = clazz == psiElement
-                        val descriptor: HierarchyNodeDescriptor =
-                                ScopeHierarchyScopeDescriptor(myProject, graph, lastDescriptor, clazz, it, isBase)
-                        lastDescriptor?.cachedChildren = arrayOf(descriptor)
-                        lastDescriptor = descriptor
-                        rootDescriptor = if (rootDescriptor == null) descriptor else rootDescriptor
-                    }
-                }
-                if (lastDescriptor == null) {
-                    return null
-                }
-                return ScopeHierarchyTreeStructure(myProject, graph, lastDescriptor!!)
+                val clazz = (scope.clazz as IntelliJClass).psiClass
+                val descriptor = ScopeHierarchyScopeAncestorDescriptor(myProject, graph, null, clazz, scope, true)
+                return ScopeHierarchyTreeStructure(myProject, graph, descriptor)
             }
         }
         return null
