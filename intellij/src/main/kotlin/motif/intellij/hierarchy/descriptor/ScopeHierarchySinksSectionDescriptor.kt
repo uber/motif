@@ -22,6 +22,7 @@ import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils
 import motif.models.Scope
+import javax.swing.Icon
 
 open class ScopeHierarchySinksSectionDescriptor(
         project: Project,
@@ -37,6 +38,10 @@ open class ScopeHierarchySinksSectionDescriptor(
         val count: Int = graph.getSinks(scope).count()
         text.ending.addText(label)
         text.ending.addText(" " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
+    }
+
+    override fun getIcon(element: PsiElement): Icon? {
+        return null
     }
 }
 

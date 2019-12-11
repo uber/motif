@@ -19,9 +19,11 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageString
+import javax.swing.Icon
 
 open class ScopeHierarchyUsageSourcesSectionDescriptor(
         private val nonNullProject: Project,
@@ -34,5 +36,9 @@ open class ScopeHierarchyUsageSourcesSectionDescriptor(
         val count: Int = getUsageCount(nonNullProject, graph, clazz, includeSources = true, includeSinks = false)
         text.ending.addText("Provides")
         text.ending.addText(" " +  getUsageString(count), getPackageNameAttributes())
+    }
+
+    override fun getIcon(element: PsiElement): Icon? {
+        return null
     }
 }

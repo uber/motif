@@ -18,8 +18,10 @@ package motif.intellij.hierarchy.descriptor
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.models.Sink
+import javax.swing.Icon
 
 open class ScopeHierarchySinkDetailsDescriptor(
         project: Project,
@@ -29,8 +31,11 @@ open class ScopeHierarchySinkDetailsDescriptor(
     : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(sink.scope.simpleName)
-        text.ending.addText(" (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Provided by: " + sink.scope.simpleName + " (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
+    }
+
+    override fun getIcon(element: PsiElement): Icon? {
+        return null
     }
 }
 
