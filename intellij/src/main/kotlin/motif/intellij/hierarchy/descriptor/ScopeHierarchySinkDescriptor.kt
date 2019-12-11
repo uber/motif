@@ -19,12 +19,15 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import motif.ast.IrMethod
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
-import motif.models.*
+import motif.models.AccessMethodSink
+import motif.models.FactoryMethodSink
+import motif.models.FactoryMethodSource
+import motif.models.Sink
 import javax.swing.Icon
 
 open class ScopeHierarchySinkDescriptor(
@@ -53,7 +56,7 @@ open class ScopeHierarchySinkDescriptor(
     }
 
     override fun getIcon(element: PsiElement): Icon? {
-        return AllIcons.Nodes.C_public
+        return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface else AllIcons.Nodes.Class
     }
 
     override fun getLegend(): String? {

@@ -15,15 +15,12 @@
  */
 package motif.intellij.hierarchy
 
-import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.DataKey
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -36,7 +33,6 @@ import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
-import motif.intellij.ScopeHierarchyUtils.Companion.formatMultilineText
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
@@ -44,7 +40,6 @@ import motif.intellij.hierarchy.descriptor.*
 import motif.models.Scope
 import java.text.MessageFormat
 import java.util.*
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -60,8 +55,6 @@ class ScopePropertyHierarchyBrowser(
     : HierarchyBrowserBaseEx(project, rootElement), MotifProjectComponent.Listener {
 
     private var graph: ResolvedGraph = initialGraph
-    private var legendPanel: JPanel? = null
-    private var legendLabel: JLabel? = null
 
     enum class PropertyHierarchyType {
         CONSUME,
@@ -78,7 +71,12 @@ class ScopePropertyHierarchyBrowser(
 
     fun setSelectedScope(element: PsiElement) {
         hierarchyBase = element
-        super.doRefresh(true)
+        doRefresh(true)
+    }
+
+    // HACK: prevent focus to be request when refresh is happening. This is to allow keyboard navigation in scope tree.
+    override fun changeView(typeName: String) {
+        super.changeView(typeName, false)
     }
 
     override fun isApplicableElement(element: PsiElement): Boolean {
@@ -108,17 +106,17 @@ class ScopePropertyHierarchyBrowser(
         return LABEL_GO_NEXT_SCOPE
     }
 
-    override fun createLegendPanel(): JPanel? {
-        // This method is invoked by superclass constructor, therefore we can't use class constructor nor lazy accessor
-        val panel = JPanel()
-        legendLabel = JLabel(AllIcons.General.ContextHelp, 0)
-        panel.add(legendLabel)
-        legendPanel = panel
-        return legendPanel
-    }
-
     override fun createTrees(trees: MutableMap<String, JTree>) {
         trees[PROPERTY_HIERARCHY_TYPE] = createTree(true)
+    }
+
+    override fun appendActions(actionGroup: DefaultActionGroup, helpID: String?) {
+        val actionManager = ActionManager.getInstance()
+        actionGroup.add(actionManager.getAction(IdeActions.ACTION_EXPAND_ALL))
+    }
+
+    override fun createLegendPanel(): JPanel? {
+        return null
     }
 
     override fun configureTree(tree: Tree) {
@@ -129,13 +127,7 @@ class ScopePropertyHierarchyBrowser(
                 val descriptor: ScopeHierarchyNodeDescriptor =
                         node.userObject as? ScopeHierarchyNodeDescriptor ?: return@addTreeSelectionListener
                 val text: String? = descriptor.getLegend()
-                if (text != null) {
-                    legendLabel?.text = formatMultilineText(text)
-                    legendLabel?.show()
-                } else {
-                    legendLabel?.hide()
-                }
-                legendPanel?.validate()
+                // TODO : display legend in a popup or dialog
             }
         }
     }

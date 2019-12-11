@@ -18,8 +18,10 @@ package motif.intellij.hierarchy.descriptor
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.models.Source
+import javax.swing.Icon
 
 open class ScopeHierarchySourceDetailsDescriptor(
         project: Project,
@@ -29,8 +31,11 @@ open class ScopeHierarchySourceDetailsDescriptor(
     : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(source.scope.simpleName)
-        text.ending.addText(" (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Consumed by: " + source.scope.simpleName + " (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
+    }
+
+    override fun getIcon(element: PsiElement): Icon? {
+        return null
     }
 }
 

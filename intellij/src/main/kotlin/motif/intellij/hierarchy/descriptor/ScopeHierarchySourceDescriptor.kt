@@ -19,6 +19,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJMethod
@@ -53,6 +54,9 @@ open class ScopeHierarchySourceDescriptor(
     }
 
     override fun updateText(text: CompositeAppearance) {
+        if (source.isExposed) {
+            text.ending.addText("@Expose ")
+        }
         text.ending.addText(source.type.simpleName)
         text.ending.addText(" (" + source.type.qualifiedName + ")", getPackageNameAttributes())
     }
@@ -63,7 +67,7 @@ open class ScopeHierarchySourceDescriptor(
     }
 
     override fun getIcon(element: PsiElement): Icon? {
-        return if (source.isExposed) AllIcons.Nodes.C_public else AllIcons.Nodes.C_private
+        return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface else AllIcons.Nodes.Class
     }
 }
 
