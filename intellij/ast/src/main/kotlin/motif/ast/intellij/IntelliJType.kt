@@ -50,12 +50,12 @@ class IntelliJType(
 
         other as IntelliJType
 
-        if (qualifiedName != other.qualifiedName) return false
+        if (psiType != other.psiType) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return qualifiedName.hashCode()
+        return psiType.hashCode()
     }
 }
