@@ -13,16 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T073_scope_factory_no_dependencies;
+package testcases.T074_superclass_nested_class;
 
-import motif.ScopeFactory;
-
-import static com.google.common.truth.Truth.assertThat;
-
-public class Test {
-
-    public static void run() {
-        Scope scope = ScopeFactory.create(Scope.class);
-        assertThat(scope.string()).isEqualTo("s");
-    }
-}
+public class Bar implements Foo {}
