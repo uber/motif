@@ -18,10 +18,10 @@ Motif is a DI library that offers a simple API optimized for nested scopes. Unde
 ## Proguard
 
 ```proguard
--keepnames @motif.Scope interface *
--keepnames @motif.ScopeImpl class * {
-    <init>(...);
-}
+-keep class motif.Scope
+-keep class motif.ScopeImpl
+-keep @motif.Scope interface *
+-keep @motif.ScopeImpl class *
 ```
 
 ## The Basics
