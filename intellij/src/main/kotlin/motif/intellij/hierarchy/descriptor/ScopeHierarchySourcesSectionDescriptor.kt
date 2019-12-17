@@ -21,6 +21,7 @@ import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils
+import motif.intellij.ScopeHierarchyUtils.Companion.getVisibleSources
 import motif.models.Scope
 import javax.swing.Icon
 
@@ -35,7 +36,7 @@ open class ScopeHierarchySourcesSectionDescriptor(
 
     override fun updateText(text: CompositeAppearance) {
         val label: String = if (useLabel) "Provides" else scope.simpleName
-        val count: Int = graph.getSources(scope).count()
+        val count: Int = getVisibleSources(graph, scope).count()
         text.ending.addText(label)
         text.ending.addText(" " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
     }

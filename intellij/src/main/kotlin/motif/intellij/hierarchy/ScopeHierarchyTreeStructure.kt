@@ -27,6 +27,7 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.ScopeHierarchyUtils
+import motif.intellij.ScopeHierarchyUtils.Companion.getVisibleSources
 import motif.intellij.hierarchy.descriptor.*
 import motif.models.*
 
@@ -62,7 +63,7 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                 }
             }
             is ScopeHierarchySourcesSectionDescriptor -> {
-                graph.getSources(descriptor.scope).forEach { source ->
+                getVisibleSources(graph, descriptor.scope).forEach { source ->
                     descriptors.add(ScopeHierarchySourceDescriptor(myProject, graph, descriptor, source))
                 }
                 if (descriptors.isEmpty()) {

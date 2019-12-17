@@ -24,7 +24,10 @@ import motif.ast.IrType
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
+import motif.models.ChildParameterSource
 import motif.models.Scope
+import motif.models.ScopeSource
+import motif.models.Source
 import java.util.*
 
 class ScopeHierarchyUtils {
@@ -53,6 +56,13 @@ class ScopeHierarchyUtils {
                 }
             }
             return false
+        }
+
+        /*
+         * Returns the list of sources for given scope to display in the UI
+         */
+        fun getVisibleSources(graph: ResolvedGraph, scope: Scope): List<Source> {
+            return graph.getSources(scope).filter { it !is ChildParameterSource && it !is ScopeSource }
         }
 
         /*

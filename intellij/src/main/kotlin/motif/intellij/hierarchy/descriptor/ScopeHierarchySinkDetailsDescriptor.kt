@@ -31,7 +31,7 @@ open class ScopeHierarchySinkDetailsDescriptor(
     : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Provided by: " + sink.scope.simpleName + " (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Consumed by: " + sink.scope.simpleName + " (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

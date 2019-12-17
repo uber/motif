@@ -56,7 +56,7 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
             return null
         }
         val identifier: PsiIdentifier = element.nameIdentifier ?: return null
-        return LineMarkerInfo(element, identifier.textRange, AllIcons.Actions.Show, UPDATE_ALL,
+        return LineMarkerInfo(element, identifier.textRange, AllIcons.Hierarchy.Supertypes, UPDATE_ALL,
                 ConstantFunction<PsiElement, String>(LABEL_ANCESTORS_SCOPE), ScopeHierarchyHandler(element.project), LEFT)
     }
 

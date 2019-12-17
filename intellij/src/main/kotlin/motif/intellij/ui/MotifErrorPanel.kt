@@ -21,20 +21,19 @@ import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
-import motif.intellij.ScopeHierarchyUtils.Companion.formatMultilineText
 import motif.intellij.hierarchy.ErrorHierarchyBrowser
 import motif.models.MotifError
 import java.awt.BorderLayout
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSplitPane
+import javax.swing.JTextArea
 
 class MotifErrorPanel(project: Project, graph: ResolvedGraph)
     : JPanel(), MotifProjectComponent.Listener, ErrorHierarchyBrowser.Listener {
 
     private val splitPane: JSplitPane
     private val errorBrowser: ErrorHierarchyBrowser
-    private val errorDetails: JLabel
+    private val errorDetails: JTextArea
 
     init {
         val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
@@ -45,9 +44,10 @@ class MotifErrorPanel(project: Project, graph: ResolvedGraph)
         errorBrowser = ErrorHierarchyBrowser(project, graph, rootElement, this)
         errorBrowser.changeView(ErrorHierarchyBrowser.ERROR_HIERARCHY_TYPE)
 
-        errorDetails = JLabel()
-        errorDetails.horizontalAlignment = JLabel.LEFT
-        errorDetails.verticalAlignment = JLabel.TOP
+        errorDetails = JTextArea()
+        errorDetails.lineWrap = true
+        errorDetails.isEditable = false
+        errorDetails.isOpaque = false
 
         splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, errorBrowser, errorDetails)
         splitPane.dividerLocation = 250
@@ -56,10 +56,10 @@ class MotifErrorPanel(project: Project, graph: ResolvedGraph)
 
     override fun onGraphUpdated(graph: ResolvedGraph) {
         errorBrowser.onGraphUpdated(graph)
+        errorDetails.text = ""
     }
 
     override fun onSelectedErrorChanged(element: PsiElement, error: MotifError, errorMessage: ErrorMessage) {
-        errorDetails.text = formatMultilineText(errorMessage.text)
+        errorDetails.text = errorMessage.text
     }
 }
-
