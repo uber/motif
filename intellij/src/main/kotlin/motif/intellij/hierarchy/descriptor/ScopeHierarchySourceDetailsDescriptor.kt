@@ -31,7 +31,7 @@ open class ScopeHierarchySourceDetailsDescriptor(
     : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Consumed by: " + source.scope.simpleName + " (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Provided by: " + source.scope.simpleName + " (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

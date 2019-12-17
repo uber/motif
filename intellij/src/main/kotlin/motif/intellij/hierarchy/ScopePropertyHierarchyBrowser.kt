@@ -21,6 +21,7 @@ import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -28,6 +29,7 @@ import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiType
 import com.intellij.psi.presentation.java.ClassPresentationUtil
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.ui.tree.TreeUtil
 import motif.ast.IrType
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJType
@@ -72,6 +74,13 @@ class ScopePropertyHierarchyBrowser(
     fun setSelectedScope(element: PsiElement) {
         hierarchyBase = element
         doRefresh(true)
+
+        // Expand tree to show items under provides/consumes nodes
+        if (hierarchyType == PropertyHierarchyType.CONSUME_AND_PROVIDE) {
+            ApplicationManager.getApplication().invokeLater {
+                TreeUtil.expand(currentTree, 2)
+            }
+        }
     }
 
     // HACK: prevent focus to be request when refresh is happening. This is to allow keyboard navigation in scope tree.

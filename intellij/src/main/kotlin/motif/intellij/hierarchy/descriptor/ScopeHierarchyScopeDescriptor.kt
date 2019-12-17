@@ -15,18 +15,17 @@
  */
 package motif.intellij.hierarchy.descriptor
 
+import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
-import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
 import motif.models.ErrorScope
 import motif.models.Scope
-import java.awt.Color
-import java.awt.Font
+import javax.swing.Icon
 
 /*
  * Node descriptor used to render a Motif scope.
@@ -43,5 +42,9 @@ open class ScopeHierarchyScopeDescriptor(
         val textAttr: TextAttributes = getDefaultTextAttributes(scope is ErrorScope)
         text.ending.addText(clazz.name, textAttr)
         text.ending.addText(" (" + clazz.qualifiedName + ")", getPackageNameAttributes())
+    }
+
+    override fun getIcon(element: PsiElement): Icon? {
+        return AllIcons.Nodes.Interface
     }
 }

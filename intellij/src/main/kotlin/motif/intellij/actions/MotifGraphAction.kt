@@ -27,7 +27,7 @@ import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 
 /*
- * {@AnAction} used to trigger displaying  a particular scope ancestors hierarchy.
+ * {@AnAction} used to trigger displaying a particular scope ancestors hierarchy.
  */
 class MotifGraphAction : AnAction() {
 

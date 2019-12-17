@@ -47,7 +47,7 @@ open class ScopeHierarchySourceDescriptor(
                     (source.spreadMethod.method as IntelliJMethod).psiMethod
                 }
                 is ChildParameterSource -> {
-                    (source.scope.clazz as IntelliJClass).psiClass
+                    (source.parameter.method.method as IntelliJMethod).psiMethod
                 }
             }
         }
