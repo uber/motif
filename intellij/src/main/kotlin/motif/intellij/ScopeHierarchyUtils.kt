@@ -25,6 +25,7 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
 import motif.models.Scope
+import motif.models.Source
 import java.util.*
 
 class ScopeHierarchyUtils {
@@ -92,7 +93,7 @@ class ScopeHierarchyUtils {
         }
 
         /*
-         * Returns all the paths, starting from root scopes, leading to the provided scope.
+         * Returns all the ancestor paths for the provided scope.
          */
         fun getMotifScopePaths(scope: Scope, graph: ResolvedGraph): ArrayList<ArrayList<Scope>> {
             val list: ArrayList<Scope> = ArrayList()
@@ -112,6 +113,52 @@ class ScopeHierarchyUtils {
                 val newList: ArrayList<Scope> = ArrayList()
                 all.add(newList)
                 getMotifScopePathsRecursive(edge.parent, graph, newList, all)
+            }
+        }
+
+        /*
+         * Returns all sources (i.e ancestor exposed dependencies w/ parent dynamic dependencies) available to the
+         * current scope.
+         *
+         * If partial is false, returns sources that are provided by all ancestor paths.
+         * If true, return sources provided only by some ancestor paths, but not all.
+         */
+         fun getExposedSources(scope: Scope, graph: ResolvedGraph, partial: Boolean): ArrayList<Source> {
+            val list: ArrayList<Source> = ArrayList()
+            val all: ArrayList<ArrayList<Source>> = ArrayList()
+            all.add(list)
+            getExposedSourcesRecursive(scope, graph, list, all)
+
+            val allSources: HashSet<Source> = HashSet()
+            all.forEach { list ->
+                list.forEach {
+                    allSources.add(it)
+                }
+            }
+
+            val retValue: ArrayList<Source> = ArrayList()
+            allSources.forEach { source ->
+                var isPartial = false
+                all.forEach { list ->
+                    if (!list.contains(source)) {
+                        isPartial = true
+                    }
+                }
+                if (isPartial == partial) retValue.add(source)
+            }
+            return retValue
+        }
+
+        private fun getExposedSourcesRecursive(scope: Scope, graph: ResolvedGraph, list: ArrayList<Source>, all: ArrayList<ArrayList<Source>>) {
+            graph.getSources(scope).filter { it.isExposed }.forEach { list.add(it) }
+            val parentEdgesIterator: Iterator<ScopeEdge> = graph.getParentEdges(scope).iterator()
+            if (parentEdgesIterator.hasNext()) {
+                getExposedSourcesRecursive(parentEdgesIterator.next().parent, graph, list, all)
+            }
+            for (edge: ScopeEdge in parentEdgesIterator) {
+                val newList: ArrayList<Source> = ArrayList(list)
+                all.add(newList)
+                getExposedSourcesRecursive(edge.parent, graph, newList, all)
             }
         }
     }

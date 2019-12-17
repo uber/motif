@@ -27,6 +27,7 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.ScopeHierarchyUtils
+import motif.intellij.ScopeHierarchyUtils.Companion.getExposedSources
 import motif.intellij.hierarchy.descriptor.*
 import motif.models.*
 
@@ -36,6 +37,7 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
     companion object {
         const val LABEL_SCOPE_NO_PROVIDE: String = "This Scope does not provide any object."
         const val LABEL_SCOPE_NO_CONSUME: String = "This Scope does not consume any object."
+        const val LABEL_SCOPE_NO_DEPENDENCIES_AVAILABLE: String = "This Scope does not have any dependencies available to consume."
         const val LABEL_SCOPE_NO_DEPENDENCIES: String = "This Scope does not have any dependencies."
     }
 
@@ -80,6 +82,7 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
             is ScopeHierarchySourcesAndSinksSectionDescriptor -> {
                 descriptors.add(ScopeHierarchySourcesSectionDescriptor(myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
                 descriptors.add(ScopeHierarchySinksSectionDescriptor(myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
+                descriptors.add(ScopeHierarchyAvailableSourceSectionDescriptor(myProject, graph, descriptor, descriptor.element, descriptor.scope))
             }
             is ScopeHierarchyDependenciesSectionDescriptor -> {
                 val dependencies: Dependencies? = descriptor.scope.dependencies
@@ -92,10 +95,24 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                     descriptors.add(ScopeHierarchySimpleDescriptor(myProject, graph, descriptor, descriptor.psiElement!!, LABEL_SCOPE_NO_DEPENDENCIES))
                 }
             }
+            is ScopeHierarchyAvailableSourceSectionDescriptor -> {
+                getExposedSources(descriptor.scope, graph, false).forEach { source ->
+                    descriptors.add(ScopeHierarchyAvailableSourceDescriptor(myProject, graph, descriptor, source, false))
+                }
+                getExposedSources(descriptor.scope, graph, true).forEach { source ->
+                    descriptors.add(ScopeHierarchyAvailableSourceDescriptor(myProject, graph, descriptor, source, true))
+                }
+                if (descriptors.isEmpty()) {
+                    descriptors.add(ScopeHierarchySimpleDescriptor(myProject, graph, descriptor, descriptor.element, LABEL_SCOPE_NO_DEPENDENCIES_AVAILABLE))
+                }
+            }
             is ScopeHierarchySinkDetailsDescriptor -> {
                 // returns no children
             }
             is ScopeHierarchySourceDetailsDescriptor -> {
+                // returns no children
+            }
+            is ScopeHierarchyAvailableSourceDescriptor -> {
                 // returns no children
             }
             is ScopeHierarchySinkDescriptor -> {
