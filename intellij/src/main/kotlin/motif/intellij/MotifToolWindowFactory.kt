@@ -41,7 +41,7 @@ import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel
 
-class MotifProjectComponent(val project: Project) : ProjectComponent {
+class MotifToolWindowFactory(val project: Project) : ProjectComponent {
 
     companion object {
         const val TOOL_WINDOW_ID: String = "Motif"
@@ -53,9 +53,10 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val ACTION_MOTIF_USAGE: String = "motif_usage"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
         const val LABEL_GRAPH_INIT: String = "Initializing Motif Graph"
+        const val LAZY_GRAPH_COMPUTE_ENABLED: Boolean = true;
 
-        fun getInstance(project: Project): MotifProjectComponent {
-            return project.getComponent(MotifProjectComponent::class.java)
+        fun getInstance(project: Project): MotifToolWindowFactory {
+            return project.getComponent(MotifToolWindowFactory::class.java)
         }
     }
 
@@ -72,14 +73,19 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     override fun projectOpened() {
         DumbService.getInstance(project).runWhenSmart {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_INIT) {
-                override fun run(indicator: ProgressIndicator) {
-                    ApplicationManager.getApplication().runReadAction {
-                        val graph: ResolvedGraph = graphFactory.compute()
-                        onGraphUpdated(graph)
+            val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
+            toolWindow.title = TOOL_WINDOW_TITLE
+
+            if (!LAZY_GRAPH_COMPUTE_ENABLED) {
+                ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_INIT) {
+                    override fun run(indicator: ProgressIndicator) {
+                        ApplicationManager.getApplication().runReadAction {
+                            val graph: ResolvedGraph = graphFactory.compute()
+                            onGraphUpdated(graph)
+                        }
                     }
-                }
-            })
+                })
+            }
         }
     }
 
@@ -135,11 +141,8 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     private fun onGraphUpdated(graph: ResolvedGraph) {
         ApplicationManager.getApplication().invokeLater {
-            val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
-            if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
-                val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
-                toolWindow.title = TOOL_WINDOW_TITLE
-
+            val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
+            if (scopePanel == null) {
                 scopePanel = MotifScopePanel(project, graph)
                 errorPanel = MotifErrorPanel(project, graph)
                 usagePanel = MotifUsagePanel(project, graph)

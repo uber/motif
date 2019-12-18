@@ -15,35 +15,34 @@
  */
 package motif.intellij.provider
 
-import com.google.common.collect.Iterables
 import com.intellij.codeHighlighting.Pass.UPDATE_ALL
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer.Alignment.LEFT
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.ListPopup
+import com.intellij.openapi.ui.popup.PopupStep
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.pom.Navigatable
-import com.intellij.psi.*
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiIdentifier
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.ConstantFunction
-import motif.ast.IrType
 import motif.ast.intellij.IntelliJClass
-import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
 import motif.intellij.MotifProjectComponent
+import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifChildScopeMethod
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.models.Scope
 import java.awt.event.MouseEvent
-import com.intellij.ui.awt.RelativePoint
-import com.intellij.openapi.ui.popup.PopupStep
-import com.intellij.openapi.ui.popup.util.BaseListPopupStep
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.ui.popup.ListPopup
 
 /*
  * {@LineMarkerProvider} used to display navigation icons in gutter to navigate to parent/children of Motif scopes.
@@ -69,32 +68,31 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
     }
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? {
-        if (graph != null) {
-            if (element is PsiClass && isMotifScopeClass(element)) {
+        val graph: ResolvedGraph = graph ?: return null
+        if (element is PsiClass && isMotifScopeClass(element)) {
+            val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, element)
+            if (scopeEdges?.isNotEmpty() == true) {
                 val identifier: PsiIdentifier = element.nameIdentifier ?: return null
                 return LineMarkerInfo(element, identifier.textRange, AllIcons.Actions.PreviousOccurence, UPDATE_ALL,
                         ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_PARENT_SCOPE),
-                        NavigationScopeHandler(element.project, graph!!), LEFT)
-            } else if (isMotifChildScopeMethod(element)) {
-                return LineMarkerInfo(element, element.textRange, AllIcons.Actions.NextOccurence, UPDATE_ALL,
-                        ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
-                        NavigationScopeHandler(element.project, graph!!), LEFT)
+                        NavigationScopeHandler(graph), LEFT)
             }
+        } else if (isMotifChildScopeMethod(element)) {
+            return LineMarkerInfo(element, element.textRange, AllIcons.Actions.NextOccurence, UPDATE_ALL,
+                    ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
+                    NavigationScopeHandler(graph), LEFT)
         }
         return null
     }
 
-    private class NavigationScopeHandler(val project: Project, val graph: ResolvedGraph) : GutterIconNavigationHandler<PsiElement> {
+    private class NavigationScopeHandler(val graph: ResolvedGraph) : GutterIconNavigationHandler<PsiElement> {
         override fun navigate(event: MouseEvent?, element: PsiElement?) {
             if (element is PsiClass) {
-                val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(element)
-                val type: IrType = IntelliJType(project, scopeType)
-                val scope: Scope? = graph.getScope(type)
-                if (scope == null) {
+                val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, element)
+                if (scopeEdges == null) {
                     Messages.showInfoMessage(MESSAGE_NAVIGATION_NO_SCOPE, MESSAGE_TITLE)
                     return
                 }
-                val scopeEdges: Array<ScopeEdge> = Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java)
                 when (scopeEdges.size) {
                     0 -> Messages.showInfoMessage(MESSAGE_NAVIGATION_PARENT_ROOT, MESSAGE_TITLE)
                     1 -> navigateToParent(scopeEdges[0])

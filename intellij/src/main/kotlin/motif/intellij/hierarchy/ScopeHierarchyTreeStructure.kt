@@ -27,9 +27,15 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.ScopeHierarchyUtils
+import motif.intellij.ScopeHierarchyUtils.Companion.MethodComparator
+import motif.intellij.ScopeHierarchyUtils.Companion.ScopeComparator
+import motif.intellij.ScopeHierarchyUtils.Companion.ScopeEdgeChildComparator
+import motif.intellij.ScopeHierarchyUtils.Companion.ScopeEdgeParentComparator
+import motif.intellij.ScopeHierarchyUtils.Companion.SinkComparator
+import motif.intellij.ScopeHierarchyUtils.Companion.SourceComparator
 import motif.intellij.ScopeHierarchyUtils.Companion.getVisibleSources
 import motif.intellij.hierarchy.descriptor.*
-import motif.models.*
+import motif.models.Dependencies
 
 class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph, descriptor: HierarchyNodeDescriptor)
     : HierarchyTreeStructure(project, descriptor) {
@@ -48,22 +54,22 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
         val descriptors: ArrayList<HierarchyNodeDescriptor> = ArrayList(1)
         when (descriptor) {
             is ScopeHierarchyRootDescriptor -> {
-                graph.roots.forEach { scope ->
+                graph.roots.sortedWith(ScopeComparator).forEach { scope ->
                     descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (scope.clazz as IntelliJClass).psiClass, scope))
                 }
             }
             is ScopeHierarchyScopeAncestorDescriptor -> {
-                graph.getParentEdges(descriptor.scope).forEach { edge ->
+                graph.getParentEdges(descriptor.scope).sortedWith(ScopeEdgeParentComparator).forEach { edge ->
                     descriptors.add(ScopeHierarchyScopeAncestorDescriptor(myProject, graph, descriptor, (edge.parent.clazz as IntelliJClass).psiClass, edge.parent))
                 }
             }
             is ScopeHierarchyScopeDescriptor -> {
-                graph.getChildEdges(descriptor.scope).forEach { edge ->
+                graph.getChildEdges(descriptor.scope).sortedWith(ScopeEdgeChildComparator).forEach { edge ->
                     descriptors.add(ScopeHierarchyScopeDescriptor(myProject, graph, descriptor, (edge.child.clazz as IntelliJClass).psiClass, edge.child))
                 }
             }
             is ScopeHierarchySourcesSectionDescriptor -> {
-                getVisibleSources(graph, descriptor.scope).forEach { source ->
+                getVisibleSources(graph, descriptor.scope).sortedWith(SourceComparator).forEach { source ->
                     descriptors.add(ScopeHierarchySourceDescriptor(myProject, graph, descriptor, source))
                 }
                 if (descriptors.isEmpty()) {
@@ -71,7 +77,7 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                 }
             }
             is ScopeHierarchySinksSectionDescriptor -> {
-                graph.getSinks(descriptor.scope).forEach { sink ->
+                graph.getSinks(descriptor.scope).sortedWith(SinkComparator).forEach { sink ->
                     descriptors.add(ScopeHierarchySinkDescriptor(myProject, graph, descriptor, sink))
                 }
                 if (descriptors.isEmpty()) {
@@ -84,8 +90,8 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
             }
             is ScopeHierarchyDependenciesSectionDescriptor -> {
                 val dependencies: Dependencies? = descriptor.scope.dependencies
-                if (dependencies != null && dependencies.methods.isNotEmpty()) {
-                    dependencies.methods.forEach { method ->
+                if (dependencies != null) {
+                    dependencies.methods.sortedWith(MethodComparator).forEach { method ->
                         descriptors.add(ScopeHierarchyDependencyDescriptor(myProject, graph, descriptor, (method.method as IntelliJMethod).psiMethod, method))
                     }
                 }
@@ -100,12 +106,12 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
                 // returns no children
             }
             is ScopeHierarchySinkDescriptor -> {
-                graph.getProviders(descriptor.sink).forEach { source ->
+                graph.getProviders(descriptor.sink).sortedWith(SourceComparator).forEach { source ->
                     descriptors.add(ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source))
                 }
             }
             is ScopeHierarchySourceDescriptor -> {
-                graph.getConsumers(descriptor.source).forEach { sink ->
+                graph.getConsumers(descriptor.source).sortedWith(SinkComparator).forEach { sink ->
                     descriptors.add(ScopeHierarchySinkDetailsDescriptor(myProject, graph, descriptor, sink))
                 }
             }
@@ -128,14 +134,14 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
             is ScopeHierarchyUsageSourcesSectionDescriptor -> {
                 val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(descriptor.clazz)
                 val type: IrType = IntelliJType(project, elementType)
-                graph.getSources(type).forEach { source ->
+                graph.getSources(type).sortedWith(SourceComparator).forEach { source ->
                     descriptors.add(ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source))
                 }
             }
             is ScopeHierarchyUsageSinksSectionDescriptor -> {
                 val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(descriptor.clazz)
                 val type: IrType = IntelliJType(project, elementType)
-                graph.getSinks(type).forEach { sink ->
+                graph.getSinks(type).sortedWith(SinkComparator).forEach { sink ->
                     descriptors.add(ScopeHierarchySinkDetailsDescriptor(myProject, graph, descriptor, sink))
                 }
             }

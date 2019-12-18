@@ -39,6 +39,6 @@ open class ScopeHierarchyRootErrorDescriptor(
     }
 
     override fun getIcon(element: PsiElement): Icon? {
-        return if (graph.errors.isNotEmpty()) AllIcons.RunConfigurations.TestFailed else AllIcons.RunConfigurations.TestPassed
+        return if (graph.errors.isNotEmpty()) null else AllIcons.RunConfigurations.TestPassed
     }
 }

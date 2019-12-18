@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Sink
 import javax.swing.Icon
 
@@ -31,7 +32,7 @@ open class ScopeHierarchySinkDetailsDescriptor(
     : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Consumed by: " + sink.scope.simpleName + " (" + sink.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Consumed by: " + sink.scope.simpleName + " (" + formatQualifiedName(sink.scope.qualifiedName) + ")", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

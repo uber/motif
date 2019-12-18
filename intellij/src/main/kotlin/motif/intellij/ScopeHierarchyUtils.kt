@@ -15,6 +15,7 @@
  */
 package motif.intellij
 
+import com.google.common.collect.Iterables
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.PsiClassReferenceType
@@ -24,15 +25,50 @@ import motif.ast.IrType
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
-import motif.models.ChildParameterSource
-import motif.models.Scope
-import motif.models.ScopeSource
-import motif.models.Source
+import motif.models.*
 import java.util.*
 
 class ScopeHierarchyUtils {
 
     companion object {
+
+        object ScopeComparator : Comparator<Scope> {
+            override fun compare(o1: Scope, o2: Scope): Int {
+                return o1.simpleName.compareTo(o2.simpleName)
+            }
+        }
+
+        object ScopeEdgeParentComparator : Comparator<ScopeEdge> {
+            override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int {
+                return o1.parent.simpleName.compareTo(o2.parent.simpleName)
+            }
+        }
+
+        object ScopeEdgeChildComparator : Comparator<ScopeEdge> {
+            override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int {
+                return o1.child.simpleName.compareTo(o2.child.simpleName)
+            }
+        }
+
+        object SourceComparator : Comparator<Source> {
+            override fun compare(o1: Source, o2: Source): Int {
+                if (o1.isExposed != o2.isExposed) return o1.isExposed.compareTo(o2.isExposed) * -1
+                return o1.type.simpleName.compareTo(o2.type.simpleName)
+            }
+        }
+
+        object SinkComparator : Comparator<Sink> {
+            override fun compare(o1: Sink, o2: Sink): Int {
+                return o1.type.simpleName.compareTo(o2.type.simpleName)
+            }
+        }
+
+        object MethodComparator : Comparator<Dependencies.Method> {
+            override fun compare(o1: Dependencies.Method, o2: Dependencies.Method): Int {
+                return o1.method.name.compareTo(o2.method.name)
+            }
+        }
+
         fun buildRootElement(project: Project): PsiClass {
             return JavaPsiFacade.getInstance(project).findClass(Object::class.java.name, GlobalSearchScope.allScope(project))!!
         }
@@ -56,6 +92,13 @@ class ScopeHierarchyUtils {
                 }
             }
             return false
+        }
+
+        fun getParentScopes(project: Project, graph: ResolvedGraph, element: PsiClass): Array<ScopeEdge>? {
+            val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(element)
+            val type: IrType = IntelliJType(project, scopeType)
+            val scope: Scope? = graph.getScope(type)
+            return if (scope != null) Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java) else null
         }
 
         /*
@@ -95,6 +138,11 @@ class ScopeHierarchyUtils {
                 1 -> "1 object"
                 else -> "$count objects"
             }
+        }
+
+        fun formatQualifiedName(qualifiedName: String): String {
+            val index: Int = qualifiedName.lastIndexOf(".")
+            return if (index > 0) qualifiedName.substring(0, index) else qualifiedName
         }
 
         fun formatMultilineText(text: String): String {

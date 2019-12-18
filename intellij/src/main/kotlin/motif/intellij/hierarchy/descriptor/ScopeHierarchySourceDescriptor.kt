@@ -24,6 +24,7 @@ import com.intellij.psi.PsiElement
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.*
 import javax.swing.Icon
 
@@ -58,7 +59,7 @@ open class ScopeHierarchySourceDescriptor(
             text.ending.addText("@Expose ")
         }
         text.ending.addText(source.type.simpleName)
-        text.ending.addText(" (" + source.type.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(" (" + formatQualifiedName(source.type.qualifiedName) + ")", getPackageNameAttributes())
     }
 
     override fun getLegend(): String? {
