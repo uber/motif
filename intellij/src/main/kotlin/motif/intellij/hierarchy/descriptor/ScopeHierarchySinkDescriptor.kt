@@ -24,10 +24,7 @@ import com.intellij.psi.PsiElement
 import motif.ast.IrMethod
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
-import motif.models.AccessMethodSink
-import motif.models.FactoryMethodSink
-import motif.models.FactoryMethodSource
-import motif.models.Sink
+import motif.models.*
 import javax.swing.Icon
 
 open class ScopeHierarchySinkDescriptor(
@@ -41,10 +38,21 @@ open class ScopeHierarchySinkDescriptor(
         fun getElementFromSink(sink: Sink): PsiElement {
             return when (sink) {
                 is FactoryMethodSink -> {
-                    (sink.parameter.method as IntelliJMethod).psiMethod
+                    (sink.parameter.factoryMethod.method as IntelliJMethod).psiMethod
                 }
                 is AccessMethodSink -> {
                     (sink.accessMethod.method as IntelliJMethod).psiMethod
+                }
+            }
+        }
+
+        fun getConsumingTypeFromSink(sink: Sink): Type {
+            return when (sink) {
+                is FactoryMethodSink -> {
+                    sink.parameter.factoryMethod.returnType.type
+                }
+                is AccessMethodSink -> {
+                    sink.type
                 }
             }
         }
@@ -52,7 +60,8 @@ open class ScopeHierarchySinkDescriptor(
 
     override fun updateText(text: CompositeAppearance) {
         text.ending.addText(sink.type.simpleName)
-        text.ending.addText(" (" + sink.type.qualifiedName + ")", getPackageNameAttributes())
+        val consumingType = getConsumingTypeFromSink(sink)
+        text.ending.addText(" → ${consumingType.simpleName}", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

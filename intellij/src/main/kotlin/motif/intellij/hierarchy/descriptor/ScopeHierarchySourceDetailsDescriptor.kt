@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Source
 import javax.swing.Icon
 
@@ -31,7 +32,7 @@ open class ScopeHierarchySourceDetailsDescriptor(
     : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
     override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Provided by: " + source.scope.simpleName + " (" + source.scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText("Provided by: " + source.scope.simpleName + " (" + formatQualifiedName(source.scope.qualifiedName) + ")", getPackageNameAttributes())
     }
 
     override fun getIcon(element: PsiElement): Icon? {

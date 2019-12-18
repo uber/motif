@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Scope
 import java.awt.Font.BOLD
 
@@ -34,7 +35,7 @@ open class ScopeHierarchySourcesAndSinksSectionDescriptor(
 
     override fun updateText(text: CompositeAppearance) {
         text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
-        text.ending.addText(" (" + scope.qualifiedName + ")", getPackageNameAttributes())
+        text.ending.addText(" (" + formatQualifiedName(scope.qualifiedName) + ")", getPackageNameAttributes())
     }
 }
 

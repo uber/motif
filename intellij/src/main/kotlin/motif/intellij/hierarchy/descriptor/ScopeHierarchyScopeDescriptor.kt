@@ -23,6 +23,7 @@ import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.ErrorScope
 import motif.models.Scope
 import javax.swing.Icon
@@ -41,7 +42,8 @@ open class ScopeHierarchyScopeDescriptor(
     override fun updateText(text: CompositeAppearance) {
         val textAttr: TextAttributes = getDefaultTextAttributes(scope is ErrorScope)
         text.ending.addText(clazz.name, textAttr)
-        text.ending.addText(" (" + clazz.qualifiedName + ")", getPackageNameAttributes())
+        val qualifiedName: String? = clazz.qualifiedName;
+        qualifiedName?.let { text.ending.addText(" (" + formatQualifiedName(it) + ")", getPackageNameAttributes()) }
     }
 
     override fun getIcon(element: PsiElement): Icon? {
