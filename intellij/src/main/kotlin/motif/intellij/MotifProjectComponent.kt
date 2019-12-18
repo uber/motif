@@ -16,6 +16,7 @@
 package motif.intellij
 
 import com.intellij.codeInsight.daemon.LineMarkerProviders
+import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
@@ -26,6 +27,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
@@ -33,6 +35,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
+import com.intellij.util.IconUtil
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.actions.MotifUsageAction
@@ -138,6 +141,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
             if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
                 val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
+                toolWindow.icon = IconLoader.getIcon("/icons/icon.svg")
                 toolWindow.title = TOOL_WINDOW_TITLE
 
                 scopePanel = MotifScopePanel(project, graph)
