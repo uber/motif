@@ -30,18 +30,26 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.util.ConstantFunction
+import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
+import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import java.awt.event.MouseEvent
 
 /*
  * {@LineMarkerProvider} used to display icon in gutter to navigate to motif scope ancestors hierarchy.
  */
-class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
+class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectComponent.Listener {
 
     companion object {
         const val LABEL_ANCESTORS_SCOPE: String = "View Scope Ancestors."
+    }
+
+    private var graph: ResolvedGraph? = null
+
+    override fun onGraphUpdated(graph: ResolvedGraph) {
+        this.graph = graph
     }
 
     override fun collectSlowLineMarkers(psiElements: List<PsiElement>,
@@ -49,10 +57,14 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider {
     }
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? {
+        val graph: ResolvedGraph = graph ?: return null
         if (element !is PsiClass) {
             return null
         }
         if (!isMotifScopeClass(element)) {
+            return null
+        }
+        if (getParentScopes(element.project, graph, element)?.isNotEmpty() != true) {
             return null
         }
         val identifier: PsiIdentifier = element.nameIdentifier ?: return null
