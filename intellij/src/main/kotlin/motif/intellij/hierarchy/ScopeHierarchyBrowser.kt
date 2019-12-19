@@ -15,15 +15,12 @@
  */
 package motif.intellij.hierarchy
 
-import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
@@ -66,6 +63,13 @@ class ScopeHierarchyBrowser(
         private val DATA_KEY = DataKey.create<ScopeHierarchyBrowser>(ScopeHierarchyBrowser::class.java.name)
     }
 
+    enum class Status {
+        UNINITIALIZED,
+        INITIALIZING,
+        INITIALIZED,
+    }
+
+    private var status: Status = Status.UNINITIALIZED
     private var graph: ResolvedGraph = initialGraph
 
     fun setSelectedScope(element: PsiElement) {
@@ -121,7 +125,7 @@ class ScopeHierarchyBrowser(
             return ScopeHierarchyTreeStructure(
                     myProject,
                     graph,
-                    ScopeHierarchyRootDescriptor(myProject, graph, psiElement))
+                    ScopeHierarchyRootDescriptor(myProject, graph, psiElement, status))
         } else if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
             // Display the scope ancestors hierarchy
             val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(psiElement)
@@ -153,6 +157,9 @@ class ScopeHierarchyBrowser(
     }
 
     override fun doRefresh(currentBuilderOnly: Boolean) {
+        status = Status.INITIALIZING
+        refresh()
+
         MotifProjectComponent.getInstance(project).refreshGraph()
     }
 
@@ -163,30 +170,10 @@ class ScopeHierarchyBrowser(
         super.doRefresh(true)
     }
 
-    /*
-     * Reset currently selected scope and display entire scope hierarchy.
-     */
-    fun reset() {
-        hierarchyBase = rootElement
-        refresh()
-    }
-
     override fun onGraphUpdated(graph: ResolvedGraph) {
+        this.status = Status.INITIALIZED
         this.graph = graph
         refresh()
-    }
-
-    inner class ResetAction : AnAction(AllIcons.General.Reset) {
-
-        override fun actionPerformed(e: AnActionEvent) {
-            reset()
-        }
-
-        override fun update(event: AnActionEvent) {
-            super.update(event)
-            val element: PsiClass? = if (hierarchyBase is PsiClass) hierarchyBase as PsiClass else null
-            event.presentation.isEnabled = element != null && isMotifScopeClass(element)
-        }
     }
 
     /*

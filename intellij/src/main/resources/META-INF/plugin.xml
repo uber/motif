@@ -34,7 +34,7 @@
             <keyboard-shortcut first-keystroke="control shift U" keymap="$default"/>
         </action>
 
-        <group id="MotifEditor" popup="true" text="Motif">
+        <group id="MotifEditor" icon="/icons/icon.svg" popup="true" text="Motif">
             <reference ref="motif_usage"/>
             <add-to-group anchor="first" group-id="EditorPopupMenu"/>
         </group>
@@ -43,7 +43,7 @@
             <add-to-group anchor="first" group-id="MotifEditor"/>
         </group>
 
-        <group id="MotifProject" popup="true" text="Motif">
+        <group id="MotifProject" icon="/icons/icon.svg" popup="true" text="Motif">
             <reference ref="motif_graph"/>
             <add-to-group anchor="first" group-id="ProjectViewPopupMenu"/>
             <add-to-group anchor="first" group-id="StructureViewPopupMenu"/>

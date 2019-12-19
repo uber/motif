@@ -23,13 +23,21 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
+import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 
 /*
  * {@AnAction} used to trigger displaying a particular scope ancestors hierarchy.
  */
-class MotifGraphAction : AnAction() {
+class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
+
+    private var graph: ResolvedGraph? = null
+
+    override fun onGraphUpdated(graph: ResolvedGraph) {
+        this.graph = graph
+    }
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
@@ -44,8 +52,10 @@ class MotifGraphAction : AnAction() {
     }
 
     override fun update(e: AnActionEvent) {
+        val project = e.project ?: return
+        val graph = this.graph ?: return
         val element: PsiElement? = e.getPsiElement()
-        e.presentation.isEnabled = element is PsiClass && isMotifScopeClass(element)
+        e.presentation.isEnabled = element is PsiClass && isMotifScopeClass(element) && (getParentScopes(project, graph, element)?.isNotEmpty() == true)
     }
 
     private fun AnActionEvent.getPsiElement(): PsiElement? {

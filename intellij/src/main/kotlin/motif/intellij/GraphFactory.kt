@@ -15,9 +15,6 @@
  */
 package motif.intellij
 
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
@@ -33,8 +30,6 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.toUElement
-import org.jetbrains.uast.toUElementOfType
-import kotlin.system.measureTimeMillis
 
 class GraphFactory(private val project: Project) {
 
@@ -42,8 +37,8 @@ class GraphFactory(private val project: Project) {
     private val psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
 
     fun compute(): ResolvedGraph {
-        val scopeClasses = { getScopeClasses() }.runAndLog("Found Scope classes.")
-        return { ResolvedGraph.create(scopeClasses) }.runAndLog("Processed graph.")
+        val scopeClasses: List<IrClass> = getScopeClasses()
+        return ResolvedGraph.create(scopeClasses)
     }
 
     private fun getScopeClasses(): List<IrClass> {
@@ -85,17 +80,5 @@ class GraphFactory(private val project: Project) {
 
     private fun isScopeClass(psiClass: PsiClass): Boolean {
         return psiClass.annotations.find { it.qualifiedName == Scope::class.qualifiedName} != null
-    }
-
-    private fun <T : Any> (() -> T).runAndLog(message: String): T {
-        lateinit var result: T
-        val duration = measureTimeMillis { result = this() }
-        log("$message (${duration}ms)")
-        return result
-    }
-
-    private fun log(message: String) {
-        Notifications.Bus.notify(
-                Notification("Motif", "Motif Graph", message, NotificationType.INFORMATION))
     }
 }

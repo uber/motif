@@ -37,9 +37,6 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.IconUtil
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.actions.MotifUsageAction
-import motif.intellij.provider.ScopeNavigationLineMarkerProvider
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel
@@ -53,9 +50,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val TAB_NAME_SCOPES: String = "All Scopes"
         const val TAB_NAME_USAGE: String = "Usage"
         const val TAB_NAME_ANCESTOR: String = "Ancestors"
-        const val ACTION_MOTIF_USAGE: String = "motif_usage"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
-        const val LABEL_GRAPH_INIT: String = "Initializing Motif Graph"
+
+        val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
 
         fun getInstance(project: Project): MotifProjectComponent {
             return project.getComponent(MotifProjectComponent::class.java)
@@ -75,14 +72,11 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     override fun projectOpened() {
         DumbService.getInstance(project).runWhenSmart {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_INIT) {
-                override fun run(indicator: ProgressIndicator) {
-                    ApplicationManager.getApplication().runReadAction {
-                        val graph: ResolvedGraph = graphFactory.compute()
-                        onGraphUpdated(graph)
-                    }
-                }
-            })
+            ApplicationManager.getApplication().runReadAction {
+                // Initialize plugin with empty graph to avoid IDE startup slowdown
+                val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
+                onGraphUpdated(emptyGraph)
+            }
         }
     }
 
@@ -101,15 +95,6 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 }
             }
         })
-    }
-
-    fun onSelectedScope(element: PsiElement) {
-        if (element !is PsiClass || !isMotifScopeClass(element)) {
-            return
-        }
-        scopePanel?.setSelectedScope(element)
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        scopeContent?.let { toolWindow.contentManager.setSelectedContent(it) }
     }
 
     fun onSelectedClass(element: PsiElement) {
@@ -165,16 +150,18 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             val language: Language? = Language.findLanguageByID("JAVA")
             language?.let {
                 for (lineMarkerProvider in LineMarkerProviders.INSTANCE.allForLanguage(it)) {
-                    if (lineMarkerProvider is ScopeNavigationLineMarkerProvider) {
+                    if (lineMarkerProvider is Listener) {
                         lineMarkerProvider.onGraphUpdated(graph)
                     }
                 }
             }
 
             // Propagate changes to actions
-            val usageAction: AnAction = ActionManager.getInstance().getAction(ACTION_MOTIF_USAGE)
-            if (usageAction is MotifUsageAction) {
-                usageAction.onGraphUpdated(graph)
+            MOTIF_ACTION_IDS.forEach {
+                val usageAction: AnAction = ActionManager.getInstance().getAction(it)
+                if (usageAction is Listener) {
+                    usageAction.onGraphUpdated(graph)
+                }
             }
         }
     }
