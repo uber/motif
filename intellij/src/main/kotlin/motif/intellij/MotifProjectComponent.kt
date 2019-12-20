@@ -17,6 +17,7 @@ package motif.intellij
 
 import com.intellij.codeInsight.daemon.LineMarkerProviders
 import com.intellij.icons.AllIcons
+import com.intellij.ide.plugins.PluginManager
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
@@ -51,6 +52,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val TAB_NAME_USAGE: String = "Usage"
         const val TAB_NAME_ANCESTOR: String = "Ancestors"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
+        const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
 
         val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
 
@@ -89,9 +91,14 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_REFRESH) {
             override fun run(indicator: ProgressIndicator) {
                 ApplicationManager.getApplication().runReadAction {
-                    val updateGraph: ResolvedGraph = graphFactory.compute()
-                    onGraphUpdated(updateGraph)
-                    isRefreshing = false
+                    try {
+                        val updateGraph: ResolvedGraph = graphFactory.compute()
+                        onGraphUpdated(updateGraph)
+                    } catch (e: Exception) {
+                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, e);
+                    } finally {
+                        isRefreshing = false
+                    }
                 }
             }
         })
