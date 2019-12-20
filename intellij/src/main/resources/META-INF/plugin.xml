@@ -1,17 +1,24 @@
 <idea-plugin>
     <id>com.uber.motif</id>
     <name>Motif Plugin</name>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
     <vendor email="leland@uber.com" url="https://www.uber.com/">Uber</vendor>
 
     <description><![CDATA[
-      Motif plugin.<br>
+      Motif plugin for IntelliJ IDE.<br><br>
+      Provides visualization UI which allows you to better understand your Motif object graph.<br>
+      <ul>
+        <li><b>All Scopes</b> panel represents your entire Motif scopes hierarchy, and let you init/refresh it once code changes are made. Selecting a scope will display additional properties for that scope, i.e the dependencies it consumes and provides.</li>
+        <li><b>Error</b> panel lists Motif-related errors. Selecting each error takes you to the corresponding place in the code where error triggered.</li>
+        <li><b>Usage</b> panel (accessible via Motif editor contextual menu) represents the usage of a given object, i.e who is providing it and who is consuming it.</li>
+        <li><b>Ancestor</b> panel (accessible via Motif editor contextual menu and gutter icon) represents the chain of parent scope(s) for a given motif scope. It can be useful to glance at which dependencies are made available by the scope parent(s).</li>
+      </ul>
     ]]></description>
 
     <idea-version since-build="163"/>
 
     <change-notes><![CDATA[
-      Release 0.0.1: Initial release.<br>
+      Release 0.0.3: Update plugin description.<br>
     ]]>
     </change-notes>
 
