@@ -15,13 +15,17 @@
  */
 package motif.intellij.hierarchy
 
+import com.intellij.icons.AllIcons
+import com.intellij.ide.IdeBundle
 import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataKey
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -67,6 +71,7 @@ class ScopeHierarchyBrowser(
         UNINITIALIZED,
         INITIALIZING,
         INITIALIZED,
+        REFRESHING,
     }
 
     private var status: Status = Status.UNINITIALIZED
@@ -75,6 +80,10 @@ class ScopeHierarchyBrowser(
     fun setSelectedScope(element: PsiElement) {
         hierarchyBase = element
         super.doRefresh(true)
+    }
+
+    fun isUpdating(): Boolean {
+        return status == Status.INITIALIZING || status == Status.REFRESHING
     }
 
     override fun isApplicableElement(element: PsiElement): Boolean {
@@ -119,6 +128,13 @@ class ScopeHierarchyBrowser(
         return MessageFormat.format(typeName, ClassPresentationUtil.getNameForClass(element, false))
     }
 
+    override fun appendActions(actionGroup: DefaultActionGroup, helpID: String?) {
+        super.appendActions(actionGroup, helpID)
+
+        // replace original refresh action with custom one, so that we can gray it out
+        actionGroup.replaceAction(actionGroup.getChildren(null).first(), RefreshAction())
+    }
+
     override fun createHierarchyTreeStructure(typeName: String, psiElement: PsiElement): HierarchyTreeStructure? {
         if (psiElement == rootElement) {
             // Display entire graph hierarchy
@@ -157,8 +173,15 @@ class ScopeHierarchyBrowser(
     }
 
     override fun doRefresh(currentBuilderOnly: Boolean) {
-        status = Status.INITIALIZING
-        refresh()
+        when (status) {
+            Status.INITIALIZED -> {
+                status = Status.REFRESHING
+            }
+            Status.UNINITIALIZED -> {
+                status = Status.INITIALIZING
+                refresh()
+            }
+        }
 
         MotifProjectComponent.getInstance(project).refreshGraph()
     }
@@ -174,6 +197,18 @@ class ScopeHierarchyBrowser(
         this.status = Status.INITIALIZED
         this.graph = graph
         refresh()
+    }
+
+    private inner class RefreshAction internal constructor() : com.intellij.ide.actions.RefreshAction(IdeBundle.message("action.refresh"), IdeBundle.message("action.refresh"), AllIcons.Actions.Refresh) {
+
+        override fun actionPerformed(e: AnActionEvent) {
+            doRefresh(false)
+        }
+
+        override fun update(event: AnActionEvent) {
+            val presentation = event.presentation
+            presentation.isEnabled = hierarchyBase != null && isApplicableElement(hierarchyBase) && hierarchyBase.isValid && !isUpdating()
+        }
     }
 
     /*
