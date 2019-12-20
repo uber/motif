@@ -49,7 +49,9 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         const val TAB_NAME_ERRORS: String = "Errors"
         const val TAB_NAME_SCOPES: String = "All Scopes"
         const val TAB_NAME_USAGE: String = "Usage"
+        const val TAB_NAME_USAGE_OF: String = "Usage of %s"
         const val TAB_NAME_ANCESTOR: String = "Ancestors"
+        const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
         const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
 
         val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
@@ -106,6 +108,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             usageContent = createUsageContent(toolWindow)
         }
         usagePanel?.setSelectedClass(element)
+        usageContent?.displayName = TAB_NAME_USAGE_OF.format(element.name)
         usageContent?.let { toolWindow.contentManager.setSelectedContent(it) }
     }
 
@@ -118,6 +121,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             ancestorContent = createAncestorContent(toolWindow)
         }
         ancestorPanel?.setSelectedScope(element)
+        ancestorContent?.displayName = TAB_NAME_ANCESTOR_OF.format(element.name)
         ancestorContent?.let { toolWindow.contentManager.setSelectedContent(it) }
     }
 
