@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.uber.motif</id>
     <name>Motif Plugin</name>
-    <version>0.0.3</version>
-    <vendor email="leland@uber.com" url="https://www.uber.com/">Uber</vendor>
+    <version>0.0.4</version>
+    <vendor email="jetbrains-plugins@uber.com" url="https://www.uber.com/">Uber</vendor>
 
     <description><![CDATA[
       Motif plugin for IntelliJ IDE.<br><br>
@@ -18,7 +18,7 @@
     <idea-version since-build="163"/>
 
     <change-notes><![CDATA[
-      Release 0.0.3: Update plugin description.<br>
+      Release 0.0.4: Update plugin email address.<br>
     ]]>
     </change-notes>
 

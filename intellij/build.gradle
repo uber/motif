@@ -11,7 +11,7 @@ intellij {
 }
 
 group 'com.uber.motif'
-version '0.0.3' // Plugin version
+version '0.0.4' // Plugin version
 
 dependencies {
     compile project(':lib')
