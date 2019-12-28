@@ -40,3 +40,5 @@ class InvalidQualifier(val annotated: IrAnnotated, val annotation: IrAnnotation)
 class DuplicatedChildParameterSource(val scope: Scope, val childScopeMethod: ChildMethod, val duplicatedParameters: List<ChildMethod.Parameter>) : ParsingError()
 class DuplicatedDependenciesMethod(val scope: Scope, val duplicatedMethods: List<Dependencies.Method>) : ParsingError()
 class ScopeExtendsScope(val scope: Scope) : ParsingError()
+class ScopeWithGenericTypeParameters(val scopeClass: IrClass) :
+        ParsingError()

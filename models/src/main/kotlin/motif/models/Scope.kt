@@ -54,6 +54,10 @@ class ValidScope internal constructor(clazz: IrClass) : Scope(clazz) {
     init {
         if (clazz.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(clazz)
         detectScopeSuperinterface(this)
+
+        if (clazz.typeArguments.isNotEmpty()) {
+            throw ScopeWithGenericTypeParameters(clazz)
+        }
     }
 
     override val objects: Objects? = Objects.fromScope(this)
