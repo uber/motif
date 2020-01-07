@@ -53,6 +53,7 @@ class ValidScope internal constructor(clazz: IrClass) : Scope(clazz) {
 
     init {
         if (clazz.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(clazz)
+        detectScopeSuperinterface(this)
     }
 
     override val objects: Objects? = Objects.fromScope(this)
@@ -66,6 +67,20 @@ class ValidScope internal constructor(clazz: IrClass) : Scope(clazz) {
     override val factoryMethods: List<FactoryMethod> = objects?.factoryMethods ?: emptyList()
 
     override val dependencies: Dependencies? = Dependencies.fromScope(this)
+
+    companion object {
+
+        private fun detectScopeSuperinterface(scope: Scope, clazz: IrClass = scope.clazz) {
+            clazz.supertypes.forEach { superType ->
+                superType.resolveClass()?.let { superClass ->
+                    if (superClass.hasAnnotation(motif.Scope::class)) {
+                        throw ScopeExtendsScope(scope)
+                    }
+                    detectScopeSuperinterface(scope, superClass)
+                }
+            }
+        }
+    }
 }
 
 private class ScopeFactory(

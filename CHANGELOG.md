@@ -1,5 +1,7 @@
 # 0.3.2-SNAPSHOT
 
+* Throw a compiler error when a Scope extends another Scope
+
 # 0.3.1
 
 * No changes
