@@ -132,7 +132,7 @@ internal class State(
         val alreadySatisfied = visibleSources.isNotEmpty()
         val exposeConditionMet = !exposeNeeded.contains(sink) || source.isExposed
 
-        if (!alreadySatisfied && !exposeConditionMet) {
+        if (unsatisfied.contains(sink) && !exposeConditionMet) {
             errors.add(UnexposedSourceError(source, sink))
             return
         }
