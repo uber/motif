@@ -21,6 +21,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer.Alignment.LEFT
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
@@ -42,6 +43,8 @@ import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifChildScopeMethod
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
 import java.awt.event.MouseEvent
 
 /*
@@ -75,17 +78,17 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
                 val identifier: PsiIdentifier = element.nameIdentifier ?: return null
                 return LineMarkerInfo(element, identifier.textRange, AllIcons.Actions.PreviousOccurence, UPDATE_ALL,
                         ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_PARENT_SCOPE),
-                        NavigationScopeHandler(graph), LEFT)
+                        NavigationScopeHandler(element.project, graph), LEFT)
             }
         } else if (isMotifChildScopeMethod(element)) {
             return LineMarkerInfo(element, element.textRange, AllIcons.Actions.NextOccurence, UPDATE_ALL,
                     ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
-                    NavigationScopeHandler(graph), LEFT)
+                    NavigationScopeHandler(element.project, graph), LEFT)
         }
         return null
     }
 
-    private class NavigationScopeHandler(val graph: ResolvedGraph) : GutterIconNavigationHandler<PsiElement> {
+    private class NavigationScopeHandler(val project: Project, val graph: ResolvedGraph) : GutterIconNavigationHandler<PsiElement> {
         override fun navigate(event: MouseEvent?, element: PsiElement?) {
             if (element is PsiClass) {
                 val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, element)
@@ -123,6 +126,7 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
                     }
                 }
             }
+            AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.NAVIGATION_GUTTER_CLICK)
         }
 
         private fun navigateToParent(scopeEdge: ScopeEdge) {

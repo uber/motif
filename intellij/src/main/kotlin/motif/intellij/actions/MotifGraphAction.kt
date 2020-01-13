@@ -27,6 +27,8 @@ import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger displaying a particular scope ancestors hierarchy.
@@ -49,6 +51,8 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
         toolWindow.activate {
             MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)
         }
+
+        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.ANCESTOR_MENU_CLICK)
     }
 
     override fun update(e: AnActionEvent) {

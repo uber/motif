@@ -35,6 +35,8 @@ import motif.intellij.MotifProjectComponent
 import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
 import java.awt.event.MouseEvent
 
 /*
@@ -87,6 +89,7 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectCompone
                     }
                 }
             }
+            AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.ANCESTOR_GUTTER_CLICK)
         }
     }
 }
