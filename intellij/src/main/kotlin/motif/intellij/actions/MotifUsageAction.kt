@@ -27,6 +27,8 @@ import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger navigation to a particular scope in the scope hierarchy window.
@@ -49,6 +51,8 @@ class MotifUsageAction : AnAction(), MotifProjectComponent.Listener {
         toolWindow.activate {
             MotifProjectComponent.getInstance(project).onSelectedClass(element)
         }
+
+        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.USAGE_MENU_CLICK)
     }
 
     override fun update(e: AnActionEvent) {

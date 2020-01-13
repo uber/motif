@@ -6,12 +6,12 @@ plugins {
 intellij {
     version 'IC-2019.2'
     plugins = [ 'java', 'Kotlin' ]
-    pluginName 'MyPlugin'
+    pluginName 'Motif Plugin'
     updateSinceUntilBuild = false
 }
 
 group 'com.uber.motif'
-version '0.0.4' // Plugin version
+version '0.0.5' // Plugin version
 
 dependencies {
     compile project(':lib')

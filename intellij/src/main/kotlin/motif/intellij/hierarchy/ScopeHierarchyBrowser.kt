@@ -40,6 +40,8 @@ import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyRootDescriptor
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyScopeAncestorDescriptor
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyScopeDescriptor
@@ -184,6 +186,9 @@ class ScopeHierarchyBrowser(
         }
 
         MotifProjectComponent.getInstance(project).refreshGraph()
+
+        val action: String = if (status == Status.INITIALIZING) MotifAnalyticsActions.GRAPH_INIT else MotifAnalyticsActions.GRAPH_UPDATE
+        AnalyticsProjectComponent.getInstance(project).logEvent(action)
     }
 
     /*

@@ -16,13 +16,13 @@
 package motif.intellij
 
 import com.intellij.codeInsight.daemon.LineMarkerProviders
-import com.intellij.icons.AllIcons
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.extensions.ProjectExtensionPointName
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -36,8 +36,10 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
-import com.intellij.util.IconUtil
 import motif.core.ResolvedGraph
+import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.MotifAnalyticsActions
+import motif.intellij.analytics.MotifAnalyticsLogger
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel
@@ -46,17 +48,21 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     companion object {
         const val TOOL_WINDOW_ID: String = "Motif"
-        const val TOOL_WINDOW_TITLE: String = "Scopes"
-        const val TAB_NAME_ERRORS: String = "Errors"
-        const val TAB_NAME_SCOPES: String = "All Scopes"
-        const val TAB_NAME_USAGE: String = "Usage"
-        const val TAB_NAME_USAGE_OF: String = "Usage of %s"
-        const val TAB_NAME_ANCESTOR: String = "Ancestors"
-        const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
-        const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
-        const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
 
-        val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
+        private const val TOOL_WINDOW_TITLE: String = "Scopes"
+        private const val TAB_NAME_ERRORS: String = "Errors"
+        private const val TAB_NAME_SCOPES: String = "All Scopes"
+        private const val TAB_NAME_USAGE: String = "Usage"
+        private const val TAB_NAME_USAGE_OF: String = "Usage of %s"
+        private const val TAB_NAME_ANCESTOR: String = "Ancestors"
+        private const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
+        private const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
+        private const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
+        private val LOGGER_EXTENSION_POINT_NAME : ProjectExtensionPointName<MotifAnalyticsLogger> =
+                ProjectExtensionPointName("com.uber.motif.motifAnalyticsLogger")
+
+
+        private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
 
         fun getInstance(project: Project): MotifProjectComponent {
             return project.getComponent(MotifProjectComponent::class.java)
@@ -80,6 +86,8 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 // Initialize plugin with empty graph to avoid IDE startup slowdown
                 val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
                 onGraphUpdated(emptyGraph)
+
+                AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.PROJECT_OPENED)
             }
         }
     }
