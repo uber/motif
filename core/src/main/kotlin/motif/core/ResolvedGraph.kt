@@ -22,19 +22,9 @@ import motif.models.*
 /**
  * Full representation of the Scope and dependency graph.
  */
-interface ResolvedGraph {
-
-    val roots: List<Scope>
-
-    val scopes: List<Scope>
+interface ResolvedGraph : ScopeDescriptor {
 
     val errors: List<MotifError>
-
-    fun getScope(scopeType: IrType): Scope?
-
-    fun getChildEdges(scope: Scope): Iterable<ScopeEdge>
-
-    fun getParentEdges(scope: Scope): Iterable<ScopeEdge>
 
     fun getChildUnsatisfied(scopeEdge: ScopeEdge): Iterable<Sink>
 
@@ -144,21 +134,11 @@ private class ValidResolvedGraph(
         private val scopeGraph: ScopeGraph,
         private val scopeStates: Map<Scope, State>,
         private val childStates: Map<ScopeEdge, State>,
-        private val graphState: State) : ResolvedGraph {
+        private val graphState: State) : ResolvedGraph, ScopeDescriptor by scopeGraph {
 
     private val scopeSinks = mutableMapOf<Scope, Set<Sink>>()
 
-    override val roots = scopeGraph.roots
-
-    override val scopes = scopeGraph.scopes
-
     override val errors = scopeGraph.parsingErrors + graphState.errors
-
-    override fun getScope(scopeType: IrType) = scopeGraph.getScope(scopeType)
-
-    override fun getChildEdges(scope: Scope) = scopeGraph.getChildEdges(scope)
-
-    override fun getParentEdges(scope: Scope) = scopeGraph.getParentEdges(scope)
 
     override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = childStates.getValue(scopeEdge).unsatisfied
 
