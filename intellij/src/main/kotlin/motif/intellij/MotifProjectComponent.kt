@@ -58,9 +58,6 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         private const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
         private const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
         private const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
-        private val LOGGER_EXTENSION_POINT_NAME : ProjectExtensionPointName<MotifAnalyticsLogger> =
-                ProjectExtensionPointName("com.uber.motif.motifAnalyticsLogger")
-
 
         private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
 
@@ -102,10 +99,14 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             override fun run(indicator: ProgressIndicator) {
                 ApplicationManager.getApplication().runReadAction {
                     try {
-                        val updateGraph: ResolvedGraph = graphFactory.compute()
-                        onGraphUpdated(updateGraph)
+                        val updatedGraph: ResolvedGraph = graphFactory.compute()
+                        onGraphUpdated(updatedGraph)
+
+                        val eventName: String = if (updatedGraph.errors.isNotEmpty()) MotifAnalyticsActions.GRAPH_UPDATE_ERROR else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
+                        AnalyticsProjectComponent.getInstance(project).logEvent(eventName)
                     } catch (e: Exception) {
-                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, e);
+                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, e)
+                        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
                     } finally {
                         isRefreshing = false
                     }
