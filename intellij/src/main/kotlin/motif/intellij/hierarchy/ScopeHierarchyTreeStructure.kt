@@ -117,7 +117,7 @@ class ScopeHierarchyTreeStructure(val project: Project, val graph: ResolvedGraph
             }
             is ScopeHierarchyRootErrorDescriptor -> {
                 graph.errors.forEach { error ->
-                    val errorMessage: ErrorMessage = ErrorMessage.get(graph, error)
+                    val errorMessage: ErrorMessage = ErrorMessage.get(error)
                     descriptors.add(ScopeHierarchyErrorDescriptor(myProject, graph, descriptor, error, errorMessage))
                 }
             }
