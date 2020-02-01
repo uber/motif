@@ -29,7 +29,7 @@ internal interface ErrorHandler {
 
     companion object {
 
-        fun get(graph: ResolvedGraph, error: MotifError): ErrorHandler {
+        fun get(error: MotifError): ErrorHandler {
             return when (error) {
                 is ParsingError -> when (error) {
                     is ScopeMustBeAnInterface -> ScopeMustBeAnInterfaceHandler(error)

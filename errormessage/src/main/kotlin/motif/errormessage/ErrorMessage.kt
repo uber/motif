@@ -39,14 +39,14 @@ class ErrorMessage(val name: String, val text: String) {
         fun toString(graph: ResolvedGraph): String {
             val content: String = graph.errors.joinToString(
                     "\n------------------------------------\n\n") { error ->
-                val message = ErrorMessage.get(graph, error)
+                val message = get(error)
                 "[${message.name}]\n\n${message.text}"
             }
             return "$header$content$footer"
         }
 
-        fun get(graph: ResolvedGraph, error: MotifError): ErrorMessage {
-            val handler = ErrorHandler.get(graph, error)
+        fun get(error: MotifError): ErrorMessage {
+            val handler = ErrorHandler.get(error)
             val sb = StringBuilder()
             handler.apply {
                 sb.handle()
