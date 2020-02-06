@@ -73,12 +73,14 @@ class ScopePropertyHierarchyBrowser(
 
     fun setSelectedScope(element: PsiElement) {
         hierarchyBase = element
-        doRefresh(true)
 
-        // Expand tree to show items under provides/consumes nodes
-        if (hierarchyType == PropertyHierarchyType.CONSUME_AND_PROVIDE) {
-            ApplicationManager.getApplication().invokeLater {
-                TreeUtil.expand(currentTree, 2)
+        ApplicationManager.getApplication().invokeLater {
+            doRefresh(true)
+            // Expand tree to show items under provides/consumes nodes
+            if (hierarchyType == PropertyHierarchyType.CONSUME_AND_PROVIDE) {
+                ApplicationManager.getApplication().invokeLater {
+                    TreeUtil.expand(currentTree, 2)
+                }
             }
         }
     }
