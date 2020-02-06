@@ -15,7 +15,6 @@
  */
 package motif.intellij.hierarchy
 
-import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
@@ -47,11 +46,11 @@ import javax.swing.tree.DefaultMutableTreeNode
  * UI component used to render scope properties.
  */
 class ErrorHierarchyBrowser(
-        val project: Project,
+        project: Project,
         initialGraph: ResolvedGraph,
         private val rootElement: PsiElement,
         private val selectionListener: Listener?)
-    : HierarchyBrowserBaseEx(project, rootElement), MotifProjectComponent.Listener {
+    : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
 
     private var graph: ResolvedGraph = initialGraph
 

@@ -96,5 +96,9 @@ open class ScopeHierarchySinkDescriptor(
         }
         return null
     }
+
+    override fun toString(): String {
+        return sink.type.simpleName
+    }
 }
 

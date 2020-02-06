@@ -37,5 +37,9 @@ open class ScopeHierarchySourcesAndSinksSectionDescriptor(
         text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
         text.ending.addText(" (" + formatQualifiedName(scope.qualifiedName) + ")", getPackageNameAttributes())
     }
+
+    override fun toString(): String {
+        return scope.simpleName
+    }
 }
 

@@ -35,5 +35,9 @@ open class ScopeHierarchyDependencyDescriptor(
         text.ending.addText(method.returnType.simpleName)
         text.ending.addText(" (" + formatQualifiedName(method.returnType.qualifiedName) + ")", getPackageNameAttributes())
     }
+
+    override fun toString(): String {
+        return method.returnType.simpleName
+    }
 }
 

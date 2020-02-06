@@ -41,10 +41,10 @@ import javax.swing.JTree
  * UI component used to render usage.
  */
 class UsageHierarchyBrowser(
-        val project: Project,
+        project: Project,
         initialGraph: ResolvedGraph,
         private val rootElement: PsiElement)
-    : HierarchyBrowserBaseEx(project, rootElement), MotifProjectComponent.Listener {
+    : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
 
     private var graph: ResolvedGraph = initialGraph
 

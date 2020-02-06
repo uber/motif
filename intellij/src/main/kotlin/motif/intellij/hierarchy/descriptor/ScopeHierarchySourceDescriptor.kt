@@ -70,5 +70,9 @@ open class ScopeHierarchySourceDescriptor(
     override fun getIcon(element: PsiElement): Icon? {
         return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface else AllIcons.Nodes.Class
     }
+
+    override fun toString(): String {
+        return source.type.simpleName
+    }
 }
 
