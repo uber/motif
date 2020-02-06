@@ -17,6 +17,7 @@ package motif.intellij.hierarchy.descriptor
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
@@ -26,6 +27,7 @@ import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.*
+import java.awt.Font
 import javax.swing.Icon
 
 open class ScopeHierarchySourceDescriptor(
@@ -56,7 +58,7 @@ open class ScopeHierarchySourceDescriptor(
 
     override fun updateText(text: CompositeAppearance) {
         if (source.isExposed) {
-            text.ending.addText("@Expose ")
+            text.ending.addText("@Expose ", TextAttributes(myColor, null, null, null, Font.ITALIC))
         }
         text.ending.addText(source.type.simpleName)
         text.ending.addText(" (" + formatQualifiedName(source.type.qualifiedName) + ")", getPackageNameAttributes())

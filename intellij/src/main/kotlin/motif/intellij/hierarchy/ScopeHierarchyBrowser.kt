@@ -16,16 +16,14 @@
 package motif.intellij.hierarchy
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.IdeBundle
 import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
 import com.intellij.ide.hierarchy.JavaHierarchyUtil
 import com.intellij.ide.util.treeView.NodeDescriptor
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataKey
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -135,6 +133,10 @@ class ScopeHierarchyBrowser(
 
         // replace original refresh action with custom one, so that we can gray it out
         actionGroup.replaceAction(actionGroup.getChildren(null).first(), RefreshAction())
+
+        // add help button and file an issue button
+        actionGroup.add(FileAnIssueAction())
+        actionGroup.add(HelpAction())
     }
 
     override fun createHierarchyTreeStructure(typeName: String, psiElement: PsiElement): HierarchyTreeStructure? {
@@ -213,6 +215,28 @@ class ScopeHierarchyBrowser(
         override fun update(event: AnActionEvent) {
             val presentation = event.presentation
             presentation.isEnabled = hierarchyBase != null && isApplicableElement(hierarchyBase) && hierarchyBase.isValid && !isUpdating()
+        }
+    }
+
+    private inner class HelpAction internal constructor() : AnAction(IdeBundle.message("action.help"), IdeBundle.message("action.help"), AllIcons.General.TodoQuestion) {
+
+        override fun actionPerformed(e: AnActionEvent) {
+            BrowserUtil.open("https://github.com/uber/motif/wiki/Motif-IntelliJ-IDE-Plugin-Help");
+        }
+
+        override fun update(event: AnActionEvent) {
+            event.presentation.isEnabled = true
+        }
+    }
+
+    private inner class FileAnIssueAction internal constructor() : AnAction("File an issue", "File an issue or feature request", AllIcons.Toolwindows.ToolWindowDebugger) {
+
+        override fun actionPerformed(e: AnActionEvent) {
+            BrowserUtil.open("https://github.com/uber/motif/issues/new?title=[Motif%20IDE%20Plugin]%20:%20%3Center%20issue%20title%20here%3E");
+        }
+
+        override fun update(event: AnActionEvent) {
+            event.presentation.isEnabled = true
         }
     }
 
