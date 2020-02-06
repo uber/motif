@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.intellij" version "0.4.10"
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
 }
 
 intellij {
@@ -32,3 +33,5 @@ runIde {
 test {
     inputs.files(file("$rootDir/tests/src"))
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

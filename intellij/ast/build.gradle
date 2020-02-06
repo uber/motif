@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.intellij" version "0.4.10"
     id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.dokka'
 }
 
 intellij {
@@ -33,3 +34,5 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
