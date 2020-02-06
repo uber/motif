@@ -130,5 +130,9 @@ open class ScopeHierarchyErrorDescriptor(
     override fun getLegend(): String? {
         return errorMessage.text
     }
+
+    override fun toString(): String {
+        return errorMessage.name
+    }
 }
 

@@ -43,4 +43,8 @@ class ScopeHierarchySimpleDescriptor(
     override fun getIcon(element: PsiElement): Icon? {
         return null
     }
+
+    override fun toString(): String {
+        return label
+    }
 }

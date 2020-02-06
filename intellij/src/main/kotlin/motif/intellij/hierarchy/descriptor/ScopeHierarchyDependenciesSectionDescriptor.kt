@@ -33,5 +33,9 @@ open class ScopeHierarchyDependenciesSectionDescriptor(
     override fun updateText(text: CompositeAppearance) {
         text.ending.addText(scope.simpleName)
     }
+
+    override fun toString(): String {
+        return scope.simpleName
+    }
 }
 

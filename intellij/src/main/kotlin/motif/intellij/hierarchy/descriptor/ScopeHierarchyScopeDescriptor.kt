@@ -49,4 +49,8 @@ open class ScopeHierarchyScopeDescriptor(
     override fun getIcon(element: PsiElement): Icon? {
         return AllIcons.Nodes.Interface
     }
+
+    override fun toString(): String {
+        return clazz.name ?: ""
+    }
 }

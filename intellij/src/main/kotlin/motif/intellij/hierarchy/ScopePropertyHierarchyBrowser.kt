@@ -50,11 +50,11 @@ import javax.swing.tree.DefaultMutableTreeNode
  * UI component used to render scope properties.
  */
 class ScopePropertyHierarchyBrowser(
-        val project: Project,
+        project: Project,
         initialGraph: ResolvedGraph,
         private val rootElement: PsiElement,
         private val hierarchyType: PropertyHierarchyType)
-    : HierarchyBrowserBaseEx(project, rootElement), MotifProjectComponent.Listener {
+    : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
 
     private var graph: ResolvedGraph = initialGraph
 
