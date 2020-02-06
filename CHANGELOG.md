@@ -1,4 +1,6 @@
-# 0.3.2-SNAPSHOT
+# 0.3.3-SNAPSHOT
+
+# 0.3.2
 
 * Throw a compiler error when a Scope extends another Scope
 
