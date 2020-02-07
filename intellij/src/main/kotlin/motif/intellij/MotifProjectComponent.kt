@@ -76,6 +76,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
     private var ancestorPanel: MotifScopePanel? = null
     private var ancestorContent: Content? = null
     private var isRefreshing: Boolean = false
+    private var pendingAction: (() -> Unit)? = null
 
     override fun projectOpened() {
         DumbService.getInstance(project).runWhenSmart {
@@ -113,6 +114,11 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                 }
             }
         })
+    }
+
+    fun refreshGraph(action: () -> Unit) {
+        pendingAction = action
+        refreshGraph()
     }
 
     fun onSelectedClass(element: PsiElement) {
@@ -183,6 +189,10 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                     usageAction.onGraphUpdated(graph)
                 }
             }
+
+            // Execute last pending action
+            pendingAction?.invoke()
+            pendingAction = null
         }
     }
 

@@ -26,6 +26,7 @@ import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
+import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
 import motif.intellij.analytics.AnalyticsProjectComponent
 import motif.intellij.analytics.MotifAnalyticsActions
@@ -44,8 +45,12 @@ class MotifUsageAction : AnAction(), MotifProjectComponent.Listener {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val element = event.getPsiElement() ?: return
+        val graph = graph ?: return
 
-        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        if (!ScopeHierarchyUtils.isInitializedGraph(graph)) {
+            MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
+            return
+        }
 
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
         toolWindow.activate {
@@ -59,7 +64,7 @@ class MotifUsageAction : AnAction(), MotifProjectComponent.Listener {
         val project = e.project ?: return
         val graph = this.graph ?: return
         val element: PsiElement? = e.getPsiElement()
-        e.presentation.isEnabled = element is PsiClass && getUsageCount(project, graph, element) > 0
+        e.presentation.isEnabled = element is PsiClass && (!ScopeHierarchyUtils.isInitializedGraph(graph) || getUsageCount(project, graph, element) > 0)
     }
 
     private fun AnActionEvent.getPsiElement(): PsiElement? {

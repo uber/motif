@@ -77,6 +77,10 @@ class ScopeHierarchyUtils {
             return element is PsiClass && element.qualifiedName == Object::class.java.name
         }
 
+        fun isInitializedGraph(graph: ResolvedGraph): Boolean {
+            return graph.roots.isNotEmpty()
+        }
+
         fun isMotifScopeClass(element: PsiClass?): Boolean {
             return element?.hasAnnotation(motif.Scope::class.java.name) ?: false
         }
