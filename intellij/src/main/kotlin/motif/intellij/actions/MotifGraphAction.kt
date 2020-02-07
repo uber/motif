@@ -21,11 +21,11 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
+import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.analytics.AnalyticsProjectComponent
 import motif.intellij.analytics.MotifAnalyticsActions
@@ -44,8 +44,12 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val element = event.getPsiElement() ?: return
+        val graph = graph ?: return
 
-        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        if (!isInitializedGraph(graph)) {
+            MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
+            return
+        }
 
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Motif")
         toolWindow.activate {
@@ -59,7 +63,7 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
         val project = e.project ?: return
         val graph = this.graph ?: return
         val element: PsiElement? = e.getPsiElement()
-        e.presentation.isEnabled = element is PsiClass && isMotifScopeClass(element) && (getParentScopes(project, graph, element)?.isNotEmpty() == true)
+        e.presentation.isEnabled = element is PsiClass && isMotifScopeClass(element) && (!isInitializedGraph(graph) || (getParentScopes(project, graph, element)?.isNotEmpty() == true))
     }
 
     private fun AnActionEvent.getPsiElement(): PsiElement? {
