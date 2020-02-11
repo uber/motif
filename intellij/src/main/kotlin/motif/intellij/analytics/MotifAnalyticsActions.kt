@@ -26,6 +26,7 @@ abstract class MotifAnalyticsActions {
         const val GRAPH_UPDATE_ERROR = "graphUpdateError"
         const val GRAPH_COMPUTATION_ERROR = "graphComputationError"
 
+        const val GRAPH_MENU_CLICK = "graphMenuClick"
         const val ANCESTOR_MENU_CLICK = "ancestorMenuClick"
         const val USAGE_MENU_CLICK = "usageMenuClick"
         const val ANCESTOR_GUTTER_CLICK = "ancestorGutterClick"

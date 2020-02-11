@@ -59,7 +59,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         private const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
         private const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
 
-        private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph")
+        private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph", "motif_ancestor_graph")
 
         fun getInstance(project: Project): MotifProjectComponent {
             return project.getComponent(MotifProjectComponent::class.java)
