@@ -17,19 +17,24 @@ package motif.intellij.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
+import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
+import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.analytics.AnalyticsProjectComponent
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
- * {@AnAction} used to trigger displaying entire scope hierarchy.
+ * {@AnAction} used to trigger displaying a particular scope ancestors hierarchy.
  */
-class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
+class MotifAncestorGraphAction : AnAction(), MotifProjectComponent.Listener {
 
     private var graph: ResolvedGraph? = null
 
@@ -39,6 +44,7 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
+        val element = event.getPsiElement() ?: return
         val graph = graph ?: return
 
         if (!isInitializedGraph(graph)) {
@@ -47,12 +53,21 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
         }
 
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
-        toolWindow.activate { }
+        toolWindow.activate {
+            MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)
+        }
 
-        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
+        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.ANCESTOR_MENU_CLICK)
     }
 
     override fun update(e: AnActionEvent) {
-        e.presentation.isEnabled = true
+        val project = e.project ?: return
+        val graph = this.graph ?: return
+        val element: PsiElement? = e.getPsiElement()
+        e.presentation.isEnabled = element is PsiClass && isMotifScopeClass(element) && (!isInitializedGraph(graph) || (getParentScopes(project, graph, element)?.isNotEmpty() == true))
+    }
+
+    private fun AnActionEvent.getPsiElement(): PsiElement? {
+        return getData(CommonDataKeys.PSI_ELEMENT)
     }
 }

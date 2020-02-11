@@ -18,6 +18,7 @@ package motif.intellij.hierarchy
 import com.intellij.ide.hierarchy.HierarchyBrowserBaseEx
 import com.intellij.ide.hierarchy.HierarchyBrowserManager
 import com.intellij.ide.hierarchy.HierarchyNodeRenderer
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.ui.AutoScrollToSourceHandler
@@ -36,6 +37,12 @@ abstract class HierarchyBrowserBase(
         val project: Project,
         private val rootElement: PsiElement)
     : HierarchyBrowserBaseEx(project, rootElement) {
+
+    override fun doRefresh(currentBuilderOnly: Boolean) {
+        ApplicationManager.getApplication().invokeLater {
+            super.doRefresh(currentBuilderOnly)
+        }
+    }
 
     override fun configureTree(tree: Tree) {
         // Hack: we're copying code from parent class here, in order to override speed search behavior
