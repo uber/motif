@@ -37,7 +37,9 @@ class IntelliJType(
     override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
 
     override fun resolveClass(): IrClass? {
-        return (psiType as? PsiClassType)?.let { IntelliJClass(project, it) }
+        val psiClassType = psiType as? PsiClassType ?: return null
+        val psiClass = psiClassType.resolve() ?: return null
+        return (psiType as? PsiClassType)?.let { IntelliJClass(project, it, psiClass) }
     }
 
     override fun isAssignableTo(type: IrType): Boolean {

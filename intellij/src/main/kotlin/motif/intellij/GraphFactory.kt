@@ -62,7 +62,7 @@ class GraphFactory(private val project: Project) {
                 .filter(this::isScopeClass)
                 .map(psiElementFactory::createType)
                 .map { type ->
-                    IntelliJClass(project, type)
+                    IntelliJClass(project, type, type.resolve()!!)
                 }
     }
 

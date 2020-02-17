@@ -20,20 +20,15 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import motif.ast.*
-import java.lang.IllegalStateException
 import kotlin.collections.filter
 import kotlin.collections.map
 
 class IntelliJClass(
         private val project: Project,
-        private val psiClassType: PsiClassType) : IrUtil, IrClass {
+        private val psiClassType: PsiClassType,
+        val psiClass: PsiClass) : IrUtil, IrClass {
 
     private val jvmPsiConversionHelper = ServiceManager.getService(project, JvmPsiConversionHelper::class.java)
-
-    val psiClass: PsiClass by lazy {
-        psiClassType.resolve()
-                ?: throw IllegalStateException(psiClassType.className)
-    }
 
     override val type: IrType by lazy { IntelliJType(project, psiClassType) }
 
@@ -69,7 +64,7 @@ class IntelliJClass(
     override val nestedClasses: List<IrClass> by lazy {
         psiClass.allInnerClasses.map {
             val psiClassType: PsiClassType = PsiElementFactory.SERVICE.getInstance(project).createType(it)
-            IntelliJClass(project, psiClassType)
+            IntelliJClass(project, psiClassType, psiClassType.resolve()!!)
         }
     }
 
