@@ -267,7 +267,7 @@ class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
 
     private fun createIntelliJClass(@Language("JAVA") classText: String): IntelliJClass {
         val psiClass = myFixture.addClass(classText)
-        return IntelliJClass(project, psiElementFactory.createType(psiClass))
+        return IntelliJClass(project, psiElementFactory.createType(psiClass), psiClass)
     }
 
     private fun createIntelliJType(classText: String): IntelliJType {

@@ -248,7 +248,7 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
 
     private fun createAnnotationClass(@Language("JAVA") classText: String): IntelliJClass {
         val psiClass = myFixture.addClass(classText)
-        return IntelliJClass(project, psiElementFactory.createType(psiClass))
+        return IntelliJClass(project, psiElementFactory.createType(psiClass), psiClass)
     }
 
     private fun getClassAnnotation(@Language("JAVA") classText: String): IntelliJAnnotation {
