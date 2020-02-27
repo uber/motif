@@ -16,13 +16,15 @@
 package motif.intellij.analytics
 
 import com.intellij.openapi.components.ProjectComponent
-import com.intellij.openapi.extensions.ProjectExtensionPointName
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import java.util.*
 
 class AnalyticsProjectComponent(val project: Project) : ProjectComponent {
 
     companion object {
+        private val LOGGER_EXTENSION_POINT_NAME : ExtensionPointName<MotifAnalyticsLogger> =
+                ExtensionPointName.create("com.uber.motif.motifAnalyticsLogger")
         private val SESSION_ID = UUID.randomUUID()
 
         fun getInstance(project: Project): AnalyticsProjectComponent {
@@ -31,15 +33,9 @@ class AnalyticsProjectComponent(val project: Project) : ProjectComponent {
     }
 
     fun logEvent(action: String) {
-        try {
-            val metadata: Map<String, String> = mapOf(
-                    "SessionId" to SESSION_ID.toString(),
-                    "ActionName" to action)
-            val projectExtensionPointName: ProjectExtensionPointName<MotifAnalyticsLogger> =
-                    ProjectExtensionPointName("com.uber.motif.motifAnalyticsLogger")
-            projectExtensionPointName.getExtensions(project).forEach { it.log(metadata) }
-        } catch (e: Exception) {
-            // TODO : investigate why ProjectExtensionPointName class can't be loaded with IJ 2018.2
-        }
+        val metadata: Map<String, String> = mapOf(
+                "SessionId" to SESSION_ID.toString(),
+                "ActionName" to action)
+        LOGGER_EXTENSION_POINT_NAME.getExtensions(project).forEach { it.log(metadata) }
     }
 }
