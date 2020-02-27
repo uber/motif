@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
-import com.intellij.openapi.extensions.ProjectExtensionPointName
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -39,7 +38,6 @@ import com.intellij.ui.content.ContentFactory
 import motif.core.ResolvedGraph
 import motif.intellij.analytics.AnalyticsProjectComponent
 import motif.intellij.analytics.MotifAnalyticsActions
-import motif.intellij.analytics.MotifAnalyticsLogger
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel

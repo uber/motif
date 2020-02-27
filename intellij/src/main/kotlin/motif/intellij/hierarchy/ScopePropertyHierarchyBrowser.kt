@@ -71,21 +71,13 @@ class ScopePropertyHierarchyBrowser(
         private const val LABEL_NO_SCOPE: String = "No Scope is selected."
     }
 
-    fun setSelectedScope(element: PsiElement) {
-        hierarchyBase = element
-
-        doRefresh(true)
+    init {
         // Expand tree to show items under provides/consumes nodes
         if (hierarchyType == PropertyHierarchyType.CONSUME_AND_PROVIDE) {
             ApplicationManager.getApplication().invokeLater {
                 TreeUtil.expand(currentTree, 2)
             }
         }
-    }
-
-    // HACK: prevent focus to be request when refresh is happening. This is to allow keyboard navigation in scope tree.
-    override fun changeView(typeName: String) {
-        super.changeView(typeName, false)
     }
 
     override fun isApplicableElement(element: PsiElement): Boolean {
@@ -146,10 +138,7 @@ class ScopePropertyHierarchyBrowser(
     }
 
     override fun createHierarchyTreeStructure(typeName: String, psiElement: PsiElement): HierarchyTreeStructure? {
-        if (psiElement == rootElement) {
-            val descriptor: HierarchyNodeDescriptor = ScopeHierarchySimpleDescriptor(project, graph, null, psiElement, LABEL_NO_SCOPE)
-            return ScopeHierarchyTreeStructure(project, graph, descriptor)
-        } else if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
+        if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
             val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(psiElement)
             val type: IrType = IntelliJType(project, scopeType)
             val scope: Scope = graph.getScope(type) ?: return null
@@ -171,9 +160,11 @@ class ScopePropertyHierarchyBrowser(
                     ScopeHierarchyTreeStructure(project, graph, descriptor)
                 }
             }
+        } else {
+            val descriptor: HierarchyNodeDescriptor = ScopeHierarchySimpleDescriptor(project, graph, null, psiElement, LABEL_NO_SCOPE)
+            return ScopeHierarchyTreeStructure(project, graph, descriptor)
         }
         return null
-
     }
 
     override fun getBrowserDataKey(): String {
