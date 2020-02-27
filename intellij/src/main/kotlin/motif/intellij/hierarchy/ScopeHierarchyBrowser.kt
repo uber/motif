@@ -212,8 +212,7 @@ class ScopeHierarchyBrowser(
         }
 
         override fun update(event: AnActionEvent) {
-            val presentation = event.presentation
-            presentation.isEnabled = hierarchyBase != null && isApplicableElement(hierarchyBase) && hierarchyBase.isValid && !isUpdating()
+            event.presentation.isEnabled = !isUpdating()
         }
     }
 
