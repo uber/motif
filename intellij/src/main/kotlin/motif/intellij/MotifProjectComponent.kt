@@ -103,9 +103,12 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
                         val eventName: String = if (updatedGraph.errors.isNotEmpty()) MotifAnalyticsActions.GRAPH_UPDATE_ERROR else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
                         AnalyticsProjectComponent.getInstance(project).logEvent(eventName)
-                    } catch (e: Exception) {
-                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, e)
+                    } catch (t: Throwable) {
+                        val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
+                        onGraphUpdated(emptyGraph)
+
                         AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
+                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, t)
                     } finally {
                         isRefreshing = false
                     }
