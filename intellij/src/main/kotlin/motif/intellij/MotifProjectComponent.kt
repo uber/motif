@@ -124,7 +124,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             return
         }
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        if (toolWindow.contentManager.findContent(TAB_NAME_USAGE) == null) {
+        if (findContentByDescription(toolWindow, TAB_NAME_USAGE) == null) {
             usageContent = createUsageContent(toolWindow)
         }
         usagePanel?.setSelectedClass(element)
@@ -137,7 +137,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             return
         }
         val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        if (toolWindow.contentManager.findContent(TAB_NAME_ANCESTOR) == null) {
+        if (findContentByDescription(toolWindow, TAB_NAME_ANCESTOR) == null) {
             ancestorContent = createAncestorContent(toolWindow)
         }
         ancestorPanel?.setSelectedScope(element)
@@ -210,6 +210,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     private fun createUsageContent(toolWindow: ToolWindow): Content {
         val content: Content = ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
+        content.description = TAB_NAME_USAGE
         content.isCloseable = true
         toolWindow.contentManager.addContent(content)
         return content
@@ -217,9 +218,16 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
     private fun createAncestorContent(toolWindow: ToolWindow): Content {
         val content: Content = ContentFactory.SERVICE.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
+        content.description = TAB_NAME_ANCESTOR
         content.isCloseable = true
         toolWindow.contentManager.addContent(content)
         return content
+    }
+
+    private fun findContentByDescription(toolWindow: ToolWindow, description: String): Content? {
+        return toolWindow.contentManager.contents.firstOrNull {
+            it.description == description
+        }
     }
 
     interface Listener {
