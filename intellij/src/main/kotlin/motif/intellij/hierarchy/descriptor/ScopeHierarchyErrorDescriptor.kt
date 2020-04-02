@@ -102,9 +102,6 @@ open class ScopeHierarchyErrorDescriptor(
                 is UnsatisfiedDependencyError -> {
                     (error.top.clazz as IntelliJClass).psiClass
                 }
-                is UnusedDependencyError -> {
-                    (error.method.method as IntelliJMethod).psiMethod
-                }
                 is DependencyCycleError -> {
                     (error.path[0].scope.clazz as IntelliJClass).psiClass
                 }

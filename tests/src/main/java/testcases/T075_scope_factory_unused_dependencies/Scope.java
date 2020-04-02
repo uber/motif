@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.errormessage
+package testcases.T075_scope_factory_unused_dependencies;
 
-import motif.core.UnusedDependencyError
+import motif.Creatable;
 
-internal class UnusedDependencyHandler(private val error: UnusedDependencyError) : ErrorHandler {
+@motif.Scope
+public interface Scope extends Creatable<Scope.Dependencies> {
 
-    override val name = "UNUSED DEPENDENCY"
+    int used();
 
-    override fun StringBuilder.handle() {
-        appendln("""
-            Dependency is explicitly declared but not consumed:
+    interface Dependencies {
 
-              [Method]
-                ${error.method.qualifiedName}
+        String unused();
 
-              [Type]
-                ${error.method.returnType.qualifiedName}
-
-            Suggestions:
-              * Delete unused dependency method.
-        """.trimIndent())
+        int used();
     }
 }

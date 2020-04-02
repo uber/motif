@@ -57,7 +57,6 @@ internal interface ErrorHandler {
                 is ProcessingError -> when (error) {
                     is ScopeCycleError -> ScopeCycleHandler(error)
                     is UnsatisfiedDependencyError -> UnsatisfiedDependencyHandler(error)
-                    is UnusedDependencyError -> UnusedDependencyHandler(error)
                     is DependencyCycleError -> DependencyCycleHandler(error)
                     is UnexposedSourceError -> UnexposedSourceHandler(error)
                     is AlreadySatisfiedError -> AlreadySatisfiedHandler(error)
