@@ -84,12 +84,6 @@ internal class State(
             unsatisfied.remove(it)
         }
 
-        val requiredTypes: Set<Type> = unsatisfied.map { it.type }.toSet()
-        val declaredButNotRequired: List<Dependencies.Method> = dependencies.methods.filter { !requiredTypes.contains(it.returnType) }
-        declaredButNotRequired.forEach {
-            errors.add(UnusedDependencyError(it))
-        }
-
         val visibleButNotDeclared = visibleSinks.keys.filter { !declaredTypes.contains(it.type) }
         visibleButNotDeclared.forEach { visibleSinks.remove(it) }
     }

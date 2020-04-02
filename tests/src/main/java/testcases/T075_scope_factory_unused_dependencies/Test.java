@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif.core
+package testcases.T075_scope_factory_unused_dependencies;
 
-import motif.models.*
+import motif.ScopeFactory;
 
-sealed class ProcessingError : MotifError
+public class Test {
 
-class ScopeCycleError(val path: List<Scope>) : ProcessingError()
-class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
-class DependencyCycleError(val path: List<Node>) : ProcessingError()
-class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+    public static void run() {
+        ScopeFactory.create(
+                Scope.class,
+                new Scope.Dependencies() {
+                    @Override
+                    public String unused() {
+                        return "someString";
+                    }
+
+                    @Override
+                    public int used() {
+                        return 0;
+                    }
+                });
+    }
+}
