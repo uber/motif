@@ -54,7 +54,7 @@
 
         <group id="MotifEditor" icon="/icons/icon.svg" popup="true" text="Motif">
             <reference ref="motif_usage"/>
-            <add-to-group anchor="first" group-id="EditorPopupMenu"/>
+            <add-to-group anchor="last" group-id="EditorPopupMenu"/>
         </group>
         <group id="MotifAncestorGraphEditor">
             <reference ref="motif_ancestor_graph"/>
@@ -67,8 +67,8 @@
 
         <group id="MotifProject" icon="/icons/icon.svg" popup="true" text="Motif">
             <reference ref="motif_graph"/>
-            <add-to-group anchor="first" group-id="ProjectViewPopupMenu"/>
-            <add-to-group anchor="first" group-id="StructureViewPopupMenu"/>
+            <add-to-group anchor="last" group-id="ProjectViewPopupMenu"/>
+            <add-to-group anchor="last" group-id="StructureViewPopupMenu"/>
         </group>
         <group id="MotifAncestorProject">
             <reference ref="motif_ancestor_graph"/>
