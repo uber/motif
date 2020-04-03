@@ -1,5 +1,7 @@
 # 0.3.3-SNAPSHOT
 
+* Removed UnusedDependencyError. It's now valid to declare a dependency that is not consumed.
+
 # 0.3.2
 
 * Throw a compiler error when a Scope extends another Scope
