@@ -1,4 +1,6 @@
-# 0.3.3-SNAPSHOT
+# 0.3.4-SNAPSHOT
+
+# 0.3.3
 
 * Removed UnusedDependencyError. It's now valid to declare a dependency that is not consumed.
 
