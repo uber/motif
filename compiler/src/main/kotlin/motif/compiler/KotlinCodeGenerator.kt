@@ -27,6 +27,7 @@ object KotlinCodeGenerator {
 
     private fun ScopeImpl.spec(): TypeSpec {
         return TypeSpec.classBuilder(className.kt).apply {
+            addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION"))
             addAnnotation(scopeImplAnnotation.spec())
             addModifiers(KModifier.PUBLIC)
             addSuperinterface(superClassName.kt)
@@ -279,4 +280,9 @@ object KotlinCodeGenerator {
                 .addStatement("throw %T()", UnsupportedOperationException::class)
                 .build()
     }
+
+    private fun suppressAnnotationSpec(name: String): AnnotationSpec =
+        AnnotationSpec.builder(Suppress::class.java)
+            .addMember("%S", name)
+            .build()
 }
