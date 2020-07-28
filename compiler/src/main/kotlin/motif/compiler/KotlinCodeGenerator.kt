@@ -27,7 +27,7 @@ object KotlinCodeGenerator {
 
     private fun ScopeImpl.spec(): TypeSpec {
         return TypeSpec.classBuilder(className.kt).apply {
-            addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION"))
+            addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
             addAnnotation(scopeImplAnnotation.spec())
             addModifiers(KModifier.PUBLIC)
             addSuperinterface(superClassName.kt)
@@ -281,8 +281,8 @@ object KotlinCodeGenerator {
                 .build()
     }
 
-    private fun suppressAnnotationSpec(name: String): AnnotationSpec =
+    private fun suppressAnnotationSpec(vararg names: String): AnnotationSpec =
         AnnotationSpec.builder(Suppress::class.java)
-            .addMember("%S", name)
+            .addMember(names.joinToString(", ") { "%S" }, *names)
             .build()
 }
