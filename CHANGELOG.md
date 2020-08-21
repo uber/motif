@@ -1,4 +1,6 @@
-# 0.3.4-SNAPSHOT
+# 0.3.4
+
+* Generated Kotlin code no longer results in compiler errors.
 
 # 0.3.3
 
