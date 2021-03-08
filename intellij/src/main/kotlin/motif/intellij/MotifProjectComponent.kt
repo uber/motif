@@ -18,6 +18,7 @@ package motif.intellij
 import com.intellij.codeInsight.daemon.LineMarkerProviders
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.lang.Language
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.application.ApplicationManager
@@ -41,6 +42,7 @@ import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel
+import org.jetbrains.kotlin.idea.KotlinLanguage
 
 class MotifProjectComponent(val project: Project) : ProjectComponent {
 
@@ -174,8 +176,8 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             errorContent?.displayName = TAB_NAME_ERRORS + " (" + graph.errors.size + ")"
 
             // Propagate changes to line markers provider
-            val language: Language? = Language.findLanguageByID("JAVA")
-            language?.let {
+            val languages: List<Language> = listOf(JavaLanguage.INSTANCE, KotlinLanguage.INSTANCE)
+            languages.forEach {
                 for (lineMarkerProvider in LineMarkerProviders.INSTANCE.allForLanguage(it)) {
                     if (lineMarkerProvider is Listener) {
                         lineMarkerProvider.onGraphUpdated(graph)

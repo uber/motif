@@ -45,6 +45,8 @@ import motif.intellij.ScopeHierarchyUtils.Companion.isMotifChildScopeMethod
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
 import motif.intellij.analytics.AnalyticsProjectComponent
 import motif.intellij.analytics.MotifAnalyticsActions
+import motif.intellij.toPsiClass
+import motif.intellij.toPsiMethod
 import java.awt.event.MouseEvent
 
 /*
@@ -72,26 +74,31 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? {
         val graph: ResolvedGraph = graph ?: return null
-        if (element is PsiClass && isMotifScopeClass(element)) {
-            val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, element)
+        val psiClassElement = element.toPsiClass()
+        if (psiClassElement is PsiClass && isMotifScopeClass(psiClassElement)) {
+            val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, psiClassElement)
             if (scopeEdges?.isNotEmpty() == true) {
-                val identifier: PsiIdentifier = element.nameIdentifier ?: return null
+                val identifier: PsiIdentifier = psiClassElement.nameIdentifier ?: return null
                 return LineMarkerInfo(element, identifier.textRange, AllIcons.Actions.PreviousOccurence, UPDATE_ALL,
                         ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_PARENT_SCOPE),
                         NavigationScopeHandler(element.project, graph), LEFT)
             }
-        } else if (isMotifChildScopeMethod(element)) {
-            return LineMarkerInfo(element, element.textRange, AllIcons.Actions.NextOccurence, UPDATE_ALL,
-                    ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
-                    NavigationScopeHandler(element.project, graph), LEFT)
+        } else {
+            val methodElement = element.toPsiMethod()
+            if (isMotifChildScopeMethod(methodElement)) {
+                return LineMarkerInfo(element, element.textRange, AllIcons.Actions.NextOccurence, UPDATE_ALL,
+                        ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
+                        NavigationScopeHandler(element.project, graph), LEFT)
+            }
         }
         return null
     }
 
     private class NavigationScopeHandler(val project: Project, val graph: ResolvedGraph) : GutterIconNavigationHandler<PsiElement> {
         override fun navigate(event: MouseEvent?, element: PsiElement?) {
-            if (element is PsiClass) {
-                val scopeEdges: Array<ScopeEdge>? = getParentScopes(element.project, graph, element)
+            val psiClassElement = element?.toPsiClass()
+            if (psiClassElement is PsiClass) {
+                val scopeEdges: Array<ScopeEdge>? = getParentScopes(psiClassElement.project, graph, psiClassElement)
                 if (scopeEdges == null) {
                     Messages.showInfoMessage(MESSAGE_NAVIGATION_NO_SCOPE, MESSAGE_TITLE)
                     return
@@ -114,14 +121,17 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
                         listPopup.show(RelativePoint(mouseEvent))
                     }
                 }
-            } else if (element is PsiMethod) {
-                val classElement = PsiTreeUtil.getParentOfType(element, PsiClass::class.java)
-                if (isMotifScopeClass(classElement) && element.returnType is PsiClassReferenceType) {
-                    val returnElementClass: PsiClass? = (element.returnType as PsiClassReferenceType).resolve()
-                    returnElementClass?.let {
-                        val navigationElement = it.navigationElement
-                        if (navigationElement is Navigatable && (navigationElement as Navigatable).canNavigate()) {
-                            navigationElement.navigate(true)
+            } else {
+                val methodElement = element?.toPsiMethod()
+                if (methodElement is PsiMethod) {
+                    val classElement = PsiTreeUtil.getParentOfType(methodElement, PsiClass::class.java)
+                    if (isMotifScopeClass(classElement) && methodElement.returnType is PsiClassReferenceType) {
+                        val returnElementClass: PsiClass? = (methodElement.returnType as PsiClassReferenceType).resolve()
+                        returnElementClass?.let {
+                            val navigationElement = it.navigationElement
+                            if (navigationElement is Navigatable && (navigationElement as Navigatable).canNavigate()) {
+                                navigationElement.navigate(true)
+                            }
                         }
                     }
                 }

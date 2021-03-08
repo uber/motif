@@ -42,13 +42,17 @@
     </project-components>
 
     <actions>
-        <action class="motif.intellij.actions.MotifGraphAction" description="Display entire Motif graph" id="motif_graph" text="View Graph">
+        <action class="motif.intellij.actions.MotifGraphAction" description="Display entire Motif graph"
+                id="motif_graph" text="View Graph">
             <keyboard-shortcut first-keystroke="control shift G" keymap="$default"/>
         </action>
-        <action class="motif.intellij.actions.MotifAncestorGraphAction" description="Display Motif ancestors graph for this scope" id="motif_ancestor_graph" text="View Scope Ancestors">
+        <action class="motif.intellij.actions.MotifAncestorGraphAction"
+                description="Display Motif ancestors graph for this scope" id="motif_ancestor_graph"
+                text="View Scope Ancestors">
             <keyboard-shortcut first-keystroke="control shift S" keymap="$default"/>
         </action>
-        <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object" id="motif_usage" text="Find Usages">
+        <action class="motif.intellij.actions.MotifUsageAction" description="Display Motif usage for this object"
+                id="motif_usage" text="Find Usages">
             <keyboard-shortcut first-keystroke="control shift U" keymap="$default"/>
         </action>
 
@@ -82,9 +86,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="JAVA"
+                                        implementatgit ionClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="kotlin"
                                         implementationClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA"
                                         implementationClass="motif.intellij.provider.ScopeHierarchyLineMarkerProvider"/>
+        <!-- TODO: Add kotlin support to ScopeHierarchyLineMarkerProvider -->
     </extensions>
 
     <extensionPoints>
