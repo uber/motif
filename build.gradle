@@ -5,8 +5,8 @@ gradle.startParameter.configureOnDemand = false
 buildscript {
     apply from: 'gradle/dependencies.gradle'
     repositories {
-        jcenter()
         google()
+        mavenCentral()
     }
     dependencies {
         classpath deps.build.gradlePlugins.android
@@ -21,10 +21,7 @@ subprojects {
     apply from: rootProject.file('gradle/dependencies.gradle')
 
     repositories {
-        jcenter()
         google()
-        // Required until the following is resolved:
-        // https://github.com/tschuchortdev/kotlin-compile-testing/issues/2
-        maven { url 'https://jitpack.io' }
+        mavenCentral()
     }
 }
