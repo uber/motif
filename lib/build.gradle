@@ -1,11 +1,11 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 dependencies {
     // Dagger is part of the API since we generate code which depends on Dagger's API in the consuming gradle module.
-    compile deps.dagger
+    api deps.dagger
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

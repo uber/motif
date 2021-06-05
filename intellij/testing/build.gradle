@@ -11,5 +11,5 @@ intellij {
 }
 
 dependencies {
-    compile deps.test.truth
+    implementation deps.test.truth
 }
