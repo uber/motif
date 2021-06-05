@@ -12,15 +12,16 @@ intellij {
 }
 
 dependencies {
-    compile project(':lib')
-    compile project(':ast')
-    compile project(':errormessage')
+    implementation project(':lib')
+    implementation project(':ast')
+    api project(':errormessage')
 
-    compile deps.kotlin.reflection
+    implementation deps.kotlin.reflection
 
-    testCompile deps.test.junit
-    testCompile deps.test.assertj
-    testCompile project(':intellij:testing')
+    testImplementation deps.test.junit
+    testImplementation deps.test.assertj
+    testImplementation deps.test.truth
+    testImplementation project(':intellij:testing')
 }
 
 compileKotlin {

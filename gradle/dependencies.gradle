@@ -26,14 +26,14 @@ def versions = [
 ext.deps = [
         "versions": versions,
         "build": [
-                buildToolsVersion: '29.0.2',
-                compileSdkVersion: 29,
+                buildToolsVersion: '30.0.3',
+                compileSdkVersion: 30,
                 ci: 'true' == System.getenv('CI'),
                 minSdkVersion: 14,
-                targetSdkVersion: 29,
+                targetSdkVersion: 30,
 
                 gradlePlugins: [
-                        android: 'com.android.tools.build:gradle:3.5.0',
+                        android: 'com.android.tools.build:gradle:4.2.0',
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
                         dokkaAndroid: "org.jetbrains.dokka:dokka-android-gradle-plugin:${versions.dokka}"
