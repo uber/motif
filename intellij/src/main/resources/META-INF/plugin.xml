@@ -86,7 +86,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="JAVA"
-                                        implementatgit ionClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
+                                        implementationClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="kotlin"
                                         implementationClass="motif.intellij.provider.ScopeNavigationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA"
