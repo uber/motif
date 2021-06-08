@@ -81,7 +81,6 @@ object KotlinCodeGenerator {
 
     private fun Constructor.spec(): FunSpec {
         return FunSpec.constructorBuilder()
-                .addModifiers(KModifier.PUBLIC)
                 .addParameter(dependenciesParameterName, dependenciesClassName.kt)
                 .addStatement("this.%N = %N", dependenciesFieldName, dependenciesParameterName)
                 .build()
