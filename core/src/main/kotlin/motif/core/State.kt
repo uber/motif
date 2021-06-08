@@ -170,8 +170,8 @@ private fun <K,V> SetMultiMap<K, V>.copy(): SetMultiMap<K, V> {
     return map
 }
 
-private fun <T> List<MutableSet<T>>.merge() = merge(::mutableSetOf)
-private fun <T> List<MutableList<T>>.merge() = merge(::mutableListOf)
+private fun <T> List<MutableSet<T>>.merge() = merge { mutableSetOf() }
+private fun <T> List<MutableList<T>>.merge() = merge { mutableListOf() }
 
 private fun <C : MutableCollection<T>, T> List<C>.merge(newCollection: () -> C): C {
     val collection = newCollection()
