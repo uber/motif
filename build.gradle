@@ -12,7 +12,6 @@ buildscript {
         classpath deps.build.gradlePlugins.android
         classpath deps.build.gradlePlugins.kotlin
         classpath deps.build.gradlePlugins.dokka
-        classpath deps.build.gradlePlugins.dokkaAndroid
         classpath deps.apacheClient
     }
 }
