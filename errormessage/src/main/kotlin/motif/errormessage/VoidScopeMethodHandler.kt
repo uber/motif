@@ -22,7 +22,7 @@ internal class VoidScopeMethodHandler(private val error: VoidScopeMethod) : Erro
     override val name = "VOID SCOPE METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Scope methods must be non-void:
 
               ${error.scope.qualifiedName}.${error.method.name}

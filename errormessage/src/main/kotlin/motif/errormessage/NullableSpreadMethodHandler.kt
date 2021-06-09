@@ -22,7 +22,7 @@ internal class NullableSpreadMethodHandler(private val error: NullableSpreadMeth
     override val name = "NULLABLE SPREAD METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             @Spread factory method return type must not declare @Nullable spreadable methods:
 
               [Method]

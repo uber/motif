@@ -22,7 +22,7 @@ internal class DependencyMethodWithParametersHandler(private val error: Dependen
     override val name = "DEPENDENCY METHOD PARAMETER"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Methods on dependencies interfaces must be parameterless:
 
               ${error.dependenciesClass.qualifiedName}.${error.method.name}

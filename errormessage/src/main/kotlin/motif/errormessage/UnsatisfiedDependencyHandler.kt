@@ -22,8 +22,8 @@ internal class UnsatisfiedDependencyHandler(private val error: UnsatisfiedDepend
     override val name = "UNSATISFIED DEPENDENCY"
 
     override fun StringBuilder.handle() {
-        appendln("Unable to satisfy dependency:")
-        appendln()
-        appendln(error.sink.errorText.prependIndent("  "))
+        appendLine("Unable to satisfy dependency:")
+        appendLine()
+        appendLine(error.sink.errorText.prependIndent("  "))
     }
 }

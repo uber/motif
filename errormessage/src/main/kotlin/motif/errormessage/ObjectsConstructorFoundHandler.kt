@@ -22,7 +22,7 @@ internal class ObjectsConstructorFoundHandler(private val error: ObjectsConstruc
     override val name = "OBJECTS CONSTRUCTOR"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Objects class may not define constructors:
 
               ${error.objectClass.qualifiedName}

@@ -70,7 +70,7 @@ class LicenseTest {
         val tmpFile = temporaryFolder.newFile()
         tmpFile.writer().use { out ->
             out.write(licenseText)
-            out.appendln()
+            out.appendLine()
             reader().copyTo(out)
         }
         tmpFile.renameTo(this)

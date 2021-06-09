@@ -22,7 +22,7 @@ internal class VoidDependenciesMethodHandler(private val error: VoidDependencies
     override val name = "VOID DEPENDENCIES METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Methods on dependencies interfaces must be non-void:
 
               void ${error.dependenciesClass.qualifiedName}.${error.method.name}

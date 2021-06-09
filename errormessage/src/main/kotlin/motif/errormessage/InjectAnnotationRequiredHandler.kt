@@ -22,7 +22,7 @@ internal class InjectAnnotationRequiredHandler(private val error: InjectAnnotati
     override val name = "INJECT ANNOTATION REQUIRED"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Multiple constructors found for constructor factory method return type. @Inject annotation required:
 
               [Type]

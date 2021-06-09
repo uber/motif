@@ -22,7 +22,7 @@ internal class NullableFactoryMethodHandler(private val error: NullableFactoryMe
     override val name = "NULLABLE FACTORY METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Factory method may not be nullable:
 
               @Nullable ${error.method.returnType.simpleName} ${error.objects.qualifiedName}.${error.method.name}

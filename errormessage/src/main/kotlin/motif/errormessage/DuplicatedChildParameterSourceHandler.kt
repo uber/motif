@@ -22,7 +22,7 @@ internal class DuplicatedChildParameterSourceHandler(private val error: Duplicat
     override val name = "DUPLICATED CHILD PARAMETER SOURCE"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Multiple child method parameters of the same type:
 
               ${error.childScopeMethod.qualifiedName}(${highlightDuplicatedParameters()})

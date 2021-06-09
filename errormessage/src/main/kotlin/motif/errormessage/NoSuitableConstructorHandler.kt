@@ -22,7 +22,7 @@ internal class NoSuitableConstructorHandler(private val error: NoSuitableConstru
     override val name = "NO SUITABLE CONSTRUCTOR"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             No suitable constructor found for constructor factory return type:
 
               [Type]

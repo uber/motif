@@ -33,10 +33,10 @@ object TestRenderer {
     private fun StringBuilder.renderScope(indent: Int, scopeViewModel: ScopeViewModel) {
         val scopeName = scopeViewModel.scope.simpleName
         val scopeLine = " ${"-".repeat(scopeName.length + 2)}"
-        appendln(indent, scopeLine)
-        appendln(indent, "| $scopeName |")
-        appendln(indent, scopeLine)
-        appendln()
+        appendLine(indent, scopeLine)
+        appendLine(indent, "| $scopeName |")
+        appendLine(indent, scopeLine)
+        appendLine()
         renderRequired(indent + 1, scopeViewModel.requiredDependencies)
         renderProvided(indent + 1, scopeViewModel.providedDependencies)
         scopeViewModel.children.forEach { child -> renderScope(indent + 1, child) }
@@ -45,46 +45,46 @@ object TestRenderer {
     private fun StringBuilder.renderRequired(indent: Int, requiredDependencies: List<RequiredDependency>, topLevel: Boolean = true) {
         var header = "Required"
         header = if (topLevel) "==== $header ====" else "[ $header ]"
-        appendln(indent, header)
-        if (topLevel) appendln()
+        appendLine(indent, header)
+        if (topLevel) appendLine()
         requiredDependencies.forEach { requiredDependency -> renderRequired(indent + 1, requiredDependency, topLevel) }
     }
 
     private fun StringBuilder.renderProvided(indent: Int, providedDependencies: List<ProvidedDependency>) {
-        appendln(indent, "==== Provides ====")
-        appendln()
+        appendLine(indent, "==== Provides ====")
+        appendLine()
         providedDependencies.forEach { providedDependency -> renderProvided(indent + 1, providedDependency) }
     }
 
     private fun StringBuilder.renderRequired(indent: Int, requiredDependency: RequiredDependency, topLevel: Boolean) {
         var header = requiredDependency.type.simpleName
         header = if (topLevel) "---- $header ----" else header
-        appendln(indent, header)
+        appendLine(indent, header)
         renderProvidedBy(indent + 1, requiredDependency.providedBy)
         if (topLevel) {
             renderConsumedBy(indent + 1, requiredDependency.requiredBy)
         }
-        if (topLevel) appendln()
+        if (topLevel) appendLine()
     }
 
     private fun StringBuilder.renderProvided(indent: Int, providedDependency: ProvidedDependency) {
-        appendln(indent, "---- ${toString(providedDependency.source, showType = true)} ----")
+        appendLine(indent, "---- ${toString(providedDependency.source, showType = true)} ----")
         renderRequired(indent + 1, providedDependency.requiredDependencies, false)
         renderConsumedBy(indent + 1, providedDependency.consumedBy)
-        appendln()
+        appendLine()
     }
 
     private fun StringBuilder.renderProvidedBy(indent: Int, providedBy: List<Source>) {
-        appendln(indent, "[ Provided By ]")
+        appendLine(indent, "[ Provided By ]")
         providedBy.forEach { source ->
-            appendln(indent + 1, "* ${toString(source)}")
+            appendLine(indent + 1, "* ${toString(source)}")
         }
     }
 
     private fun StringBuilder.renderConsumedBy(indent: Int, consumedBy: List<Sink>) {
-        appendln(indent, "[ Consumed By ]")
+        appendLine(indent, "[ Consumed By ]")
         consumedBy.forEach { sink ->
-            appendln(indent + 1, "* ${toString(sink)}")
+            appendLine(indent + 1, "* ${toString(sink)}")
         }
     }
 
@@ -107,8 +107,8 @@ object TestRenderer {
         return "${sink.scope.simpleName} | $referenceString"
     }
 
-    private fun StringBuilder.appendln(count: Int, value: String) {
+    private fun StringBuilder.appendLine(count: Int, value: String) {
         append("  ".repeat(count))
-        appendln(value)
+        this.appendLine(value)
     }
 }

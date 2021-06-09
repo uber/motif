@@ -22,7 +22,7 @@ internal class InvalidQualifierHandler(private val error: InvalidQualifier) : Er
     override val name = "INVALID QUALIFIER"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Qualifier must define either no members or a single value member of type String:
 
               ${error.annotation.className}
