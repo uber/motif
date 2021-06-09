@@ -155,7 +155,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
             if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
                 val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
-                toolWindow.icon = IconLoader.getIcon("/icons/icon.svg")
+                toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg"))
                 toolWindow.title = TOOL_WINDOW_TITLE
 
                 scopePanel = MotifScopePanel(project, graph)
@@ -178,7 +178,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
             // Propagate changes to line markers provider
             val languages: List<Language> = listOf(JavaLanguage.INSTANCE, KotlinLanguage.INSTANCE)
             languages.forEach {
-                for (lineMarkerProvider in LineMarkerProviders.INSTANCE.allForLanguage(it)) {
+                for (lineMarkerProvider in LineMarkerProviders.getInstance().allForLanguage(it)) {
                     if (lineMarkerProvider is Listener) {
                         lineMarkerProvider.onGraphUpdated(graph)
                     }

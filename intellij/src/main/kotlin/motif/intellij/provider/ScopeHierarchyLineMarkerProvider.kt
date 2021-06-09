@@ -54,10 +54,6 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectCompone
         this.graph = graph
     }
 
-    override fun collectSlowLineMarkers(psiElements: List<PsiElement>,
-                                        lineMarkerInfos: Collection<LineMarkerInfo<PsiElement>>) {
-    }
-
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? {
         val graph: ResolvedGraph = graph ?: return null
         if (element !is PsiClass) {
@@ -76,7 +72,7 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectCompone
 
     private class ScopeHierarchyHandler(val project: Project) : GutterIconNavigationHandler<PsiElement> {
         override fun navigate(event: MouseEvent?, element: PsiElement?) {
-            val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
+            val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
             if (element is PsiClass) {
                 toolWindow.activate {
                     MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)

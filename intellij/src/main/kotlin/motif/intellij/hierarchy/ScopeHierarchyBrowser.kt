@@ -93,7 +93,7 @@ class ScopeHierarchyBrowser(
         return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
     }
 
-    override fun getComparator(): Comparator<NodeDescriptor<Any>>? {
+    override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
         return JavaHierarchyUtil.getComparator(myProject)
     }
 

@@ -4,9 +4,9 @@ plugins {
 }
 
 intellij {
-    version 'IC-2018.3'
-    plugins = []
-    pluginName 'MyPlugin'
+    version = deps.versions.gradleIntellijPlugin.ide
+    plugins = [ 'java', 'Kotlin' ]
+    pluginName = 'Motif Plugin'
     updateSinceUntilBuild = false
 }
 

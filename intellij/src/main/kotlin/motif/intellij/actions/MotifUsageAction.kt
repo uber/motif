@@ -52,7 +52,7 @@ class MotifUsageAction : AnAction(), MotifProjectComponent.Listener {
             return
         }
 
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID)
+        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
         toolWindow.activate {
             MotifProjectComponent.getInstance(project).onSelectedClass(element)
         }

@@ -23,6 +23,7 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.util.parents
+import com.intellij.psi.util.parentsWithSelf
 import motif.ast.IrClass
 import motif.ast.IrType
 import motif.ast.intellij.IntelliJClass
@@ -115,7 +116,7 @@ class GraphInvalidator(private val project: Project, private val graph: Resolved
     }
 
     fun shouldInvalidate(changedElement: PsiElement): Boolean {
-        return (sequenceOf(changedElement) + changedElement.parents())
+        return (sequenceOf(changedElement) + changedElement.parentsWithSelf)
                 .mapNotNull { it as? PsiClass }
                 .map { psiElementFactory.createType(it) }
                 .any { IntelliJType(project, it) in relevantTypes }
