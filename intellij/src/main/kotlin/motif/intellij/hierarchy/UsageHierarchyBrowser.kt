@@ -69,7 +69,7 @@ class UsageHierarchyBrowser(
     override fun prependActions(actionGroup: DefaultActionGroup) {
     }
 
-    override fun getComparator(): Comparator<NodeDescriptor<Any>>? {
+    override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
         return JavaHierarchyUtil.getComparator(myProject)
     }
 

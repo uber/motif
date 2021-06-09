@@ -68,10 +68,6 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectCompon
         this.graph = graph
     }
 
-    override fun collectSlowLineMarkers(psiElements: List<PsiElement>,
-                                        lineMarkerInfos: Collection<LineMarkerInfo<PsiElement>>) {
-    }
-
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? {
         val graph: ResolvedGraph = graph ?: return null
         val psiClassElement = element.toPsiClass()

@@ -1,13 +1,13 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.4.10"
+    id "org.jetbrains.intellij" version "1.0"
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
 }
 
 intellij {
-    version 'IC-2019.2'
+    version = deps.versions.gradleIntellijPlugin.ide
     plugins = [ 'java', 'Kotlin' ]
-    pluginName 'Motif Plugin'
+    pluginName = 'Motif Plugin'
     updateSinceUntilBuild = false
 }
 

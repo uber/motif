@@ -17,6 +17,7 @@ package motif.intellij.testing
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.LightPlatformTestCase
+import com.intellij.testFramework.TestApplicationManager
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -28,7 +29,7 @@ class IntelliJRule : TestRule {
         return object : Statement() {
 
             override fun evaluate() {
-                LightPlatformTestCase.initApplication()
+                TestApplicationManager.getInstance()
                 var e: Throwable? = null
                 val latch = CountDownLatch(1)
                 ApplicationManager.getApplication().invokeLater {
