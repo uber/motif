@@ -22,7 +22,7 @@ class ScopeExtendsScopeMethodHandler(private val error: ScopeExtendsScope) : Err
     override val name = "SCOPE EXTENDS SCOPE"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Scopes can't extend other Scopes:
 
               ${error.scope.qualifiedName}

@@ -22,7 +22,7 @@ internal class NotAssignableBindsMethodHandler(private val error: NotAssignableB
     override val name = "INVALID BINDS"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Binds factory method parameter is not assignable to return type:
 
               [Factory Method]

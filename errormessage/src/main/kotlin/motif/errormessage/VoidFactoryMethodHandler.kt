@@ -22,7 +22,7 @@ internal class VoidFactoryMethodHandler(private val error: VoidFactoryMethod) : 
     override val name = "VOID FACTORY METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Factory methods must be non-void:
 
               void ${error.objects.qualifiedName}.${error.method.name}

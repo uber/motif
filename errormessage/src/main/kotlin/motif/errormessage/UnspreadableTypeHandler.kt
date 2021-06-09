@@ -22,7 +22,7 @@ internal class UnspreadableTypeHandler(private val error: UnspreadableType) : Er
     override val name = "UNSPREADABLE TYPE"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             This type is not Spread-able:
 
               [Type]

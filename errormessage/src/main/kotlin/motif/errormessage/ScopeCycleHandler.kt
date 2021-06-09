@@ -22,11 +22,11 @@ internal class ScopeCycleHandler(private val error: ScopeCycleError) : ErrorHand
     override val name = "SCOPE CYCLE"
 
     override fun StringBuilder.handle() {
-        appendln("Scope cycle detected:")
-        appendln()
+        appendLine("Scope cycle detected:")
+        appendLine()
         error.path.forEachIndexed { i, scopeType ->
             val prefix = if (i == 0) "  " else "  -> "
-            appendln("$prefix${scopeType.qualifiedName}")
+            appendLine("$prefix${scopeType.qualifiedName}")
         }
     }
 }

@@ -22,11 +22,11 @@ internal class DuplicatedDependenciesMethodHandler(private val error: Duplicated
     override val name = "DUPLICATED DEPENDENCIES METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("Multiple dependencies methods of the same type:\n")
+        appendLine("Multiple dependencies methods of the same type:\n")
         append(error.duplicatedMethods.joinToString("\n") { "  * ${it.qualifiedName}" })
-        appendln()
-        appendln()
-        appendln("""
+        appendLine()
+        appendLine()
+        appendLine("""
             Suggestions:
               * Remove the redundant methods
         """.trimIndent())

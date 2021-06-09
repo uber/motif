@@ -22,7 +22,7 @@ internal class NullableDynamicDependencyHandler(private val error: NullableDynam
     override val name = "NULLABLE CHILD METHOD PARAMETER"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Parameter may not be nullable:
 
               [Method]

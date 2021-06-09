@@ -22,7 +22,7 @@ internal class ObjectsFieldFoundHandler(private val error: ObjectsFieldFound) : 
     override val name = "OBJECTS FIELD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Objects class may not have fields:
 
               ${error.objectClass.qualifiedName}

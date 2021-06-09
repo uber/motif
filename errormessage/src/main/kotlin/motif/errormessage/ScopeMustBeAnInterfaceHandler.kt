@@ -22,7 +22,7 @@ internal class ScopeMustBeAnInterfaceHandler(private val error: ScopeMustBeAnInt
     override val name = "SCOPE CLASS"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Scope must be an interface:
 
               ${error.scopeClass.qualifiedName}

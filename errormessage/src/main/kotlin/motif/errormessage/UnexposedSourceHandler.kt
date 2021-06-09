@@ -22,15 +22,15 @@ internal class UnexposedSourceHandler(private val error: UnexposedSourceError) :
     override val name = "UNEXPOSED SOURCE"
 
     override fun StringBuilder.handle() {
-        appendln("Dependency source is not annotated with @Expose but is required by a descendant:")
-        appendln()
-        appendln("  [Source]")
-        appendln(error.source.errorText.prependIndent("    "))
-        appendln()
-        appendln("  [Required by]")
-        appendln(error.sink.errorText.prependIndent("    "))
-        appendln()
-        appendln("""Suggestions:
+        appendLine("Dependency source is not annotated with @Expose but is required by a descendant:")
+        appendLine()
+        appendLine("  [Source]")
+        appendLine(error.source.errorText.prependIndent("    "))
+        appendLine()
+        appendLine("  [Required by]")
+        appendLine(error.sink.errorText.prependIndent("    "))
+        appendLine()
+        appendLine("""Suggestions:
             |  * Annotate the source with @Expose.
             |  * Resolve the descendant dependency elsewhere.
         """.trimMargin())

@@ -22,7 +22,7 @@ internal class InvalidFactoryMethodHandler(private val error: InvalidFactoryMeth
     override val name = "INVALID FACTORY METHOD"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Factory method is invalid:
 
               ${error.objects.qualifiedName}.${error.method.name}

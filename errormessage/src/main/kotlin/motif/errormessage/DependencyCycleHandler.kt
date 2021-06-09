@@ -22,19 +22,19 @@ internal class DependencyCycleHandler(private val error: DependencyCycleError) :
     override val name = "DEPENDENCY CYCLE"
 
     override fun StringBuilder.handle() {
-        appendln("Dependency cycle detected:")
-        appendln()
+        appendLine("Dependency cycle detected:")
+        appendLine()
         error.path.forEachIndexed { i, node ->
             val prefix = if (i == 0) "  " else "  -> "
             node.errorText.lineSequence().forEachIndexed { index, line ->
                 val indent = " ".repeat(prefix.length)
                 if (index == 0) {
-                    appendln("$prefix$line")
+                    appendLine("$prefix$line")
                 } else {
-                    appendln(line.prependIndent(indent))
+                    appendLine(line.prependIndent(indent))
                 }
             }
-            appendln()
+            appendLine()
         }
     }
 }

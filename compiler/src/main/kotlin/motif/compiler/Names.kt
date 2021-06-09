@@ -57,9 +57,9 @@ class Names {
     companion object {
 
         @JvmStatic
-        fun safeName(typeMirror: TypeMirror, annnotation: AnnotationMirror?): String {
+        fun safeName(typeMirror: TypeMirror, annotation: AnnotationMirror?): String {
             var name = NameVisitor.visit(typeMirror)
-            val annotationString = annnotation?.let(this::annotationString) ?: ""
+            val annotationString = annotation?.let(this::annotationString) ?: ""
             name = "$annotationString$name".decapitalize()
             if (name in KEYWORDS) {
                 name += "_"
@@ -67,11 +67,11 @@ class Names {
             return name
         }
 
-        private fun annotationString(annnotation: AnnotationMirror): String {
-            return if (annnotation.annotationType.toString() == "javax.inject.Named") {
-                AnnotationMirrors.getAnnotationValue(annnotation, "value").value.toString()
+        private fun annotationString(annotation: AnnotationMirror): String {
+            return if (annotation.annotationType.toString() == "javax.inject.Named") {
+                AnnotationMirrors.getAnnotationValue(annotation, "value").value.toString()
             } else {
-                annnotation.annotationType.asElement().simpleName.toString()
+                annotation.annotationType.asElement().simpleName.toString()
             }
         }
     }

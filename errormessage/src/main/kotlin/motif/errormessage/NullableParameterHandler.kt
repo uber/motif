@@ -22,7 +22,7 @@ internal class NullableParameterHandler(private val error: NullableParameter) : 
     override val name = "NULLABLE PARAMETER"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Parameter may not be nullable:
 
               [Method]

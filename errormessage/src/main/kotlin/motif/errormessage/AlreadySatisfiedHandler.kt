@@ -25,12 +25,12 @@ internal class AlreadySatisfiedHandler(private val error: AlreadySatisfiedError)
         val existingSources = error.existingSources.joinToString("\n") { existingSource ->
             existingSource.errorText.prependIndent("    ")
         }
-        appendln("Dependency is already satisfied:")
-        appendln()
-        appendln("  [Source]")
-        appendln(error.source.errorText.prependIndent("    "))
-        appendln()
-        appendln("  [Existing Sources]")
-        appendln(existingSources)
+        appendLine("Dependency is already satisfied:")
+        appendLine()
+        appendLine("  [Source]")
+        appendLine(error.source.errorText.prependIndent("    "))
+        appendLine()
+        appendLine("  [Existing Sources]")
+        appendLine(existingSources)
     }
 }

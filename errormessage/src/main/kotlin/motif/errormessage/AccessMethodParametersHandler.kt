@@ -22,7 +22,7 @@ internal class AccessMethodParametersHandler(private val error: AccessMethodPara
     override val name = "ACCESS METHOD PARAMETERS"
 
     override fun StringBuilder.handle() {
-        appendln("""
+        appendLine("""
             Access methods must be parameterless:
 
               ${error.scope.qualifiedName}.${error.method.name}
