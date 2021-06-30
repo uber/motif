@@ -68,7 +68,7 @@ ext.deps = [
         dagger: "com.google.dagger:dagger:${versions.dagger}",
         daggerCompiler: "com.google.dagger:dagger-compiler:${versions.dagger}",
         javapoet: 'com.squareup:javapoet:1.11.1',
-        kotlinpoet: 'com.squareup:kotlinpoet:1.8.0',
+        kotlinpoet: 'com.squareup:kotlinpoet:1.9.0',
         autoCommon: 'com.google.auto:auto-common:0.10',
         commonsCodec: 'commons-codec:commons-codec:1.13',
         asciiTable: 'de.vandermeer:asciitable:0.3.2',
