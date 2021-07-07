@@ -17,6 +17,7 @@ Motif is a DI library that offers a simple API optimized for nested scopes.
 | [![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif-compiler.svg)](https://search.maven.org/artifact/com.uber.motif/motif-compiler)<br>[![Maven Central](https://img.shields.io/maven-central/v/com.uber.motif/motif.svg)](https://search.maven.org/artifact/com.uber.motif/motif) | <pre>annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'<br>implementation 'com.uber.motif:motif:x.y.z'</pre> |
 |-|:-|
 
+For kotlin projects that use kapt, replace `annotationProcessor 'com.uber.motif:motif-compiler:x.y.z'` with `kapt "com.uber.motif:motif-compiler:x.y.z"`
 ## Proguard
 
 ```proguard
