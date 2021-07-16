@@ -1,4 +1,7 @@
-# 0.3.5-SNAPSHOT
+# 0.3.5
+
+* Update to Kotlin 1.5.10.
+* IntelliJ scope navigation line marker now supports Kotlin files.
 
 # 0.3.4
 
