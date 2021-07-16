@@ -24,7 +24,7 @@ jobs:
         # Gradle configuration install deps 
         run: ./gradlew help
       - name: Build Project
-        run: ./gradlew assemble --stacktrace
+        run: ./gradlew build --stacktrace
       - name : Testing 
         run: ./gradlew test --stacktrace
       - name: Final Checks
