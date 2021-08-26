@@ -94,6 +94,7 @@ private object NameVisitor : SimpleTypeVisitor8<String, Void>() {
     }
 
     override fun visitDeclared(t: DeclaredType, p: Void?): String {
+        t.asElement().getKind()
         val simpleName = t.asElement().simpleName.toString()
         val enclosingElementString = t.asElement().enclosingElement.accept(object : SimpleElementVisitor8<String, Void?>() {
 
