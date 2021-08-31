@@ -1,3 +1,5 @@
+# 0.3.6-SNAPSHOT
+
 # 0.3.5
 
 * Update to Kotlin 1.5.10.
