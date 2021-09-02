@@ -1,3 +1,5 @@
+# 0.3.7-SNAPSHOT
+
 # 0.3.6
 
 * Fix edge case causing generating wrong method names.
