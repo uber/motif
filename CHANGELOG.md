@@ -1,4 +1,6 @@
-# 0.3.7-SNAPSHOT
+# 0.3.7
+
+* Fix edge case of compiler unable to find dependency methods with inner classes types.
 
 # 0.3.6
 
