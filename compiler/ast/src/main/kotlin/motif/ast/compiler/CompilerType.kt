@@ -35,7 +35,15 @@ class CompilerType(
     }
 
     override val qualifiedName: String by lazy {
-        val candidate = mirror.toString()
+        val candidate = mirror.toString().let {
+            if(it.contains("$") && mirror.kind == TypeKind.DECLARED) {
+                val declaredType: DeclaredType = mirror as DeclaredType
+                declaredType.asElement().kind
+                mirror.toString()
+            } else {
+                it
+            }
+        }
         return@lazy if (candidate.startsWith('(')) {
             candidate.substringAfter(":: ").dropLast(1)
         } else {
