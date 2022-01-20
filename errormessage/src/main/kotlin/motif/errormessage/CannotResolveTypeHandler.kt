@@ -22,11 +22,16 @@ internal class CannotResolveTypeHandler(private val error: CannotResolveType) : 
     override val name = "CANNOT RESOLVE TYPE"
 
     override fun StringBuilder.handle() {
-        appendLine("""
-            Following type cannot be resolved:
+        appendLine(
+            """
+            Following type cannot be resolved in ${error.scope.qualifiedName}:
 
               ${error.type.qualifiedName}
-        """.trimIndent())
+              
+            Suggestions:
+              * Check if the type is visible and/or provided as transitive dependency to the module where ${error.scope.qualifiedName} is
+        """.trimIndent()
+        )
     }
 
 }

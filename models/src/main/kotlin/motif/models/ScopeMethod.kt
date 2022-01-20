@@ -36,7 +36,7 @@ sealed class ScopeMethod {
             if (returnClass == null && !method.returnType.isPrimitive) {
                 // resolve class does not return IrClass if it is primitive,
                 // hence we need to throw only if not primitive and not resolved.
-                throw CannotResolveType(method.returnType)
+                throw CannotResolveType(scope, method.returnType)
             }
 
             if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
