@@ -19,6 +19,7 @@ interface IrType : IrEquivalence {
 
     val qualifiedName: String
     val isVoid: Boolean
+    val isPrimitive: Boolean
 
     val simpleName: String
         get() = simpleName(qualifiedName)
