@@ -36,6 +36,20 @@ class IntelliJType(
 
     override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
 
+    override val isPrimitive: Boolean by lazy {
+        when (psiType) {
+            PsiType.BOOLEAN,
+            PsiType.BYTE,
+            PsiType.SHORT,
+            PsiType.INT,
+            PsiType.LONG,
+            PsiType.CHAR,
+            PsiType.FLOAT,
+            PsiType.DOUBLE -> true
+            else -> false
+        }
+    }
+
     override fun resolveClass(): IrClass? {
         val psiClassType = psiType as? PsiClassType ?: return null
         val psiClass = psiClassType.resolve() ?: return null

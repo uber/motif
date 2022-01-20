@@ -55,6 +55,10 @@ class CompilerType(
         mirror.kind == TypeKind.VOID
     }
 
+    override val isPrimitive: Boolean by lazy {
+        mirror.kind.isPrimitive
+    }
+
     override fun resolveClass(): IrClass? {
         if (mirror.kind != TypeKind.DECLARED) return null
 

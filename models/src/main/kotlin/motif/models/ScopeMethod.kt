@@ -27,8 +27,19 @@ sealed class ScopeMethod {
     companion object {
 
         fun fromScopeMethod(scope: Scope, method: IrMethod): ScopeMethod {
-            val returnClass: IrClass = method.returnType.resolveClass() ?: throw CannotResolveType(method.returnType)
-            if (returnClass.hasAnnotation(motif.Scope::class)) {
+            if (method.isVoid()) {
+                throw VoidScopeMethod(scope, method)
+            }
+
+            val returnClass: IrClass? = method.returnType.resolveClass()
+
+            if (returnClass == null && !method.returnType.isPrimitive) {
+                // resolve class does not return IrClass if it is primitive,
+                // hence we need to throw only if not primitive and not resolved.
+                throw CannotResolveType(method.returnType)
+            }
+
+            if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
                 method.parameters.find { it.isNullable() }?.let { nullableParameter ->
                     throw NullableDynamicDependency(scope, method, nullableParameter)
                 }
@@ -42,10 +53,6 @@ sealed class ScopeMethod {
 
             if (method.hasParameters()) {
                 throw AccessMethodParameters(scope, method)
-            }
-
-            if (method.isVoid()) {
-                throw VoidScopeMethod(scope, method)
             }
 
             return AccessMethod(method, scope)
