@@ -29,7 +29,8 @@ internal class CannotResolveTypeHandler(private val error: CannotResolveType) : 
               ${error.type.qualifiedName}
               
             Suggestions:
-              * Check if the type is visible and/or provided as transitive dependency to the module where ${error.scope.qualifiedName} is
+              * Check if the module of ${error.type.qualifiedName} is provided as a dependency 
+              to the module where the parent scope of ${error.scope.qualifiedName} is defined.
         """.trimIndent()
         )
     }
