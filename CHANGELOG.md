@@ -1,3 +1,7 @@
+# 0.3.8
+
+* Throw CannotResolveType error when compiler cannot resolve it.
+
 # 0.3.7
 
 * Fix edge case of compiler unable to find dependency methods with inner classes types.
