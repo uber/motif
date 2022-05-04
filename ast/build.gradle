@@ -7,7 +7,6 @@ apply plugin: 'kotlin-kapt'
 
 sourceCompatibility = 1.8
 
-
 dependencies {
     implementation deps.kotlin.stdlib
     implementation deps.dagger
@@ -16,4 +15,4 @@ dependencies {
     testImplementation deps.test.truth
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'com.vanniktech.maven.publish'
