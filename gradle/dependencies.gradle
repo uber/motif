@@ -39,6 +39,7 @@ ext.deps = [
                         android: 'com.android.tools.build:gradle:4.2.0',
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
+                        mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.18.0',
                 ]
         ],
         "kotlin": [

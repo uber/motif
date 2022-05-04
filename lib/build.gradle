@@ -8,4 +8,4 @@ dependencies {
     api deps.dagger
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'com.vanniktech.maven.publish'
