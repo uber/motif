@@ -16,10 +16,14 @@
 package motif.sample.app.root;
 
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import java.util.List;
@@ -34,17 +38,15 @@ import motif.sample.lib.multiselect.MultiSelector;
 
 class RootController extends Controller<RootView> {
 
-    private static final int PERMISSION_EXTERNAL_STORAGE = 1;
-
-
     private final RootScope scope;
-    private final Activity activity;
+    private final AppCompatActivity activity;
     private final Database database;
     private final MultiSelector multiSelector;
+    private final ActivityResultLauncher<String> sdCardPermissionLauncher;
 
     RootController(
             RootScope scope,
-            Activity activity,
+            AppCompatActivity activity,
             Database database,
             MultiSelector multiSelector) {
         super(activity, R.layout.root);
@@ -52,6 +54,15 @@ class RootController extends Controller<RootView> {
         this.activity = activity;
         this.database = database;
         this.multiSelector = multiSelector;
+        this.sdCardPermissionLauncher = register(activity);
+    }
+
+    /**
+     * It has to be registered prior to the onResume lifecycle per official doc.
+     * More refer to https://stackoverflow.com/a/64477786
+     */
+    private ActivityResultLauncher<String> register(AppCompatActivity activity) {
+        return activity.registerForActivityResult(new ActivityResultContracts.RequestPermission(), this::onSdCardPermissionReturned);
     }
 
     @Override
@@ -61,7 +72,6 @@ class RootController extends Controller<RootView> {
         } else {
             loadData();
         }
-
     }
 
     @RequiresPermission("android.permission.READ_EXTERNAL_STORAGE")
@@ -90,8 +100,15 @@ class RootController extends Controller<RootView> {
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                PERMISSION_EXTERNAL_STORAGE);
+        sdCardPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void onSdCardPermissionReturned(boolean granted) {
+        if (granted) {
+            loadData();
+        } else {
+            Toast.makeText(activity, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
     }
 }

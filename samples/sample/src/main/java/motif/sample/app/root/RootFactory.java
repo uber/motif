@@ -17,6 +17,9 @@ package motif.sample.app.root;
 
 import android.app.Activity;
 import android.content.Context;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import motif.Creatable;
 import motif.NoDependencies;
 import motif.Scope;
@@ -29,5 +32,5 @@ import motif.Scope;
 @Scope
 public interface RootFactory extends Creatable<NoDependencies> {
 
-    RootScope create(Activity activity);
+    RootScope create(AppCompatActivity activity);
 }

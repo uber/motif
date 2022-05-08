@@ -30,7 +30,7 @@ ext.deps = [
         "versions": versions,
         "build": [
                 buildToolsVersion: '30.0.3',
-                compileSdkVersion: 30,
+                compileSdkVersion: 31,
                 ci: 'true' == System.getenv('CI'),
                 minSdkVersion: 14,
                 targetSdkVersion: 30,
@@ -57,7 +57,7 @@ ext.deps = [
                 annotations: 'androidx.annoation:annoation:1.1.0',
                 design: 'com.google.android.material:material:1.0.0',
                 recyclerview: 'androidx.recyclerview:recyclerview:1.0.0',
-                appCompat: 'androidx.appcompat:appcompat:1.0.2'
+                appCompat: 'androidx.appcompat:appcompat:1.4.0'
         ],
         "test": [
                 junit: 'junit:junit:4.12',
