@@ -105,10 +105,6 @@ class RootController extends Controller<RootView> {
 
     @SuppressLint("MissingPermission")
     private void onSdCardPermissionReturned(boolean granted) {
-        if (granted) {
-            loadData();
-        } else {
-            Toast.makeText(activity, "Permission denied", Toast.LENGTH_SHORT).show();
-        }
+        loadData();
     }
 }
