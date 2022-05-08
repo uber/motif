@@ -13,7 +13,7 @@
         android:name="motif.sample.app.application.Application"
         android:icon="@drawable/ub__ic_launcher"
         android:label="Motif Sample"
-        android:theme="@style/Theme.MaterialComponents.Light">
+        android:theme="@style/Theme.AppCompat.Light">
         <activity android:name="motif.sample.app.root.RootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
