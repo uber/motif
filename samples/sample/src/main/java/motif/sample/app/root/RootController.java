@@ -15,50 +15,83 @@
  */
 package motif.sample.app.root;
 
-import android.content.Context;
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+
+import androidx.annotation.RequiresPermission;
+import androidx.core.app.ActivityCompat;
+
+import java.util.List;
 
 import motif.sample.R;
-import motif.sample.app.photo_grid.PhotoGridView;
 import motif.sample.app.bottom_sheet.BottomSheetView;
+import motif.sample.app.photo_grid.PhotoGridView;
 import motif.sample.lib.controller.Controller;
 import motif.sample.lib.db.Database;
+import motif.sample.lib.db.Photo;
 import motif.sample.lib.multiselect.MultiSelector;
 
 class RootController extends Controller<RootView> {
 
+    private static final int PERMISSION_EXTERNAL_STORAGE = 1;
+
+
     private final RootScope scope;
+    private final Activity activity;
     private final Database database;
     private final MultiSelector multiSelector;
 
     RootController(
             RootScope scope,
-            Context context,
+            Activity activity,
             Database database,
             MultiSelector multiSelector) {
-        super(context, R.layout.root);
+        super(activity, R.layout.root);
         this.scope = scope;
+        this.activity = activity;
         this.database = database;
         this.multiSelector = multiSelector;
     }
 
     @Override
     protected void onAttach() {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission();
+        } else {
+            loadData();
+        }
+
+    }
+
+    @RequiresPermission("android.permission.READ_EXTERNAL_STORAGE")
+    private void loadData() {
         database.populateIfNecessary()
                 .as(autoDispose())
-                .subscribe(() -> {
-                    PhotoGridView photoGridView = scope.photoList(view).view();
-                    view.showPhotos(photoGridView);
-                });
+                .subscribe(this::onDataPopulated);
 
         multiSelector.selected()
                 .as(autoDispose())
-                .subscribe(photos -> {
-                    if (photos.isEmpty()) {
-                        view.clearBottomSheet();
-                    } else if (!view.isSectionViewShowing()) {
-                        BottomSheetView bottomSheetView = scope.bottomSheet(this.view).view();
-                        view.showBottomSheet(bottomSheetView);
-                    }
-                });
+                .subscribe(this::onPhotoSelected);
+    }
+
+    private void onPhotoSelected(List<Photo> photos) {
+        if (photos.isEmpty()) {
+            view.clearBottomSheet();
+        } else if (!view.isSectionViewShowing()) {
+            BottomSheetView bottomSheetView = scope.bottomSheet(this.view).view();
+            view.showBottomSheet(bottomSheetView);
+        }
+    }
+
+    private void onDataPopulated() {
+        PhotoGridView photoGridView = scope.photoList(view).view();
+        view.showPhotos(photoGridView);
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSION_EXTERNAL_STORAGE);
     }
 }
