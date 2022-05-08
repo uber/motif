@@ -15,6 +15,8 @@
  */
 package motif.sample.app.root;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.ViewGroup;
 import motif.Expose;
 import motif.Scope;
@@ -38,6 +40,9 @@ public interface RootScope {
 
         @Expose
         abstract Database database();
+
+        @Expose
+        abstract Context activityContext(Activity activity);
 
         @Expose
         abstract MultiSelector multiSelector();
