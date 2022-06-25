@@ -18,10 +18,12 @@ package motif.sample
 import android.app.Activity
 import android.os.Bundle
 import android.widget.TextView
+import motif.ScopeFactory
 
 class MainActivity : Activity() {
 
-    private val mainScope: MainScope = MainScopeImpl()
+    private val mainScope: MainScope = ScopeFactory.create(MainScope::class.java, object :
+        MainScope.Dependencies {})
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
