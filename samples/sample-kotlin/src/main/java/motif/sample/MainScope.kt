@@ -15,19 +15,23 @@
  */
 package motif.sample
 
+import motif.Creatable
 import motif.Scope
 import javax.inject.Named
 
 @Scope
-interface MainScope {
+interface MainScope : Creatable<MainScope.Dependencies> {
 
     fun greeter(): Greeter
 
     @motif.Objects
     open class Objects {
 
-        @Named("name") fun name() = "World"
+        @Named("name")
+        fun name() = "World"
 
         fun greeter(@Named("name") name: String) = Greeter(name)
     }
+
+    interface Dependencies
 }
