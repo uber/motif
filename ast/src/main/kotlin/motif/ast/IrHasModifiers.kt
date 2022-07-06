@@ -17,21 +17,21 @@ package motif.ast
 
 interface IrHasModifiers {
 
-    val modifiers: Set<IrModifier>
+  val modifiers: Set<IrModifier>
 
-    fun isStatic(): Boolean {
-        return IrModifier.STATIC in modifiers
-    }
+  fun isStatic(): Boolean {
+    return IrModifier.STATIC in modifiers
+  }
 
-    fun isPrivate(): Boolean {
-        return IrModifier.PRIVATE in modifiers
-    }
+  fun isPrivate(): Boolean {
+    return IrModifier.PRIVATE in modifiers
+  }
 
-    fun isPublic(): Boolean {
-        return IrModifier.PUBLIC in modifiers
-    }
+  fun isPublic(): Boolean {
+    return IrModifier.PUBLIC in modifiers
+  }
 
-    fun isAbstract(): Boolean {
-        return IrModifier.ABSTRACT in modifiers
-    }
+  fun isAbstract(): Boolean {
+    return IrModifier.ABSTRACT in modifiers
+  }
 }

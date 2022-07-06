@@ -19,13 +19,14 @@ import motif.models.VoidFactoryMethod
 
 internal class VoidFactoryMethodHandler(private val error: VoidFactoryMethod) : ErrorHandler {
 
-    override val name = "VOID FACTORY METHOD"
+  override val name = "VOID FACTORY METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Factory methods must be non-void:
 
               void ${error.objects.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

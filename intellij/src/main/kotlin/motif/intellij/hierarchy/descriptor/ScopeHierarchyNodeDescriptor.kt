@@ -22,46 +22,45 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.openapi.util.Comparing
 import com.intellij.psi.PsiElement
-import motif.core.ResolvedGraph
 import java.awt.Color
 import java.awt.Font
+import motif.core.ResolvedGraph
 
 /*
  * Base class for all tree node descriptors used in Motif IntelliJ plugin. It simplifies populate text content of
  * nodes, and provides an optional legend.
  */
 open class ScopeHierarchyNodeDescriptor(
-        project: Project,
-        val graph: ResolvedGraph,
-        val parentDescriptor: HierarchyNodeDescriptor?,
-        val element: PsiElement,
-        isBase: Boolean)
-    : HierarchyNodeDescriptor(project, parentDescriptor, element, isBase) {
+    project: Project,
+    val graph: ResolvedGraph,
+    val parentDescriptor: HierarchyNodeDescriptor?,
+    val element: PsiElement,
+    isBase: Boolean
+) : HierarchyNodeDescriptor(project, parentDescriptor, element, isBase) {
 
-    open fun updateText(text: CompositeAppearance) {}
+  open fun updateText(text: CompositeAppearance) {}
 
-    open fun getLegend(): String? {
-        return null
+  open fun getLegend(): String? {
+    return null
+  }
+
+  override fun update(): Boolean {
+    val changes = super.update()
+
+    if (psiElement == null) {
+      return invalidElement()
     }
 
-    override fun update(): Boolean {
-        val changes = super.update()
+    val oldText = myHighlightedText
+    myHighlightedText = CompositeAppearance()
+    updateText(myHighlightedText)
 
-        if (psiElement == null) {
-            return invalidElement()
-        }
+    return changes || !Comparing.equal(myHighlightedText, oldText)
+  }
 
-        val oldText = myHighlightedText
-        myHighlightedText = CompositeAppearance()
-        updateText(myHighlightedText)
-
-        return changes || !Comparing.equal(myHighlightedText, oldText)
-    }
-
-    fun getDefaultTextAttributes(isError: Boolean = false): TextAttributes {
-        val font: Int = if (myIsBase) Font.BOLD else Font.PLAIN
-        return if (isError)
-            TextAttributes(myColor, null, Color.red, EffectType.WAVE_UNDERSCORE, font) else
-            TextAttributes(myColor, null, null, null, font)
-    }
+  fun getDefaultTextAttributes(isError: Boolean = false): TextAttributes {
+    val font: Int = if (myIsBase) Font.BOLD else Font.PLAIN
+    return if (isError) TextAttributes(myColor, null, Color.red, EffectType.WAVE_UNDERSCORE, font)
+    else TextAttributes(myColor, null, null, null, font)
+  }
 }

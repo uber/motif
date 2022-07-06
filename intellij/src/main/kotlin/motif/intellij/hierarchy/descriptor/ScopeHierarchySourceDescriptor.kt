@@ -22,59 +22,66 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import java.awt.Font
+import javax.swing.Icon
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
-import motif.models.*
-import java.awt.Font
-import javax.swing.Icon
+import motif.models.ChildParameterSource
+import motif.models.FactoryMethodSource
+import motif.models.ScopeSource
+import motif.models.Source
+import motif.models.SpreadSource
 
 open class ScopeHierarchySourceDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        val source: Source)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, getElementFromSource(source), false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    val source: Source
+) :
+    ScopeHierarchyNodeDescriptor(
+        project, graph, parentDescriptor, getElementFromSource(source), false) {
 
-    companion object {
-        fun getElementFromSource(source: Source): PsiElement {
-            return when (source) {
-                is FactoryMethodSource -> {
-                    (source.factoryMethod.method as IntelliJMethod).psiMethod
-                }
-                is ScopeSource -> {
-                    (source.scope.clazz as IntelliJClass).psiClass
-                }
-                is SpreadSource -> {
-                    (source.spreadMethod.method as IntelliJMethod).psiMethod
-                }
-                is ChildParameterSource -> {
-                    (source.parameter.method.method as IntelliJMethod).psiMethod
-                }
-            }
+  companion object {
+    fun getElementFromSource(source: Source): PsiElement {
+      return when (source) {
+        is FactoryMethodSource -> {
+          (source.factoryMethod.method as IntelliJMethod).psiMethod
         }
-    }
-
-    override fun updateText(text: CompositeAppearance) {
-        if (source.isExposed) {
-            text.ending.addText("@Expose ", TextAttributes(myColor, null, null, null, Font.ITALIC))
+        is ScopeSource -> {
+          (source.scope.clazz as IntelliJClass).psiClass
         }
-        text.ending.addText(source.type.simpleName)
-        text.ending.addText(" (" + formatQualifiedName(source.type.qualifiedName) + ")", getPackageNameAttributes())
+        is SpreadSource -> {
+          (source.spreadMethod.method as IntelliJMethod).psiMethod
+        }
+        is ChildParameterSource -> {
+          (source.parameter.method.method as IntelliJMethod).psiMethod
+        }
+      }
     }
+  }
 
-    override fun getLegend(): String? {
-        // TODO
-        return super.getLegend()
+  override fun updateText(text: CompositeAppearance) {
+    if (source.isExposed) {
+      text.ending.addText("@Expose ", TextAttributes(myColor, null, null, null, Font.ITALIC))
     }
+    text.ending.addText(source.type.simpleName)
+    text.ending.addText(
+        " (" + formatQualifiedName(source.type.qualifiedName) + ")", getPackageNameAttributes())
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface else AllIcons.Nodes.Class
-    }
+  override fun getLegend(): String? {
+    // TODO
+    return super.getLegend()
+  }
 
-    override fun toString(): String {
-        return source.type.simpleName
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface
+    else AllIcons.Nodes.Class
+  }
+
+  override fun toString(): String {
+    return source.type.simpleName
+  }
 }
-

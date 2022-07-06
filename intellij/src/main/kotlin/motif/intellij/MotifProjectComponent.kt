@@ -46,197 +46,210 @@ import org.jetbrains.kotlin.idea.KotlinLanguage
 
 class MotifProjectComponent(val project: Project) : ProjectComponent {
 
-    companion object {
-        const val TOOL_WINDOW_ID: String = "Motif"
+  companion object {
+    const val TOOL_WINDOW_ID: String = "Motif"
 
-        private const val TOOL_WINDOW_TITLE: String = "Scopes"
-        private const val TAB_NAME_ERRORS: String = "Errors"
-        private const val TAB_NAME_SCOPES: String = "All Scopes"
-        private const val TAB_NAME_USAGE: String = "Usage"
-        private const val TAB_NAME_USAGE_OF: String = "Usage of %s"
-        private const val TAB_NAME_ANCESTOR: String = "Ancestors"
-        private const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
-        private const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
-        private const val LABEL_GRAPH_COMPUTATION_ERROR: String = "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
+    private const val TOOL_WINDOW_TITLE: String = "Scopes"
+    private const val TAB_NAME_ERRORS: String = "Errors"
+    private const val TAB_NAME_SCOPES: String = "All Scopes"
+    private const val TAB_NAME_USAGE: String = "Usage"
+    private const val TAB_NAME_USAGE_OF: String = "Usage of %s"
+    private const val TAB_NAME_ANCESTOR: String = "Ancestors"
+    private const val TAB_NAME_ANCESTOR_OF: String = "Ancestors of %s"
+    private const val LABEL_GRAPH_REFRESH: String = "Refreshing Motif Graph"
+    private const val LABEL_GRAPH_COMPUTATION_ERROR: String =
+        "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
 
-        private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph", "motif_ancestor_graph")
+    private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph", "motif_ancestor_graph")
 
-        fun getInstance(project: Project): MotifProjectComponent {
-            return project.getComponent(MotifProjectComponent::class.java)
-        }
+    fun getInstance(project: Project): MotifProjectComponent {
+      return project.getComponent(MotifProjectComponent::class.java)
     }
+  }
 
-    private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
-    private var scopePanel: MotifScopePanel? = null
-    private var scopeContent: Content? = null
-    private var errorPanel: MotifErrorPanel? = null
-    private var errorContent: Content? = null
-    private var usagePanel: MotifUsagePanel? = null
-    private var usageContent: Content? = null
-    private var ancestorPanel: MotifScopePanel? = null
-    private var ancestorContent: Content? = null
-    private var isRefreshing: Boolean = false
-    private var pendingAction: (() -> Unit)? = null
+  private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
+  private var scopePanel: MotifScopePanel? = null
+  private var scopeContent: Content? = null
+  private var errorPanel: MotifErrorPanel? = null
+  private var errorContent: Content? = null
+  private var usagePanel: MotifUsagePanel? = null
+  private var usageContent: Content? = null
+  private var ancestorPanel: MotifScopePanel? = null
+  private var ancestorContent: Content? = null
+  private var isRefreshing: Boolean = false
+  private var pendingAction: (() -> Unit)? = null
 
-    override fun projectOpened() {
-        DumbService.getInstance(project).runWhenSmart {
-            ApplicationManager.getApplication().runReadAction {
-                // Initialize plugin with empty graph to avoid IDE startup slowdown
-                val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
-                onGraphUpdated(emptyGraph)
+  override fun projectOpened() {
+    DumbService.getInstance(project).runWhenSmart {
+      ApplicationManager.getApplication().runReadAction {
+        // Initialize plugin with empty graph to avoid IDE startup slowdown
+        val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
+        onGraphUpdated(emptyGraph)
 
-                AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.PROJECT_OPENED)
-            }
-        }
+        AnalyticsProjectComponent.getInstance(project)
+            .logEvent(MotifAnalyticsActions.PROJECT_OPENED)
+      }
     }
+  }
 
-    fun refreshGraph() {
-        if (isRefreshing) {
-            return
-        }
-        isRefreshing = true
+  fun refreshGraph() {
+    if (isRefreshing) {
+      return
+    }
+    isRefreshing = true
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, LABEL_GRAPH_REFRESH) {
-            override fun run(indicator: ProgressIndicator) {
+    ProgressManager.getInstance()
+        .run(
+            object : Task.Backgroundable(project, LABEL_GRAPH_REFRESH) {
+              override fun run(indicator: ProgressIndicator) {
                 ApplicationManager.getApplication().runReadAction {
-                    try {
-                        val updatedGraph: ResolvedGraph = graphFactory.compute()
-                        onGraphUpdated(updatedGraph)
+                  try {
+                    val updatedGraph: ResolvedGraph = graphFactory.compute()
+                    onGraphUpdated(updatedGraph)
 
-                        val eventName: String = if (updatedGraph.errors.isNotEmpty()) MotifAnalyticsActions.GRAPH_UPDATE_ERROR else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
-                        AnalyticsProjectComponent.getInstance(project).logEvent(eventName)
-                    } catch (t: Throwable) {
-                        val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
-                        onGraphUpdated(emptyGraph)
+                    val eventName: String =
+                        if (updatedGraph.errors.isNotEmpty())
+                            MotifAnalyticsActions.GRAPH_UPDATE_ERROR
+                        else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
+                    AnalyticsProjectComponent.getInstance(project).logEvent(eventName)
+                  } catch (t: Throwable) {
+                    val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
+                    onGraphUpdated(emptyGraph)
 
-                        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
-                        PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, t)
-                    } finally {
-                        isRefreshing = false
-                    }
+                    AnalyticsProjectComponent.getInstance(project)
+                        .logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
+                    PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, t)
+                  } finally {
+                    isRefreshing = false
+                  }
                 }
-            }
-        })
-    }
+              }
+            })
+  }
 
-    fun refreshGraph(action: () -> Unit) {
-        pendingAction = action
-        refreshGraph()
-    }
+  fun refreshGraph(action: () -> Unit) {
+    pendingAction = action
+    refreshGraph()
+  }
 
-    fun onSelectedClass(element: PsiElement) {
-        if (element !is PsiClass) {
-            return
+  fun onSelectedClass(element: PsiElement) {
+    if (element !is PsiClass) {
+      return
+    }
+    val toolWindow: ToolWindow =
+        ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+    if (findContentByDescription(toolWindow, TAB_NAME_USAGE) == null) {
+      usageContent = createUsageContent(toolWindow)
+    }
+    usagePanel?.setSelectedClass(element)
+    usageContent?.displayName = TAB_NAME_USAGE_OF.format(element.name)
+    usageContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+  }
+
+  fun onSelectedAncestorScope(element: PsiElement) {
+    if (element !is PsiClass) {
+      return
+    }
+    val toolWindow: ToolWindow =
+        ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+    if (findContentByDescription(toolWindow, TAB_NAME_ANCESTOR) == null) {
+      ancestorContent = createAncestorContent(toolWindow)
+    }
+    ancestorPanel?.setSelectedScope(element)
+    ancestorContent?.displayName = TAB_NAME_ANCESTOR_OF.format(element.name)
+    ancestorContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+  }
+
+  private fun onGraphUpdated(graph: ResolvedGraph) {
+    ApplicationManager.getApplication().invokeLater {
+      val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
+      if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
+        val toolWindow: ToolWindow =
+            toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
+        toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg"))
+        toolWindow.title = TOOL_WINDOW_TITLE
+
+        scopePanel = MotifScopePanel(project, graph)
+        errorPanel = MotifErrorPanel(project, graph)
+        usagePanel = MotifUsagePanel(project, graph)
+        ancestorPanel = MotifScopePanel(project, graph)
+
+        scopeContent = createScopeContent(toolWindow)
+        errorContent = createErrorContent(toolWindow)
+      } else {
+        scopePanel?.onGraphUpdated(graph)
+        errorPanel?.onGraphUpdated(graph)
+        usagePanel?.onGraphUpdated(graph)
+        ancestorPanel?.onGraphUpdated(graph)
+      }
+
+      // display # of errors in tab label
+      errorContent?.displayName = TAB_NAME_ERRORS + " (" + graph.errors.size + ")"
+
+      // Propagate changes to line markers provider
+      val languages: List<Language> = listOf(JavaLanguage.INSTANCE, KotlinLanguage.INSTANCE)
+      languages.forEach {
+        for (lineMarkerProvider in LineMarkerProviders.getInstance().allForLanguage(it)) {
+          if (lineMarkerProvider is Listener) {
+            lineMarkerProvider.onGraphUpdated(graph)
+          }
         }
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        if (findContentByDescription(toolWindow, TAB_NAME_USAGE) == null) {
-            usageContent = createUsageContent(toolWindow)
+      }
+
+      // Propagate changes to actions
+      MOTIF_ACTION_IDS.forEach {
+        val usageAction: AnAction = ActionManager.getInstance().getAction(it)
+        if (usageAction is Listener) {
+          usageAction.onGraphUpdated(graph)
         }
-        usagePanel?.setSelectedClass(element)
-        usageContent?.displayName = TAB_NAME_USAGE_OF.format(element.name)
-        usageContent?.let { toolWindow.contentManager.setSelectedContent(it) }
+      }
+
+      // Execute last pending action
+      pendingAction?.invoke()
+      pendingAction = null
     }
+  }
 
-    fun onSelectedAncestorScope(element: PsiElement) {
-        if (element !is PsiClass) {
-            return
-        }
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        if (findContentByDescription(toolWindow, TAB_NAME_ANCESTOR) == null) {
-            ancestorContent = createAncestorContent(toolWindow)
-        }
-        ancestorPanel?.setSelectedScope(element)
-        ancestorContent?.displayName = TAB_NAME_ANCESTOR_OF.format(element.name)
-        ancestorContent?.let { toolWindow.contentManager.setSelectedContent(it) }
-    }
+  private fun createScopeContent(toolWindow: ToolWindow): Content {
+    val content =
+        ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
+    content.isCloseable = false
+    toolWindow.contentManager.addContent(content)
+    return content
+  }
 
-    private fun onGraphUpdated(graph: ResolvedGraph) {
-        ApplicationManager.getApplication().invokeLater {
-            val toolWindowManager: ToolWindowManager = ToolWindowManager.getInstance(project)
-            if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
-                val toolWindow: ToolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
-                toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg"))
-                toolWindow.title = TOOL_WINDOW_TITLE
+  private fun createErrorContent(toolWindow: ToolWindow): Content {
+    val content =
+        ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
+    content.isCloseable = false
+    toolWindow.contentManager.addContent(content)
+    return content
+  }
 
-                scopePanel = MotifScopePanel(project, graph)
-                errorPanel = MotifErrorPanel(project, graph)
-                usagePanel = MotifUsagePanel(project, graph)
-                ancestorPanel = MotifScopePanel(project, graph)
+  private fun createUsageContent(toolWindow: ToolWindow): Content {
+    val content: Content =
+        ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
+    content.description = TAB_NAME_USAGE
+    content.isCloseable = true
+    toolWindow.contentManager.addContent(content)
+    return content
+  }
 
-                scopeContent = createScopeContent(toolWindow)
-                errorContent = createErrorContent(toolWindow)
-            } else {
-                scopePanel?.onGraphUpdated(graph)
-                errorPanel?.onGraphUpdated(graph)
-                usagePanel?.onGraphUpdated(graph)
-                ancestorPanel?.onGraphUpdated(graph)
-            }
+  private fun createAncestorContent(toolWindow: ToolWindow): Content {
+    val content: Content =
+        ContentFactory.SERVICE.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
+    content.description = TAB_NAME_ANCESTOR
+    content.isCloseable = true
+    toolWindow.contentManager.addContent(content)
+    return content
+  }
 
-            // display # of errors in tab label
-            errorContent?.displayName = TAB_NAME_ERRORS + " (" + graph.errors.size + ")"
+  private fun findContentByDescription(toolWindow: ToolWindow, description: String): Content? {
+    return toolWindow.contentManager.contents.firstOrNull { it.description == description }
+  }
 
-            // Propagate changes to line markers provider
-            val languages: List<Language> = listOf(JavaLanguage.INSTANCE, KotlinLanguage.INSTANCE)
-            languages.forEach {
-                for (lineMarkerProvider in LineMarkerProviders.getInstance().allForLanguage(it)) {
-                    if (lineMarkerProvider is Listener) {
-                        lineMarkerProvider.onGraphUpdated(graph)
-                    }
-                }
-            }
+  interface Listener {
 
-            // Propagate changes to actions
-            MOTIF_ACTION_IDS.forEach {
-                val usageAction: AnAction = ActionManager.getInstance().getAction(it)
-                if (usageAction is Listener) {
-                    usageAction.onGraphUpdated(graph)
-                }
-            }
-
-            // Execute last pending action
-            pendingAction?.invoke()
-            pendingAction = null
-        }
-    }
-
-    private fun createScopeContent(toolWindow: ToolWindow): Content {
-        val content = ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
-        content.isCloseable = false
-        toolWindow.contentManager.addContent(content)
-        return content
-    }
-
-    private fun createErrorContent(toolWindow: ToolWindow): Content {
-        val content = ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
-        content.isCloseable = false
-        toolWindow.contentManager.addContent(content)
-        return content
-    }
-
-    private fun createUsageContent(toolWindow: ToolWindow): Content {
-        val content: Content = ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
-        content.description = TAB_NAME_USAGE
-        content.isCloseable = true
-        toolWindow.contentManager.addContent(content)
-        return content
-    }
-
-    private fun createAncestorContent(toolWindow: ToolWindow): Content {
-        val content: Content = ContentFactory.SERVICE.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
-        content.description = TAB_NAME_ANCESTOR
-        content.isCloseable = true
-        toolWindow.contentManager.addContent(content)
-        return content
-    }
-
-    private fun findContentByDescription(toolWindow: ToolWindow, description: String): Content? {
-        return toolWindow.contentManager.contents.firstOrNull {
-            it.description == description
-        }
-    }
-
-    interface Listener {
-
-        fun onGraphUpdated(graph: ResolvedGraph)
-    }
+    fun onGraphUpdated(graph: ResolvedGraph)
+  }
 }

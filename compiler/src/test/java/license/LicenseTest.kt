@@ -16,16 +16,17 @@
 package license
 
 import com.google.common.truth.Truth.assertThat
+import java.io.File
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.File
 
 class LicenseTest {
 
-    @Rule @JvmField val temporaryFolder = TemporaryFolder()
+  @Rule @JvmField val temporaryFolder = TemporaryFolder()
 
-    private val licenseText = """
+  private val licenseText =
+      """
         /*
          * Copyright (c) 2018-2019 Uber Technologies, Inc.
          *
@@ -43,37 +44,35 @@ class LicenseTest {
          */
     """.trimIndent()
 
-    @Test
-    fun test() {
-        val srcDirs = File("..").walk()
-                .filter { file ->
-                    file.name == "src"
-                            && file.isDirectory
-                            && file.resolveSibling("build.gradle").exists()
-                }
-        val missingLicenses = srcDirs.flatMap { srcDir -> srcDir.walk() }
-                .filter { it.extension == "java" || it.extension == "kt" }
-                .filter { !it.ensureLicense() }
-                .toList()
-        assertThat(missingLicenses).isEmpty()
+  @Test
+  fun test() {
+    val srcDirs =
+        File("..").walk().filter { file ->
+          file.name == "src" && file.isDirectory && file.resolveSibling("build.gradle").exists()
+        }
+    val missingLicenses =
+        srcDirs
+            .flatMap { srcDir -> srcDir.walk() }
+            .filter { it.extension == "java" || it.extension == "kt" }
+            .filter { !it.ensureLicense() }
+            .toList()
+    assertThat(missingLicenses).isEmpty()
+  }
+
+  private fun File.ensureLicense(): Boolean {
+    val hasLicense = useLines { it.take(3).find { "Copyright" in it } != null }
+
+    if (hasLicense) {
+      return true
     }
 
-    private fun File.ensureLicense(): Boolean {
-        val hasLicense = useLines {
-            it.take(3).find { "Copyright" in it } != null
-        }
-
-        if (hasLicense) {
-            return true
-        }
-
-        val tmpFile = temporaryFolder.newFile()
-        tmpFile.writer().use { out ->
-            out.write(licenseText)
-            out.appendLine()
-            reader().copyTo(out)
-        }
-        tmpFile.renameTo(this)
-        return false
+    val tmpFile = temporaryFolder.newFile()
+    tmpFile.writer().use { out ->
+      out.write(licenseText)
+      out.appendLine()
+      reader().copyTo(out)
     }
+    tmpFile.renameTo(this)
+    return false
+  }
 }

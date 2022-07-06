@@ -17,16 +17,16 @@ package motif.compiler
 
 import com.google.common.truth.Truth
 import dagger.Component
+import java.io.File
+import javax.annotation.Nullable
+import javax.inject.Inject
+import kotlin.reflect.KClass
 import motif.Scope
 import org.jetbrains.annotations.NotNull
 import proguard.ClassPath
 import proguard.ClassPathEntry
 import proguard.Configuration
 import proguard.ConfigurationParser
-import java.io.File
-import javax.annotation.Nullable
-import javax.inject.Inject
-import kotlin.reflect.KClass
 
 object ProGuard {
 
@@ -41,36 +41,38 @@ object ProGuard {
                 .map { libraryPath(it) }
     }
 
-    @JvmStatic
-    fun run(
-            externalClassesDir: File?,
-            classesDir: File,
-            proguardFile: File): File {
-        val outputDir = createTempDir()
-        val outputJar = outputDir.resolve("proguarded.jar")
+  @JvmStatic
+  fun run(externalClassesDir: File?, classesDir: File, proguardFile: File): File {
+    val outputDir = createTempDir()
+    val outputJar = outputDir.resolve("proguarded.jar")
 
-        val config = Configuration().apply {
-            programJars = ClassPath().apply {
+    val config =
+        Configuration().apply {
+          programJars =
+              ClassPath().apply {
                 add(ClassPathEntry(classesDir, false))
                 add(ClassPathEntry(outputJar, true))
-            }
-            libraryJars = ClassPath().apply {
-                (listOfNotNull(externalClassesDir) + classPathFiles)
-                        .forEach { add(ClassPathEntry(it, false)) }
-            }
+              }
+          libraryJars =
+              ClassPath().apply {
+                (listOfNotNull(externalClassesDir) + classPathFiles).forEach {
+                  add(ClassPathEntry(it, false))
+                }
+              }
         }
 
-        val configURL = if (proguardFile.exists()) {
-            proguardFile.toURI().toURL()
+    val configURL =
+        if (proguardFile.exists()) {
+          proguardFile.toURI().toURL()
         } else {
-            this::class.java.getResource("/default.pro")
+          this::class.java.getResource("/default.pro")
         }
-        ConfigurationParser(configURL, System.getProperties()).parse(config)
-        proguard.ProGuard(config).execute()
-        return outputJar
-    }
+    ConfigurationParser(configURL, System.getProperties()).parse(config)
+    proguard.ProGuard(config).execute()
+    return outputJar
+  }
 
-    private fun libraryPath(clazz: KClass<*>): File {
-        return File(clazz.java.protectionDomain.codeSource.location.toURI())
-    }
+  private fun libraryPath(clazz: KClass<*>): File {
+    return File(clazz.java.protectionDomain.codeSource.location.toURI())
+  }
 }

@@ -21,13 +21,12 @@ import motif.ast.IrField
 import motif.ast.IrModifier
 import motif.ast.IrType
 
-class IntelliJField(
-        private val project: Project,
-        private val psiField: PsiField) : IrUtil, IrField {
+class IntelliJField(private val project: Project, private val psiField: PsiField) :
+    IrUtil, IrField {
 
-    override val type: IrType by lazy { IntelliJType(project, psiField.type) }
+  override val type: IrType by lazy { IntelliJType(project, psiField.type) }
 
-    override val name: String by lazy { psiField.name }
+  override val name: String by lazy { psiField.name }
 
-    override val modifiers: Set<IrModifier> by lazy { psiField.irModifiers() }
+  override val modifiers: Set<IrModifier> by lazy { psiField.irModifiers() }
 }

@@ -16,16 +16,16 @@
 package motif.ast
 
 interface IrMethod : IrAnnotated, IrHasModifiers {
-    val parameters: List<IrParameter>
-    val returnType: IrType
-    val name: String
-    val isConstructor: Boolean
+  val parameters: List<IrParameter>
+  val returnType: IrType
+  val name: String
+  val isConstructor: Boolean
 
-    fun hasParameters(): Boolean {
-        return parameters.isNotEmpty()
-    }
+  fun hasParameters(): Boolean {
+    return parameters.isNotEmpty()
+  }
 
-    fun isVoid(): Boolean {
-        return returnType.isVoid
-    }
+  fun isVoid(): Boolean {
+    return returnType.isVoid
+  }
 }

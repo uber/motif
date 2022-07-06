@@ -17,28 +17,27 @@ package motif.sample.app.photo_list;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import javax.inject.Inject;
 
 public class PhotoListView extends RecyclerView {
 
-    @Inject
-    public PhotoListView(@NonNull Context context) {
-        this(context, null);
-    }
+  @Inject
+  public PhotoListView(@NonNull Context context) {
+    this(context, null);
+  }
 
-    public PhotoListView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+  public PhotoListView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
 
-    public PhotoListView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        LinearLayoutManager layout = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
-        setLayoutManager(layout);
-    }
+  public PhotoListView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    LinearLayoutManager layout =
+        new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+    setLayoutManager(layout);
+  }
 }

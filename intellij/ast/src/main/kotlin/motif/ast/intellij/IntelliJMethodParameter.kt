@@ -23,17 +23,18 @@ import motif.ast.IrParameter
 import motif.ast.IrType
 
 class IntelliJMethodParameter(
-        private val project: Project,
-        val psiParameter: PsiParameter,
-        val substitutor: PsiSubstitutor) : IrUtil, IrParameter {
+    private val project: Project,
+    val psiParameter: PsiParameter,
+    val substitutor: PsiSubstitutor
+) : IrUtil, IrParameter {
 
-    override val type: IrType by lazy {
-        IntelliJType(project, substitutor.substitute(psiParameter.type))
-    }
+  override val type: IrType by lazy {
+    IntelliJType(project, substitutor.substitute(psiParameter.type))
+  }
 
-    override val name: String by lazy { psiParameter.name!! }
+  override val name: String by lazy { psiParameter.name!! }
 
-    override val annotations: List<IrAnnotation> by lazy {
-        psiParameter.modifierList!!.irAnnotations(project)
-    }
+  override val annotations: List<IrAnnotation> by lazy {
+    psiParameter.modifierList!!.irAnnotations(project)
+  }
 }

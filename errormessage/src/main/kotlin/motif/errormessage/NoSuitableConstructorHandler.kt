@@ -17,12 +17,14 @@ package motif.errormessage
 
 import motif.models.NoSuitableConstructor
 
-internal class NoSuitableConstructorHandler(private val error: NoSuitableConstructor) : ErrorHandler {
+internal class NoSuitableConstructorHandler(private val error: NoSuitableConstructor) :
+    ErrorHandler {
 
-    override val name = "NO SUITABLE CONSTRUCTOR"
+  override val name = "NO SUITABLE CONSTRUCTOR"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             No suitable constructor found for constructor factory return type:
 
               [Type]
@@ -30,6 +32,6 @@ internal class NoSuitableConstructorHandler(private val error: NoSuitableConstru
 
               [Factory Method]
                 ${error.objects.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

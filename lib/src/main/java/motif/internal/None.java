@@ -17,7 +17,7 @@ package motif.internal;
 
 public final class None {
 
-    public static final Object NONE = new None();
+  public static final Object NONE = new None();
 
-    private None() {}
+  private None() {}
 }

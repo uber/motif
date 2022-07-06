@@ -21,8 +21,8 @@ import motif.sample.lib.controller.ViewlessControllerObjects;
 @Scope
 public interface PhotoListItemScope {
 
-    PhotoListItemController controller();
+  PhotoListItemController controller();
 
-    @motif.Objects
-    abstract class Objects extends ViewlessControllerObjects<PhotoListItemController> {}
+  @motif.Objects
+  abstract class Objects extends ViewlessControllerObjects<PhotoListItemController> {}
 }

@@ -24,15 +24,15 @@ import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageString
 
 open class ScopeHierarchyUsageSectionDescriptor(
-        private val nonNullproject: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        val clazz: PsiClass)
-    : ScopeHierarchyNodeDescriptor(nonNullproject, graph, parentDescriptor, clazz, false) {
+    private val nonNullproject: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    val clazz: PsiClass
+) : ScopeHierarchyNodeDescriptor(nonNullproject, graph, parentDescriptor, clazz, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        val count: Int = getUsageCount(nonNullproject, graph, clazz)
-        text.ending.addText("Found usages")
-        text.ending.addText(" " + getUsageString(count), getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    val count: Int = getUsageCount(nonNullproject, graph, clazz)
+    text.ending.addText("Found usages")
+    text.ending.addText(" " + getUsageString(count), getPackageNameAttributes())
+  }
 }

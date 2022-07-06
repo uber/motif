@@ -16,36 +16,35 @@
 package motif.intellij.testing
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.testFramework.LightPlatformTestCase
 import com.intellij.testFramework.TestApplicationManager
+import java.util.concurrent.CountDownLatch
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.util.concurrent.CountDownLatch
 
 class IntelliJRule : TestRule {
 
-    override fun apply(base: Statement, description: Description): Statement {
-        return object : Statement() {
+  override fun apply(base: Statement, description: Description): Statement {
+    return object : Statement() {
 
-            override fun evaluate() {
-                TestApplicationManager.getInstance()
-                var e: Throwable? = null
-                val latch = CountDownLatch(1)
-                ApplicationManager.getApplication().invokeLater {
-                    ApplicationManager.getApplication().runReadAction {
-                        try {
-                            base.evaluate()
-                        } catch (throwable: Throwable) {
-                            e = throwable
-                        } finally {
-                            latch.countDown()
-                        }
-                    }
-                }
-                latch.await()
-                e?.let { throw it }
+      override fun evaluate() {
+        TestApplicationManager.getInstance()
+        var e: Throwable? = null
+        val latch = CountDownLatch(1)
+        ApplicationManager.getApplication().invokeLater {
+          ApplicationManager.getApplication().runReadAction {
+            try {
+              base.evaluate()
+            } catch (throwable: Throwable) {
+              e = throwable
+            } finally {
+              latch.countDown()
             }
+          }
         }
+        latch.await()
+        e?.let { throw it }
+      }
     }
+  }
 }

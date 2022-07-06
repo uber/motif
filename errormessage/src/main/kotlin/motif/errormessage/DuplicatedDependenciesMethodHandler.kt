@@ -17,18 +17,21 @@ package motif.errormessage
 
 import motif.models.DuplicatedDependenciesMethod
 
-internal class DuplicatedDependenciesMethodHandler(private val error: DuplicatedDependenciesMethod) : ErrorHandler {
+internal class DuplicatedDependenciesMethodHandler(
+    private val error: DuplicatedDependenciesMethod
+) : ErrorHandler {
 
-    override val name = "DUPLICATED DEPENDENCIES METHOD"
+  override val name = "DUPLICATED DEPENDENCIES METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("Multiple dependencies methods of the same type:\n")
-        append(error.duplicatedMethods.joinToString("\n") { "  * ${it.qualifiedName}" })
-        appendLine()
-        appendLine()
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine("Multiple dependencies methods of the same type:\n")
+    append(error.duplicatedMethods.joinToString("\n") { "  * ${it.qualifiedName}" })
+    appendLine()
+    appendLine()
+    appendLine(
+        """
             Suggestions:
               * Remove the redundant methods
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

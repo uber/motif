@@ -33,52 +33,53 @@ import org.jetbrains.uast.toUElement
 
 class GraphFactory(private val project: Project) {
 
-    private val psiManager = PsiManager.getInstance(project)
-    private val psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+  private val psiManager = PsiManager.getInstance(project)
+  private val psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
 
-    fun compute(): ResolvedGraph {
-        val scopeClasses: List<IrClass> = getScopeClasses()
-        return ResolvedGraph.create(scopeClasses)
+  fun compute(): ResolvedGraph {
+    val scopeClasses: List<IrClass> = getScopeClasses()
+    return ResolvedGraph.create(scopeClasses)
+  }
+
+  private fun getScopeClasses(): List<IrClass> {
+    val scopeClasses = mutableListOf<IrClass>()
+    ProjectFileIndex.SERVICE.getInstance(project).iterateContent { file ->
+      scopeClasses.addAll(getScopeClasses(file))
+      true
     }
+    return scopeClasses
+  }
 
-    private fun getScopeClasses(): List<IrClass> {
-        val scopeClasses = mutableListOf<IrClass>()
-        ProjectFileIndex.SERVICE.getInstance(project).iterateContent { file ->
-            scopeClasses.addAll(getScopeClasses(file))
-            true
+  private fun getScopeClasses(virtualFile: VirtualFile): List<IrClass> {
+    val psiFile = psiManager.findFile(virtualFile) ?: return emptyList()
+    val psiClasses: Iterable<PsiClass> =
+        when (psiFile) {
+          is PsiJavaFile -> getScopeClasses(psiFile)
+          is KtFile -> getScopeClasses(psiFile)
+          else -> return emptyList()
         }
-        return scopeClasses
-    }
+    return psiClasses
+        .flatMap(this::getClasses)
+        .filter(this::isScopeClass)
+        .map(psiElementFactory::createType)
+        .map { type -> IntelliJClass(project, type, type.resolve()!!) }
+  }
 
-    private fun getScopeClasses(virtualFile: VirtualFile): List<IrClass> {
-        val psiFile = psiManager.findFile(virtualFile) ?: return emptyList()
-        val psiClasses: Iterable<PsiClass> = when (psiFile) {
-            is PsiJavaFile -> getScopeClasses(psiFile)
-            is KtFile -> getScopeClasses(psiFile)
-            else -> return emptyList()
-        }
-        return psiClasses
-                .flatMap(this::getClasses)
-                .filter(this::isScopeClass)
-                .map(psiElementFactory::createType)
-                .map { type ->
-                    IntelliJClass(project, type, type.resolve()!!)
-                }
-    }
+  private fun getScopeClasses(psiFile: PsiJavaFile): Iterable<PsiClass> {
+    return psiFile.classes.toList()
+  }
 
-    private fun getScopeClasses(psiFile: PsiJavaFile): Iterable<PsiClass> {
-        return psiFile.classes.toList()
+  private fun getScopeClasses(psiFile: KtFile): Iterable<PsiClass> {
+    return psiFile.declarations.filterIsInstance<KtClass>().map {
+      it.toUElement(UClass::class.java)!!.javaPsi
     }
+  }
 
-    private fun getScopeClasses(psiFile: KtFile): Iterable<PsiClass> {
-        return psiFile.declarations.filterIsInstance<KtClass>().map { it.toUElement(UClass::class.java)!!.javaPsi }
-    }
+  private fun getClasses(psiClass: PsiClass): List<PsiClass> {
+    return listOf(psiClass) + psiClass.innerClasses.flatMap(this::getClasses)
+  }
 
-    private fun getClasses(psiClass: PsiClass): List<PsiClass> {
-        return listOf(psiClass) + psiClass.innerClasses.flatMap(this::getClasses)
-    }
-
-    private fun isScopeClass(psiClass: PsiClass): Boolean {
-        return psiClass.annotations.find { it.qualifiedName == Scope::class.qualifiedName} != null
-    }
+  private fun isScopeClass(psiClass: PsiClass): Boolean {
+    return psiClass.annotations.find { it.qualifiedName == Scope::class.qualifiedName } != null
+  }
 }

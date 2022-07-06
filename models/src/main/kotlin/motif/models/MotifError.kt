@@ -16,7 +16,7 @@
 package motif.models
 
 /**
- * An error that can be produced by Motif's core parsing and graph processing logic. This is not a sealed class because
- * it's implementations are spread across multiple modules.
+ * An error that can be produced by Motif's core parsing and graph processing logic. This is not a
+ * sealed class because it's implementations are spread across multiple modules.
  */
 interface MotifError

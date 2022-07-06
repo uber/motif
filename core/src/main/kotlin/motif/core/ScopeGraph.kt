@@ -15,7 +15,6 @@
  */
 package motif.core
 
-import motif.ast.IrClass
 import motif.ast.IrType
 import motif.models.ChildMethod
 import motif.models.ErrorScope
@@ -25,55 +24,62 @@ import motif.models.Scope
 class ScopeEdge(val parent: Scope, val child: Scope, val method: ChildMethod)
 
 /**
- * Graph of [Scopes][Scope] as defined by [Scope.childMethods]. Throws an [IllegalStateException] if any of a
- * Scope's childEdge Scopes does not exist in the initial list of Scopes.
+ * Graph of [Scopes] [Scope] as defined by [Scope.childMethods]. Throws an [IllegalStateException]
+ * if any of a Scope's childEdge Scopes does not exist in the initial list of Scopes.
  */
 internal class ScopeGraph private constructor(val scopes: List<Scope>) {
 
-    private val scopeMap: Map<IrType, Scope> = scopes.associateBy { it.clazz.type }
-    private val childEdges: Map<Scope, List<ScopeEdge>> = scopes.associate { scope -> scope to createChildren(scope) }
-    private val parentEdges: Map<Scope, List<ScopeEdge>> = {
+  private val scopeMap: Map<IrType, Scope> = scopes.associateBy { it.clazz.type }
+  private val childEdges: Map<Scope, List<ScopeEdge>> =
+      scopes.associate { scope -> scope to createChildren(scope) }
+  private val parentEdges: Map<Scope, List<ScopeEdge>> =
+      {
         val mapping = childEdges.values.flatten().groupBy { it.child }
         scopes.associateWith { mapping[it] ?: emptyList() }
-    }()
+      }()
 
-    val roots: List<Scope> = parentEdges.filter { it.value.isEmpty() }.map { it.key }
+  val roots: List<Scope> = parentEdges.filter { it.value.isEmpty() }.map { it.key }
 
-    val scopeCycleError: ScopeCycleError? = calculateCycle()
+  val scopeCycleError: ScopeCycleError? = calculateCycle()
 
-    val parsingErrors: List<ParsingError> = scopes.filterIsInstance<ErrorScope>().map { it.parsingError }
+  val parsingErrors: List<ParsingError> =
+      scopes.filterIsInstance<ErrorScope>().map { it.parsingError }
 
-    fun getChildEdges(scope: Scope): List<ScopeEdge> {
-        return childEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
+  fun getChildEdges(scope: Scope): List<ScopeEdge> {
+    return childEdges[scope]
+        ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
+  }
+
+  fun getParentEdges(scope: Scope): List<ScopeEdge> {
+    return parentEdges[scope]
+        ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
+  }
+
+  fun getScope(scopeType: IrType): Scope? {
+    return scopeMap[scopeType]
+  }
+
+  private fun createChildren(scope: Scope): List<ScopeEdge> {
+    return scope.childMethods.map { method ->
+      val childScope =
+          getScope(method.childScopeClass.type)
+              ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
+      ScopeEdge(scope, childScope, method)
     }
+  }
 
-    fun getParentEdges(scope: Scope): List<ScopeEdge> {
-        return parentEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
+  private fun calculateCycle(): ScopeCycleError? {
+    // Sort for stable tests
+    val sortedScopes = scopes.sortedBy { it.qualifiedName }
+    val cycle =
+        Cycle.find(sortedScopes) { scope -> getChildEdges(scope).map { it.child } } ?: return null
+    return ScopeCycleError(cycle.path)
+  }
+
+  companion object {
+
+    fun create(scopes: List<Scope>): ScopeGraph {
+      return ScopeGraph(scopes)
     }
-
-    fun getScope(scopeType: IrType): Scope? {
-        return scopeMap[scopeType]
-    }
-
-    private fun createChildren(scope: Scope): List<ScopeEdge> {
-        return scope.childMethods.map { method ->
-            val childScope = getScope(method.childScopeClass.type)
-                    ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
-            ScopeEdge(scope, childScope, method)
-        }
-    }
-
-    private fun calculateCycle(): ScopeCycleError? {
-        // Sort for stable tests
-        val sortedScopes = scopes.sortedBy { it.qualifiedName }
-        val cycle = Cycle.find(sortedScopes) { scope -> getChildEdges(scope).map { it.child } } ?: return null
-        return ScopeCycleError(cycle.path)
-    }
-
-    companion object {
-
-        fun create(scopes: List<Scope>): ScopeGraph {
-            return ScopeGraph(scopes)
-        }
-    }
+  }
 }

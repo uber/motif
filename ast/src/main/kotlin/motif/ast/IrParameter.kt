@@ -16,6 +16,6 @@
 package motif.ast
 
 interface IrParameter : IrAnnotated {
-    val type: IrType
-    val name: String
+  val type: IrType
+  val name: String
 }

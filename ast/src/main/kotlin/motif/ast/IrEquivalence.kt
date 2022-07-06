@@ -17,7 +17,7 @@ package motif.ast
 
 interface IrEquivalence {
 
-    override fun equals(other: Any?): Boolean
+  override fun equals(other: Any?): Boolean
 
-    override fun hashCode(): Int
+  override fun hashCode(): Int
 }

@@ -22,73 +22,68 @@ import motif.ast.IrParameter
 
 sealed class ScopeMethod {
 
-    abstract val method: IrMethod
+  abstract val method: IrMethod
 
-    companion object {
+  companion object {
 
-        fun fromScopeMethod(scope: Scope, method: IrMethod): ScopeMethod {
-            if (method.isVoid()) {
-                throw VoidScopeMethod(scope, method)
-            }
+    fun fromScopeMethod(scope: Scope, method: IrMethod): ScopeMethod {
+      if (method.isVoid()) {
+        throw VoidScopeMethod(scope, method)
+      }
 
-            val returnClass: IrClass? = method.returnType.resolveClass()
+      val returnClass: IrClass? = method.returnType.resolveClass()
 
-            if (returnClass == null && !method.returnType.isPrimitive) {
-                // resolve class does not return IrClass if it is primitive,
-                // hence we need to throw only if not primitive and not resolved.
-                throw CannotResolveType(scope, method.returnType)
-            }
+      if (returnClass == null && !method.returnType.isPrimitive) {
+        // resolve class does not return IrClass if it is primitive,
+        // hence we need to throw only if not primitive and not resolved.
+        throw CannotResolveType(scope, method.returnType)
+      }
 
-            if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
-                method.parameters.find { it.isNullable() }?.let { nullableParameter ->
-                    throw NullableDynamicDependency(scope, method, nullableParameter)
-                }
-                val childMethod = ChildMethod(method, scope, returnClass)
-                val duplicatedParameterTypes = childMethod.parameters - childMethod.parameters.distinctBy { it.type }
-                if (duplicatedParameterTypes.isNotEmpty()) {
-                    throw DuplicatedChildParameterSource(scope, childMethod, duplicatedParameterTypes)
-                }
-                return childMethod
-            }
-
-            if (method.hasParameters()) {
-                throw AccessMethodParameters(scope, method)
-            }
-
-            return AccessMethod(method, scope)
+      if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
+        method.parameters.find { it.isNullable() }?.let { nullableParameter ->
+          throw NullableDynamicDependency(scope, method, nullableParameter)
         }
+        val childMethod = ChildMethod(method, scope, returnClass)
+        val duplicatedParameterTypes =
+            childMethod.parameters - childMethod.parameters.distinctBy { it.type }
+        if (duplicatedParameterTypes.isNotEmpty()) {
+          throw DuplicatedChildParameterSource(scope, childMethod, duplicatedParameterTypes)
+        }
+        return childMethod
+      }
+
+      if (method.hasParameters()) {
+        throw AccessMethodParameters(scope, method)
+      }
+
+      return AccessMethod(method, scope)
     }
+  }
 }
 
-/**
- * [Wiki](https://github.com/uber/motif/wiki#access-methods)
- */
+/** [Wiki](https://github.com/uber/motif/wiki#access-methods) */
 class AccessMethod(override val method: IrMethod, val scope: Scope) : ScopeMethod() {
 
-    val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
+  val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
 
-    val returnType = Type.fromReturnType(method)
+  val returnType = Type.fromReturnType(method)
 
-    val sink = AccessMethodSink(this)
+  val sink = AccessMethodSink(this)
 }
 
-/**
- * [Wiki](https://github.com/uber/motif/wiki#child-methods)
- */
-class ChildMethod(
-        override val method: IrMethod,
-        val scope: Scope,
-        val childScopeClass: IrClass) : ScopeMethod() {
+/** [Wiki](https://github.com/uber/motif/wiki#child-methods) */
+class ChildMethod(override val method: IrMethod, val scope: Scope, val childScopeClass: IrClass) :
+    ScopeMethod() {
 
-    val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
+  val qualifiedName: String by lazy { "${scope.qualifiedName}.${method.name}" }
 
-    val parameters: List<Parameter> = method.parameters.map { Parameter(this, it) }
+  val parameters: List<Parameter> = method.parameters.map { Parameter(this, it) }
 
-    val sources: List<ChildParameterSource> = parameters.map(::ChildParameterSource)
+  val sources: List<ChildParameterSource> = parameters.map(::ChildParameterSource)
 
-    class Parameter(val method: ChildMethod, val parameter: IrParameter) {
+  class Parameter(val method: ChildMethod, val parameter: IrParameter) {
 
-        val type = Type.fromParameter(parameter)
-        val isExposed = parameter.hasAnnotation(Expose::class)
-    }
+    val type = Type.fromParameter(parameter)
+    val isExposed = parameter.hasAnnotation(Expose::class)
+  }
 }

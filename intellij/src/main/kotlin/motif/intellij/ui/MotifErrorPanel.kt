@@ -17,49 +17,53 @@ package motif.intellij.ui
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import java.awt.BorderLayout
+import javax.swing.JPanel
+import javax.swing.JSplitPane
+import javax.swing.JTextArea
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.ErrorHierarchyBrowser
 import motif.models.MotifError
-import java.awt.BorderLayout
-import javax.swing.JPanel
-import javax.swing.JSplitPane
-import javax.swing.JTextArea
 
-class MotifErrorPanel(project: Project, graph: ResolvedGraph)
-    : JPanel(), MotifProjectComponent.Listener, ErrorHierarchyBrowser.Listener {
+class MotifErrorPanel(project: Project, graph: ResolvedGraph) :
+    JPanel(), MotifProjectComponent.Listener, ErrorHierarchyBrowser.Listener {
 
-    private val splitPane: JSplitPane
-    private val errorBrowser: ErrorHierarchyBrowser
-    private val errorDetails: JTextArea
+  private val splitPane: JSplitPane
+  private val errorBrowser: ErrorHierarchyBrowser
+  private val errorDetails: JTextArea
 
-    init {
-        val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
+  init {
+    val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
 
-        // Build UI
-        layout = BorderLayout()
+    // Build UI
+    layout = BorderLayout()
 
-        errorBrowser = ErrorHierarchyBrowser(project, graph, rootElement, this)
-        errorBrowser.changeView(ErrorHierarchyBrowser.ERROR_HIERARCHY_TYPE)
+    errorBrowser = ErrorHierarchyBrowser(project, graph, rootElement, this)
+    errorBrowser.changeView(ErrorHierarchyBrowser.ERROR_HIERARCHY_TYPE)
 
-        errorDetails = JTextArea()
-        errorDetails.lineWrap = true
-        errorDetails.isEditable = false
-        errorDetails.isOpaque = false
+    errorDetails = JTextArea()
+    errorDetails.lineWrap = true
+    errorDetails.isEditable = false
+    errorDetails.isOpaque = false
 
-        splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, errorBrowser, errorDetails)
-        splitPane.dividerLocation = 250
-        add(splitPane)
-    }
+    splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, errorBrowser, errorDetails)
+    splitPane.dividerLocation = 250
+    add(splitPane)
+  }
 
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        errorBrowser.onGraphUpdated(graph)
-        errorDetails.text = ""
-    }
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    errorBrowser.onGraphUpdated(graph)
+    errorDetails.text = ""
+  }
 
-    override fun onSelectedErrorChanged(element: PsiElement, error: MotifError, errorMessage: ErrorMessage) {
-        errorDetails.text = errorMessage.text
-    }
+  override fun onSelectedErrorChanged(
+      element: PsiElement,
+      error: MotifError,
+      errorMessage: ErrorMessage
+  ) {
+    errorDetails.text = errorMessage.text
+  }
 }

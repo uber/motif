@@ -18,12 +18,14 @@ package motif.intellij
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.intellij.pom.java.LanguageLevel
-import com.intellij.psi.PsiJavaFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.Parameterized
 import com.intellij.testFramework.PsiTestUtil
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import java.io.File
+import javax.annotation.Nullable
+import javax.inject.Inject
+import kotlin.reflect.KClass
 import motif.Scope
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
@@ -35,83 +37,79 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
-import javax.annotation.Nullable
-import javax.inject.Inject
-import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
 class TestHarness : LightCodeInsightFixtureTestCase() {
 
-    @get:Rule val rule = IntelliJRule()
+  @get:Rule val rule = IntelliJRule()
 
-    @org.junit.runners.Parameterized.Parameter(0)
-    lateinit var testDir: File
+  @org.junit.runners.Parameterized.Parameter(0) lateinit var testDir: File
 
-    override fun getProjectDescriptor(): LightProjectDescriptor {
-        return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
-            override fun getSdk() = InternalJdk.instance
-        }
+  override fun getProjectDescriptor(): LightProjectDescriptor {
+    return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
+      override fun getSdk() = InternalJdk.instance
+    }
+  }
+
+  @Before
+  public override fun setUp() {
+    super.setUp()
+
+    addLibrary(Inject::class)
+    addLibrary(Scope::class)
+    addLibrary(Nullable::class)
+  }
+
+  @After
+  public override fun tearDown() {
+    super.tearDown()
+  }
+
+  private fun addLibrary(clazz: KClass<*>) {
+    val path = clazz.java.protectionDomain.codeSource.location.path
+    val file = File(path)
+    val libName = file.name
+    PsiTestUtil.addLibrary(myFixture.projectDisposable, module, libName, file.parent, libName)
+  }
+
+  @Test
+  fun test() {
+    val testFiles = testDir.walk()
+    val externalFiles = EXTERNAL_ROOT.resolve(testDir.name).walk()
+    (testFiles + externalFiles).filter { !it.isDirectory }.forEach { sourceFile ->
+      when {
+        sourceFile.name.endsWith(".java") -> myFixture.addClass(sourceFile.readText())
+        sourceFile.name.endsWith(".kt") ->
+            myFixture.addFileToProject(sourceFile.name, sourceFile.readText())
+      }
+    }
+    val graph = GraphFactory(project).compute()
+
+    val errorFile = testDir.resolve("ERROR.txt")
+    if (errorFile.exists()) {
+      val expectedErrorText = errorFile.readText()
+      val actualErrorText = getActualErrorString(graph)
+      assertThat(actualErrorText).isEqualTo(expectedErrorText)
+    } else if (graph.errors.isNotEmpty()) {
+      val errorText = getActualErrorString(graph)
+      assertWithMessage("Expected valid graph but errors found:\n\n$errorText").fail()
     }
 
-    @Before
-    public override fun setUp() {
-        super.setUp()
-
-        addLibrary(Inject::class)
-        addLibrary(Scope::class)
-        addLibrary(Nullable::class)
+    val graphFile = testDir.resolve("GRAPH.txt")
+    if (graphFile.exists()) {
+      val expectedGraphText = graphFile.readText()
+      val actualGraphText = getActualGraphString(graph)
+      assertThat(actualGraphText).isEqualTo(expectedGraphText)
     }
+  }
 
-    @After
-    public override fun tearDown() {
-        super.tearDown()
-    }
-
-    private fun addLibrary(clazz: KClass<*>) {
-        val path = clazz.java.protectionDomain.codeSource.location.path
-        val file = File(path)
-        val libName = file.name
-        PsiTestUtil.addLibrary(myFixture.projectDisposable, module, libName, file.parent, libName)
-    }
-
-    @Test
-    fun test() {
-        val testFiles = testDir.walk()
-        val externalFiles = EXTERNAL_ROOT.resolve(testDir.name).walk()
-        (testFiles + externalFiles)
-                .filter { !it.isDirectory }
-                .forEach { sourceFile ->
-                    when {
-                        sourceFile.name.endsWith(".java") -> myFixture.addClass(sourceFile.readText())
-                        sourceFile.name.endsWith(".kt") -> myFixture.addFileToProject(sourceFile.name, sourceFile.readText())
-                    }
-                }
-        val graph = GraphFactory(project).compute()
-
-        val errorFile = testDir.resolve("ERROR.txt")
-        if (errorFile.exists()) {
-            val expectedErrorText = errorFile.readText()
-            val actualErrorText = getActualErrorString(graph)
-            assertThat(actualErrorText).isEqualTo(expectedErrorText)
-        } else if (graph.errors.isNotEmpty()) {
-            val errorText = getActualErrorString(graph)
-            assertWithMessage("Expected valid graph but errors found:\n\n$errorText").fail()
-        }
-
-        val graphFile = testDir.resolve("GRAPH.txt")
-        if (graphFile.exists()) {
-            val expectedGraphText = graphFile.readText()
-            val actualGraphText = getActualGraphString(graph)
-            assertThat(actualGraphText).isEqualTo(expectedGraphText)
-        }
-    }
-
-    // TODO Some of this code is duplicated in the compiler TestHarness. Move both test harnesses into the
-    //      same module so they can share code.
-    private fun getActualGraphString(graph: ResolvedGraph): String {
-        val message = TestRenderer.render(graph)
-        val header ="""########################################################################
+  // TODO Some of this code is duplicated in the compiler TestHarness. Move both test harnesses into
+  // the
+  //      same module so they can share code.
+  private fun getActualGraphString(graph: ResolvedGraph): String {
+    val message = TestRenderer.render(graph)
+    val header =
+        """########################################################################
 #                                                                      #
 # This file is auto-generated by running the Motif compiler tests and  #
 # serves a as validation of graph correctness. IntelliJ plugin tests   #
@@ -125,11 +123,12 @@ class TestHarness : LightCodeInsightFixtureTestCase() {
 #                                                                      #
 ########################################################################
 """
-        return header + "\n" + message + "\n"
-    }
+    return header + "\n" + message + "\n"
+  }
 
-    private fun getActualErrorString(graph: ResolvedGraph): String {
-        val header = """########################################################################
+  private fun getActualErrorString(graph: ResolvedGraph): String {
+    val header =
+        """########################################################################
 #                                                                      #
 # This file is auto-generated by running the Motif compiler tests and  #
 # serves both as validation of error correctness and as a record of    #
@@ -142,31 +141,29 @@ class TestHarness : LightCodeInsightFixtureTestCase() {
 #                                                                      #
 ########################################################################
 """
-        val message = ErrorMessage.toString(graph).trim().prependIndent("  ")
-        return header + "\n" + message + "\n"
+    val message = ErrorMessage.toString(graph).trim().prependIndent("  ")
+    return header + "\n" + message + "\n"
+  }
+
+  override fun getTestDataPath() = testDir.parent
+
+  companion object {
+
+    private val SOURCE_ROOT = File("../tests/src/main/java/")
+    private val TEST_CASE_ROOT = File(SOURCE_ROOT, "testcases")
+    private val EXTERNAL_ROOT = File(SOURCE_ROOT, "external")
+
+    @Parameterized.Parameters(name = "{0}")
+    @JvmStatic
+    fun data(clazz: Class<*>): List<Array<Any>> {
+      val testDirs = TEST_CASE_ROOT.listFiles() ?: throw IllegalStateException()
+      return testDirs.filter { !it.resolve("SKIP_INTELLIJ").exists() }.map { testDir ->
+        arrayOf<Any>(testDir)
+      }
     }
 
-    override fun getTestDataPath() = testDir.parent
-
-    companion object {
-
-        private val SOURCE_ROOT = File("../tests/src/main/java/")
-        private val TEST_CASE_ROOT = File(SOURCE_ROOT, "testcases")
-        private val EXTERNAL_ROOT = File(SOURCE_ROOT, "external")
-
-        @Parameterized.Parameters(name = "{0}")
-        @JvmStatic
-        fun data(clazz: Class<*>): List<Array<Any>> {
-            val testDirs = TEST_CASE_ROOT.listFiles() ?: throw IllegalStateException()
-            return testDirs
-                    .filter { !it.resolve("SKIP_INTELLIJ").exists() }
-                    .map { testDir ->
-                        arrayOf<Any>(testDir)
-                    }
-        }
-
-        @org.junit.runners.Parameterized.Parameters
-        @JvmStatic
-        fun ignore(): List<Array<Any>> = emptyList()
-    }
+    @org.junit.runners.Parameterized.Parameters
+    @JvmStatic
+    fun ignore(): List<Array<Any>> = emptyList()
+  }
 }

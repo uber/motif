@@ -17,29 +17,25 @@ package motif.models
 
 import motif.ast.IrClass
 
-/**
- * [Wiki](https://github.com/uber/motif/wiki#objects)
- */
-class Objects private constructor(
-        val clazz: IrClass,
-        val scope: Scope) {
+/** [Wiki](https://github.com/uber/motif/wiki#objects) */
+class Objects private constructor(val clazz: IrClass, val scope: Scope) {
 
-    val qualifiedName: String by lazy { clazz.qualifiedName }
+  val qualifiedName: String by lazy { clazz.qualifiedName }
 
-    val simpleName: String by lazy { clazz.simpleName }
+  val simpleName: String by lazy { clazz.simpleName }
 
-    val factoryMethods = clazz.methods
-            .map { method -> FactoryMethod.fromObjectsMethod(this, method) }
+  val factoryMethods = clazz.methods.map { method -> FactoryMethod.fromObjectsMethod(this, method) }
 
-    companion object {
+  companion object {
 
-        fun fromScope(scope: Scope): Objects? {
-            val objectsClass = scope.clazz.annotatedInnerClass(motif.Objects::class) ?: return null
+    fun fromScope(scope: Scope): Objects? {
+      val objectsClass = scope.clazz.annotatedInnerClass(motif.Objects::class) ?: return null
 
-            if (objectsClass.fields.any { !it.isStatic() }) throw ObjectsFieldFound(scope, objectsClass)
-            if (objectsClass.hasNonDefaultConstructor()) throw ObjectsConstructorFound(scope, objectsClass)
+      if (objectsClass.fields.any { !it.isStatic() }) throw ObjectsFieldFound(scope, objectsClass)
+      if (objectsClass.hasNonDefaultConstructor())
+          throw ObjectsConstructorFound(scope, objectsClass)
 
-            return Objects(objectsClass, scope)
-        }
+      return Objects(objectsClass, scope)
     }
+  }
 }

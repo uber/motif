@@ -31,28 +31,29 @@ import motif.intellij.analytics.MotifAnalyticsActions
  */
 class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
 
-    private var graph: ResolvedGraph? = null
+  private var graph: ResolvedGraph? = null
 
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        this.graph = graph
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    this.graph = graph
+  }
+
+  override fun actionPerformed(event: AnActionEvent) {
+    val project = event.project ?: return
+    val graph = graph ?: return
+
+    if (!isInitializedGraph(graph)) {
+      MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
+      return
     }
 
-    override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project ?: return
-        val graph = graph ?: return
+    val toolWindow: ToolWindow =
+        ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+    toolWindow.activate {}
 
-        if (!isInitializedGraph(graph)) {
-            MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
-            return
-        }
+    AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
+  }
 
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        toolWindow.activate { }
-
-        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
-    }
-
-    override fun update(e: AnActionEvent) {
-        e.presentation.isEnabled = true
-    }
+  override fun update(e: AnActionEvent) {
+    e.presentation.isEnabled = true
+  }
 }

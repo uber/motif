@@ -19,13 +19,14 @@ import motif.models.VoidScopeMethod
 
 internal class VoidScopeMethodHandler(private val error: VoidScopeMethod) : ErrorHandler {
 
-    override val name = "VOID SCOPE METHOD"
+  override val name = "VOID SCOPE METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Scope methods must be non-void:
 
               ${error.scope.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

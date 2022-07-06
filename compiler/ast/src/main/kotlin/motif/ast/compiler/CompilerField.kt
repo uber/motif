@@ -15,25 +15,20 @@
  */
 package motif.ast.compiler
 
+import javax.annotation.processing.ProcessingEnvironment
+import javax.lang.model.element.VariableElement
 import motif.ast.IrField
 import motif.ast.IrModifier
 import motif.ast.IrType
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.VariableElement
 
 class CompilerField(
-        override val env: ProcessingEnvironment,
-        private val variableElement: VariableElement) : IrUtil, IrField {
+    override val env: ProcessingEnvironment,
+    private val variableElement: VariableElement
+) : IrUtil, IrField {
 
-    override val type: IrType by lazy {
-        CompilerType(env, variableElement.asType())
-    }
+  override val type: IrType by lazy { CompilerType(env, variableElement.asType()) }
 
-    override val name: String by lazy {
-        variableElement.simpleName.toString()
-    }
+  override val name: String by lazy { variableElement.simpleName.toString() }
 
-    override val modifiers: Set<IrModifier> by lazy {
-        variableElement.irModifiers()
-    }
+  override val modifiers: Set<IrModifier> by lazy { variableElement.irModifiers() }
 }

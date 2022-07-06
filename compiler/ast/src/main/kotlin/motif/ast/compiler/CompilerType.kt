@@ -17,117 +17,111 @@ package motif.ast.compiler
 
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
-import motif.ast.IrClass
-import motif.ast.IrType
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
+import motif.ast.IrClass
+import motif.ast.IrType
 
-class CompilerType(
-        private val env: ProcessingEnvironment,
-        val mirror: TypeMirror) : IrType {
+class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirror) : IrType {
 
-    private val key: Equivalence.Wrapper<TypeMirror> = MoreTypes.equivalence().wrap(mirror)
+  private val key: Equivalence.Wrapper<TypeMirror> = MoreTypes.equivalence().wrap(mirror)
 
-    fun isInterface(): Boolean {
-        return IrClass.Kind.INTERFACE == resolveClass()?.kind
-    }
+  fun isInterface(): Boolean {
+    return IrClass.Kind.INTERFACE == resolveClass()?.kind
+  }
 
-    override val qualifiedName: String by lazy {
-        val candidate = mirror.toString().let {
-            if(it.contains("$") && mirror.kind == TypeKind.DECLARED) {
-                val declaredType: DeclaredType = mirror as DeclaredType
-                declaredType.asElement().kind
-                mirror.toString()
-            } else {
-                it
-            }
+  override val qualifiedName: String by lazy {
+    val candidate =
+        mirror.toString().let {
+          if (it.contains("$") && mirror.kind == TypeKind.DECLARED) {
+            val declaredType: DeclaredType = mirror as DeclaredType
+            declaredType.asElement().kind
+            mirror.toString()
+          } else {
+            it
+          }
         }
         return@lazy if (candidate.startsWith('(')) {
             candidate.substringAfter(":: ").dropLast(1)
         } else if (candidate.startsWith("@")) {
             candidate.substringAfterLast(" ")
         } else {
-            candidate
-        }
+      candidate
+    }
+  }
+
+  override val isVoid: Boolean by lazy { mirror.kind == TypeKind.VOID }
+
+  override val isPrimitive: Boolean by lazy { mirror.kind.isPrimitive }
+
+  override fun resolveClass(): IrClass? {
+    if (mirror.kind != TypeKind.DECLARED) return null
+
+    val declaredType: DeclaredType = mirror as DeclaredType
+
+    return CompilerClass(env, declaredType)
+  }
+
+  override fun isAssignableTo(type: IrType): Boolean {
+    val baseMirror = (type as CompilerType).mirror
+
+    if (!env.typeUtils.isAssignable(mirror, baseMirror)) {
+      return false
     }
 
-    override val isVoid: Boolean by lazy {
-        mirror.kind == TypeKind.VOID
+    if (env.typeUtils.isSameType(mirror, baseMirror)) {
+      return true
     }
 
-    override val isPrimitive: Boolean by lazy {
-        mirror.kind.isPrimitive
+    if (mirror !is DeclaredType || baseMirror !is DeclaredType) {
+      return env.typeUtils.isAssignable(mirror, baseMirror)
     }
 
-    override fun resolveClass(): IrClass? {
-        if (mirror.kind != TypeKind.DECLARED) return null
+    val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
 
-        val declaredType: DeclaredType = mirror as DeclaredType
-
-        return CompilerClass(env, declaredType)
+    if (baseMirror.typeArguments.isEmpty()) {
+      return true
     }
 
-    override fun isAssignableTo(type: IrType): Boolean {
-        val baseMirror = (type as CompilerType).mirror
-
-        if (!env.typeUtils.isAssignable(mirror, baseMirror)) {
-            return false
-        }
-
-        if (env.typeUtils.isSameType(mirror, baseMirror)) {
-            return true
-        }
-
-        if (mirror !is DeclaredType || baseMirror !is DeclaredType) {
-            return env.typeUtils.isAssignable(mirror, baseMirror)
-        }
-
-        val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
-
-        if (baseMirror.typeArguments.isEmpty()) {
-            return true
-        }
-
-        if (matchingType.typeArguments.size != baseMirror.typeArguments.size) {
-            return false
-        }
-
-        return env.typeUtils.isAssignable(matchingType, baseMirror)
+    if (matchingType.typeArguments.size != baseMirror.typeArguments.size) {
+      return false
     }
 
-    private fun getMatchingSuperType(baseType: DeclaredType, type: DeclaredType): DeclaredType? {
-        val baseErasure = env.typeUtils.erasure(baseType)
-        val erasure = env.typeUtils.erasure(type)
-        if (env.typeUtils.isSameType(baseErasure, erasure)) {
-            return type
-        }
+    return env.typeUtils.isAssignable(matchingType, baseMirror)
+  }
 
-        return env.typeUtils.directSupertypes(type)
-                .asSequence()
-                .mapNotNull { superType ->
-                    getMatchingSuperType(baseType, superType as DeclaredType)
-                }
-                .firstOrNull()
+  private fun getMatchingSuperType(baseType: DeclaredType, type: DeclaredType): DeclaredType? {
+    val baseErasure = env.typeUtils.erasure(baseType)
+    val erasure = env.typeUtils.erasure(type)
+    if (env.typeUtils.isSameType(baseErasure, erasure)) {
+      return type
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    return env.typeUtils
+        .directSupertypes(type)
+        .asSequence()
+        .mapNotNull { superType -> getMatchingSuperType(baseType, superType as DeclaredType) }
+        .firstOrNull()
+  }
 
-        other as CompilerType
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
 
-        if (key != other.key) return false
+    other as CompilerType
 
-        return true
-    }
+    if (key != other.key) return false
 
-    override fun hashCode(): Int {
-        return key.hashCode()
-    }
+    return true
+  }
 
-    override fun toString(): String {
-        return mirror.toString()
-    }
+  override fun hashCode(): Int {
+    return key.hashCode()
+  }
+
+  override fun toString(): String {
+    return mirror.toString()
+  }
 }

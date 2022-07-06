@@ -19,58 +19,56 @@ import motif.Creatable
 import motif.ast.IrClass
 import motif.ast.IrMethod
 
-/**
- * [Wiki](https://github.com/uber/motif/wiki#dependencies)
- */
+/** [Wiki](https://github.com/uber/motif/wiki#dependencies) */
 class Dependencies(val clazz: IrClass, val scope: Scope) {
 
-    val methods: List<Method> = clazz.methods
-            .map { method ->
-                if (method.isVoid()) throw VoidDependenciesMethod(scope, clazz, method)
-                if (method.hasParameters()) throw DependencyMethodWithParameters(scope, clazz, method)
-                val type = Type.fromReturnType(method)
-                Method(this, method, type)
+  val methods: List<Method> =
+      clazz.methods.map { method ->
+        if (method.isVoid()) throw VoidDependenciesMethod(scope, clazz, method)
+        if (method.hasParameters()) throw DependencyMethodWithParameters(scope, clazz, method)
+        val type = Type.fromReturnType(method)
+        Method(this, method, type)
+      }
+
+  val methodByType: Map<Type, Method> =
+      methods
+          .groupBy { it.returnType }
+          .mapValues { (type, methods) ->
+            if (methods.size > 1) {
+              throw DuplicatedDependenciesMethod(scope, methods)
             }
+            methods.first()
+          }
+          .toSortedMap()
 
-    val methodByType: Map<Type, Method> = methods.groupBy { it.returnType }
-            .mapValues { (type, methods) ->
-                if (methods.size > 1) {
-                    throw DuplicatedDependenciesMethod(scope, methods)
-                }
-                methods.first()
-            }
-            .toSortedMap()
+  val types: List<Type> = methods.map { it.returnType }
 
-    val types: List<Type> = methods.map { it.returnType }
+  class Method(val dependencies: Dependencies, val method: IrMethod, val returnType: Type) {
 
-    class Method(val dependencies: Dependencies, val method: IrMethod, val returnType: Type) {
+    val qualifiedName: String by lazy { "${dependencies.clazz.qualifiedName}.${method.name}" }
+  }
 
-        val qualifiedName: String by lazy {
-            "${dependencies.clazz.qualifiedName}.${method.name}"
-        }
+  companion object {
+
+    fun fromScope(scope: Scope): Dependencies? {
+      val creatable = findCreatableSuperinterface(scope.clazz) ?: return null
+      val dependenciesType = creatable.typeArguments.singleOrNull() ?: return null
+      val dependenciesClass = dependenciesType.resolveClass() ?: return null
+      return Dependencies(dependenciesClass, scope)
     }
 
-    companion object {
+    private fun findCreatableSuperinterface(clazz: IrClass): IrClass? {
+      if (clazz.qualifiedName.takeWhile { it != '<' } == Creatable::class.java.name) {
+        return clazz
+      }
 
-        fun fromScope(scope: Scope): Dependencies? {
-            val creatable = findCreatableSuperinterface(scope.clazz) ?: return null
-            val dependenciesType = creatable.typeArguments.singleOrNull() ?: return null
-            val dependenciesClass = dependenciesType.resolveClass() ?: return null
-            return Dependencies(dependenciesClass, scope)
+      clazz.supertypes.mapNotNull { it.resolveClass() }.forEach { superinterface ->
+        findCreatableSuperinterface(superinterface)?.let {
+          return it
         }
+      }
 
-        private fun findCreatableSuperinterface(clazz: IrClass): IrClass? {
-            if (clazz.qualifiedName.takeWhile { it != '<' } == Creatable::class.java.name) {
-                return clazz
-            }
-
-            clazz.supertypes
-                    .mapNotNull { it.resolveClass() }
-                    .forEach { superinterface ->
-                        findCreatableSuperinterface(superinterface)?.let { return it }
-                    }
-
-            return null
-        }
+      return null
     }
+  }
 }

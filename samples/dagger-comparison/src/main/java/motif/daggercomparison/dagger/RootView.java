@@ -24,15 +24,16 @@ import motif.sample.R;
 
 public class RootView extends FrameLayout {
 
-    public RootView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+  public RootView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+  }
 
-    public RootView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+  public RootView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
 
-    public static RootView create(ViewGroup parent) {
-        return (RootView) LayoutInflater.from(parent.getContext()).inflate(R.layout.root, parent, false);
-    }
+  public static RootView create(ViewGroup parent) {
+    return (RootView)
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.root, parent, false);
+  }
 }

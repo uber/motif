@@ -24,13 +24,13 @@ import motif.sample.lib.db.Photo;
 @Scope
 public interface PhotoGridScope {
 
-    PhotoGridView view();
+  PhotoGridView view();
 
-    PhotoGridItemScope photoRow(PhotoGridItemView view, Photo photo);
+  PhotoGridItemScope photoRow(PhotoGridItemView view, Photo photo);
 
-    @motif.Objects
-    abstract class Objects extends ControllerObjects<PhotoGridController, PhotoGridView> {
+  @motif.Objects
+  abstract class Objects extends ControllerObjects<PhotoGridController, PhotoGridView> {
 
-        abstract PhotoGridAdapter adapter();
-    }
+    abstract PhotoGridAdapter adapter();
+  }
 }

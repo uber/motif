@@ -19,9 +19,6 @@ import org.junit.Test;
 
 public class RootScopeTest {
 
-    @Test
-    public void testIt(){
-
-    }
-
+  @Test
+  public void testIt() {}
 }

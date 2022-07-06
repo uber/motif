@@ -24,17 +24,17 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFunction
 
 internal fun PsiElement.toPsiClass(): PsiElement? {
-    return when (this) {
-        is PsiClass -> this
-        is KtClass -> toLightClass()
-        else -> this
-    }
+  return when (this) {
+    is PsiClass -> this
+    is KtClass -> toLightClass()
+    else -> this
+  }
 }
 
 internal fun PsiElement.toPsiMethod(): PsiElement? {
-    return when (this) {
-        is PsiMethod -> this
-        is KtFunction -> toLightMethods().singleOrNull()
-        else -> this
-    }
+  return when (this) {
+    is PsiMethod -> this
+    is KtFunction -> toLightMethods().singleOrNull()
+    else -> this
+  }
 }

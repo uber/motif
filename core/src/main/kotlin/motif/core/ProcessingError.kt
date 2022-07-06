@@ -15,12 +15,24 @@
  */
 package motif.core
 
-import motif.models.*
+import motif.models.MotifError
+import motif.models.Node
+import motif.models.Scope
+import motif.models.Sink
+import motif.models.Source
 
 sealed class ProcessingError : MotifError
 
 class ScopeCycleError(val path: List<Scope>) : ProcessingError()
+
 class UnsatisfiedDependencyError(val top: Scope, val sink: Sink) : ProcessingError()
+
 class DependencyCycleError(val path: List<Node>) : ProcessingError()
+
 class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError()
-class AlreadySatisfiedError(val scope: Scope, val source: Source, val existingSources: List<Source>) : ProcessingError()
+
+class AlreadySatisfiedError(
+    val scope: Scope,
+    val source: Source,
+    val existingSources: List<Source>
+) : ProcessingError()

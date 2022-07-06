@@ -21,17 +21,17 @@ import motif.Scope;
 @Scope
 public interface RootScope {
 
-    RootController controller();
+  RootController controller();
 
-    LoggedInScope loggedIn(ViewGroup parentViewGroup);
+  LoggedInScope loggedIn(ViewGroup parentViewGroup);
 
-    @motif.Objects
-    abstract class Objects {
+  @motif.Objects
+  abstract class Objects {
 
-        abstract RootController controller();
+    abstract RootController controller();
 
-        RootView view(ViewGroup viewGroup) {
-            return RootView.create(viewGroup);
-        }
+    RootView view(ViewGroup viewGroup) {
+      return RootView.create(viewGroup);
     }
+  }
 }

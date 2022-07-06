@@ -22,28 +22,22 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 
 @Entity(
-        tableName = "photo_tag",
-        primaryKeys = {"photo_id", "tag"},
-        indices = {@Index("photo_id"), @Index("tag")},
-        foreignKeys = {
-                @ForeignKey(entity = Photo.class,
-                        parentColumns = "id",
-                        childColumns = "photo_id"),
-                @ForeignKey(entity = Tag.class,
-                        parentColumns = "name",
-                        childColumns = "tag")
-        }
-)
+    tableName = "photo_tag",
+    primaryKeys = {"photo_id", "tag"},
+    indices = {@Index("photo_id"), @Index("tag")},
+    foreignKeys = {
+      @ForeignKey(entity = Photo.class, parentColumns = "id", childColumns = "photo_id"),
+      @ForeignKey(entity = Tag.class, parentColumns = "name", childColumns = "tag")
+    })
 public class PhotoTag {
 
-    @ColumnInfo(name = "photo_id")
-    public final int photoId;
+  @ColumnInfo(name = "photo_id")
+  public final int photoId;
 
-    @NonNull
-    public final String tag;
+  @NonNull public final String tag;
 
-    public PhotoTag(int photoId, @NonNull String tag) {
-        this.photoId = photoId;
-        this.tag = tag;
-    }
+  public PhotoTag(int photoId, @NonNull String tag) {
+    this.photoId = photoId;
+    this.tag = tag;
+  }
 }

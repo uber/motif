@@ -21,84 +21,102 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import motif.ast.IrMethod
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
-import motif.models.*
-import javax.swing.Icon
+import motif.models.AccessMethodSink
+import motif.models.FactoryMethodSink
+import motif.models.FactoryMethodSource
+import motif.models.Sink
+import motif.models.Type
 
 open class ScopeHierarchySinkDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        val sink: Sink)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, getElementFromSink(sink), false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    val sink: Sink
+) :
+    ScopeHierarchyNodeDescriptor(
+        project, graph, parentDescriptor, getElementFromSink(sink), false) {
 
-    companion object {
-        fun getElementFromSink(sink: Sink): PsiElement {
-            return when (sink) {
-                is FactoryMethodSink -> {
-                    (sink.parameter.factoryMethod.method as IntelliJMethod).psiMethod
-                }
-                is AccessMethodSink -> {
-                    (sink.accessMethod.method as IntelliJMethod).psiMethod
-                }
-            }
+  companion object {
+    fun getElementFromSink(sink: Sink): PsiElement {
+      return when (sink) {
+        is FactoryMethodSink -> {
+          (sink.parameter.factoryMethod.method as IntelliJMethod).psiMethod
         }
-
-        fun getConsumingTypeFromSink(sink: Sink): Type {
-            return when (sink) {
-                is FactoryMethodSink -> {
-                    sink.parameter.factoryMethod.returnType.type
-                }
-                is AccessMethodSink -> {
-                    sink.type
-                }
-            }
+        is AccessMethodSink -> {
+          (sink.accessMethod.method as IntelliJMethod).psiMethod
         }
+      }
     }
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(sink.type.simpleName)
-        val consumingType = getConsumingTypeFromSink(sink)
-        text.ending.addText(" → ${consumingType.simpleName}", getPackageNameAttributes())
-    }
-
-    override fun getIcon(element: PsiElement): Icon? {
-        return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface else AllIcons.Nodes.Class
-    }
-
-    override fun getLegend(): String? {
-        val sb: StringBuilder = StringBuilder()
-        when (sink) {
-            is FactoryMethodSink -> {
-                val method: IrMethod = sink.parameter.method
-                if (method.isConstructor) {
-                    sb.append("Object <b>" + method.name + "</b> used in Scope <b>" + sink.scope.simpleName + "</b>" +
-                            " has a dependency on type <b>" + sink.type.simpleName + "</b>.")
-                }
-                graph.getProviders(sink).forEach { source ->
-                    when (source) {
-                        is FactoryMethodSource -> {
-                            sb.append("This dependency is provided by Scope <b>" + source.scope.simpleName + "</b>" +
-                                    ", via Motif Factory method <b>" + source.factoryMethod.name + "()</b>.")
-                        }
-                        else -> {
-                            // TODO : Handle all types
-                        }
-                    }
-                }
-                return sb.toString()
-            }
-            is AccessMethodSink -> {
-                // TODO : Handle all types
-            }
+    fun getConsumingTypeFromSink(sink: Sink): Type {
+      return when (sink) {
+        is FactoryMethodSink -> {
+          sink.parameter.factoryMethod.returnType.type
         }
-        return null
+        is AccessMethodSink -> {
+          sink.type
+        }
+      }
     }
+  }
 
-    override fun toString(): String {
-        return sink.type.simpleName
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(sink.type.simpleName)
+    val consumingType = getConsumingTypeFromSink(sink)
+    text.ending.addText(" → ${consumingType.simpleName}", getPackageNameAttributes())
+  }
+
+  override fun getIcon(element: PsiElement): Icon? {
+    return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface
+    else AllIcons.Nodes.Class
+  }
+
+  override fun getLegend(): String? {
+    val sb: StringBuilder = StringBuilder()
+    when (sink) {
+      is FactoryMethodSink -> {
+        val method: IrMethod = sink.parameter.method
+        if (method.isConstructor) {
+          sb.append(
+              "Object <b>" +
+                  method.name +
+                  "</b> used in Scope <b>" +
+                  sink.scope.simpleName +
+                  "</b>" +
+                  " has a dependency on type <b>" +
+                  sink.type.simpleName +
+                  "</b>.")
+        }
+        graph.getProviders(sink).forEach { source ->
+          when (source) {
+            is FactoryMethodSource -> {
+              sb.append(
+                  "This dependency is provided by Scope <b>" +
+                      source.scope.simpleName +
+                      "</b>" +
+                      ", via Motif Factory method <b>" +
+                      source.factoryMethod.name +
+                      "()</b>.")
+            }
+            else -> {
+              // TODO : Handle all types
+            }
+          }
+        }
+        return sb.toString()
+      }
+      is AccessMethodSink -> {
+        // TODO : Handle all types
+      }
     }
+    return null
+  }
+
+  override fun toString(): String {
+    return sink.type.simpleName
+  }
 }
-

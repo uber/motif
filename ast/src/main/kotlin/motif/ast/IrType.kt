@@ -17,31 +17,31 @@ package motif.ast
 
 interface IrType : IrEquivalence {
 
-    val qualifiedName: String
-    val isVoid: Boolean
-    val isPrimitive: Boolean
+  val qualifiedName: String
+  val isVoid: Boolean
+  val isPrimitive: Boolean
 
-    val simpleName: String
-        get() = simpleName(qualifiedName)
+  val simpleName: String
+    get() = simpleName(qualifiedName)
 
-    fun resolveClass(): IrClass?
-    fun isAssignableTo(type: IrType): Boolean
+  fun resolveClass(): IrClass?
+  fun isAssignableTo(type: IrType): Boolean
 }
 
 private val SEPARATORS = setOf(',', ' ', '<', '>')
 
 internal fun simpleName(qualifiedName: String): String {
-    val sb = StringBuilder()
-    var skipRest = false
-    qualifiedName.reversed().forEach { c ->
-        if (SEPARATORS.contains(c)) {
-            skipRest = false
-        }
-        if (c == '.') {
-            skipRest = true
-        } else if (!skipRest) {
-            sb.append(c)
-        }
+  val sb = StringBuilder()
+  var skipRest = false
+  qualifiedName.reversed().forEach { c ->
+    if (SEPARATORS.contains(c)) {
+      skipRest = false
     }
-    return sb.reversed().toString()
+    if (c == '.') {
+      skipRest = true
+    } else if (!skipRest) {
+      sb.append(c)
+    }
+  }
+  return sb.reversed().toString()
 }

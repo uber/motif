@@ -23,40 +23,46 @@ import org.junit.Test
  *
  * There are a couple reasons why the tests in this module should remain minimal:
  *
- *   1. Running the integration tests in the :tests module should give us full confidence that our implementation is
+ * 1. Running the integration tests in the :tests module should give us full confidence that our
+ * implementation is
+ * ```
  *      correct. We should not rely on ModelsSmokeTest for validating correctness. Full coverage in this module
  *      would likely result in missing coverage in :tests.
- *   2. Full coverage in this module would couple us to a specific implementation. We want it to be possible to
+ * ```
+ * 2. Full coverage in this module would couple us to a specific implementation. We want it to be
+ * possible to
+ * ```
  *      safely rewrite the compiler with minimal changes to our test suite.
+ * ```
  */
 class ModelsSmokeTest : BaseTest() {
 
-    @Test
-    fun emptyScope() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun emptyScope() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
                     interface FooScope {}
-                """.trimIndent())
+      """.trimIndent())
 
-        val scopes = getScopes()
+    val scopes = getScopes()
 
-        assertThat(scopes).hasSize(1)
+    assertThat(scopes).hasSize(1)
 
-        val scope = scopes[0]
+    val scope = scopes[0]
 
-        assertThat(scope.qualifiedName).isEqualTo("test.FooScope")
-        assertThat(scope.factoryMethods).isEmpty()
-    }
+    assertThat(scope.qualifiedName).isEqualTo("test.FooScope")
+    assertThat(scope.factoryMethods).isEmpty()
+  }
 
-    @Test
-    fun objects() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun objects() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -65,18 +71,18 @@ class ModelsSmokeTest : BaseTest() {
                       @motif.Objects
                       class Objects {}
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val scope = getScopes()[0]
+    val scope = getScopes()[0]
 
-        assertThat(scope.factoryMethods).isEmpty()
-    }
+    assertThat(scope.factoryMethods).isEmpty()
+  }
 
-    @Test
-    fun basicFactoryMethod() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun basicFactoryMethod() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -89,35 +95,34 @@ class ModelsSmokeTest : BaseTest() {
                         }
                       }
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val factoryMethods = getScopes()[0].factoryMethods
+    val factoryMethods = getScopes()[0].factoryMethods
 
-        assertThat(factoryMethods.map { it.qualifiedName })
-                .isEqualTo(listOf("test.FooScope.Objects.string"))
+    assertThat(factoryMethods.map { it.qualifiedName })
+        .isEqualTo(listOf("test.FooScope.Objects.string"))
 
-        val factoryMethod = factoryMethods[0]
+    val factoryMethod = factoryMethods[0]
 
-        assertThat(factoryMethod.returnType.qualifiedName)
-                .isEqualTo("java.lang.String")
+    assertThat(factoryMethod.returnType.qualifiedName).isEqualTo("java.lang.String")
 
-        assertThat(factoryMethod.parameters.map { it.qualifiedName })
-                .isEqualTo(listOf("int"))
-    }
+    assertThat(factoryMethod.parameters.map { it.qualifiedName }).isEqualTo(listOf("int"))
+  }
 
-    @Test
-    fun constructorFactoryMethod() {
-        addClass("test.Foo",
-                """
+  @Test
+  fun constructorFactoryMethod() {
+    addClass(
+        "test.Foo",
+        """
                     package test;
 
                     class Foo {
                       Foo(int i) {}
                     }
-                """.trimIndent())
-        addClass(
-                "test.FooScope",
-                """
+      """.trimIndent())
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -128,35 +133,35 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo foo();
                       }
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val factoryMethod = getScopes()[0].factoryMethods[0]
+    val factoryMethod = getScopes()[0].factoryMethods[0]
 
-        assertThat(factoryMethod.returnType.qualifiedName)
-                .isEqualTo("test.Foo")
+    assertThat(factoryMethod.returnType.qualifiedName).isEqualTo("test.Foo")
 
-        assertThat(factoryMethod.parameters.map { it.qualifiedName })
-                .isEqualTo(listOf("int"))
-    }
+    assertThat(factoryMethod.parameters.map { it.qualifiedName }).isEqualTo(listOf("int"))
+  }
 
-    @Test
-    fun bindsFactoryMethod() {
-        addClass("test.Foo",
-                """
+  @Test
+  fun bindsFactoryMethod() {
+    addClass(
+        "test.Foo",
+        """
                     package test;
 
                     class Foo {}
-                """.trimIndent())
+      """.trimIndent())
 
-        addClass("test.Bar",
-                """
+    addClass(
+        "test.Bar",
+        """
                     package test;
 
                     class Bar extends Foo {}
-                """.trimIndent())
-        addClass(
-                "test.FooScope",
-                """
+      """.trimIndent())
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -167,21 +172,20 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo bar(Bar bar);
                       }
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val factoryMethod = getScopes()[0].factoryMethods[0]
+    val factoryMethod = getScopes()[0].factoryMethods[0]
 
-        assertThat(factoryMethod.returnType.qualifiedName)
-                .isEqualTo("test.Foo")
+    assertThat(factoryMethod.returnType.qualifiedName).isEqualTo("test.Foo")
 
-        assertThat(factoryMethod.parameters.map { it.qualifiedName })
-                .isEqualTo(listOf("test.Bar"))
-    }
+    assertThat(factoryMethod.parameters.map { it.qualifiedName }).isEqualTo(listOf("test.Bar"))
+  }
 
-    @Test
-    fun spread() {
-        addClass("test.Foo",
-                """
+  @Test
+  fun spread() {
+    addClass(
+        "test.Foo",
+        """
                     package test;
 
                     public class Foo {
@@ -191,10 +195,10 @@ class ModelsSmokeTest : BaseTest() {
                         return "";
                       }
                     }
-                """.trimIndent())
-        addClass(
-                "test.FooScope",
-                """
+      """.trimIndent())
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -207,83 +211,82 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo foo();
                       }
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val factoryMethod = getScopes()[0].factoryMethods[0]
+    val factoryMethod = getScopes()[0].factoryMethods[0]
 
-        assertThat(factoryMethod.spread).isNotNull()
+    assertThat(factoryMethod.spread).isNotNull()
 
-        val spread = factoryMethod.spread!!
+    val spread = factoryMethod.spread!!
 
-        assertThat(spread.clazz.qualifiedName).isEqualTo("test.Foo")
+    assertThat(spread.clazz.qualifiedName).isEqualTo("test.Foo")
 
-        assertThat(spread.methods.map { it.qualifiedName })
-                .isEqualTo(listOf("test.Foo.string"))
-    }
+    assertThat(spread.methods.map { it.qualifiedName }).isEqualTo(listOf("test.Foo.string"))
+  }
 
-    @Test
-    fun accessMethod() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun accessMethod() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
                     interface FooScope {
                       String string();
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val scope = getScopes()[0]
+    val scope = getScopes()[0]
 
-        assertThat(scope.childMethods).isEmpty()
-        assertThat(scope.accessMethods.map { it.qualifiedName })
-                .isEqualTo(listOf("test.FooScope.string"))
+    assertThat(scope.childMethods).isEmpty()
+    assertThat(scope.accessMethods.map { it.qualifiedName })
+        .isEqualTo(listOf("test.FooScope.string"))
 
-        val accessMethod = scope.accessMethods[0]
-        assertThat(accessMethod.returnType.qualifiedName).isEqualTo("java.lang.String")
-    }
+    val accessMethod = scope.accessMethods[0]
+    assertThat(accessMethod.returnType.qualifiedName).isEqualTo("java.lang.String")
+  }
 
-    @Test
-    fun childMethod() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun childMethod() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
                     interface FooScope {
                       BarScope bar(String string);
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        addClass(
-                "test.BarScope",
-                """
+    addClass(
+        "test.BarScope",
+        """
                     package test;
 
                     @motif.Scope
                     interface BarScope {}
-                """.trimIndent())
+      """.trimIndent())
 
-        // getScopes is alphabetically sorted so FooScope is last
-        val fooScope = getScopes()[1]
+    // getScopes is alphabetically sorted so FooScope is last
+    val fooScope = getScopes()[1]
 
-        assertThat(fooScope.childMethods.map { it.qualifiedName })
-                .isEqualTo(listOf("test.FooScope.bar"))
+    assertThat(fooScope.childMethods.map { it.qualifiedName })
+        .isEqualTo(listOf("test.FooScope.bar"))
 
-        val childMethod = fooScope.childMethods[0]
-        assertThat(childMethod.childScopeClass.qualifiedName).isEqualTo("test.BarScope")
+    val childMethod = fooScope.childMethods[0]
+    assertThat(childMethod.childScopeClass.qualifiedName).isEqualTo("test.BarScope")
 
-        assertThat(childMethod.parameters.map { it.type.qualifiedName })
-                .isEqualTo(listOf("java.lang.String"))
-    }
+    assertThat(childMethod.parameters.map { it.type.qualifiedName })
+        .isEqualTo(listOf("java.lang.String"))
+  }
 
-    @Test
-    fun explicitDependencies() {
-        addClass(
-                "test.FooScope",
-                """
+  @Test
+  fun explicitDependencies() {
+    addClass(
+        "test.FooScope",
+        """
                     package test;
 
                     @motif.Scope
@@ -293,14 +296,14 @@ class ModelsSmokeTest : BaseTest() {
                         String string();
                       }
                     }
-                """.trimIndent())
+      """.trimIndent())
 
-        val scope = getScopes()[0]
+    val scope = getScopes()[0]
 
-        assertThat(scope.dependencies).isNotNull()
+    assertThat(scope.dependencies).isNotNull()
 
-        val explicitDependencies = scope.dependencies!!
-        assertThat(explicitDependencies.methods.map { it.returnType.qualifiedName })
-                .isEqualTo(listOf("java.lang.String"))
-    }
+    val explicitDependencies = scope.dependencies!!
+    assertThat(explicitDependencies.methods.map { it.returnType.qualifiedName })
+        .isEqualTo(listOf("java.lang.String"))
+  }
 }

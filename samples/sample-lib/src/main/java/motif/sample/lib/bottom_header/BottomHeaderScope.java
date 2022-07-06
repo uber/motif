@@ -21,8 +21,8 @@ import motif.sample.lib.controller.ControllerObjects;
 @Scope
 public interface BottomHeaderScope {
 
-    BottomHeaderView view();
+  BottomHeaderView view();
 
-    @motif.Objects
-    abstract class Objects extends ControllerObjects<BottomHeaderController, BottomHeaderView> {}
+  @motif.Objects
+  abstract class Objects extends ControllerObjects<BottomHeaderController, BottomHeaderView> {}
 }

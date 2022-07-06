@@ -24,13 +24,13 @@ import motif.sample.lib.db.Photo;
 @Scope
 public interface PhotoListScope {
 
-    PhotoListView view();
+  PhotoListView view();
 
-    PhotoListItemScope item(PhotoListItemView view, Photo photo);
+  PhotoListItemScope item(PhotoListItemView view, Photo photo);
 
-    @motif.Objects
-    abstract class Objects extends ControllerObjects<PhotoListController, PhotoListView> {
+  @motif.Objects
+  abstract class Objects extends ControllerObjects<PhotoListController, PhotoListView> {
 
-        abstract PhotoListAdapter adapter();
-    }
+    abstract PhotoListAdapter adapter();
+  }
 }

@@ -22,15 +22,15 @@ import motif.ScopeFactory
 
 class MainActivity : Activity() {
 
-    private val mainScope: MainScope = ScopeFactory.create(MainScope::class.java, object :
-        MainScope.Dependencies {})
+  private val mainScope: MainScope =
+      ScopeFactory.create(MainScope::class.java, object : MainScope.Dependencies {})
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
 
-        val greeter = mainScope.greeter()
+    val greeter = mainScope.greeter()
 
-        findViewById<TextView>(R.id.text).text = greeter.greet()
-    }
+    findViewById<TextView>(R.id.text).text = greeter.greet()
+  }
 }

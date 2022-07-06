@@ -17,25 +17,23 @@ package motif.sample.app.photo_grid;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import javax.inject.Inject;
 
 public class PhotoGridView extends RecyclerView {
 
-    @Inject
-    public PhotoGridView(Context context) {
-        this(context, null);
-    }
+  @Inject
+  public PhotoGridView(Context context) {
+    this(context, null);
+  }
 
-    public PhotoGridView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+  public PhotoGridView(Context context, AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
 
-    public PhotoGridView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        setLayoutManager(new GridLayoutManager(context, 2));
-    }
+  public PhotoGridView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    setLayoutManager(new GridLayoutManager(context, 2));
+  }
 }

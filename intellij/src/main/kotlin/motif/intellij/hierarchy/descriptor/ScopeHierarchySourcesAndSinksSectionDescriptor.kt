@@ -20,26 +20,26 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
+import java.awt.Font.BOLD
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Scope
-import java.awt.Font.BOLD
 
 open class ScopeHierarchySourcesAndSinksSectionDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        element: PsiElement,
-        val scope: Scope)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    element: PsiElement,
+    val scope: Scope
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
-        text.ending.addText(" (" + formatQualifiedName(scope.qualifiedName) + ")", getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
+    text.ending.addText(
+        " (" + formatQualifiedName(scope.qualifiedName) + ")", getPackageNameAttributes())
+  }
 
-    override fun toString(): String {
-        return scope.simpleName
-    }
+  override fun toString(): String {
+    return scope.simpleName
+  }
 }
-

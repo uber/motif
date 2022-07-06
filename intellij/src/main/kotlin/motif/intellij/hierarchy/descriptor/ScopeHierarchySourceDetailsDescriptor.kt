@@ -19,24 +19,29 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Source
-import javax.swing.Icon
 
 open class ScopeHierarchySourceDetailsDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        source: Source)
-    : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    source: Source
+) : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Provided by: " + source.scope.simpleName + " (" + formatQualifiedName(source.scope.qualifiedName) + ")", getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(
+        "Provided by: " +
+            source.scope.simpleName +
+            " (" +
+            formatQualifiedName(source.scope.qualifiedName) +
+            ")",
+        getPackageNameAttributes())
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return null
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return null
+  }
 }
-

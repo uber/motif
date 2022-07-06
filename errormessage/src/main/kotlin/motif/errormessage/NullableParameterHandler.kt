@@ -19,10 +19,11 @@ import motif.models.NullableParameter
 
 internal class NullableParameterHandler(private val error: NullableParameter) : ErrorHandler {
 
-    override val name = "NULLABLE PARAMETER"
+  override val name = "NULLABLE PARAMETER"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Parameter may not be nullable:
 
               [Method]
@@ -33,6 +34,6 @@ internal class NullableParameterHandler(private val error: NullableParameter) : 
 
             Suggestions:
               * Consider using Optional<...> instead.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

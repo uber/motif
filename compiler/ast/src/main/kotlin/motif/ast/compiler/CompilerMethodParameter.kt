@@ -15,28 +15,22 @@
  */
 package motif.ast.compiler
 
-import motif.ast.IrAnnotation
-import motif.ast.IrParameter
-import motif.ast.IrType
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
+import motif.ast.IrAnnotation
+import motif.ast.IrParameter
+import motif.ast.IrType
 
 class CompilerMethodParameter(
-        override val env: ProcessingEnvironment,
-        val element: VariableElement,
-        val typeMirror: TypeMirror) : IrUtil, IrParameter {
+    override val env: ProcessingEnvironment,
+    val element: VariableElement,
+    val typeMirror: TypeMirror
+) : IrUtil, IrParameter {
 
+  override val type: IrType by lazy { CompilerType(env, typeMirror) }
 
-    override val type: IrType by lazy {
-        CompilerType(env, typeMirror)
-    }
+  override val name: String by lazy { element.simpleName.toString() }
 
-    override val name: String by lazy {
-        element.simpleName.toString()
-    }
-
-    override val annotations: List<IrAnnotation> by lazy {
-        element.irAnnotations()
-    }
+  override val annotations: List<IrAnnotation> by lazy { element.irAnnotations() }
 }

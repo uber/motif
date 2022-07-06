@@ -25,9 +25,10 @@ import motif.models.Scope
  * Node descriptor used to render a Motif scope ancestor.
  */
 class ScopeHierarchyScopeAncestorDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        clazz: PsiClass,
-        scope: Scope,
-        isBase: Boolean = false) : ScopeHierarchyScopeDescriptor(project, graph, parentDescriptor, clazz, scope, isBase)
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    clazz: PsiClass,
+    scope: Scope,
+    isBase: Boolean = false
+) : ScopeHierarchyScopeDescriptor(project, graph, parentDescriptor, clazz, scope, isBase)

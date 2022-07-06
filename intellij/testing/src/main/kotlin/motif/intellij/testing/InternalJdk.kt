@@ -20,7 +20,5 @@ import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
 
 object InternalJdk {
 
-    val instance: Sdk by lazy {
-        JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
-    }
+  val instance: Sdk by lazy { JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk }
 }

@@ -19,13 +19,14 @@ import motif.models.InvalidFactoryMethod
 
 internal class InvalidFactoryMethodHandler(private val error: InvalidFactoryMethod) : ErrorHandler {
 
-    override val name = "INVALID FACTORY METHOD"
+  override val name = "INVALID FACTORY METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Factory method is invalid:
 
               ${error.objects.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

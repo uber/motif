@@ -19,20 +19,21 @@ import motif.core.UnexposedSourceError
 
 internal class UnexposedSourceHandler(private val error: UnexposedSourceError) : ErrorHandler {
 
-    override val name = "UNEXPOSED SOURCE"
+  override val name = "UNEXPOSED SOURCE"
 
-    override fun StringBuilder.handle() {
-        appendLine("Dependency source is not annotated with @Expose but is required by a descendant:")
-        appendLine()
-        appendLine("  [Source]")
-        appendLine(error.source.errorText.prependIndent("    "))
-        appendLine()
-        appendLine("  [Required by]")
-        appendLine(error.sink.errorText.prependIndent("    "))
-        appendLine()
-        appendLine("""Suggestions:
+  override fun StringBuilder.handle() {
+    appendLine("Dependency source is not annotated with @Expose but is required by a descendant:")
+    appendLine()
+    appendLine("  [Source]")
+    appendLine(error.source.errorText.prependIndent("    "))
+    appendLine()
+    appendLine("  [Required by]")
+    appendLine(error.sink.errorText.prependIndent("    "))
+    appendLine()
+    appendLine(
+        """Suggestions:
             |  * Annotate the source with @Expose.
             |  * Resolve the descendant dependency elsewhere.
         """.trimMargin())
-    }
+  }
 }
