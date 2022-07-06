@@ -40,6 +40,7 @@ ext.deps = [
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
                         mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.18.0',
+                        spotless: "com.diffplug.spotless:spotless-plugin-gradle:5.11.0",
                 ]
         ],
         "kotlin": [
