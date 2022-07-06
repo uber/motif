@@ -26,7 +26,6 @@ subprojects {
         mavenCentral()
     }
 
-<<<<<<< HEAD
     configurations.configureEach {
         resolutionStrategy.eachDependency {
             if (requested.name.startsWith("kotlin-stdlib")) {

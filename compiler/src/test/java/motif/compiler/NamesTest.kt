@@ -147,13 +147,13 @@ class NamesTest {
         .compile()
   }
 
-    private fun getErrorMessage(classString: String): String {
-      val result = compile(SafeNameProcessor(), classString)
-      if (result.exitCode != COMPILATION_ERROR && result.exitCode != INTERNAL_ERROR) {
-        assertWithMessage(result.messages).fail()
-      }
-      return result.messages
+  private fun getErrorMessage(classString: String): String {
+    val result = compile(SafeNameProcessor(), classString)
+    if (result.exitCode != COMPILATION_ERROR && result.exitCode != INTERNAL_ERROR) {
+      assertWithMessage(result.messages).fail()
     }
+    return result.messages
+  }
 
   private fun getSafeName(classString: String): String {
     val processor = SafeNameProcessor()
