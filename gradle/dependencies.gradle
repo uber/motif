@@ -15,11 +15,14 @@
  */
 
 def versions = [
-        kotlin: '1.6.21',
+        kotlin: '1.5.10',
+        ktlint: '0.41.0',
+        ktfmt: '0.23',
         dagger: '2.24',
         butterknife: '10.1.0',
         glide: '4.9.0',
-        room: '2.4.2',
+        gjf: '1.7',
+        room: '2.1.0',
         dokka: '1.4.32',
         "gradleIntellijPlugin": [
                 ide: '2020.1'
