@@ -46,6 +46,8 @@ class CompilerType(
         }
         return@lazy if (candidate.startsWith('(')) {
             candidate.substringAfter(":: ").dropLast(1)
+        } else if (candidate.startsWith("@")) {
+            candidate.substringAfterLast(" ")
         } else {
             candidate
         }

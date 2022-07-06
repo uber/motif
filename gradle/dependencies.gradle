@@ -22,7 +22,7 @@ def versions = [
         room: '2.4.2',
         dokka: '1.4.32',
         "gradleIntellijPlugin": [
-                ide: '2020.2'
+                ide: '2021.1'
         ],
 ]
 

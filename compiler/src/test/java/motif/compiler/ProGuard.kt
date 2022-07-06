@@ -31,7 +31,6 @@ import kotlin.reflect.KClass
 object ProGuard {
 
     private val classPathFiles: List<File> by lazy {
-        val rtJar = File(System.getProperty("java.home"), "lib/rt.jar");
         listOf(Scope::class,
                 Truth::class,
                 Inject::class,
@@ -39,7 +38,7 @@ object ProGuard {
                 Component::class,
                 Unit::class,
                 NotNull::class)
-                .map { libraryPath(it) } + rtJar
+                .map { libraryPath(it) }
     }
 
     @JvmStatic

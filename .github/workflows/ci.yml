@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java_version: [8]
+        java_version: [11]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,4 +31,4 @@ jobs:
         run: ./gradlew check --stacktrace
       - name: Upload Snapshot 
         run: ./gradlew publish --no-daemon --no-parallel -PmavenCentralUsername="${{ secrets.SonatypeUsername }}" -PmavenCentralPassword="${{ secrets.SonatypePassword }}"
-        if: success() && github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && matrix.java_version == '8'
+        if: success() && github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && matrix.java_version == '11'
