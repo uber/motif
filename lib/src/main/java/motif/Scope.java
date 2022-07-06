@@ -15,4 +15,4 @@
  */
 package motif;
 
-public @interface Scope { }
+public @interface Scope {}

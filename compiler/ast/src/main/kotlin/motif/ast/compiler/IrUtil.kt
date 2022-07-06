@@ -15,20 +15,20 @@
  */
 package motif.ast.compiler
 
-import motif.ast.IrAnnotation
-import motif.ast.IrModifier
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
+import motif.ast.IrAnnotation
+import motif.ast.IrModifier
 
 interface IrUtil {
 
-    val env: ProcessingEnvironment
+  val env: ProcessingEnvironment
 
-    fun Element.irModifiers(): Set<IrModifier> {
-        return modifiers.map { IrModifier.valueOf(it.name) }.toSet()
-    }
+  fun Element.irModifiers(): Set<IrModifier> {
+    return modifiers.map { IrModifier.valueOf(it.name) }.toSet()
+  }
 
-    fun Element.irAnnotations(): List<IrAnnotation> {
-        return annotationMirrors.map { CompilerAnnotation(env, it) }
-    }
+  fun Element.irAnnotations(): List<IrAnnotation> {
+    return annotationMirrors.map { CompilerAnnotation(env, it) }
+  }
 }

@@ -21,7 +21,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
@@ -36,38 +35,40 @@ import motif.intellij.analytics.MotifAnalyticsActions
  */
 class MotifUsageAction : AnAction(), MotifProjectComponent.Listener {
 
-    private var graph: ResolvedGraph? = null
+  private var graph: ResolvedGraph? = null
 
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        this.graph = graph
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    this.graph = graph
+  }
+
+  override fun actionPerformed(event: AnActionEvent) {
+    val project = event.project ?: return
+    val element = event.getPsiElement() ?: return
+    val graph = graph ?: return
+
+    if (!ScopeHierarchyUtils.isInitializedGraph(graph)) {
+      MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
+      return
     }
 
-    override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project ?: return
-        val element = event.getPsiElement() ?: return
-        val graph = graph ?: return
+    val toolWindow: ToolWindow =
+        ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
+    toolWindow.activate { MotifProjectComponent.getInstance(project).onSelectedClass(element) }
 
-        if (!ScopeHierarchyUtils.isInitializedGraph(graph)) {
-            MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
-            return
-        }
+    AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.USAGE_MENU_CLICK)
+  }
 
-        val toolWindow: ToolWindow = ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-        toolWindow.activate {
-            MotifProjectComponent.getInstance(project).onSelectedClass(element)
-        }
+  override fun update(e: AnActionEvent) {
+    val project = e.project ?: return
+    val graph = this.graph ?: return
+    val element: PsiElement? = e.getPsiElement()
+    e.presentation.isEnabled =
+        element is PsiClass &&
+            (!ScopeHierarchyUtils.isInitializedGraph(graph) ||
+                getUsageCount(project, graph, element) > 0)
+  }
 
-        AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.USAGE_MENU_CLICK)
-    }
-
-    override fun update(e: AnActionEvent) {
-        val project = e.project ?: return
-        val graph = this.graph ?: return
-        val element: PsiElement? = e.getPsiElement()
-        e.presentation.isEnabled = element is PsiClass && (!ScopeHierarchyUtils.isInitializedGraph(graph) || getUsageCount(project, graph, element) > 0)
-    }
-
-    private fun AnActionEvent.getPsiElement(): PsiElement? {
-        return getData(CommonDataKeys.PSI_ELEMENT)
-    }
+  private fun AnActionEvent.getPsiElement(): PsiElement? {
+    return getData(CommonDataKeys.PSI_ELEMENT)
+  }
 }

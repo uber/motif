@@ -18,35 +18,35 @@ package motif.intellij.ui
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import java.awt.BorderLayout
+import javax.swing.JPanel
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.UsageHierarchyBrowser
-import java.awt.BorderLayout
-import javax.swing.JPanel
 
-class MotifUsagePanel(project: Project, graph: ResolvedGraph) : JPanel(), MotifProjectComponent.Listener {
+class MotifUsagePanel(project: Project, graph: ResolvedGraph) :
+    JPanel(), MotifProjectComponent.Listener {
 
-    private val usageBrowser: UsageHierarchyBrowser
+  private val usageBrowser: UsageHierarchyBrowser
 
-    init {
-        val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
+  init {
+    val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
 
-        // Build UI
-        layout = BorderLayout()
+    // Build UI
+    layout = BorderLayout()
 
-        usageBrowser = UsageHierarchyBrowser(project, graph, rootElement)
-        usageBrowser.changeView(UsageHierarchyBrowser.USAGE_HIERARCHY_TYPE)
+    usageBrowser = UsageHierarchyBrowser(project, graph, rootElement)
+    usageBrowser.changeView(UsageHierarchyBrowser.USAGE_HIERARCHY_TYPE)
 
-        add(usageBrowser)
-    }
+    add(usageBrowser)
+  }
 
-    fun setSelectedClass(clazz: PsiClass) {
-        usageBrowser.setSelectedClass(clazz)
-    }
+  fun setSelectedClass(clazz: PsiClass) {
+    usageBrowser.setSelectedClass(clazz)
+  }
 
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        usageBrowser.onGraphUpdated(graph)
-    }
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    usageBrowser.onGraphUpdated(graph)
+  }
 }
-

@@ -19,22 +19,22 @@ import motif.core.DependencyCycleError
 
 internal class DependencyCycleHandler(private val error: DependencyCycleError) : ErrorHandler {
 
-    override val name = "DEPENDENCY CYCLE"
+  override val name = "DEPENDENCY CYCLE"
 
-    override fun StringBuilder.handle() {
-        appendLine("Dependency cycle detected:")
-        appendLine()
-        error.path.forEachIndexed { i, node ->
-            val prefix = if (i == 0) "  " else "  -> "
-            node.errorText.lineSequence().forEachIndexed { index, line ->
-                val indent = " ".repeat(prefix.length)
-                if (index == 0) {
-                    appendLine("$prefix$line")
-                } else {
-                    appendLine(line.prependIndent(indent))
-                }
-            }
-            appendLine()
+  override fun StringBuilder.handle() {
+    appendLine("Dependency cycle detected:")
+    appendLine()
+    error.path.forEachIndexed { i, node ->
+      val prefix = if (i == 0) "  " else "  -> "
+      node.errorText.lineSequence().forEachIndexed { index, line ->
+        val indent = " ".repeat(prefix.length)
+        if (index == 0) {
+          appendLine("$prefix$line")
+        } else {
+          appendLine(line.prependIndent(indent))
         }
+      }
+      appendLine()
     }
+  }
 }

@@ -21,15 +21,15 @@ import motif.Scope;
 @Scope
 public interface LoggedInScope {
 
-    LoggedInController controller();
+  LoggedInController controller();
 
-    @motif.Objects
-    abstract class Objects {
+  @motif.Objects
+  abstract class Objects {
 
-        abstract LoggedInController controller();
+    abstract LoggedInController controller();
 
-        LoggedInView view(ViewGroup parentViewGroup) {
-            return LoggedInView.create(parentViewGroup);
-        }
+    LoggedInView view(ViewGroup parentViewGroup) {
+      return LoggedInView.create(parentViewGroup);
     }
+  }
 }

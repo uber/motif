@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http:www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,10 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.presentation.java.ClassPresentationUtil
 import com.intellij.ui.treeStructure.Tree
+import java.text.MessageFormat
+import javax.swing.JPanel
+import javax.swing.JTree
+import javax.swing.tree.DefaultMutableTreeNode
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.MotifProjectComponent
@@ -36,113 +40,114 @@ import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOU
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyErrorDescriptor
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyRootErrorDescriptor
 import motif.models.MotifError
-import java.text.MessageFormat
-import java.util.*
-import javax.swing.JPanel
-import javax.swing.JTree
-import javax.swing.tree.DefaultMutableTreeNode
 
 /*
  * UI component used to render scope properties.
  */
 class ErrorHierarchyBrowser(
-        project: Project,
-        initialGraph: ResolvedGraph,
-        private val rootElement: PsiElement,
-        private val selectionListener: Listener?)
-    : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
+    project: Project,
+    initialGraph: ResolvedGraph,
+    private val rootElement: PsiElement,
+    private val selectionListener: Listener?
+) : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
 
-    private var graph: ResolvedGraph = initialGraph
+  private var graph: ResolvedGraph = initialGraph
 
-    companion object {
-        const val ERROR_HIERARCHY_TYPE: String = "Errors"
-        private val DATA_KEY = DataKey.create<ErrorHierarchyBrowser>(ErrorHierarchyBrowser::class.java.name)
+  companion object {
+    const val ERROR_HIERARCHY_TYPE: String = "Errors"
+    private val DATA_KEY =
+        DataKey.create<ErrorHierarchyBrowser>(ErrorHierarchyBrowser::class.java.name)
+  }
+
+  override fun isApplicableElement(element: PsiElement): Boolean {
+    return element is PsiClass
+  }
+
+  override fun getActionPlace(): String {
+    return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
+  }
+
+  override fun prependActions(actionGroup: DefaultActionGroup) {}
+
+  override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
+    return JavaHierarchyUtil.getComparator(myProject)
+  }
+
+  override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
+    if (isRootElement(descriptor.psiElement)) {
+      return null
     }
+    return descriptor.psiElement
+  }
 
-    override fun isApplicableElement(element: PsiElement): Boolean {
-        return element is PsiClass
-    }
+  override fun getPrevOccurenceActionNameImpl(): String {
+    return LABEL_GO_PREVIOUS_SCOPE
+  }
 
-    override fun getActionPlace(): String {
-        return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
-    }
+  override fun getNextOccurenceActionNameImpl(): String {
+    return LABEL_GO_NEXT_SCOPE
+  }
 
-    override fun prependActions(actionGroup: DefaultActionGroup) {
-    }
+  override fun createLegendPanel(): JPanel? {
+    return null
+  }
 
-    override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
-        return JavaHierarchyUtil.getComparator(myProject)
-    }
+  override fun createTrees(trees: MutableMap<String, JTree>) {
+    trees[ERROR_HIERARCHY_TYPE] = createTree(true)
+  }
 
-    override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
-        if (isRootElement(descriptor.psiElement)) {
-            return null
+  override fun configureTree(tree: Tree) {
+    super.configureTree(tree)
+    tree.addTreeSelectionListener {
+      tree.addTreeSelectionListener {
+        val node: Any? = tree.lastSelectedPathComponent
+        if (node is DefaultMutableTreeNode) {
+          val descriptor = node.userObject
+          if (descriptor is ScopeHierarchyErrorDescriptor) {
+            selectionListener?.onSelectedErrorChanged(
+                descriptor.element, descriptor.error, descriptor.errorMessage)
+          }
         }
-        return descriptor.psiElement
+      }
     }
+  }
 
-    override fun getPrevOccurenceActionNameImpl(): String {
-        return LABEL_GO_PREVIOUS_SCOPE
+  override fun getContentDisplayName(typeName: String, element: PsiElement): String? {
+    return MessageFormat.format(
+        typeName, ClassPresentationUtil.getNameForClass(element as PsiClass, false))
+  }
+
+  override fun createHierarchyTreeStructure(
+      typeName: String,
+      psiElement: PsiElement
+  ): HierarchyTreeStructure? {
+    if (psiElement == rootElement) {
+      val descriptor: HierarchyNodeDescriptor =
+          ScopeHierarchyRootErrorDescriptor(project, graph, null, psiElement)
+      return ScopeHierarchyTreeStructure(project, graph, descriptor)
     }
+    return null
+  }
 
-    override fun getNextOccurenceActionNameImpl(): String {
-        return LABEL_GO_NEXT_SCOPE
-    }
+  override fun getBrowserDataKey(): String {
+    return DATA_KEY.name
+  }
 
-    override fun createLegendPanel(): JPanel? {
-        return null
-    }
+  override fun doRefresh(currentBuilderOnly: Boolean) {
+    MotifProjectComponent.getInstance(project).refreshGraph()
+  }
 
-    override fun createTrees(trees: MutableMap<String, JTree>) {
-        trees[ERROR_HIERARCHY_TYPE] = createTree(true)
-    }
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    this.graph = graph
+    super.doRefresh(true)
+  }
 
-    override fun configureTree(tree: Tree) {
-        super.configureTree(tree)
-        tree.addTreeSelectionListener {
-          tree.addTreeSelectionListener {
-                val node: Any? = tree.lastSelectedPathComponent
-                if (node is DefaultMutableTreeNode) {
-                    val descriptor = node.userObject
-                    if (descriptor is ScopeHierarchyErrorDescriptor) {
-                        selectionListener?.onSelectedErrorChanged(descriptor.element, descriptor.error, descriptor.errorMessage)
-                    }
-                }
-            }
-        }
-    }
+  /*
+   * Interface used to notify that an new error was selected in the
+   * {@ErrorHierarchyBrowser} component.
+   */
+  interface Listener {
 
-    override fun getContentDisplayName(typeName: String, element: PsiElement): String? {
-        return MessageFormat.format(typeName, ClassPresentationUtil.getNameForClass(element as PsiClass, false))
-    }
-
-    override fun createHierarchyTreeStructure(typeName: String, psiElement: PsiElement): HierarchyTreeStructure? {
-        if (psiElement == rootElement) {
-            val descriptor: HierarchyNodeDescriptor = ScopeHierarchyRootErrorDescriptor(project, graph, null, psiElement)
-            return ScopeHierarchyTreeStructure(project, graph, descriptor)
-        }
-        return null
-    }
-
-    override fun getBrowserDataKey(): String {
-        return DATA_KEY.name
-    }
-
-    override fun doRefresh(currentBuilderOnly: Boolean) {
-        MotifProjectComponent.getInstance(project).refreshGraph()
-    }
-
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        this.graph = graph
-        super.doRefresh(true)
-    }
-
-    /*
-     * Interface used to notify that an new error was selected in the
-     * {@ErrorHierarchyBrowser} component.
-     */
-    interface Listener {
-
-        fun onSelectedErrorChanged(element: PsiElement, error: MotifError, errorMessage: ErrorMessage)
-    }
+    fun onSelectedErrorChanged(element: PsiElement, error: MotifError, errorMessage: ErrorMessage)
+  }
 }

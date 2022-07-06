@@ -23,19 +23,18 @@ import motif.core.ResolvedGraph
 import motif.models.Scope
 
 open class ScopeHierarchyDependenciesSectionDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        element: PsiElement,
-        val scope: Scope)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    element: PsiElement,
+    val scope: Scope
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(scope.simpleName)
-    }
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(scope.simpleName)
+  }
 
-    override fun toString(): String {
-        return scope.simpleName
-    }
+  override fun toString(): String {
+    return scope.simpleName
+  }
 }
-

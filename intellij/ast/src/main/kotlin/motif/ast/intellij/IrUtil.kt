@@ -19,25 +19,24 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotationOwner
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
-import motif.ast.IrAnnotation
-import motif.ast.IrModifier
-import java.util.*
+import java.util.Locale
 import kotlin.collections.filter
 import kotlin.collections.map
 import kotlin.collections.toSet
 import kotlin.text.toUpperCase
+import motif.ast.IrAnnotation
+import motif.ast.IrModifier
 
 interface IrUtil {
 
-    fun PsiModifierListOwner.irModifiers(): Set<IrModifier> {
-        return PsiModifier.MODIFIERS
-                .filter { hasModifierProperty(it) }
-                .map { IrModifier.valueOf(it.toUpperCase(Locale.getDefault())) }
-                .toSet()
-    }
+  fun PsiModifierListOwner.irModifiers(): Set<IrModifier> {
+    return PsiModifier.MODIFIERS
+        .filter { hasModifierProperty(it) }
+        .map { IrModifier.valueOf(it.toUpperCase(Locale.getDefault())) }
+        .toSet()
+  }
 
-    fun PsiAnnotationOwner.irAnnotations(project: Project): List<IrAnnotation> {
-        return annotations.map { IntelliJAnnotation(project, it) }
-    }
-
+  fun PsiAnnotationOwner.irAnnotations(project: Project): List<IrAnnotation> {
+    return annotations.map { IntelliJAnnotation(project, it) }
+  }
 }

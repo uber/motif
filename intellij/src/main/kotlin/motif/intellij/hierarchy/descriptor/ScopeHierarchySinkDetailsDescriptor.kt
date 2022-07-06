@@ -19,24 +19,29 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Sink
-import javax.swing.Icon
 
 open class ScopeHierarchySinkDetailsDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        sink: Sink)
-    : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    sink: Sink
+) : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText("Consumed by: " + sink.scope.simpleName + " (" + formatQualifiedName(sink.scope.qualifiedName) + ")", getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(
+        "Consumed by: " +
+            sink.scope.simpleName +
+            " (" +
+            formatQualifiedName(sink.scope.qualifiedName) +
+            ")",
+        getPackageNameAttributes())
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return null
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return null
+  }
 }
-

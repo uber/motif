@@ -19,13 +19,14 @@ import motif.models.InvalidQualifier
 
 internal class InvalidQualifierHandler(private val error: InvalidQualifier) : ErrorHandler {
 
-    override val name = "INVALID QUALIFIER"
+  override val name = "INVALID QUALIFIER"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Qualifier must define either no members or a single value member of type String:
 
               ${error.annotation.className}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

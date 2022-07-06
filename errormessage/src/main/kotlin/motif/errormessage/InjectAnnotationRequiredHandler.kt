@@ -17,12 +17,14 @@ package motif.errormessage
 
 import motif.models.InjectAnnotationRequired
 
-internal class InjectAnnotationRequiredHandler(private val error: InjectAnnotationRequired) : ErrorHandler {
+internal class InjectAnnotationRequiredHandler(private val error: InjectAnnotationRequired) :
+    ErrorHandler {
 
-    override val name = "INJECT ANNOTATION REQUIRED"
+  override val name = "INJECT ANNOTATION REQUIRED"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Multiple constructors found for constructor factory method return type. @Inject annotation required:
 
               [Type]
@@ -34,6 +36,6 @@ internal class InjectAnnotationRequiredHandler(private val error: InjectAnnotati
             Suggestions:
               * Annotation the desired constructor with @Inject.
               * Update the type to have only one constructor.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

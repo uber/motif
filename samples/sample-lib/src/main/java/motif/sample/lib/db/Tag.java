@@ -22,11 +22,9 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "tag")
 public class Tag {
 
-    @PrimaryKey
-    @NonNull
-    public final String name;
+  @PrimaryKey @NonNull public final String name;
 
-    public Tag(@NonNull String name) {
-        this.name = name;
-    }
+  public Tag(@NonNull String name) {
+    this.name = name;
+  }
 }

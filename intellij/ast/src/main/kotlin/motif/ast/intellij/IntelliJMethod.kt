@@ -18,24 +18,33 @@ package motif.ast.intellij
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiSubstitutor
-import motif.ast.*
+import motif.ast.IrAnnotation
+import motif.ast.IrMethod
+import motif.ast.IrModifier
+import motif.ast.IrParameter
+import motif.ast.IrType
 
 class IntelliJMethod(
-        private val project: Project,
-        val psiMethod: PsiMethod,
-        val substitutor: PsiSubstitutor) : IrUtil, IrMethod {
+    private val project: Project,
+    val psiMethod: PsiMethod,
+    val substitutor: PsiSubstitutor
+) : IrUtil, IrMethod {
 
-    override val parameters: List<IrParameter> by lazy {
-        psiMethod.parameterList.parameters.map { IntelliJMethodParameter(project, it, substitutor) }
-    }
+  override val parameters: List<IrParameter> by lazy {
+    psiMethod.parameterList.parameters.map { IntelliJMethodParameter(project, it, substitutor) }
+  }
 
-    override val returnType: IrType by lazy { IntelliJType(project, substitutor.substitute(psiMethod.returnType!!)) }
+  override val returnType: IrType by lazy {
+    IntelliJType(project, substitutor.substitute(psiMethod.returnType!!))
+  }
 
-    override val name: String by lazy { if (isConstructor) "<init>" else psiMethod.name }
+  override val name: String by lazy { if (isConstructor) "<init>" else psiMethod.name }
 
-    override val isConstructor: Boolean by lazy { psiMethod.isConstructor }
+  override val isConstructor: Boolean by lazy { psiMethod.isConstructor }
 
-    override val annotations: List<IrAnnotation> by lazy { psiMethod.modifierList.irAnnotations(project) }
+  override val annotations: List<IrAnnotation> by lazy {
+    psiMethod.modifierList.irAnnotations(project)
+  }
 
-    override val modifiers: Set<IrModifier> by lazy { psiMethod.irModifiers() }
+  override val modifiers: Set<IrModifier> by lazy { psiMethod.irModifiers() }
 }

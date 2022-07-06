@@ -17,56 +17,55 @@ package motif.ast.compiler
 
 import com.google.auto.common.AnnotationMirrors
 import com.google.common.base.Equivalence
-import motif.ast.IrAnnotation
-import motif.ast.IrMethod
-import motif.ast.IrType
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.ExecutableType
 import kotlin.reflect.KClass
+import motif.ast.IrAnnotation
+import motif.ast.IrMethod
+import motif.ast.IrType
 
-class CompilerAnnotation(
-        env: ProcessingEnvironment,
-        val mirror: AnnotationMirror) : IrAnnotation {
+class CompilerAnnotation(env: ProcessingEnvironment, val mirror: AnnotationMirror) : IrAnnotation {
 
-    override val className: String by lazy {
-        val typeElement = mirror.annotationType.asElement() as TypeElement
-        typeElement.qualifiedName.toString()
+  override val className: String by lazy {
+    val typeElement = mirror.annotationType.asElement() as TypeElement
+    typeElement.qualifiedName.toString()
+  }
+
+  private val key: Equivalence.Wrapper<AnnotationMirror> =
+      AnnotationMirrors.equivalence().wrap(mirror)
+  private val pretty: String by lazy { mirror.toString() }
+
+  override val type: IrType = CompilerType(env, mirror.annotationType)
+
+  override val members: List<IrMethod> by lazy {
+    mirror.elementValues.keys.map {
+      val executableType = env.typeUtils.asMemberOf(mirror.annotationType, it) as ExecutableType
+      CompilerMethod(env, mirror.annotationType, executableType, it)
     }
+  }
 
-    private val key: Equivalence.Wrapper<AnnotationMirror> = AnnotationMirrors.equivalence().wrap(mirror)
-    private val pretty: String by lazy { mirror.toString() }
+  override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
+    return annotationClass.java.name == className
+  }
 
-    override val type: IrType = CompilerType(env, mirror.annotationType)
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
 
-    override val members: List<IrMethod> by lazy {
-        mirror.elementValues.keys.map {
-            val executableType = env.typeUtils.asMemberOf(mirror.annotationType, it) as ExecutableType
-            CompilerMethod(env, mirror.annotationType, executableType, it)
-        }
-    }
+    other as CompilerAnnotation
 
-    override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
-        return annotationClass.java.name == className
-    }
+    if (key != other.key) return false
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    return true
+  }
 
-        other as CompilerAnnotation
+  override fun hashCode(): Int {
+    return key.hashCode()
+  }
 
-        if (key != other.key) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return key.hashCode()
-    }
-
-    override fun toString(): String {
-        return pretty
-    }
+  override fun toString(): String {
+    return pretty
+  }
 }

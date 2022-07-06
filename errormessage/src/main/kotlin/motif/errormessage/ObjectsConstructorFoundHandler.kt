@@ -17,15 +17,17 @@ package motif.errormessage
 
 import motif.models.ObjectsConstructorFound
 
-internal class ObjectsConstructorFoundHandler(private val error: ObjectsConstructorFound) : ErrorHandler {
+internal class ObjectsConstructorFoundHandler(private val error: ObjectsConstructorFound) :
+    ErrorHandler {
 
-    override val name = "OBJECTS CONSTRUCTOR"
+  override val name = "OBJECTS CONSTRUCTOR"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Objects class may not define constructors:
 
               ${error.objectClass.qualifiedName}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

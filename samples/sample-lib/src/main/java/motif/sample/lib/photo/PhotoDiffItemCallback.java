@@ -16,18 +16,17 @@
 package motif.sample.lib.photo;
 
 import androidx.recyclerview.widget.DiffUtil;
-
 import motif.sample.lib.db.Photo;
 
 public class PhotoDiffItemCallback extends DiffUtil.ItemCallback<Photo> {
 
-    @Override
-    public boolean areItemsTheSame(Photo oldItem, Photo newItem) {
-        return oldItem.id == newItem.id;
-    }
+  @Override
+  public boolean areItemsTheSame(Photo oldItem, Photo newItem) {
+    return oldItem.id == newItem.id;
+  }
 
-    @Override
-    public boolean areContentsTheSame(Photo oldItem, Photo newItem) {
-        return oldItem == newItem;
-    }
+  @Override
+  public boolean areContentsTheSame(Photo oldItem, Photo newItem) {
+    return oldItem == newItem;
+  }
 }

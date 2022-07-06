@@ -19,6 +19,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.ui.components.JBTabbedPane
+import java.awt.BorderLayout
+import javax.swing.JPanel
+import javax.swing.JSplitPane
+import javax.swing.JSplitPane.RIGHT
 import motif.core.ResolvedGraph
 import motif.intellij.MotifProjectComponent
 import motif.intellij.ScopeHierarchyUtils
@@ -26,63 +30,68 @@ import motif.intellij.hierarchy.ScopeHierarchyBrowser
 import motif.intellij.hierarchy.ScopePropertyHierarchyBrowser
 import motif.intellij.hierarchy.ScopePropertyHierarchyBrowser.PropertyHierarchyType
 import motif.models.Scope
-import java.awt.BorderLayout
-import javax.swing.JPanel
-import javax.swing.JSplitPane
-import javax.swing.JSplitPane.RIGHT
 
-class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) : JPanel(), ScopeHierarchyBrowser.Listener, MotifProjectComponent.Listener {
+class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) :
+    JPanel(), ScopeHierarchyBrowser.Listener, MotifProjectComponent.Listener {
 
-    private var graph: ResolvedGraph = initialGraph
+  private var graph: ResolvedGraph = initialGraph
 
-    private val splitPane: JSplitPane
-    private val tabs: JBTabbedPane
-    private val scopeBrowser: ScopeHierarchyBrowser
-    private var consumeAndProvideBrowser: ScopePropertyHierarchyBrowser
+  private val splitPane: JSplitPane
+  private val tabs: JBTabbedPane
+  private val scopeBrowser: ScopeHierarchyBrowser
+  private var consumeAndProvideBrowser: ScopePropertyHierarchyBrowser
 
-    init {
-        val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
+  init {
+    val rootElement: PsiElement = ScopeHierarchyUtils.buildRootElement(project)
 
-        // Build UI
-        layout = BorderLayout()
-        scopeBrowser = ScopeHierarchyBrowser(project, graph, rootElement, this)
-        scopeBrowser.changeView(ScopeHierarchyBrowser.TYPE_HIERARCHY_TYPE)
+    // Build UI
+    layout = BorderLayout()
+    scopeBrowser = ScopeHierarchyBrowser(project, graph, rootElement, this)
+    scopeBrowser.changeView(ScopeHierarchyBrowser.TYPE_HIERARCHY_TYPE)
 
-        consumeAndProvideBrowser = buildPropertyHierarchyBrowser(project, graph, rootElement, PropertyHierarchyType.CONSUME_AND_PROVIDE)
+    consumeAndProvideBrowser =
+        buildPropertyHierarchyBrowser(
+            project, graph, rootElement, PropertyHierarchyType.CONSUME_AND_PROVIDE)
 
-        tabs = JBTabbedPane()
-        splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, scopeBrowser, consumeAndProvideBrowser)
-        splitPane.dividerLocation = 250
-        add(splitPane)
-    }
+    tabs = JBTabbedPane()
+    splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, scopeBrowser, consumeAndProvideBrowser)
+    splitPane.dividerLocation = 250
+    add(splitPane)
+  }
 
-    override fun onGraphUpdated(graph: ResolvedGraph) {
-        this.graph = graph
-        consumeAndProvideBrowser.onGraphUpdated(graph)
-        scopeBrowser.onGraphUpdated(graph)
-    }
+  override fun onGraphUpdated(graph: ResolvedGraph) {
+    this.graph = graph
+    consumeAndProvideBrowser.onGraphUpdated(graph)
+    scopeBrowser.onGraphUpdated(graph)
+  }
 
-    /*
-     * Request to select a given scope in the scope hierarchy browser.
-     */
-    fun setSelectedScope(clazz: PsiClass) {
-        scopeBrowser.setSelectedScope(clazz)
-    }
+  /*
+   * Request to select a given scope in the scope hierarchy browser.
+   */
+  fun setSelectedScope(clazz: PsiClass) {
+    scopeBrowser.setSelectedScope(clazz)
+  }
 
-    /*
-     * Notify panel that a new scope has been selected in scope hierarchy browser.
-     */
-    override fun onSelectedScopeChanged(element: PsiElement, scope: Scope) {
-        val previousDividerLocation = splitPane.dividerLocation
-        consumeAndProvideBrowser = buildPropertyHierarchyBrowser(project, graph, element, PropertyHierarchyType.CONSUME_AND_PROVIDE)
-        splitPane.add(consumeAndProvideBrowser, RIGHT)
-        splitPane.dividerLocation = previousDividerLocation
-    }
+  /*
+   * Notify panel that a new scope has been selected in scope hierarchy browser.
+   */
+  override fun onSelectedScopeChanged(element: PsiElement, scope: Scope) {
+    val previousDividerLocation = splitPane.dividerLocation
+    consumeAndProvideBrowser =
+        buildPropertyHierarchyBrowser(
+            project, graph, element, PropertyHierarchyType.CONSUME_AND_PROVIDE)
+    splitPane.add(consumeAndProvideBrowser, RIGHT)
+    splitPane.dividerLocation = previousDividerLocation
+  }
 
-    private fun buildPropertyHierarchyBrowser(project: Project, graph: ResolvedGraph, rootElement: PsiElement, type: PropertyHierarchyType): ScopePropertyHierarchyBrowser {
-        val propertyBrowser = ScopePropertyHierarchyBrowser(project, graph, rootElement, type)
-        propertyBrowser.changeView(ScopePropertyHierarchyBrowser.PROPERTY_HIERARCHY_TYPE)
-        return propertyBrowser
-    }
+  private fun buildPropertyHierarchyBrowser(
+      project: Project,
+      graph: ResolvedGraph,
+      rootElement: PsiElement,
+      type: PropertyHierarchyType
+  ): ScopePropertyHierarchyBrowser {
+    val propertyBrowser = ScopePropertyHierarchyBrowser(project, graph, rootElement, type)
+    propertyBrowser.changeView(ScopePropertyHierarchyBrowser.PROPERTY_HIERARCHY_TYPE)
+    return propertyBrowser
+  }
 }
-

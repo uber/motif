@@ -17,18 +17,20 @@ package motif.errormessage
 
 import motif.models.NullableFactoryMethod
 
-internal class NullableFactoryMethodHandler(private val error: NullableFactoryMethod) : ErrorHandler {
+internal class NullableFactoryMethodHandler(private val error: NullableFactoryMethod) :
+    ErrorHandler {
 
-    override val name = "NULLABLE FACTORY METHOD"
+  override val name = "NULLABLE FACTORY METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Factory method may not be nullable:
 
               @Nullable ${error.method.returnType.simpleName} ${error.objects.qualifiedName}.${error.method.name}
 
             Suggestions:
               * Consider using Optional<...> instead.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

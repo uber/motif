@@ -21,8 +21,8 @@ import motif.sample.lib.controller.ViewlessControllerObjects;
 @Scope
 public interface PhotoGridItemScope {
 
-    PhotoGridItemController controller();
+  PhotoGridItemController controller();
 
-    @motif.Objects
-    abstract class Objects extends ViewlessControllerObjects<PhotoGridItemController> {}
+  @motif.Objects
+  abstract class Objects extends ViewlessControllerObjects<PhotoGridItemController> {}
 }

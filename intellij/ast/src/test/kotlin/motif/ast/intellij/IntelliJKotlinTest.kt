@@ -27,37 +27,41 @@ import org.jetbrains.uast.toUElementOfType
 
 class IntelliJKotlinTest : LightCodeInsightFixtureTestCase() {
 
-    lateinit var psiElementFactory: PsiElementFactory
+  lateinit var psiElementFactory: PsiElementFactory
 
-    override fun setUp() {
-        super.setUp()
+  override fun setUp() {
+    super.setUp()
 
-        psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+    psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+  }
+
+  override fun getProjectDescriptor(): LightProjectDescriptor {
+    return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
+      override fun getSdk() = InternalJdk.instance
     }
+  }
 
-    override fun getProjectDescriptor(): LightProjectDescriptor {
-        return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
-            override fun getSdk() = InternalJdk.instance
-        }
-    }
+  override fun getTestDataPath(): String {
+    return "testData"
+  }
 
-    override fun getTestDataPath(): String {
-        return "testData"
-    }
-
-    fun testImplicitNullabilityAnnotationType() {
-        val fooPsiFile = myFixture.addFileToProject("Foo.kt", """
+  fun testImplicitNullabilityAnnotationType() {
+    val fooPsiFile =
+        myFixture.addFileToProject(
+            "Foo.kt",
+            """
             open class Foo(val s: String) {
-                
+
                 internal fun a() {}
             }
-        """.trimIndent()) as KtFile
+        """.trimIndent()) as
+            KtFile
 
-        val fooPsiClass = fooPsiFile.declarations[0].toUElementOfType<UClass>()!!.javaPsi
-        val psiAnnotation = fooPsiClass.constructors[0].parameterList.parameters[0].annotations[0]
-        val annotation = IntelliJAnnotation(project, psiAnnotation)
+    val fooPsiClass = fooPsiFile.declarations[0].toUElementOfType<UClass>()!!.javaPsi
+    val psiAnnotation = fooPsiClass.constructors[0].parameterList.parameters[0].annotations[0]
+    val annotation = IntelliJAnnotation(project, psiAnnotation)
 
-        assertThat(annotation.type).isNull()
-        assertThat(annotation.className).isEqualTo("org.jetbrains.annotations.NotNull")
-    }
+    assertThat(annotation.type).isNull()
+    assertThat(annotation.className).isEqualTo("org.jetbrains.annotations.NotNull")
+  }
 }

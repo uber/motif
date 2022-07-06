@@ -17,13 +17,14 @@ package motif.errormessage
 
 import motif.core.UnsatisfiedDependencyError
 
-internal class UnsatisfiedDependencyHandler(private val error: UnsatisfiedDependencyError) : ErrorHandler {
+internal class UnsatisfiedDependencyHandler(private val error: UnsatisfiedDependencyError) :
+    ErrorHandler {
 
-    override val name = "UNSATISFIED DEPENDENCY"
+  override val name = "UNSATISFIED DEPENDENCY"
 
-    override fun StringBuilder.handle() {
-        appendLine("Unable to satisfy dependency:")
-        appendLine()
-        appendLine(error.sink.errorText.prependIndent("  "))
-    }
+  override fun StringBuilder.handle() {
+    appendLine("Unable to satisfy dependency:")
+    appendLine()
+    appendLine(error.sink.errorText.prependIndent("  "))
+  }
 }

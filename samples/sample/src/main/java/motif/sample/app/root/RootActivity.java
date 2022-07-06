@@ -16,19 +16,17 @@
 package motif.sample.app.root;
 
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import motif.ScopeFactory;
 
 public class RootActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        RootFactory rootFactory = ScopeFactory.create(RootFactory.class);
-        RootScope rootScope = rootFactory.create(this);
-        setContentView(rootScope.view());
-    }
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    RootFactory rootFactory = ScopeFactory.create(RootFactory.class);
+    RootScope rootScope = rootFactory.create(this);
+    setContentView(rootScope.view());
+  }
 }

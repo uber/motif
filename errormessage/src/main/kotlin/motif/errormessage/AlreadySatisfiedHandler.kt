@@ -19,18 +19,19 @@ import motif.core.AlreadySatisfiedError
 
 internal class AlreadySatisfiedHandler(private val error: AlreadySatisfiedError) : ErrorHandler {
 
-    override val name = "ALREADY SATISFIED"
+  override val name = "ALREADY SATISFIED"
 
-    override fun StringBuilder.handle() {
-        val existingSources = error.existingSources.joinToString("\n") { existingSource ->
-            existingSource.errorText.prependIndent("    ")
+  override fun StringBuilder.handle() {
+    val existingSources =
+        error.existingSources.joinToString("\n") { existingSource ->
+          existingSource.errorText.prependIndent("    ")
         }
-        appendLine("Dependency is already satisfied:")
-        appendLine()
-        appendLine("  [Source]")
-        appendLine(error.source.errorText.prependIndent("    "))
-        appendLine()
-        appendLine("  [Existing Sources]")
-        appendLine(existingSources)
-    }
+    appendLine("Dependency is already satisfied:")
+    appendLine()
+    appendLine("  [Source]")
+    appendLine(error.source.errorText.prependIndent("    "))
+    appendLine()
+    appendLine("  [Existing Sources]")
+    appendLine(existingSources)
+  }
 }

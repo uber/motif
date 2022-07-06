@@ -19,7 +19,4 @@ import motif.models.Sink
 import motif.models.Source
 import motif.models.Type
 
-class RequiredDependency(
-        val type: Type,
-        val providedBy: List<Source>,
-        val requiredBy: List<Sink>)
+class RequiredDependency(val type: Type, val providedBy: List<Source>, val requiredBy: List<Sink>)

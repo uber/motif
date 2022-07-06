@@ -17,7 +17,7 @@ package motif.internal;
 
 public class Constants {
 
-    public static final String SCOPE_IMPL_SUFFIX = "Impl";
+  public static final String SCOPE_IMPL_SUFFIX = "Impl";
 
-    private Constants() {}
+  private Constants() {}
 }

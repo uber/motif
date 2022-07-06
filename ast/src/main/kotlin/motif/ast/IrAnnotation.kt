@@ -19,11 +19,11 @@ import kotlin.reflect.KClass
 
 interface IrAnnotation : IrEquivalence {
 
-    val className: String?
+  val className: String?
 
-    val type: IrType?
+  val type: IrType?
 
-    val members: List<IrMethod>
+  val members: List<IrMethod>
 
-    fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
+  fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
 }

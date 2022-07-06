@@ -22,91 +22,84 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
 import androidx.annotation.Nullable;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding3.view.RxView;
-
+import io.reactivex.Observable;
 import kotlin.Unit;
 import motif.sample.R;
 import motif.sample.lib.db.Photo;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.Observable;
-
 public class PhotoGridItemView extends FrameLayout {
 
-    @BindView(R.id.image)
-    ImageView imageView;
+  @BindView(R.id.image)
+  ImageView imageView;
 
-    @BindView(R.id.touch)
-    View touchView;
+  @BindView(R.id.touch)
+  View touchView;
 
-    @Nullable
-    private View overlayView;
+  @Nullable private View overlayView;
 
-    public PhotoGridItemView(Context context) {
-        super(context);
+  public PhotoGridItemView(Context context) {
+    super(context);
+  }
+
+  public PhotoGridItemView(Context context, @Nullable AttributeSet attrs) {
+    super(context, attrs);
+  }
+
+  public PhotoGridItemView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
+
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+    ButterKnife.bind(this);
+  }
+
+  Observable<Unit> clicks() {
+    return RxView.clicks(touchView);
+  }
+
+  void setPhoto(Photo photo) {
+    clearOverlay();
+    Glide.with(this).load(photo.location).thumbnail(0.1f).into(imageView);
+  }
+
+  @Override
+  public void setSelected(boolean selected) {
+    if (selected && !isSelected()) {
+      showOverlay();
+    } else if (!selected && isSelected()) {
+      clearOverlay();
     }
+  }
 
-    public PhotoGridItemView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
+  @Override
+  public boolean isSelected() {
+    return overlayView != null;
+  }
 
-    public PhotoGridItemView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+  private void showOverlay() {
+    clearOverlay();
+    this.overlayView = createOverlay();
+    addView(overlayView);
+  }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        ButterKnife.bind(this);
-    }
+  private void clearOverlay() {
+    removeView(overlayView);
+    this.overlayView = null;
+  }
 
-    Observable<Unit> clicks() {
-        return RxView.clicks(touchView);
-    }
+  private View createOverlay() {
+    return LayoutInflater.from(getContext()).inflate(R.layout.photo_grid_item_overlay, this, false);
+  }
 
-    void setPhoto(Photo photo) {
-        clearOverlay();
-        Glide.with(this)
-                .load(photo.location)
-                .thumbnail(0.1f)
-                .into(imageView);
-    }
-
-    @Override
-    public void setSelected(boolean selected) {
-        if (selected && !isSelected()) {
-            showOverlay();
-        } else if (!selected && isSelected()){
-            clearOverlay();
-        }
-    }
-
-    @Override
-    public boolean isSelected() {
-        return overlayView != null;
-    }
-
-    private void showOverlay() {
-        clearOverlay();
-        this.overlayView = createOverlay();
-        addView(overlayView);
-    }
-
-    private void clearOverlay() {
-        removeView(overlayView);
-        this.overlayView = null;
-    }
-
-    private View createOverlay() {
-        return LayoutInflater.from(getContext()).inflate(R.layout.photo_grid_item_overlay, this, false);
-    }
-
-    public static PhotoGridItemView create(ViewGroup parent) {
-        return (PhotoGridItemView) LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_grid_item, parent, false);
-    }
+  public static PhotoGridItemView create(ViewGroup parent) {
+    return (PhotoGridItemView)
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_grid_item, parent, false);
+  }
 }

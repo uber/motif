@@ -17,12 +17,14 @@ package motif.errormessage
 
 import motif.models.NotAssignableBindsMethod
 
-internal class NotAssignableBindsMethodHandler(private val error: NotAssignableBindsMethod) : ErrorHandler {
+internal class NotAssignableBindsMethodHandler(private val error: NotAssignableBindsMethod) :
+    ErrorHandler {
 
-    override val name = "INVALID BINDS"
+  override val name = "INVALID BINDS"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Binds factory method parameter is not assignable to return type:
 
               [Factory Method]
@@ -33,6 +35,6 @@ internal class NotAssignableBindsMethodHandler(private val error: NotAssignableB
 
               [Parameter Type]
                 ${error.parameterType.qualifiedName}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

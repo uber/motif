@@ -17,15 +17,18 @@ package motif.errormessage
 
 import motif.models.DependencyMethodWithParameters
 
-internal class DependencyMethodWithParametersHandler(private val error: DependencyMethodWithParameters) : ErrorHandler {
+internal class DependencyMethodWithParametersHandler(
+    private val error: DependencyMethodWithParameters
+) : ErrorHandler {
 
-    override val name = "DEPENDENCY METHOD PARAMETER"
+  override val name = "DEPENDENCY METHOD PARAMETER"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Methods on dependencies interfaces must be parameterless:
 
               ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

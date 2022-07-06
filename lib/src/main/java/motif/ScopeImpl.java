@@ -15,14 +15,12 @@
  */
 package motif;
 
-/**
- * Annotation to provide a stable API for statically analyzing the Scope hierarchy.
- */
+/** Annotation to provide a stable API for statically analyzing the Scope hierarchy. */
 public @interface ScopeImpl {
 
-    Class<?> scope();
+  Class<?> scope();
 
-    Class<?> dependencies();
+  Class<?> dependencies();
 
-    Class<?>[] children();
+  Class<?>[] children();
 }

@@ -17,18 +17,20 @@ package motif.errormessage
 
 import motif.models.AccessMethodParameters
 
-internal class AccessMethodParametersHandler(private val error: AccessMethodParameters) : ErrorHandler {
+internal class AccessMethodParametersHandler(private val error: AccessMethodParameters) :
+    ErrorHandler {
 
-    override val name = "ACCESS METHOD PARAMETERS"
+  override val name = "ACCESS METHOD PARAMETERS"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Access methods must be parameterless:
 
               ${error.scope.qualifiedName}.${error.method.name}
-            
+
             Suggestions:
               * If this method was intended to be a child method, ensure that the return type is a Scope.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

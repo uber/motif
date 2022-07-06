@@ -20,25 +20,25 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
-import motif.core.ResolvedGraph
 import javax.swing.Icon
+import motif.core.ResolvedGraph
 
 open class ScopeHierarchyRootErrorDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        element: PsiElement)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    element: PsiElement
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        if (graph.errors.isEmpty()) {
-            text.ending.addText("No Errors!")
-        } else {
-            text.ending.addText("" + graph.errors.size + " errors")
-        }
+  override fun updateText(text: CompositeAppearance) {
+    if (graph.errors.isEmpty()) {
+      text.ending.addText("No Errors!")
+    } else {
+      text.ending.addText("" + graph.errors.size + " errors")
     }
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return if (graph.errors.isNotEmpty()) null else AllIcons.RunConfigurations.TestPassed
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return if (graph.errors.isNotEmpty()) null else AllIcons.RunConfigurations.TestPassed
+  }
 }

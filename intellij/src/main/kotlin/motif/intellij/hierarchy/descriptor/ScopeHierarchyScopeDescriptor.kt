@@ -22,35 +22,38 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.ErrorScope
 import motif.models.Scope
-import javax.swing.Icon
 
 /*
  * Node descriptor used to render a Motif scope.
  */
 open class ScopeHierarchyScopeDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        private val clazz: PsiClass,
-        val scope: Scope,
-        isBase: Boolean = false) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, clazz, isBase) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    private val clazz: PsiClass,
+    val scope: Scope,
+    isBase: Boolean = false
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, clazz, isBase) {
 
-    override fun updateText(text: CompositeAppearance) {
-        val textAttr: TextAttributes = getDefaultTextAttributes(scope is ErrorScope)
-        text.ending.addText(clazz.name, textAttr)
-        val qualifiedName: String? = clazz.qualifiedName;
-        qualifiedName?.let { text.ending.addText(" (" + formatQualifiedName(it) + ")", getPackageNameAttributes()) }
+  override fun updateText(text: CompositeAppearance) {
+    val textAttr: TextAttributes = getDefaultTextAttributes(scope is ErrorScope)
+    text.ending.addText(clazz.name, textAttr)
+    val qualifiedName: String? = clazz.qualifiedName
+    qualifiedName?.let {
+      text.ending.addText(" (" + formatQualifiedName(it) + ")", getPackageNameAttributes())
     }
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return AllIcons.Nodes.Interface
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return AllIcons.Nodes.Interface
+  }
 
-    override fun toString(): String {
-        return clazz.name ?: ""
-    }
+  override fun toString(): String {
+    return clazz.name ?: ""
+  }
 }

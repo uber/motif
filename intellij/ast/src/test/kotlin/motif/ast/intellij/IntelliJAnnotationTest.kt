@@ -25,134 +25,160 @@ import org.intellij.lang.annotations.Language
 
 class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
 
-    lateinit var psiElementFactory: PsiElementFactory
+  lateinit var psiElementFactory: PsiElementFactory
 
-    override fun setUp() {
-        super.setUp()
+  override fun setUp() {
+    super.setUp()
 
-        psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+    psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+  }
+
+  override fun getProjectDescriptor(): LightProjectDescriptor {
+    return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
+      override fun getSdk() = InternalJdk.instance
     }
+  }
 
-    override fun getProjectDescriptor(): LightProjectDescriptor {
-        return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
-            override fun getSdk() = InternalJdk.instance
-        }
-    }
+  override fun getTestDataPath(): String {
+    return "testData"
+  }
 
-    override fun getTestDataPath(): String {
-        return "testData"
-    }
-
-    fun testEqual() {
-        createAnnotationClass("""
+  fun testEqual() {
+    createAnnotationClass(
+        """
             package test;
 
             @interface A {}
-        """.trimIndent())
+      """.trimIndent())
 
-        val fooAnnotation = getClassAnnotation("""
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @A class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @A class Bar {}
         """.trimIndent())
 
-        assertThat(fooAnnotation).isEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isEqualTo(barAnnotation)
+  }
 
-    fun testNotEqual() {
-        createAnnotationClass("""
+  fun testNotEqual() {
+    createAnnotationClass(
+        """
             package test;
 
             @interface A {}
-        """.trimIndent())
+      """.trimIndent())
 
-        createAnnotationClass("""
+    createAnnotationClass(
+        """
             package test;
 
             @interface B {}
-        """.trimIndent())
+      """.trimIndent())
 
-        val fooAnnotation = getClassAnnotation("""
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @A class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @B class Bar {}
         """.trimIndent())
 
-        assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
+  }
 
-    fun testEqual_qualified() {
-        createAnnotationClass("""
+  fun testEqual_qualified() {
+    createAnnotationClass(
+        """
             package test;
 
             @interface A {}
-        """.trimIndent())
+      """.trimIndent())
 
-        val fooAnnotation = getClassAnnotation("""
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @test.A class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @A class Bar {}
         """.trimIndent())
 
-        assertThat(fooAnnotation).isEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isEqualTo(barAnnotation)
+  }
 
-    fun testEqual_named() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testEqual_named() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Bar {}
         """.trimIndent())
 
-        assertThat(fooAnnotation).isEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isEqualTo(barAnnotation)
+  }
 
-    fun testNotEqual_named() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testNotEqual_named() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("b")
             class Bar {}
         """.trimIndent())
 
-        assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
+  }
 
-    fun testEqual_namedReference() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testEqual_namedReference() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Foo.S)
@@ -161,7 +187,9 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Bar.S)
@@ -170,11 +198,13 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        assertThat(fooAnnotation).isEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isEqualTo(barAnnotation)
+  }
 
-    fun testNotEqual_namedReference() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testNotEqual_namedReference() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Foo.S)
@@ -183,7 +213,9 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Bar.S)
@@ -192,18 +224,22 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
+  }
 
-    fun testEqual_namedReferenceAndString() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testEqual_namedReferenceAndString() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Bar.S)
@@ -212,18 +248,22 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        assertThat(fooAnnotation).isEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isEqualTo(barAnnotation)
+  }
 
-    fun testNotEqual_namedReferenceAndString() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testNotEqual_namedReferenceAndString() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Foo {}
         """.trimIndent())
 
-        val barAnnotation = getClassAnnotation("""
+    val barAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named(Bar.S)
@@ -232,28 +272,30 @@ class IntelliJAnnotationTest : LightCodeInsightFixtureTestCase() {
             }
         """.trimIndent())
 
-        assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
-    }
+    assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
+  }
 
-    fun testClassName() {
-        val fooAnnotation = getClassAnnotation("""
+  fun testClassName() {
+    val fooAnnotation =
+        getClassAnnotation(
+            """
             package test;
 
             @javax.inject.Named("a")
             class Foo {}
         """.trimIndent())
 
-        assertThat(fooAnnotation.className).isEqualTo("javax.inject.Named")
-    }
+    assertThat(fooAnnotation.className).isEqualTo("javax.inject.Named")
+  }
 
-    private fun createAnnotationClass(@Language("JAVA") classText: String): IntelliJClass {
-        val psiClass = myFixture.addClass(classText)
-        return IntelliJClass(project, psiElementFactory.createType(psiClass), psiClass)
-    }
+  private fun createAnnotationClass(@Language("JAVA") classText: String): IntelliJClass {
+    val psiClass = myFixture.addClass(classText)
+    return IntelliJClass(project, psiElementFactory.createType(psiClass), psiClass)
+  }
 
-    private fun getClassAnnotation(@Language("JAVA") classText: String): IntelliJAnnotation {
-        val psiClass = myFixture.addClass(classText)
-        val psiAnnotation = psiClass.annotations.single()
-        return IntelliJAnnotation(project, psiAnnotation)
-    }
+  private fun getClassAnnotation(@Language("JAVA") classText: String): IntelliJAnnotation {
+    val psiClass = myFixture.addClass(classText)
+    val psiAnnotation = psiClass.annotations.single()
+    return IntelliJAnnotation(project, psiAnnotation)
+  }
 }

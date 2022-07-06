@@ -19,13 +19,14 @@ import motif.models.ObjectsFieldFound
 
 internal class ObjectsFieldFoundHandler(private val error: ObjectsFieldFound) : ErrorHandler {
 
-    override val name = "OBJECTS FIELD"
+  override val name = "OBJECTS FIELD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Objects class may not have fields:
 
               ${error.objectClass.qualifiedName}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

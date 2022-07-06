@@ -17,12 +17,14 @@ package motif.errormessage
 
 import motif.models.NullableDynamicDependency
 
-internal class NullableDynamicDependencyHandler(private val error: NullableDynamicDependency) : ErrorHandler {
+internal class NullableDynamicDependencyHandler(private val error: NullableDynamicDependency) :
+    ErrorHandler {
 
-    override val name = "NULLABLE CHILD METHOD PARAMETER"
+  override val name = "NULLABLE CHILD METHOD PARAMETER"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Parameter may not be nullable:
 
               [Method]
@@ -33,6 +35,6 @@ internal class NullableDynamicDependencyHandler(private val error: NullableDynam
 
             Suggestions:
               * Consider using Optional<...> instead.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

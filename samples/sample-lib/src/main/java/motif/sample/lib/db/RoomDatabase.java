@@ -16,19 +16,18 @@
 package motif.sample.lib.db;
 
 import android.content.Context;
-
 import androidx.room.Room;
 import androidx.room.TypeConverters;
 
 @androidx.room.Database(
-        entities = {Photo.class, Tag.class, PhotoTag.class},
-        version = 1,
-        exportSchema = false)
+    entities = {Photo.class, Tag.class, PhotoTag.class},
+    version = 1,
+    exportSchema = false)
 @TypeConverters({FileTypeConverter.class})
 public abstract class RoomDatabase extends androidx.room.RoomDatabase {
-    public abstract PhotoDao photoDao();
+  public abstract PhotoDao photoDao();
 
-    public static RoomDatabase create(Context context) {
-        return Room.databaseBuilder(context, RoomDatabase.class, "motif-sample").build();
-    }
+  public static RoomDatabase create(Context context) {
+    return Room.databaseBuilder(context, RoomDatabase.class, "motif-sample").build();
+  }
 }

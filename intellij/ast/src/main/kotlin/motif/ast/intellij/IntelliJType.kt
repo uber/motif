@@ -20,58 +20,56 @@ import com.intellij.psi.GenericsUtil
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.TypeConversionUtil
-import motif.ast.IrClass
-import motif.ast.IrType
 import kotlin.jvm.javaClass
 import kotlin.let
 import kotlin.text.contains
+import motif.ast.IrClass
+import motif.ast.IrType
 
-class IntelliJType(
-        private val project: Project,
-        val psiType: PsiType) : IrType {
+class IntelliJType(private val project: Project, val psiType: PsiType) : IrType {
 
-    override val qualifiedName: String by lazy {
-        GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(false)
+  override val qualifiedName: String by lazy {
+    GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(false)
+  }
+
+  override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
+
+  override val isPrimitive: Boolean by lazy {
+    when (psiType) {
+      PsiType.BOOLEAN,
+      PsiType.BYTE,
+      PsiType.SHORT,
+      PsiType.INT,
+      PsiType.LONG,
+      PsiType.CHAR,
+      PsiType.FLOAT,
+      PsiType.DOUBLE -> true
+      else -> false
     }
+  }
 
-    override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
+  override fun resolveClass(): IrClass? {
+    val psiClassType = psiType as? PsiClassType ?: return null
+    val psiClass = psiClassType.resolve() ?: return null
+    return (psiType as? PsiClassType)?.let { IntelliJClass(project, it, psiClass) }
+  }
 
-    override val isPrimitive: Boolean by lazy {
-        when (psiType) {
-            PsiType.BOOLEAN,
-            PsiType.BYTE,
-            PsiType.SHORT,
-            PsiType.INT,
-            PsiType.LONG,
-            PsiType.CHAR,
-            PsiType.FLOAT,
-            PsiType.DOUBLE -> true
-            else -> false
-        }
-    }
+  override fun isAssignableTo(type: IrType): Boolean {
+    return TypeConversionUtil.isAssignable((type as IntelliJType).psiType, psiType, false)
+  }
 
-    override fun resolveClass(): IrClass? {
-        val psiClassType = psiType as? PsiClassType ?: return null
-        val psiClass = psiClassType.resolve() ?: return null
-        return (psiType as? PsiClassType)?.let { IntelliJClass(project, it, psiClass) }
-    }
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
 
-    override fun isAssignableTo(type: IrType): Boolean {
-        return TypeConversionUtil.isAssignable((type as IntelliJType).psiType, psiType, false)
-    }
+    other as IntelliJType
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    if (psiType != other.psiType) return false
 
-        other as IntelliJType
+    return true
+  }
 
-        if (psiType != other.psiType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return psiType.hashCode()
-    }
+  override fun hashCode(): Int {
+    return psiType.hashCode()
+  }
 }

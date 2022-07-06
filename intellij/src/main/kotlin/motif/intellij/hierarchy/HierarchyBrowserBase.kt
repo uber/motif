@@ -33,32 +33,29 @@ import javax.swing.tree.TreeSelectionModel
  * It enables speed search configurations to search non-expanded nodes too. It is needed when searching for given
  * scope(s) in the entire graph hierarchy (which can be pretty large).
  */
-abstract class HierarchyBrowserBase(
-        val project: Project,
-        private val rootElement: PsiElement)
-    : HierarchyBrowserBaseEx(project, rootElement) {
+abstract class HierarchyBrowserBase(val project: Project, private val rootElement: PsiElement) :
+    HierarchyBrowserBaseEx(project, rootElement) {
 
-    override fun doRefresh(currentBuilderOnly: Boolean) {
-        ApplicationManager.getApplication().invokeLater {
-            super.doRefresh(currentBuilderOnly)
+  override fun doRefresh(currentBuilderOnly: Boolean) {
+    ApplicationManager.getApplication().invokeLater { super.doRefresh(currentBuilderOnly) }
+  }
+
+  override fun configureTree(tree: Tree) {
+    // Hack: we're copying code from parent class here, in order to override speed search behavior
+    tree.selectionModel.selectionMode = TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
+    tree.toggleClickCount = -1
+    tree.cellRenderer = HierarchyNodeRenderer()
+    TreeSpeedSearch(tree, { path -> path.lastPathComponent.toString() }, true)
+    TreeUtil.installActions(tree)
+    object : AutoScrollToSourceHandler() {
+          override fun isAutoScrollMode(): Boolean {
+            return HierarchyBrowserManager.getSettings(myProject).IS_AUTOSCROLL_TO_SOURCE
+          }
+
+          override fun setAutoScrollMode(state: Boolean) {
+            HierarchyBrowserManager.getSettings(myProject).IS_AUTOSCROLL_TO_SOURCE = state
+          }
         }
-    }
-
-    override fun configureTree(tree: Tree) {
-        // Hack: we're copying code from parent class here, in order to override speed search behavior
-        tree.selectionModel.selectionMode = TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
-        tree.toggleClickCount = -1
-        tree.cellRenderer = HierarchyNodeRenderer()
-        TreeSpeedSearch(tree, { path -> path.lastPathComponent.toString() }, true)
-        TreeUtil.installActions(tree)
-        object : AutoScrollToSourceHandler() {
-            override fun isAutoScrollMode(): Boolean {
-                return HierarchyBrowserManager.getSettings(myProject).IS_AUTOSCROLL_TO_SOURCE
-            }
-
-            override fun setAutoScrollMode(state: Boolean) {
-                HierarchyBrowserManager.getSettings(myProject).IS_AUTOSCROLL_TO_SOURCE = state
-            }
-        }.install(tree)
-    }
+        .install(tree)
+  }
 }

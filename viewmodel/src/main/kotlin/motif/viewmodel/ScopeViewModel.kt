@@ -18,7 +18,8 @@ package motif.viewmodel
 import motif.models.Scope
 
 class ScopeViewModel(
-        val scope: Scope,
-        val children: List<ScopeViewModel>,
-        val providedDependencies: List<ProvidedDependency>,
-        val requiredDependencies: List<RequiredDependency>)
+    val scope: Scope,
+    val children: List<ScopeViewModel>,
+    val providedDependencies: List<ProvidedDependency>,
+    val requiredDependencies: List<RequiredDependency>
+)

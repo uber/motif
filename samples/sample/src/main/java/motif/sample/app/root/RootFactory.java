@@ -15,22 +15,19 @@
  */
 package motif.sample.app.root;
 
-import android.app.Activity;
-import android.content.Context;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import motif.Creatable;
 import motif.NoDependencies;
 import motif.Scope;
 
 /**
- * This is a convenience Scope defined simply to build the RootScope. This additional layer is useful since RootScope
- * requires a Context that must be provided from outside of the graph. RootFactory itself does not require any
- * dependencies of its own and can be instantiated in RootActivity via ScopeFactory.create(RootFactory.class).
+ * This is a convenience Scope defined simply to build the RootScope. This additional layer is
+ * useful since RootScope requires a Context that must be provided from outside of the graph.
+ * RootFactory itself does not require any dependencies of its own and can be instantiated in
+ * RootActivity via ScopeFactory.create(RootFactory.class).
  */
 @Scope
 public interface RootFactory extends Creatable<NoDependencies> {
 
-    RootScope create(AppCompatActivity activity);
+  RootScope create(AppCompatActivity activity);
 }

@@ -17,49 +17,46 @@ package motif.sample.app.root;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import motif.sample.app.photo_grid.PhotoGridView;
-import motif.sample.app.bottom_sheet.BottomSheetView;
-
 import javax.inject.Inject;
+import motif.sample.app.bottom_sheet.BottomSheetView;
+import motif.sample.app.photo_grid.PhotoGridView;
 
 public class RootView extends CoordinatorLayout {
 
-    private BottomSheetView bottomSheetView;
+  private BottomSheetView bottomSheetView;
 
-    @Inject
-    public RootView(Context context) {
-        this(context, null);
-    }
+  @Inject
+  public RootView(Context context) {
+    this(context, null);
+  }
 
-    public RootView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+  public RootView(Context context, AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
 
-    public RootView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+  public RootView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+  }
 
-    public void showPhotos(PhotoGridView view) {
-        addView(view);
-    }
+  public void showPhotos(PhotoGridView view) {
+    addView(view);
+  }
 
-    public boolean isSectionViewShowing() {
-        return bottomSheetView != null;
-    }
+  public boolean isSectionViewShowing() {
+    return bottomSheetView != null;
+  }
 
-    public void showBottomSheet(BottomSheetView view) {
-        clearBottomSheet();
-        bottomSheetView = view;
-        addView(bottomSheetView);
-    }
+  public void showBottomSheet(BottomSheetView view) {
+    clearBottomSheet();
+    bottomSheetView = view;
+    addView(bottomSheetView);
+  }
 
-    public void clearBottomSheet() {
-        if (bottomSheetView != null) {
-            removeView(bottomSheetView);
-            bottomSheetView = null;
-        }
+  public void clearBottomSheet() {
+    if (bottomSheetView != null) {
+      removeView(bottomSheetView);
+      bottomSheetView = null;
     }
+  }
 }

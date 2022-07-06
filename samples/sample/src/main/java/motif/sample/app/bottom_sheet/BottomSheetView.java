@@ -15,81 +15,82 @@
  */
 package motif.sample.app.bottom_sheet;
 
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
-
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import motif.sample.lib.bottom_header.BottomHeaderView;
-import motif.sample.app.photo_list.PhotoListView;
-
 import javax.inject.Inject;
-
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+import motif.sample.app.photo_list.PhotoListView;
+import motif.sample.lib.bottom_header.BottomHeaderView;
 
 public class BottomSheetView extends LinearLayout {
 
-    private BottomSheetBehavior<BottomSheetView> behavior;
+  private BottomSheetBehavior<BottomSheetView> behavior;
 
-    @Inject
-    public BottomSheetView(@NonNull Context context) {
-        this(context, null);
-    }
+  @Inject
+  public BottomSheetView(@NonNull Context context) {
+    this(context, null);
+  }
 
-    public BottomSheetView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+  public BottomSheetView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
 
-    public BottomSheetView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
+  public BottomSheetView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    getViewTreeObserver()
+        .addOnPreDrawListener(
+            new ViewTreeObserver.OnPreDrawListener() {
+              @Override
+              public boolean onPreDraw() {
                 getViewTreeObserver().removeOnPreDrawListener(this);
                 setTranslationY(behavior.getPeekHeight());
-                animate().translationY(0)
-                        .setDuration(100)
-                        .setInterpolator(new LinearOutSlowInInterpolator())
-                        .start();
+                animate()
+                    .translationY(0)
+                    .setDuration(100)
+                    .setInterpolator(new LinearOutSlowInInterpolator())
+                    .start();
                 return true;
-            }
+              }
+            });
+  }
+
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+    behavior = BottomSheetBehavior.from(this);
+  }
+
+  public void showHeader(BottomHeaderView view) {
+    addView(view);
+    view.setOpenFraction(0);
+
+    behavior.setBottomSheetCallback(
+        new BottomSheetBehavior.BottomSheetCallback() {
+          @Override
+          public void onStateChanged(@NonNull View bottomSheet, int newState) {}
+
+          @Override
+          public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            view.setOpenFraction(slideOffset);
+          }
         });
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        behavior = BottomSheetBehavior.from(this);
-    }
-
-    public void showHeader(BottomHeaderView view) {
-        addView(view);
-        view.setOpenFraction(0);
-
-        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {}
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                view.setOpenFraction(slideOffset);
-            }
+    view.setOnClickListener(
+        v -> {
+          int nextState = behavior.getState() == STATE_EXPANDED ? STATE_COLLAPSED : STATE_EXPANDED;
+          behavior.setState(nextState);
         });
-        view.setOnClickListener(v -> {
-            int nextState = behavior.getState() == STATE_EXPANDED ? STATE_COLLAPSED : STATE_EXPANDED;
-            behavior.setState(nextState);
-        });
-    }
+  }
 
-    public void showPhotoList(PhotoListView view) {
-        addView(view);
-    }
+  public void showPhotoList(PhotoListView view) {
+    addView(view);
+  }
 }

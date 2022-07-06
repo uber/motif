@@ -19,29 +19,29 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
+import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils
 import motif.models.Scope
-import javax.swing.Icon
 
 open class ScopeHierarchySinksSectionDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        element: PsiElement,
-        val scope: Scope,
-        private val useLabel: Boolean = false)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    element: PsiElement,
+    val scope: Scope,
+    private val useLabel: Boolean = false
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        val label: String = if (useLabel) "Consumes" else scope.simpleName
-        val count: Int = graph.getSinks(scope).count()
-        text.ending.addText(label)
-        text.ending.addText(" " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    val label: String = if (useLabel) "Consumes" else scope.simpleName
+    val count: Int = graph.getSinks(scope).count()
+    text.ending.addText(label)
+    text.ending.addText(
+        " " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return null
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return null
+  }
 }
-

@@ -20,39 +20,38 @@ import motif.models.MotifError
 
 class ErrorMessage(val name: String, val text: String) {
 
-    companion object {
+  companion object {
 
-        val header = """
+    val header =
+        """
 
             ====================================
                         Motif Errors
             ====================================
 
 
-            """.trimIndent()
+      """.trimIndent()
 
-        val footer = """
+    val footer = """
 
             ====================================
-            """.trimIndent()
+    """.trimIndent()
 
-        fun toString(graph: ResolvedGraph): String {
-            val content: String = graph.errors.joinToString(
-                    "\n------------------------------------\n\n") { error ->
-                val message = get(error)
-                "[${message.name}]\n\n${message.text}"
-            }
-            return "$header$content$footer"
-        }
-
-        fun get(error: MotifError): ErrorMessage {
-            val handler = ErrorHandler.get(error)
-            val sb = StringBuilder()
-            handler.apply {
-                sb.handle()
-            }
-            val message = sb.toString()
-            return ErrorMessage(handler.name, message)
-        }
+    fun toString(graph: ResolvedGraph): String {
+      val content: String =
+          graph.errors.joinToString("\n------------------------------------\n\n") { error ->
+            val message = get(error)
+            "[${message.name}]\n\n${message.text}"
+          }
+      return "$header$content$footer"
     }
+
+    fun get(error: MotifError): ErrorMessage {
+      val handler = ErrorHandler.get(error)
+      val sb = StringBuilder()
+      handler.apply { sb.handle() }
+      val message = sb.toString()
+      return ErrorMessage(handler.name, message)
+    }
+  }
 }

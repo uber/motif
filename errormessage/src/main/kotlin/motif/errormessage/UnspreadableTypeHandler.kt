@@ -19,10 +19,11 @@ import motif.models.UnspreadableType
 
 internal class UnspreadableTypeHandler(private val error: UnspreadableType) : ErrorHandler {
 
-    override val name = "UNSPREADABLE TYPE"
+  override val name = "UNSPREADABLE TYPE"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             This type is not Spread-able:
 
               [Type]
@@ -30,6 +31,6 @@ internal class UnspreadableTypeHandler(private val error: UnspreadableType) : Er
 
               [Factory Method]
                 ${error.objects.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

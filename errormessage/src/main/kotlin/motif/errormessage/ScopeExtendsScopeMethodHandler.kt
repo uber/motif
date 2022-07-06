@@ -19,13 +19,14 @@ import motif.models.ScopeExtendsScope
 
 class ScopeExtendsScopeMethodHandler(private val error: ScopeExtendsScope) : ErrorHandler {
 
-    override val name = "SCOPE EXTENDS SCOPE"
+  override val name = "SCOPE EXTENDS SCOPE"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Scopes can't extend other Scopes:
 
               ${error.scope.qualifiedName}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

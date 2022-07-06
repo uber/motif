@@ -17,70 +17,73 @@ package motif.compiler
 
 import com.google.auto.common.BasicAnnotationProcessor
 import com.google.common.collect.SetMultimap
-import motif.Scope
-import motif.ast.compiler.CompilerClass
-import motif.core.ResolvedGraph
-import motif.errormessage.ErrorMessage
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.type.DeclaredType
 import javax.tools.Diagnostic
+import motif.Scope
+import motif.ast.compiler.CompilerClass
+import motif.core.ResolvedGraph
+import motif.errormessage.ErrorMessage
 
 const val OPTION_KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
 const val OPTION_MODE = "motif.mode"
 
 enum class Mode {
-    JAVA,   // Generate pure Java implementation
-    KOTLIN, // Generate pure Kotlin implementation
+  JAVA, // Generate pure Java implementation
+  KOTLIN, // Generate pure Kotlin implementation
 }
 
 class Processor : BasicAnnotationProcessor() {
 
-    lateinit var graph: ResolvedGraph
+  lateinit var graph: ResolvedGraph
 
-    override fun getSupportedSourceVersion(): SourceVersion {
-        return SourceVersion.latestSupported()
+  override fun getSupportedSourceVersion(): SourceVersion {
+    return SourceVersion.latestSupported()
+  }
+
+  override fun initSteps(): Iterable<ProcessingStep> {
+    return listOf<ProcessingStep>(Step())
+  }
+
+  override fun getSupportedOptions(): Set<String> {
+    return setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
+  }
+
+  private inner class Step : ProcessingStep {
+
+    override fun annotations(): Set<Class<out Annotation>> {
+      return setOf(motif.Scope::class.java)
     }
 
-    override fun initSteps(): Iterable<ProcessingStep> {
-        return listOf<ProcessingStep>(Step())
+    override fun process(
+        elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>
+    ): Set<Element> {
+      val scopeElements = elementsByAnnotation[Scope::class.java]
+      val initialScopeClasses =
+          scopeElements.map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
+      if (initialScopeClasses.isEmpty()) {
+        return emptySet()
+      }
+
+      this@Processor.graph = ResolvedGraph.create(initialScopeClasses)
+
+      if (graph.errors.isNotEmpty()) {
+        val errorMessage = ErrorMessage.toString(graph)
+        processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, errorMessage)
+        return emptySet()
+      }
+
+      val mode: Mode? =
+          try {
+            Mode.valueOf(processingEnv.options[OPTION_MODE]?.toUpperCase() ?: "")
+          } catch (ignore: IllegalArgumentException) {
+            null
+          }
+
+      CodeGenerator.generate(processingEnv, graph, mode)
+
+      return emptySet()
     }
-
-    override fun getSupportedOptions(): Set<String> {
-        return setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
-    }
-
-    private inner class Step : ProcessingStep {
-
-        override fun annotations(): Set<Class<out Annotation>> {
-            return setOf(motif.Scope::class.java)
-        }
-
-        override fun process(elementsByAnnotation: SetMultimap<Class<out Annotation>, Element>): Set<Element> {
-            val scopeElements = elementsByAnnotation[Scope::class.java]
-            val initialScopeClasses = scopeElements
-                    .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
-            if (initialScopeClasses.isEmpty()) {
-                return emptySet()
-            }
-
-            this@Processor.graph = ResolvedGraph.create(initialScopeClasses)
-
-            if (graph.errors.isNotEmpty()) {
-                val errorMessage = ErrorMessage.toString(graph)
-                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR, errorMessage)
-                return emptySet()
-            }
-
-            val mode: Mode? = try {
-                Mode.valueOf(processingEnv.options[OPTION_MODE]?.toUpperCase() ?: "")
-            } catch (ignore: IllegalArgumentException) {
-                null
-            }
-
-            CodeGenerator.generate(processingEnv, graph, mode)
-
-            return emptySet()
-        }
-    }
+  }
 }

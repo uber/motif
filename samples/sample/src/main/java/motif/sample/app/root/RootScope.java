@@ -18,9 +18,7 @@ package motif.sample.app.root;
 import android.app.Activity;
 import android.content.Context;
 import android.view.ViewGroup;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import motif.Expose;
 import motif.Scope;
 import motif.sample.app.bottom_sheet.BottomSheetScope;
@@ -32,25 +30,25 @@ import motif.sample.lib.multiselect.MultiSelector;
 @Scope
 public interface RootScope {
 
-    RootView view();
+  RootView view();
 
-    PhotoGridScope photoList(ViewGroup parent);
+  PhotoGridScope photoList(ViewGroup parent);
 
-    BottomSheetScope bottomSheet(ViewGroup parent);
+  BottomSheetScope bottomSheet(ViewGroup parent);
 
-    @motif.Objects
-    abstract class Objects extends ControllerObjects<RootController, RootView> {
+  @motif.Objects
+  abstract class Objects extends ControllerObjects<RootController, RootView> {
 
-        @Expose
-        abstract Database database();
+    @Expose
+    abstract Database database();
 
-        @Expose
-        abstract Context activityContext(AppCompatActivity activity);
+    @Expose
+    abstract Context activityContext(AppCompatActivity activity);
 
-        @Expose
-        abstract Activity activity(AppCompatActivity activity);
+    @Expose
+    abstract Activity activity(AppCompatActivity activity);
 
-        @Expose
-        abstract MultiSelector multiSelector();
-    }
+    @Expose
+    abstract MultiSelector multiSelector();
+  }
 }

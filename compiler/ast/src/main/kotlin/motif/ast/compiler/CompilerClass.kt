@@ -16,85 +16,99 @@
 package motif.ast.compiler
 
 import com.google.auto.common.MoreElements
-import motif.ast.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.*
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
+import motif.ast.IrAnnotation
+import motif.ast.IrClass
+import motif.ast.IrField
+import motif.ast.IrMethod
+import motif.ast.IrModifier
+import motif.ast.IrType
 
-class CompilerClass(
-        override val env: ProcessingEnvironment,
-        val declaredType: DeclaredType) : IrUtil, IrClass {
+class CompilerClass(override val env: ProcessingEnvironment, val declaredType: DeclaredType) :
+    IrUtil, IrClass {
 
-    val typeElement: TypeElement by lazy { declaredType.asElement() as TypeElement }
+  val typeElement: TypeElement by lazy { declaredType.asElement() as TypeElement }
 
-    override val type: IrType by lazy { CompilerType(env, declaredType) }
+  override val type: IrType by lazy { CompilerType(env, declaredType) }
 
-    override val supertypes: List<IrType> by lazy {
-        env.typeUtils.directSupertypes(declaredType).map { CompilerType(env, it) }
+  override val supertypes: List<IrType> by lazy {
+    env.typeUtils.directSupertypes(declaredType).map { CompilerType(env, it) }
+  }
+
+  override val typeArguments: List<IrType> by lazy {
+    declaredType.typeArguments.map { CompilerType(env, it) }
+  }
+
+  override val kind: IrClass.Kind by lazy {
+    when (typeElement.kind) {
+      ElementKind.CLASS -> IrClass.Kind.CLASS
+      ElementKind.INTERFACE -> IrClass.Kind.INTERFACE
+      else -> throw IllegalStateException()
     }
+  }
 
-    override val typeArguments: List<IrType> by lazy { declaredType.typeArguments.map { CompilerType(env, it) } }
-
-    override val kind: IrClass.Kind by lazy {
-        when (typeElement.kind) {
-            ElementKind.CLASS -> IrClass.Kind.CLASS
-            ElementKind.INTERFACE -> IrClass.Kind.INTERFACE
-            else -> throw IllegalStateException()
+  override val methods: List<IrMethod> by lazy {
+    val methods: List<ExecutableElement> =
+        MoreElements.getLocalAndInheritedMethods(typeElement, env.typeUtils, env.elementUtils)
+            .filter { it.enclosingElement.toString() != "java.lang.Object" }
+    val nonPrivateStaticMethods: List<ExecutableElement> =
+        ElementFilter.methodsIn(typeElement.enclosedElements).filter {
+          Modifier.STATIC in it.modifiers && Modifier.PRIVATE !in it.modifiers
         }
+    (methods + nonPrivateStaticMethods).map { executableElement ->
+      val executableType =
+          env.typeUtils.asMemberOf(declaredType, executableElement) as ExecutableType
+      CompilerMethod(env, declaredType, executableType, executableElement)
     }
+  }
 
-    override val methods: List<IrMethod> by lazy {
-        val methods: List<ExecutableElement> = MoreElements.getLocalAndInheritedMethods(typeElement, env.typeUtils, env.elementUtils)
-                .filter { it.enclosingElement.toString() != "java.lang.Object" }
-        val nonPrivateStaticMethods: List<ExecutableElement> = ElementFilter.methodsIn(typeElement.enclosedElements)
-                .filter { Modifier.STATIC in it.modifiers && Modifier.PRIVATE !in it.modifiers }
-        (methods + nonPrivateStaticMethods)
-                .map { executableElement ->
-                    val executableType = env.typeUtils.asMemberOf(declaredType, executableElement) as ExecutableType
-                    CompilerMethod(env, declaredType, executableType, executableElement)
-                }
+  override val constructors: List<IrMethod> by lazy {
+    ElementFilter.constructorsIn(typeElement.enclosedElements).map { executableElement ->
+      val executableType =
+          env.typeUtils.asMemberOf(declaredType, executableElement) as ExecutableType
+      CompilerMethod(env, declaredType, executableType, executableElement)
     }
+  }
 
-    override val constructors: List<IrMethod> by lazy {
-        ElementFilter.constructorsIn(typeElement.enclosedElements)
-                .map { executableElement ->
-                    val executableType = env.typeUtils.asMemberOf(declaredType, executableElement) as ExecutableType
-                    CompilerMethod(env, declaredType, executableType, executableElement)
-                }
+  override val nestedClasses: List<IrClass> by lazy {
+    ElementFilter.typesIn(typeElement.enclosedElements).map { typeElement ->
+      CompilerClass(env, typeElement.asType() as DeclaredType)
     }
+  }
 
-    override val nestedClasses: List<IrClass> by lazy {
-        ElementFilter.typesIn(typeElement.enclosedElements)
-                .map { typeElement ->
-                    CompilerClass(env, typeElement.asType() as DeclaredType)
-                }
-    }
+  override val fields: List<IrField> by lazy { declaredType.getAllFields() }
 
-    override val fields: List<IrField> by lazy { declaredType.getAllFields() }
+  override val annotations: List<IrAnnotation> by lazy { typeElement.irAnnotations() }
 
-    override val annotations: List<IrAnnotation> by lazy { typeElement.irAnnotations() }
+  override val modifiers: Set<IrModifier> by lazy { typeElement.irModifiers() }
 
-    override val modifiers: Set<IrModifier> by lazy { typeElement.irModifiers() }
-
-    private fun DeclaredType.getAllFields(): List<IrField> {
-        val typeElement: TypeElement = asElement() as TypeElement
-        var fields: List<IrField> = ElementFilter.fieldsIn(typeElement.enclosedElements)
-                .map { variableElement -> CompilerField(env, variableElement) }
-
-        val superclass: TypeMirror = typeElement.superclass
-        if (superclass.kind == TypeKind.DECLARED) {
-            fields += (superclass as DeclaredType).getAllFields()
-        } else if (superclass.kind != TypeKind.NONE) {
-            // TODO Is it possible for TypeElement.superclass to return a TypeMirror of TypeKind other than
-            // DECLARED or NONE? If so, then we should not throw an Exception here and instead handle the
-            // recursion properly.
-            throw IllegalStateException("Unknown superclass type.")
+  private fun DeclaredType.getAllFields(): List<IrField> {
+    val typeElement: TypeElement = asElement() as TypeElement
+    var fields: List<IrField> =
+        ElementFilter.fieldsIn(typeElement.enclosedElements).map { variableElement ->
+          CompilerField(env, variableElement)
         }
 
-        return fields
+    val superclass: TypeMirror = typeElement.superclass
+    if (superclass.kind == TypeKind.DECLARED) {
+      fields += (superclass as DeclaredType).getAllFields()
+    } else if (superclass.kind != TypeKind.NONE) {
+      // TODO Is it possible for TypeElement.superclass to return a TypeMirror of TypeKind other
+      // than
+      // DECLARED or NONE? If so, then we should not throw an Exception here and instead handle the
+      // recursion properly.
+      throw IllegalStateException("Unknown superclass type.")
     }
+
+    return fields
+  }
 }

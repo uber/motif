@@ -22,27 +22,31 @@ import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.hierarchy.ScopeHierarchyBrowser
 
-class ScopeHierarchyRootDescriptor(project: Project, graph: ResolvedGraph, element: PsiElement, private val status: ScopeHierarchyBrowser.Status) :
-        ScopeHierarchyNodeDescriptor(project, graph, null, element, true) {
+class ScopeHierarchyRootDescriptor(
+    project: Project,
+    graph: ResolvedGraph,
+    element: PsiElement,
+    private val status: ScopeHierarchyBrowser.Status
+) : ScopeHierarchyNodeDescriptor(project, graph, null, element, true) {
 
-    companion object {
-        const val LABEL_ROOT_SCOPES: String = "Root Scopes"
-        const val LABEL_CLICK_REFRESH: String = "Click Refresh button to access Motif scope hierarchy."
-        const val LABEL_WAIT: String = "Please wait..."
-    }
+  companion object {
+    const val LABEL_ROOT_SCOPES: String = "Root Scopes"
+    const val LABEL_CLICK_REFRESH: String = "Click Refresh button to access Motif scope hierarchy."
+    const val LABEL_WAIT: String = "Please wait..."
+  }
 
-    override fun updateText(text: CompositeAppearance) {
-        when (status) {
-            ScopeHierarchyBrowser.Status.UNINITIALIZED -> {
-                text.ending.addText(LABEL_CLICK_REFRESH)
-            }
-            ScopeHierarchyBrowser.Status.INITIALIZING -> {
-                text.ending.addText(LABEL_WAIT)
-            }
-            else -> {
-                val textAttr: TextAttributes = getDefaultTextAttributes(graph.errors.isNotEmpty())
-                text.ending.addText(LABEL_ROOT_SCOPES, textAttr)
-            }
-        }
+  override fun updateText(text: CompositeAppearance) {
+    when (status) {
+      ScopeHierarchyBrowser.Status.UNINITIALIZED -> {
+        text.ending.addText(LABEL_CLICK_REFRESH)
+      }
+      ScopeHierarchyBrowser.Status.INITIALIZING -> {
+        text.ending.addText(LABEL_WAIT)
+      }
+      else -> {
+        val textAttr: TextAttributes = getDefaultTextAttributes(graph.errors.isNotEmpty())
+        text.ending.addText(LABEL_ROOT_SCOPES, textAttr)
+      }
     }
+  }
 }

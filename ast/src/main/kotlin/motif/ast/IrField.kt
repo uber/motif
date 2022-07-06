@@ -16,6 +16,6 @@
 package motif.ast
 
 interface IrField : IrHasModifiers {
-    val type: IrType
-    val name: String
+  val type: IrType
+  val name: String
 }

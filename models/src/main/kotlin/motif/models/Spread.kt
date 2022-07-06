@@ -18,34 +18,34 @@ package motif.models
 import motif.ast.IrClass
 import motif.ast.IrMethod
 
-/**
- * [Wiki](https://github.com/uber/motif/wiki#spread)
- */
+/** [Wiki](https://github.com/uber/motif/wiki#spread) */
 class Spread(val clazz: IrClass, val factoryMethod: FactoryMethod) {
 
-    val sourceType: Type by lazy { factoryMethod.returnType.type }
-    val qualifiedName: String by lazy { clazz.qualifiedName }
+  val sourceType: Type by lazy { factoryMethod.returnType.type }
+  val qualifiedName: String by lazy { clazz.qualifiedName }
 
-    val methods: List<Method> = clazz.methods
-            .filter { method -> isSpreadMethod(method) }
-            .onEach { method ->
-                if (method.isNullable()) {
-                    throw NullableSpreadMethod(factoryMethod.objects, factoryMethod.method, clazz, method)
-                }
+  val methods: List<Method> =
+      clazz
+          .methods
+          .filter { method -> isSpreadMethod(method) }
+          .onEach { method ->
+            if (method.isNullable()) {
+              throw NullableSpreadMethod(factoryMethod.objects, factoryMethod.method, clazz, method)
             }
-            .map { method -> Method(method, this, Type.fromReturnType(method)) }
+          }
+          .map { method -> Method(method, this, Type.fromReturnType(method)) }
 
-    class Method(val method: IrMethod, val spread: Spread, val returnType: Type) {
+  class Method(val method: IrMethod, val spread: Spread, val returnType: Type) {
 
-        val name = method.name
-        val sourceType: Type by lazy { spread.sourceType }
-        val qualifiedName: String by lazy { "${spread.qualifiedName}.${method.name}" }
+    val name = method.name
+    val sourceType: Type by lazy { spread.sourceType }
+    val qualifiedName: String by lazy { "${spread.qualifiedName}.${method.name}" }
+  }
+
+  companion object {
+
+    private fun isSpreadMethod(method: IrMethod): Boolean {
+      return !method.isVoid() && method.isPublic() && !method.hasParameters()
     }
-
-    companion object {
-
-        private fun isSpreadMethod(method: IrMethod): Boolean {
-            return !method.isVoid() && method.isPublic() && !method.hasParameters()
-        }
-    }
+  }
 }

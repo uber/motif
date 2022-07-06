@@ -19,14 +19,14 @@ import motif.core.ScopeCycleError
 
 internal class ScopeCycleHandler(private val error: ScopeCycleError) : ErrorHandler {
 
-    override val name = "SCOPE CYCLE"
+  override val name = "SCOPE CYCLE"
 
-    override fun StringBuilder.handle() {
-        appendLine("Scope cycle detected:")
-        appendLine()
-        error.path.forEachIndexed { i, scopeType ->
-            val prefix = if (i == 0) "  " else "  -> "
-            appendLine("$prefix${scopeType.qualifiedName}")
-        }
+  override fun StringBuilder.handle() {
+    appendLine("Scope cycle detected:")
+    appendLine()
+    error.path.forEachIndexed { i, scopeType ->
+      val prefix = if (i == 0) "  " else "  -> "
+      appendLine("$prefix${scopeType.qualifiedName}")
     }
+  }
 }

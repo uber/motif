@@ -19,10 +19,11 @@ import motif.models.NullableSpreadMethod
 
 internal class NullableSpreadMethodHandler(private val error: NullableSpreadMethod) : ErrorHandler {
 
-    override val name = "NULLABLE SPREAD METHOD"
+  override val name = "NULLABLE SPREAD METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             @Spread factory method return type must not declare @Nullable spreadable methods:
 
               [Method]
@@ -33,6 +34,6 @@ internal class NullableSpreadMethodHandler(private val error: NullableSpreadMeth
 
             Suggestions:
               * Use Optional<...> instead.
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }

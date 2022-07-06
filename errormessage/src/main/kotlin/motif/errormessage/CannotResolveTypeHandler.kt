@@ -19,20 +19,18 @@ import motif.models.CannotResolveType
 
 internal class CannotResolveTypeHandler(private val error: CannotResolveType) : ErrorHandler {
 
-    override val name = "CANNOT RESOLVE TYPE"
+  override val name = "CANNOT RESOLVE TYPE"
 
-    override fun StringBuilder.handle() {
-        appendLine(
-            """
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Following type cannot be resolved in ${error.scope.qualifiedName}:
 
               ${error.type.qualifiedName}
-              
-            Suggestions:
-              * Check if the module of ${error.type.qualifiedName} is provided as a dependency 
-              to the module where the parent scope of ${error.scope.qualifiedName} is defined.
-        """.trimIndent()
-        )
-    }
 
+            Suggestions:
+              * Check if the module of ${error.type.qualifiedName} is provided as a dependency
+              to the module where the parent scope of ${error.scope.qualifiedName} is defined.
+      """.trimIndent())
+  }
 }

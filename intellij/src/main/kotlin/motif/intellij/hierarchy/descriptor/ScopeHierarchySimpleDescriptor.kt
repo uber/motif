@@ -20,31 +20,31 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
-import motif.core.ResolvedGraph
 import java.awt.Font
 import javax.swing.Icon
+import motif.core.ResolvedGraph
 
 /*
  * Node descriptor used to render a simple string, with no children descendant.
  */
 class ScopeHierarchySimpleDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor?,
-        element: PsiElement,
-        private val label: String)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor?,
+    element: PsiElement,
+    private val label: String
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        val textAttr = TextAttributes(myColor, null, null, null, Font.ITALIC)
-        text.ending.addText(label, textAttr)
-    }
+  override fun updateText(text: CompositeAppearance) {
+    val textAttr = TextAttributes(myColor, null, null, null, Font.ITALIC)
+    text.ending.addText(label, textAttr)
+  }
 
-    override fun getIcon(element: PsiElement): Icon? {
-        return null
-    }
+  override fun getIcon(element: PsiElement): Icon? {
+    return null
+  }
 
-    override fun toString(): String {
-        return label
-    }
+  override fun toString(): String {
+    return label
+  }
 }

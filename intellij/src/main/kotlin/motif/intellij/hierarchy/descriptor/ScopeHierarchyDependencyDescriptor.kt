@@ -24,20 +24,21 @@ import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
 import motif.models.Dependencies
 
 open class ScopeHierarchyDependencyDescriptor(
-        project: Project,
-        graph: ResolvedGraph,
-        parentDescriptor: HierarchyNodeDescriptor,
-        element: PsiElement,
-        private val method: Dependencies.Method)
-    : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
+    project: Project,
+    graph: ResolvedGraph,
+    parentDescriptor: HierarchyNodeDescriptor,
+    element: PsiElement,
+    private val method: Dependencies.Method
+) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
-    override fun updateText(text: CompositeAppearance) {
-        text.ending.addText(method.returnType.simpleName)
-        text.ending.addText(" (" + formatQualifiedName(method.returnType.qualifiedName) + ")", getPackageNameAttributes())
-    }
+  override fun updateText(text: CompositeAppearance) {
+    text.ending.addText(method.returnType.simpleName)
+    text.ending.addText(
+        " (" + formatQualifiedName(method.returnType.qualifiedName) + ")",
+        getPackageNameAttributes())
+  }
 
-    override fun toString(): String {
-        return method.returnType.simpleName
-    }
+  override fun toString(): String {
+    return method.returnType.simpleName
+  }
 }
-

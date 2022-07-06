@@ -19,30 +19,31 @@ import kotlin.reflect.KClass
 
 interface IrClass : IrAnnotated, IrHasModifiers {
 
-    val type: IrType
-    val supertypes: List<IrType>
-    val typeArguments: List<IrType>
-    val kind: Kind
-    val methods: List<IrMethod>
-    val nestedClasses: List<IrClass>
-    val fields: List<IrField>
-    val constructors: List<IrMethod>
+  val type: IrType
+  val supertypes: List<IrType>
+  val typeArguments: List<IrType>
+  val kind: Kind
+  val methods: List<IrMethod>
+  val nestedClasses: List<IrClass>
+  val fields: List<IrField>
+  val constructors: List<IrMethod>
 
-    val qualifiedName: String
-        get() = type.qualifiedName
+  val qualifiedName: String
+    get() = type.qualifiedName
 
-    val simpleName: String
-        get() = type.simpleName
+  val simpleName: String
+    get() = type.simpleName
 
-    fun hasNonDefaultConstructor(): Boolean {
-        return constructors.any { it.hasParameters() }
-    }
+  fun hasNonDefaultConstructor(): Boolean {
+    return constructors.any { it.hasParameters() }
+  }
 
-    fun annotatedInnerClass(annotationClass: KClass<out Annotation>): IrClass? {
-        return nestedClasses.find { it.hasAnnotation(annotationClass) }
-    }
+  fun annotatedInnerClass(annotationClass: KClass<out Annotation>): IrClass? {
+    return nestedClasses.find { it.hasAnnotation(annotationClass) }
+  }
 
-    enum class Kind {
-        CLASS, INTERFACE
-    }
+  enum class Kind {
+    CLASS,
+    INTERFACE
+  }
 }

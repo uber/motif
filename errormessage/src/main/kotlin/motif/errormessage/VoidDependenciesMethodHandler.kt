@@ -17,15 +17,17 @@ package motif.errormessage
 
 import motif.models.VoidDependenciesMethod
 
-internal class VoidDependenciesMethodHandler(private val error: VoidDependenciesMethod) : ErrorHandler {
+internal class VoidDependenciesMethodHandler(private val error: VoidDependenciesMethod) :
+    ErrorHandler {
 
-    override val name = "VOID DEPENDENCIES METHOD"
+  override val name = "VOID DEPENDENCIES METHOD"
 
-    override fun StringBuilder.handle() {
-        appendLine("""
+  override fun StringBuilder.handle() {
+    appendLine(
+        """
             Methods on dependencies interfaces must be non-void:
 
               void ${error.dependenciesClass.qualifiedName}.${error.method.name}
-        """.trimIndent())
-    }
+      """.trimIndent())
+  }
 }
