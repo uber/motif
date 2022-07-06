@@ -15,7 +15,7 @@
  */
 
 def versions = [
-        kotlin: '1.5.10',
+        kotlin: '1.6.21',
         ktlint: '0.41.0',
         ktfmt: '0.23',
         dagger: '2.24',

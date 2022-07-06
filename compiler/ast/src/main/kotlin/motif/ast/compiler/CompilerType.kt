@@ -43,11 +43,11 @@ class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirro
             it
           }
         }
-        return@lazy if (candidate.startsWith('(')) {
-            candidate.substringAfter(":: ").dropLast(1)
-        } else if (candidate.startsWith("@")) {
-            candidate.substringAfterLast(" ")
-        } else {
+    return@lazy if (candidate.startsWith('(')) {
+      candidate.substringAfter(":: ").dropLast(1)
+    } else if (candidate.startsWith("@")) {
+      candidate.substringAfterLast(" ")
+    } else {
       candidate
     }
   }

@@ -30,16 +30,17 @@ import proguard.ConfigurationParser
 
 object ProGuard {
 
-    private val classPathFiles: List<File> by lazy {
-        listOf(Scope::class,
-                Truth::class,
-                Inject::class,
-                Nullable::class,
-                Component::class,
-                Unit::class,
-                NotNull::class)
-                .map { libraryPath(it) }
-    }
+  private val classPathFiles: List<File> by lazy {
+    listOf(
+        Scope::class,
+        Truth::class,
+        Inject::class,
+        Nullable::class,
+        Component::class,
+        Unit::class,
+        NotNull::class)
+        .map { libraryPath(it) }
+  }
 
   @JvmStatic
   fun run(externalClassesDir: File?, classesDir: File, proguardFile: File): File {
