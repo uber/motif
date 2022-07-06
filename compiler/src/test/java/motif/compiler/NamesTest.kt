@@ -20,6 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.COMPILATION_ERROR
+import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.INTERNAL_ERROR
 import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.OK
 import com.tschuchort.compiletesting.SourceFile.Companion.java
 import dagger.shaded.auto.common.AnnotationMirrors
@@ -163,7 +164,7 @@ class NamesTest {
 
     private fun getErrorMessage(classString: String): String {
         val result = compile(SafeNameProcessor(), classString)
-        if (result.exitCode != COMPILATION_ERROR) {
+        if (result.exitCode != COMPILATION_ERROR && result.exitCode != INTERNAL_ERROR) {
             assertWithMessage(result.messages).fail()
         }
         return result.messages
