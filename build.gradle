@@ -26,6 +26,7 @@ subprojects {
         mavenCentral()
     }
 
+<<<<<<< HEAD
     configurations.configureEach {
         resolutionStrategy.eachDependency {
             if (requested.name.startsWith("kotlin-stdlib")) {
@@ -36,35 +37,36 @@ subprojects {
         }
     }
 
-    apply plugin: 'com.diffplug.spotless'
-    spotless {
-        format 'misc', {
-            target '**/*.md', '**/.gitignore'
+    if (project.path != ":tests") {
+        apply plugin: 'com.diffplug.spotless'
+        spotless {
+            format 'misc', {
+                target '**/*.md', '**/.gitignore'
 
-            indentWithTabs()
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-        kotlin {
-            target "**/*.kt"
-            ktlint(deps.versions.ktlint).userData(['indent_size': '2', 'continuation_indent_size' : '2'])
-            ktfmt(deps.versions.ktfmt)
-            licenseHeaderFile rootProject.file('config/spotless/copyright.kt')
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-        java {
-            target "**/*.java"
-            googleJavaFormat(deps.versions.gjf)
-            licenseHeaderFile rootProject.file('config/spotless/copyright.java')
-            removeUnusedImports()
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-        groovyGradle {
-            target '**/*.gradle'
-            trimTrailingWhitespace()
-            endWithNewline()
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
+            kotlin {
+                target "**/*.kt"
+                ktlint(deps.versions.ktlint).userData(['indent_size': '2', 'continuation_indent_size': '2'])
+                ktfmt(deps.versions.ktfmt)
+                licenseHeaderFile rootProject.file('config/spotless/copyright.kt')
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
+            java {
+                target "**/*.java"
+                googleJavaFormat(deps.versions.gjf)
+                licenseHeaderFile rootProject.file('config/spotless/copyright.java')
+                removeUnusedImports()
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
+            groovyGradle {
+                target '**/*.gradle'
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
         }
     }
 }
