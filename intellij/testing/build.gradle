@@ -13,3 +13,9 @@ intellij {
 dependencies {
     implementation deps.test.truth
 }
+
+tasks {
+    buildSearchableOptions {
+        enabled = false
+    }
+}

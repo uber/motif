@@ -24,4 +24,14 @@ subprojects {
         google()
         mavenCentral()
     }
+
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.name.startsWith("kotlin-stdlib")) {
+                useTarget("${requested.group}:${requested.name.replace("jre", "jdk")}:${requested.version}")
+            } else if (requested.group == "org.jetbrains.kotlin") {
+                useVersion(deps.versions.kotlin)
+            }
+        }
+    }
 }
