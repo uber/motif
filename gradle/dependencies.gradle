@@ -22,7 +22,7 @@ def versions = [
         room: '2.4.2',
         dokka: '1.4.32',
         "gradleIntellijPlugin": [
-                ide: '2021.1'
+                ide: '2020.1'
         ],
 ]
 
@@ -63,7 +63,7 @@ ext.deps = [
                 junit: 'junit:junit:4.12',
                 truth: 'com.google.truth:truth:1.0',
                 compileTesting: 'com.google.testing.compile:compile-testing:0.18',
-                compileTestingKotlin: 'com.github.tschuchortdev:kotlin-compile-testing:1.4.2',
+                compileTestingKotlin: 'com.github.tschuchortdev:kotlin-compile-testing:1.4.8',
                 assertj: 'org.assertj:assertj-core:3.13.2'
         ],
         dagger: "com.google.dagger:dagger:${versions.dagger}",

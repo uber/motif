@@ -36,4 +36,10 @@ compileTestKotlin {
     }
 }
 
+tasks {
+    buildSearchableOptions {
+        enabled = false
+    }
+}
+
 apply plugin: 'com.vanniktech.maven.publish'
