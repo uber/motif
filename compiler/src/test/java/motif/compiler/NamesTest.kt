@@ -91,6 +91,18 @@ class NamesTest {
   }
 
   @Test
+  fun array() {
+    val name = getSafeName("String[]")
+    assertThat(name).isEqualTo("stringArray")
+  }
+
+  @Test
+  fun enum() {
+    val name = getSafeName("LogLevel")
+    assertThat(name).isEqualTo("logLevel")
+  }
+
+  @Test
   fun errorType() {
     val errorMessage = getErrorMessage("DoesNotExist")
     assertThat(errorMessage).contains("DoesNotExist")
@@ -133,6 +145,11 @@ class NamesTest {
                 import javax.inject.Qualifier;
 
                 @javax.inject.Qualifier @interface Foo {}
+
+                enum LogLevel {
+                    INFO,
+                    ERROR
+                }
 
                 class Test<A extends String> {
                     $classString  test() { return null; }
