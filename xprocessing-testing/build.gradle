@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+// create extra configuration for shaded dependencies, so they're not included in the pom
+def shadedConfig = configurations.create('compileShaded')
+shadedConfig.transitive = false
+configurations.compileOnly.extendsFrom(shadedConfig)
+
+dependencies {
+    compileShaded deps.test.roomCompilerProcessingTesting
+}
+
+shadowJar {
+    dependencies {
+        include dependency(deps.test.roomCompilerProcessingTesting)
+    }
+    classifier = ''
+    configurations = [shadedConfig]
+    mergeServiceFiles()
+    relocate 'androidx.room.compiler.processing', 'motif.compiler.processing'
+}
+
+/**
+ * Workaround to add a qualifier to the non-shadowed artifact so that IntelliJ indexes the
+ * shadowed jar properly. This is not done when publishing to avoid having 2 artifacts.
+ *
+ * https://youtrack.jetbrains.com/issue/IDEA-163411/Gradle-integration-is-broken-when-using-the-Shadow-Plugin#focus=Comments-27-5742926.0-0
+ */
+if (System.getenv("CI") == null) {
+    jar {
+        archiveClassifier = 'unshaded'
+    }
+}
+
+artifacts {
+    runtimeOnly shadowJar
+    archives shadowJar
+}
+
+apply plugin: "com.vanniktech.maven.publish"
