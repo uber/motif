@@ -46,6 +46,8 @@ include 'ast'
 include 'tests'
 include 'tests:compiler'
 include 'viewmodel'
+include 'xprocessing'
+include 'xprocessing-testing'
 
 project(':compiler-ast').projectDir = file('compiler/ast')
 project(':intellij-ast').projectDir = file('intellij/ast')
