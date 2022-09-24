@@ -16,25 +16,25 @@
 package motif.compiler.ksp
 
 import com.google.devtools.ksp.KspErrorThrower
+import javax.tools.Diagnostic
 import motif.compiler.processing.XAnnotation
 import motif.compiler.processing.XAnnotationValue
 import motif.compiler.processing.XElement
 import motif.compiler.processing.XMessager
-import javax.tools.Diagnostic
 
 /**
- * A message watcher that re-throws exceptions from the KSP devtools package
- * to work around an issue where exceptions are swallowed.
+ * A message watcher that re-throws exceptions from the KSP devtools package to work around an issue
+ * where exceptions are swallowed.
  *
- *  https://github.com/google/ksp/issues/974
+ * https://github.com/google/ksp/issues/974
  */
 internal class MessageWatcher : XMessager() {
   override fun onPrintMessage(
-    kind: Diagnostic.Kind,
-    msg: String,
-    element: XElement?,
-    annotation: XAnnotation?,
-    annotationValue: XAnnotationValue?
+      kind: Diagnostic.Kind,
+      msg: String,
+      element: XElement?,
+      annotation: XAnnotation?,
+      annotationValue: XAnnotationValue?
   ) {
     if (kind == Diagnostic.Kind.ERROR) {
       KspErrorThrower.rethrowKspError(msg)
