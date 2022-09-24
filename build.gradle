@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         classpath deps.build.gradlePlugins.android
         classpath deps.build.gradlePlugins.kotlin
+        classpath deps.build.gradlePlugins.ksp
         classpath deps.build.gradlePlugins.dokka
         classpath deps.build.gradlePlugins.mavenPublish
         classpath deps.build.gradlePlugins.spotless

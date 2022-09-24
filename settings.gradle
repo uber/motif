@@ -32,6 +32,7 @@ rootProject.name = 'motif'
 include 'lib'
 include 'compiler'
 include 'compiler-ast'
+include 'compiler-ksp'
 include 'samples:sample'
 include 'samples:sample-lib'
 include 'samples:sample-kotlin'
@@ -50,4 +51,5 @@ include 'xprocessing'
 include 'xprocessing-testing'
 
 project(':compiler-ast').projectDir = file('compiler/ast')
+project(':compiler-ksp').projectDir = file('compiler/ksp')
 project(':intellij-ast').projectDir = file('intellij/ast')
