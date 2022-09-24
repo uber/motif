@@ -190,6 +190,7 @@ class ScopeHierarchyBrowser(
         status = Status.INITIALIZING
         refresh()
       }
+      else -> {}
     }
 
     MotifProjectComponent.getInstance(project).refreshGraph()
