@@ -34,6 +34,10 @@ subprojects {
                 useTarget("${requested.group}:${requested.name.replace("jre", "jdk")}:${requested.version}")
             } else if (requested.group == "org.jetbrains.kotlin") {
                 useVersion(deps.versions.kotlin)
+            } else if (requested.group == "com.google.auto" && requested.name == "auto-common") {
+                useTarget(deps.autoCommon)
+            } else if (requested.group == "org.jetbrains.kotlinx" && requested.name == "kotlinx-metadata") {
+                useTarget(deps.kotlinxMetadata)
             }
         }
     }
