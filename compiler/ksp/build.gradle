@@ -1,0 +1,31 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+sourceCompatibility = 1.8
+
+dependencies {
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflection
+    implementation deps.autoCommon
+    implementation deps.autoService
+    implementation deps.commonsCodec
+    implementation deps.kotlinpoet
+    implementation deps.dagger
+    implementation deps.daggerCompiler
+    implementation deps.kspApi
+    implementation project(path: ':xprocessing', configuration: 'shadow')
+    implementation project(':lib')
+    implementation project(':compiler')
+    implementation project(':compiler-ast')
+    implementation project(':core')
+    implementation project(':errormessage')
+
+    testImplementation project(':viewmodel')
+    testImplementation deps.proguard
+    testImplementation deps.test.truth
+    testImplementation deps.test.compileTesting
+    testImplementation deps.test.compileTestingKotlin
+}
+
+apply plugin: 'com.vanniktech.maven.publish'
