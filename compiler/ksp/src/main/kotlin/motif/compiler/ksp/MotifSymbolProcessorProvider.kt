@@ -15,19 +15,19 @@
  */
 package motif.compiler.ksp
 
-import motif.compiler.processing.ExperimentalProcessingApi
-import motif.compiler.processing.XProcessingEnvConfig
-import motif.compiler.processing.ksp.KspBasicAnnotationProcessor
 import com.google.auto.service.AutoService
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import motif.compiler.MotifProcessingStep
+import motif.compiler.processing.ExperimentalProcessingApi
+import motif.compiler.processing.XProcessingEnvConfig
+import motif.compiler.processing.ksp.KspBasicAnnotationProcessor
 import motif.core.ResolvedGraph
 
 @AutoService(SymbolProcessorProvider::class)
 class MotifSymbolProcessorProvider(
-  private val config: XProcessingEnvConfig = XProcessingEnvConfig.DEFAULT
+    private val config: XProcessingEnvConfig = XProcessingEnvConfig.DEFAULT
 ) : SymbolProcessorProvider {
   lateinit var graph: ResolvedGraph
 
@@ -37,12 +37,11 @@ class MotifSymbolProcessorProvider(
 
   @OptIn(ExperimentalProcessingApi::class)
   private inner class MotifSymbolProcessor(
-    environment: SymbolProcessorEnvironment,
-    config: XProcessingEnvConfig
+      environment: SymbolProcessorEnvironment,
+      config: XProcessingEnvConfig
   ) : KspBasicAnnotationProcessor(environment, config) {
 
-    override fun processingSteps() = listOf(
-      MotifProcessingStep(graphSetter = { graph = it }, messageWatcher = MessageWatcher())
-    )
+    override fun processingSteps() =
+        listOf(MotifProcessingStep(graphSetter = { graph = it }, messageWatcher = MessageWatcher()))
   }
 }

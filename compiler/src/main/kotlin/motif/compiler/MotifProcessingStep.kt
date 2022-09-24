@@ -24,8 +24,8 @@ import motif.core.ResolvedGraph
 
 @ExperimentalProcessingApi
 class MotifProcessingStep(
-  private val graphSetter: (ResolvedGraph) -> Unit,
-  private val messageWatcher: XMessager? = null,
+    private val graphSetter: (ResolvedGraph) -> Unit,
+    private val messageWatcher: XMessager? = null,
 ) : XProcessingStep {
 
   override fun annotations() = mutableSetOf(motif.Scope::class.qualifiedName!!)
