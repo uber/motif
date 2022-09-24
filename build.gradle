@@ -7,6 +7,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath deps.build.gradlePlugins.android
@@ -14,6 +15,7 @@ buildscript {
         classpath deps.build.gradlePlugins.dokka
         classpath deps.build.gradlePlugins.mavenPublish
         classpath deps.build.gradlePlugins.spotless
+        classpath deps.build.gradlePlugins.shadow
         classpath deps.apacheClient
     }
 }
