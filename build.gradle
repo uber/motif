@@ -38,6 +38,27 @@ subprojects {
         }
     }
 
+    afterEvaluate {
+        def extraKotlincArgs = [
+            "-Xjvm-default=all",
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlin.contracts.ExperimentalContracts",
+        ]
+        if (project.path.startsWith(":compiler")) {
+            extraKotlincArgs += [
+                "-opt-in=motif.compiler.processing.ExperimentalProcessingApi"
+            ]
+        }
+        boolean isKotlinLibrary = project.plugins.hasPlugin("org.jetbrains.kotlin.jvm") || project.plugins.hasPlugin("org.jetbrains.kotlin.android")
+        if (isKotlinLibrary) {
+            it.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                kotlinOptions {
+                    freeCompilerArgs += extraKotlincArgs
+                }
+            }
+        }
+    }
+
     if (project.path != ":tests") {
         apply plugin: 'com.diffplug.spotless'
         spotless {
