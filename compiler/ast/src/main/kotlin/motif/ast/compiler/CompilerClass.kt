@@ -111,4 +111,8 @@ class CompilerClass(override val env: ProcessingEnvironment, val declaredType: D
 
     return fields
   }
+
+  companion object {
+    internal val TOP_LEVEL_OBJECT_NAMES = setOf("java.lang.Object", "kotlin.Any", "Any", "Object")
+  }
 }

@@ -11,11 +11,16 @@ sourceCompatibility = 1.8
 dependencies {
     implementation deps.kotlin.stdlib
     implementation deps.autoCommon
+    implementation deps.javapoet
+    implementation deps.kotlinpoetInteropMetadata
+    implementation deps.kspApi
+    implementation deps.roomCompilerProcessing
 
     api project(':ast')
 
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
+    testImplementation deps.test.roomCompilerProcessingTesting
 }
 
 apply plugin: 'com.vanniktech.maven.publish'
