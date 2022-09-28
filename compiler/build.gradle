@@ -14,7 +14,7 @@ dependencies {
     implementation deps.kotlinpoet
     implementation deps.dagger
     implementation deps.daggerCompiler
-    implementation project(path: ':xprocessing', configuration: 'shadow')
+    implementation deps.roomCompilerProcessing
     implementation project(':lib')
     implementation project(':compiler-ast')
     implementation project(':core')
