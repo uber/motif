@@ -15,11 +15,11 @@
  */
 package motif.compiler
 
-import motif.compiler.processing.ExperimentalProcessingApi
-import motif.compiler.processing.XElement
-import motif.compiler.processing.XMessager
-import motif.compiler.processing.XProcessingEnv
-import motif.compiler.processing.XProcessingStep
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XElement
+import androidx.room.compiler.processing.XMessager
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XProcessingStep
 import motif.core.ResolvedGraph
 
 @ExperimentalProcessingApi

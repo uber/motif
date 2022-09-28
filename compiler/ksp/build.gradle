@@ -14,7 +14,7 @@ dependencies {
     implementation deps.dagger
     implementation deps.daggerCompiler
     implementation deps.kspApi
-    implementation project(path: ':xprocessing', configuration: 'shadow')
+    implementation deps.roomCompilerProcessing
     implementation project(':lib')
     implementation project(':compiler')
     implementation project(':compiler-ast')

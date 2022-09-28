@@ -113,7 +113,7 @@ object JavaCodeGenerator {
           addAnnotation(Override::class.java)
           addModifiers(Modifier.PUBLIC)
           returns(childClassName.j)
-          parameters.forEach { addParameter(it.spec()) }
+          this@spec.parameters.forEach { addParameter(it.spec()) }
           addStatement("return new \$T(\$L)", childImplClassName.j, childDependenciesImpl.spec())
         }
         .build()
