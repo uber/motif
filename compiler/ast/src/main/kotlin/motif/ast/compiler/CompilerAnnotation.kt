@@ -15,34 +15,36 @@
  */
 package motif.ast.compiler
 
-import com.google.auto.common.AnnotationMirrors
-import com.google.common.base.Equivalence
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
-import javax.lang.model.type.ExecutableType
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XAnnotation
+import androidx.room.compiler.processing.XProcessingEnv
+import com.uber.xprocessing.ext.isEquivalent
+import com.uber.xprocessing.ext.toPrettyString
 import kotlin.reflect.KClass
 import motif.ast.IrAnnotation
 import motif.ast.IrMethod
 import motif.ast.IrType
 
-class CompilerAnnotation(env: ProcessingEnvironment, val mirror: AnnotationMirror) : IrAnnotation {
+@OptIn(ExperimentalProcessingApi::class)
+class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrAnnotation {
 
   override val className: String by lazy {
-    val typeElement = mirror.annotationType.asElement() as TypeElement
-    typeElement.qualifiedName.toString()
+    mirror.type.typeElement?.qualifiedName
+        ?: throw IllegalStateException("Compiler annotation has no qualified class name")
   }
 
-  private val key: Equivalence.Wrapper<AnnotationMirror> =
-      AnnotationMirrors.equivalence().wrap(mirror)
-  private val pretty: String by lazy { mirror.toString() }
+  private val pretty: String by lazy { mirror.toPrettyString() }
 
-  override val type: IrType = CompilerType(env, mirror.annotationType)
+  override val type: IrType = CompilerType(env, mirror.type)
 
   override val members: List<IrMethod> by lazy {
-    mirror.elementValues.keys.map {
-      val executableType = env.typeUtils.asMemberOf(mirror.annotationType, it) as ExecutableType
-      CompilerMethod(env, mirror.annotationType, executableType, it)
+    val annotationMethods = mirror.type.typeElement?.getDeclaredMethods().orEmpty()
+    mirror.annotationValues.map { annotationValue ->
+      val executableElement =
+          annotationMethods.firstOrNull { it.jvmName == annotationValue.name }
+              ?: throw IllegalStateException(
+                  "No matching annotations for ${annotationValue.name} in ${mirror.annotationValues.map { it.name }.joinToString(separator = ", ")}")
+      CompilerMethod(env, mirror.type, executableElement.executableType, executableElement)
     }
   }
 
@@ -56,13 +58,13 @@ class CompilerAnnotation(env: ProcessingEnvironment, val mirror: AnnotationMirro
 
     other as CompilerAnnotation
 
-    if (key != other.key) return false
+    if (!mirror.isEquivalent(other.mirror, env)) return false
 
     return true
   }
 
   override fun hashCode(): Int {
-    return key.hashCode()
+    return pretty.hashCode()
   }
 
   override fun toString(): String {

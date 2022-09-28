@@ -15,22 +15,26 @@
  */
 package motif.ast.compiler
 
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.VariableElement
-import javax.lang.model.type.TypeMirror
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XType
+import androidx.room.compiler.processing.XVariableElement
 import motif.ast.IrAnnotation
 import motif.ast.IrParameter
 import motif.ast.IrType
 
+@OptIn(ExperimentalProcessingApi::class)
 class CompilerMethodParameter(
-    override val env: ProcessingEnvironment,
-    val element: VariableElement,
-    val typeMirror: TypeMirror
+    override val env: XProcessingEnv,
+    val element: XVariableElement,
+    val typeMirror: XType
 ) : IrUtil, IrParameter {
 
-  override val type: IrType by lazy { CompilerType(env, typeMirror) }
+  override val type: IrType by lazy {
+    return@lazy CompilerType(env, typeMirror)
+  }
 
-  override val name: String by lazy { element.simpleName.toString() }
+  override val name: String by lazy { element.name }
 
   override val annotations: List<IrAnnotation> by lazy { element.irAnnotations() }
 }

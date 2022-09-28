@@ -15,20 +15,22 @@
  */
 package motif.ast.compiler
 
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.VariableElement
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XVariableElement
 import motif.ast.IrField
 import motif.ast.IrModifier
 import motif.ast.IrType
 
+@OptIn(ExperimentalProcessingApi::class)
 class CompilerField(
-    override val env: ProcessingEnvironment,
-    private val variableElement: VariableElement
+    override val env: XProcessingEnv,
+    private val variableElement: XVariableElement
 ) : IrUtil, IrField {
 
-  override val type: IrType by lazy { CompilerType(env, variableElement.asType()) }
+  override val type: IrType by lazy { CompilerType(env, variableElement.type) }
 
-  override val name: String by lazy { variableElement.simpleName.toString() }
+  override val name: String by lazy { variableElement.name }
 
   override val modifiers: Set<IrModifier> by lazy { variableElement.irModifiers() }
 }
