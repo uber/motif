@@ -36,9 +36,6 @@ class MotifProcessingStep(
   ): Set<XElement> {
     messageWatcher?.let { env.messager.addMessageWatcher(messageWatcher) }
 
-    // TODO: implement processor in next PR
-    graphSetter.invoke(ResolvedGraph.create(emptyList()))
-
     return emptySet()
   }
 

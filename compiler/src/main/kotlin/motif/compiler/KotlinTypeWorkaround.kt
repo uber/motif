@@ -15,93 +15,77 @@
  */
 package motif.compiler
 
-import com.squareup.kotlinpoet.FunSpec
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XType
+import androidx.room.compiler.processing.compat.XConverters.getProcessingEnv
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.WildcardTypeName
-import com.squareup.kotlinpoet.asTypeName
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.ExecutableType
-import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Types
+import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
+import com.squareup.kotlinpoet.javapoet.toKTypeName
 import kotlin.reflect.jvm.internal.impl.builtins.jvm.JavaToKotlinClassMap
 import kotlin.reflect.jvm.internal.impl.name.FqName
 
 /** Workarounds for: https://github.com/square/kotlinpoet/issues/236 */
+@OptIn(KotlinPoetJavaPoetPreview::class)
 object KotlinTypeWorkaround {
 
-  fun javaToKotlinType(mirror: TypeMirror): TypeName {
-    return javaToKotlinType(asTypeName(mirror))
+  fun javaToKotlinType(mirror: XType): TypeName {
+    return javaToKotlinType(asTypeName(mirror), mirror.getProcessingEnv())
   }
 
-  fun javaToKotlinType(className: com.squareup.kotlinpoet.ClassName): TypeName {
-    return javaToKotlinType(className as TypeName)
+  fun javaToKotlinType(
+      className: com.squareup.kotlinpoet.ClassName,
+      env: XProcessingEnv?
+  ): TypeName {
+    return javaToKotlinType(className as TypeName, env)
   }
 
-  private fun asTypeName(mirror: TypeMirror): TypeName {
-    val typeName = mirror.asTypeName()
-    val className = typeName as? com.squareup.kotlinpoet.ClassName ?: return typeName
-    val declaredType = mirror as? DeclaredType ?: return typeName
-    val element = declaredType.asElement() as? TypeElement ?: return typeName
-
-    if (element.typeParameters.isEmpty()) {
-      return typeName
-    }
-
-    val typeArguments = element.typeParameters.map { STAR }
-    return className.parameterizedBy(*typeArguments.toTypedArray())
+  private fun asTypeName(mirror: XType): TypeName {
+    return mirror.typeName.toKTypeName()
   }
 
   /** https://github.com/square/kotlinpoet/issues/236#issuecomment-437961476 */
-  private fun javaToKotlinType(typeName: TypeName): TypeName {
+  private fun javaToKotlinType(typeName: TypeName, env: XProcessingEnv?): TypeName {
     return when (typeName) {
       is ParameterizedTypeName ->
-          (javaToKotlinType(typeName.rawType) as com.squareup.kotlinpoet.ClassName).parameterizedBy(
-              *typeName.typeArguments.map { javaToKotlinType(it) }.toTypedArray())
+          (javaToKotlinType(typeName.rawType, null) as com.squareup.kotlinpoet.ClassName)
+              .parameterizedBy(
+                  *typeName.typeArguments.map { javaToKotlinType(it, env) }.toTypedArray())
       is WildcardTypeName ->
           when {
             typeName.inTypes.isNotEmpty() ->
-                WildcardTypeName.consumerOf(javaToKotlinType(typeName.inTypes.single()))
+                WildcardTypeName.consumerOf(javaToKotlinType(typeName.inTypes.single(), env))
             typeName.outTypes.isNotEmpty() ->
-                WildcardTypeName.producerOf(javaToKotlinType(typeName.outTypes.single()))
+                WildcardTypeName.producerOf(javaToKotlinType(typeName.outTypes.single(), env))
             else -> throw IllegalStateException()
           }
+      is TypeVariableName -> STAR
       else -> {
         val className =
             JavaToKotlinClassMap.INSTANCE
                 .mapJavaToKotlin(FqName(typeName.toString()))
                 ?.asSingleFqName()
                 ?.asString()
-        if (className == null) typeName else com.squareup.kotlinpoet.ClassName.bestGuess(className)
+        if (className == null) {
+          typeName.withRawTypeFix(env)
+        } else {
+          com.squareup.kotlinpoet.ClassName.bestGuess(className)
+        }
       }
     }
   }
 
-  /** Copied from [FunSpec.overriding] and modified to leverage [javaToKotlinType]. */
-  fun overriding(
-      method: ExecutableElement,
-      enclosing: DeclaredType,
-      types: Types
-  ): FunSpec.Builder {
-    val executableType = types.asMemberOf(enclosing, method) as ExecutableType
-    val resolvedParameterTypes = executableType.parameterTypes
-    val resolvedReturnType = executableType.returnType
-
-    val builder = FunSpec.overriding(method)
-    builder.returns(javaToKotlinType(resolvedReturnType))
-    var i = 0
-    val size = builder.parameters.size
-    while (i < size) {
-      val parameter = builder.parameters[i]
-      val type = javaToKotlinType(resolvedParameterTypes[i])
-      builder.parameters[i] = parameter.toBuilder(parameter.name, type).build()
-      i++
+  private fun TypeName.withRawTypeFix(env: XProcessingEnv?): TypeName {
+    if (env?.backend == XProcessingEnv.Backend.KSP && this is com.squareup.kotlinpoet.ClassName) {
+      val mirror = env.findType(this.toString())
+      if (mirror != null && mirror.typeArguments.isNotEmpty() && "<" !in this.toString()) {
+        return this.parameterizedBy(mirror.typeArguments.map { STAR })
+      }
     }
-
-    return builder
+    return this
   }
 }

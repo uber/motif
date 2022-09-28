@@ -38,8 +38,12 @@ class ErrorMessage(val name: String, val text: String) {
     """.trimIndent()
 
     fun toString(graph: ResolvedGraph): String {
+      return toString(graph.errors)
+    }
+
+    fun toString(errors: List<MotifError>): String {
       val content: String =
-          graph.errors.joinToString("\n------------------------------------\n\n") { error ->
+          errors.joinToString("\n------------------------------------\n\n") { error ->
             val message = get(error)
             "[${message.name}]\n\n${message.text}"
           }

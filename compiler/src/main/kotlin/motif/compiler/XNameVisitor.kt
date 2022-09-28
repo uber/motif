@@ -15,7 +15,6 @@
  */
 package motif.compiler
 
-import androidx.room.compiler.processing.ExperimentalProcessingApi
 import androidx.room.compiler.processing.XArrayType
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
@@ -32,7 +31,6 @@ import com.uber.xprocessing.ext.isDeclaredType
 import com.uber.xprocessing.ext.isEnum
 import com.uber.xprocessing.ext.isPrimitive
 
-@OptIn(ExperimentalProcessingApi::class)
 object XNameVisitor {
 
   fun visit(t: XType): String {

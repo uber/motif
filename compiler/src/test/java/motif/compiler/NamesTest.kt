@@ -15,6 +15,8 @@
  */
 package motif.compiler
 
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toXProcessing
 import com.google.common.collect.ImmutableSet
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -122,6 +124,7 @@ class NamesTest {
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+      val env = XProcessingEnv.create(processingEnv)
       if (roundEnv.processingOver()) {
         return true
       }
@@ -133,7 +136,7 @@ class NamesTest {
       val returnType = testMethod.returnType
       val qualifiers = AnnotationMirrors.getAnnotatedAnnotations(testMethod, Qualifier::class.java)
       val qualifier = if (qualifiers.isEmpty()) null else qualifiers.iterator().next()
-      safeName = safeName(returnType, qualifier)
+      safeName = safeName(returnType.toXProcessing(env), qualifier?.toXProcessing(env))
       return true
     }
   }

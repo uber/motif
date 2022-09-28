@@ -51,7 +51,7 @@ subprojects {
         ]
         if (project.path.startsWith(":compiler")) {
             extraKotlincArgs += [
-                "-opt-in=motif.compiler.processing.ExperimentalProcessingApi"
+                "-opt-in=androidx.room.compiler.processing.ExperimentalProcessingApi"
             ]
         }
         boolean isKotlinLibrary = project.plugins.hasPlugin("org.jetbrains.kotlin.jvm") || project.plugins.hasPlugin("org.jetbrains.kotlin.android")

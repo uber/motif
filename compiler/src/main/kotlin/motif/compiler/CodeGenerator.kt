@@ -15,45 +15,58 @@
  */
 package motif.compiler
 
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.writeTo
 import java.io.File
-import javax.annotation.processing.ProcessingEnvironment
 import motif.core.ResolvedGraph
 
 object CodeGenerator {
 
-  fun generate(env: ProcessingEnvironment, graph: ResolvedGraph, mode: Mode?) {
+  fun generate(env: XProcessingEnv, graph: ResolvedGraph, mode: Mode?): List<String> {
     val kaptKotlinGeneratedDir = env.options[OPTION_KAPT_KOTLIN_GENERATED]
-    if (mode == Mode.JAVA) {
+    return if (mode == Mode.JAVA) {
       generateJava(env, graph)
     } else if (mode == Mode.KOTLIN) {
-      if (kaptKotlinGeneratedDir == null) {
+      if (env.backend == XProcessingEnv.Backend.JAVAC && kaptKotlinGeneratedDir == null) {
         throw IllegalStateException(
             "-A$OPTION_MODE=${Mode.KOTLIN.name.toLowerCase()} " +
                 "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
       }
       generateKotlin(env, graph, kaptKotlinGeneratedDir)
     } else {
-      if (kaptKotlinGeneratedDir == null) {
-        generateJava(env, graph)
-      } else {
+      if (env.backend == XProcessingEnv.Backend.KSP) {
         generateKotlin(env, graph, kaptKotlinGeneratedDir)
+      } else {
+        if (kaptKotlinGeneratedDir == null) {
+          generateJava(env, graph)
+        } else {
+          generateKotlin(env, graph, kaptKotlinGeneratedDir)
+        }
       }
     }
   }
 
-  private fun generateJava(env: ProcessingEnvironment, graph: ResolvedGraph) {
-    ScopeImplFactory.create(env, graph)
+  private fun generateJava(env: XProcessingEnv, graph: ResolvedGraph): List<String> {
+    return ScopeImplFactory.create(env, graph)
         .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
-        .forEach { javaFile -> javaFile.writeTo(env.filer) }
+        .onEach { javaFile -> javaFile.writeTo(env.filer) }
+        .map { "${it.packageName}.${it.typeSpec.name}" }
   }
 
   private fun generateKotlin(
-      env: ProcessingEnvironment,
+      env: XProcessingEnv,
       graph: ResolvedGraph,
-      kaptKotlinGeneratedDir: String
-  ) {
-    ScopeImplFactory.create(env, graph)
+      kaptKotlinGeneratedDir: String? = null
+  ): List<String> {
+    return ScopeImplFactory.create(env, graph)
         .map { scopeImpl -> KotlinCodeGenerator.generate(scopeImpl) }
-        .forEach { fileSpec -> fileSpec.writeTo(File(kaptKotlinGeneratedDir)) }
+        .onEach { fileSpec ->
+          if (kaptKotlinGeneratedDir != null) {
+            fileSpec.writeTo(File(kaptKotlinGeneratedDir))
+          } else {
+            fileSpec.writeTo(env.filer)
+          }
+        }
+        .map { "${it.packageName}.${it.name}" }
   }
 }
