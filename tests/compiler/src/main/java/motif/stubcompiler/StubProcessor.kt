@@ -15,6 +15,10 @@
  */
 package motif.stubcompiler
 
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toJavac
+import androidx.room.compiler.processing.compat.XConverters.toXProcessing
 import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
@@ -34,6 +38,7 @@ import motif.Scope
 import motif.ast.compiler.CompilerClass
 import motif.ast.compiler.CompilerMethod
 
+@OptIn(ExperimentalProcessingApi::class)
 class StubProcessor : AbstractProcessor() {
 
   private val env: ProcessingEnvironment by lazy { processingEnv }
@@ -80,14 +85,18 @@ class StubProcessor : AbstractProcessor() {
       builder.superclass(scopeClassName)
     }
 
-    CompilerClass(env, scopeType).methods.map { it as CompilerMethod }.forEach {
-        method: CompilerMethod ->
-      val methodSpec: MethodSpec =
-          MethodSpec.overriding(method.element, scopeType, processingEnv.typeUtils)
-              .addStatement("throw new \$T()", IllegalStateException::class.java)
-              .build()
-      builder.addMethod(methodSpec)
-    }
+    // TODO: Fix after cleaning up all tests
+    val xProcessingEnv = XProcessingEnv.create(env)
+    CompilerClass(xProcessingEnv, scopeType.toXProcessing(xProcessingEnv))
+        .methods
+        .map { it as CompilerMethod }
+        .forEach { method: CompilerMethod ->
+          val methodSpec: MethodSpec =
+              MethodSpec.overriding(method.element.toJavac(), scopeType, processingEnv.typeUtils)
+                  .addStatement("throw new \$T()", IllegalStateException::class.java)
+                  .build()
+          builder.addMethod(methodSpec)
+        }
 
     return builder.build()
   }

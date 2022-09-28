@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(ExperimentalProcessingApi::class)
+
 package motif.models.motif
 
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toXProcessing
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler.javac
 import com.google.testing.compile.JavaFileObjects
@@ -57,10 +62,11 @@ abstract class BaseTest {
       if (roundEnv.processingOver()) {
         return true
       }
+      val env = XProcessingEnv.create(processingEnv)
       scopeClasses =
           roundEnv
               .getElementsAnnotatedWith(motif.Scope::class.java)
-              .map { CompilerClass(processingEnv, it.asType() as DeclaredType) }
+              .map { CompilerClass(env, (it.asType() as DeclaredType).toXProcessing(env)) }
               .toSet()
       return true
     }

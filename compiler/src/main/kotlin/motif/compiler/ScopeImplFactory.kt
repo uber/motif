@@ -15,10 +15,12 @@
  */
 package motif.compiler
 
-import javax.annotation.processing.ProcessingEnvironment
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
 import motif.ast.IrClass
 import motif.ast.IrType
 import motif.ast.compiler.CompilerAnnotation
+import motif.ast.compiler.CompilerClass
 import motif.ast.compiler.CompilerMethod
 import motif.ast.compiler.CompilerType
 import motif.core.ResolvedGraph
@@ -36,8 +38,9 @@ import motif.models.Sink
 import motif.models.Spread
 import motif.models.Type
 
+@OptIn(ExperimentalProcessingApi::class)
 class ScopeImplFactory
-private constructor(private val env: ProcessingEnvironment, private val graph: ResolvedGraph) {
+private constructor(private val env: XProcessingEnv, private val graph: ResolvedGraph) {
 
   private val scopeImplClassNames = mutableMapOf<Scope, ClassName>()
   private val dependenciesClassNames = mutableMapOf<Scope, ClassName>()
@@ -49,9 +52,7 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
 
   private fun create(): List<ScopeImpl> =
       graph.scopes
-          .filter { scope ->
-            env.elementUtils.getTypeElement(scope.implClassName.j.toString()) == null
-          }
+          .filter { scope -> env.findTypeElement(scope.implClassName.j.toString()) == null }
           .map { scope -> Factory(scope).create() }
 
   private inner class Factory(private val scope: Scope) {
@@ -64,9 +65,11 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
     private val cacheFieldNames = mutableMapOf<Type, String>()
 
     fun create(): ScopeImpl {
+      val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
       return ScopeImpl(
           scope.implClassName,
           scope.typeName,
+          isInternal,
           scopeImplAnnotation(),
           objectsField(),
           dependenciesField(),
@@ -128,6 +131,7 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
     }
 
     private fun childMethodImpl(childEdge: ScopeEdge): ChildMethodImpl {
+
       return ChildMethodImpl(
           childEdge.child.typeName,
           childEdge.child.implClassName,
@@ -150,7 +154,9 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
           getDependencyMethodData(childEdge.child).map { methodData ->
             childDependencyMethodImpl(parameters, methodData)
           }
-      return ChildDependenciesImpl(childEdge.child.dependenciesClassName, dependencyMethodImpls)
+      val isAbstractClass = dependencyMethodImpls.any { it.isInternal }
+      return ChildDependenciesImpl(
+          childEdge.child.dependenciesClassName, dependencyMethodImpls, isAbstractClass, env)
     }
 
     private fun childDependencyMethodImpl(
@@ -165,12 +171,15 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
           } else {
             ChildDependencyMethodImpl.ReturnExpression.Parameter(parameter.parameter.name)
           }
-      return ChildDependencyMethodImpl(methodData.name, methodData.returnTypeName, returnExpression)
+      val isInternal = (methodData.returnType.type as? CompilerType)?.isInternal() ?: false
+      return ChildDependencyMethodImpl(
+          methodData.name, methodData.returnTypeName, returnExpression, isInternal)
     }
 
     private fun scopeProviderMethod(): ScopeProviderMethod {
       val name = getProviderMethodName(Type(scope.clazz.type, null))
-      return ScopeProviderMethod(name, scope.typeName)
+      val isInternal = (scope.clazz.type as? CompilerType)?.isInternal() ?: false
+      return ScopeProviderMethod(name, scope.typeName, isInternal)
     }
 
     private fun factoryProviderMethods(): List<FactoryProviderMethod> {
@@ -182,7 +191,8 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
             getProviderMethodName(returnType),
             returnType.type.typeName,
             factoryProviderMethodBody(factoryMethod),
-            spreadProviderMethods)
+            spreadProviderMethods,
+            env)
       }
     }
 
@@ -197,7 +207,8 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
         FactoryProviderMethodBody.Cached(
             getCacheFieldName(factoryMethod.returnType.type),
             factoryMethod.returnType.type.type.typeName,
-            instantiation)
+            instantiation,
+            env)
       } else {
         FactoryProviderMethodBody.Uncached(instantiation)
       }
@@ -252,7 +263,8 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
             getProviderMethodName(methodData.returnType),
             methodData.returnTypeName,
             DEPENDENCIES_FIELD_NAME,
-            methodData.name)
+            methodData.name,
+            env)
       }
     }
 
@@ -280,8 +292,13 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
                 methodData.returnType.qualifier?.let { annotation ->
                   Qualifier(annotation as CompilerAnnotation)
                 }
+            val isInternal = (methodData.returnType.type as? CompilerType)?.isInternal() ?: false
             DependencyMethod(
-                methodData.name, methodData.returnTypeName, qualifier, javaDoc(methodData))
+                methodData.name,
+                methodData.returnTypeName,
+                qualifier,
+                javaDoc(methodData),
+                isInternal)
           }
       return Dependencies(scope.dependenciesClassName, methods)
     }
@@ -297,7 +314,8 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
 
             val owner = removeGenerics(ownerType.qualifiedName)
             val methodName =
-                if (callerMethod.isConstructor) ownerType.simpleName else callerMethod.name
+                if (callerMethod.isConstructor) ownerType.simpleName.substringBefore('<')
+                else callerMethod.name
             val paramList = callerMethod.parameters.map { removeGenerics(it.type.qualifiedName) }
 
             JavaDocMethodLink(owner, methodName, paramList)
@@ -309,11 +327,28 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
       return name.takeWhile { it != '<' }
     }
 
-    private fun getProviderMethodName(type: Type) =
-        providerMethodNames.computeIfAbsent(type) { methodNameScope.name(type) }
+    private fun getProviderMethodName(type: Type): String {
+      // val key = getTypeOrMappedType(type, providerMethodNames.keys)
+      return providerMethodNames.computeIfAbsent(type) { methodNameScope.name(type) }
+    }
 
     private fun getCacheFieldName(type: Type) =
         cacheFieldNames.computeIfAbsent(type) { fieldNameScope.name(type) }
+
+    private fun getTypeOrMappedType(type: Type, keys: Set<Type>): Type {
+      if (type in keys) return type
+
+      if (type.type is CompilerType) {
+        val cType = type.type as CompilerType
+        val javaType = Type(cType.mapToJavaType(), type.qualifier)
+        if (javaType in keys) return javaType
+
+        val kotlinType = Type(cType.mapToKotlinType(), type.qualifier)
+        if (kotlinType in keys) return kotlinType
+      }
+
+      return type
+    }
   }
 
   private class DependencyMethodData(
@@ -382,7 +417,7 @@ private constructor(private val env: ProcessingEnvironment, private val graph: R
     private const val OBJECTS_FIELD_NAME = "objects"
     private const val DEPENDENCIES_FIELD_NAME = "dependencies"
 
-    fun create(env: ProcessingEnvironment, graph: ResolvedGraph): List<ScopeImpl> {
+    fun create(env: XProcessingEnv, graph: ResolvedGraph): List<ScopeImpl> {
       return ScopeImplFactory(env, graph).create()
     }
   }

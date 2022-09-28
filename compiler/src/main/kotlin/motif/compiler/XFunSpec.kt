@@ -15,12 +15,10 @@
  */
 package motif.compiler
 
-import androidx.room.compiler.processing.ExperimentalProcessingApi
 import androidx.room.compiler.processing.XExecutableElement
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
-import androidx.room.compiler.processing.compat.XConverters.toJavac
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -31,7 +29,7 @@ import com.uber.xprocessing.ext.modifiers
 import javax.lang.model.element.Modifier
 import motif.compiler.KotlinTypeWorkaround.javaToKotlinType
 
-@OptIn(ExperimentalProcessingApi::class, KotlinPoetJavaPoetPreview::class)
+@OptIn(KotlinPoetJavaPoetPreview::class)
 object XFunSpec {
   /** Copied from [FunSpec.overriding] and modified to leverage [javaToKotlinType]& XProcessing. */
   fun overriding(
@@ -110,10 +108,5 @@ object XFunSpec {
     }
 
     return funBuilder
-  }
-
-  // TODO: remove after KSP support is checked in
-  private fun javaToKotlinType(mirror: XType): com.squareup.kotlinpoet.TypeName {
-    return KotlinTypeWorkaround.javaToKotlinType(mirror.toJavac())
   }
 }

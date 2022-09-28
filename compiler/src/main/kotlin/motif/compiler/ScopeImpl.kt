@@ -15,8 +15,16 @@
  */
 package motif.compiler
 
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.type.TypeMirror
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XType
+import androidx.room.compiler.processing.compat.XConverters.getProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toKS
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.WildcardTypeName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.jvm.jvmSuppressWildcards
+import com.squareup.kotlinpoet.jvm.jvmWildcard
 import motif.ast.compiler.CompilerAnnotation
 import motif.ast.compiler.CompilerMethod
 
@@ -28,6 +36,7 @@ import motif.ast.compiler.CompilerMethod
 class ScopeImpl(
     val className: ClassName,
     val superClassName: ClassName,
+    val internalScope: Boolean,
     val scopeImplAnnotation: ScopeImplAnnotation,
     val objectsField: ObjectsField?,
     val dependenciesField: DependenciesField,
@@ -115,7 +124,7 @@ class AlternateConstructor(val dependenciesClassName: ClassName)
  */
 class AccessMethodImpl(
     // Required work around https://github.com/square/javapoet/issues/656
-    val env: ProcessingEnvironment,
+    val env: XProcessingEnv,
     val overriddenMethod: CompilerMethod,
     val providerMethodName: String
 )
@@ -153,7 +162,9 @@ class ChildMethodImplParameter(val typeName: TypeName, val name: String)
  */
 class ChildDependenciesImpl(
     val childDependenciesClassName: ClassName,
-    val methods: List<ChildDependencyMethodImpl>
+    val methods: List<ChildDependencyMethodImpl>,
+    val isAbstractClass: Boolean,
+    val env: XProcessingEnv
 )
 
 /**
@@ -167,7 +178,8 @@ class ChildDependenciesImpl(
 class ChildDependencyMethodImpl(
     val name: String,
     val returnTypeName: TypeName,
-    val returnExpression: ReturnExpression
+    val returnExpression: ReturnExpression,
+    val isInternal: Boolean
 ) {
 
   sealed class ReturnExpression {
@@ -195,7 +207,7 @@ class ChildDependencyMethodImpl(
  * }
  * ```
  */
-class ScopeProviderMethod(val name: String, val scopeClassName: ClassName)
+class ScopeProviderMethod(val name: String, val scopeClassName: ClassName, val isInternal: Boolean)
 
 /**
  * ```
@@ -208,7 +220,8 @@ class DependencyProviderMethod(
     val name: String,
     val returnTypeName: TypeName,
     val dependenciesFieldName: String,
-    val dependencyMethodName: String
+    val dependencyMethodName: String,
+    val env: XProcessingEnv
 )
 
 /**
@@ -224,7 +237,8 @@ class FactoryProviderMethod(
     val name: String,
     val returnTypeName: TypeName,
     val body: FactoryProviderMethodBody,
-    val spreadProviderMethods: List<SpreadProviderMethod>
+    val spreadProviderMethods: List<SpreadProviderMethod>,
+    val env: XProcessingEnv
 )
 
 sealed class FactoryProviderMethodBody {
@@ -244,7 +258,8 @@ sealed class FactoryProviderMethodBody {
   class Cached(
       val cacheFieldName: String,
       val returnTypeName: TypeName,
-      val instantiation: FactoryProviderInstantiation
+      val instantiation: FactoryProviderInstantiation,
+      val env: XProcessingEnv
   ) : FactoryProviderMethodBody()
 
   /**
@@ -335,7 +350,8 @@ class DependencyMethod(
     val name: String,
     val returnTypeName: TypeName,
     val qualifier: Qualifier?,
-    val javaDoc: DependencyMethodJavaDoc
+    val javaDoc: DependencyMethodJavaDoc,
+    val internal: Boolean
 )
 
 /**
@@ -391,48 +407,84 @@ class ObjectsImpl(
  */
 class ObjectsAbstractMethod(
     // Required work around https://github.com/square/javapoet/issues/656
-    val env: ProcessingEnvironment,
+    val env: XProcessingEnv,
     val overriddenMethod: CompilerMethod
 )
 
-class TypeName private constructor(private val mirror: TypeMirror) {
+class TypeName private constructor(private val mirror: XType) {
 
-  val j: com.squareup.javapoet.TypeName by lazy { com.squareup.javapoet.TypeName.get(mirror) }
+  val j: com.squareup.javapoet.TypeName by lazy {
+    val jTypeName = mirror.typeName
+    if (mirror.typeArguments.isNotEmpty() &&
+        "<" !in jTypeName.toString() &&
+        jTypeName is com.squareup.javapoet.ClassName) {
+      ParameterizedTypeName.get(
+          jTypeName,
+          *mirror
+              .typeArguments
+              .map { WildcardTypeName.subtypeOf(Object::class.java) }
+              .toTypedArray())
+    } else {
+      jTypeName
+    }
+  }
 
-  val kt: com.squareup.kotlinpoet.TypeName by lazy { KotlinTypeWorkaround.javaToKotlinType(mirror) }
+  val kt: com.squareup.kotlinpoet.TypeName by lazy {
+    val ktTypeName = KotlinTypeWorkaround.javaToKotlinType(mirror)
+    if (mirror.typeArguments.isNotEmpty() &&
+        "<" !in ktTypeName.toString() &&
+        ktTypeName is com.squareup.kotlinpoet.ClassName) {
+      ktTypeName.parameterizedBy(mirror.typeArguments.map { STAR })
+    } else if (mirror.getProcessingEnv().backend == XProcessingEnv.Backend.KSP &&
+        mirror.toKS().annotations.any {
+          it.shortName.asString() == JvmSuppressWildcards::class.java.simpleName
+        }) {
+      ktTypeName.jvmSuppressWildcards()
+    } else if (mirror.getProcessingEnv().backend == XProcessingEnv.Backend.KSP &&
+        mirror.toKS().annotations.any {
+          it.shortName.asString() == JvmWildcard::class.java.simpleName
+        }) {
+      ktTypeName.jvmWildcard()
+    } else if ("<out " in ktTypeName.toString()) {
+      ktTypeName.jvmSuppressWildcards()
+    } else {
+      ktTypeName
+    }
+  }
 
-  val className: ClassName by lazy { ClassName.get(j) }
+  val className: ClassName by lazy { ClassName.get(j, mirror.getProcessingEnv()) }
 
   companion object {
 
-    fun get(mirror: TypeMirror): TypeName {
+    fun get(mirror: XType): TypeName {
       return TypeName(mirror)
     }
   }
 }
 
-class ClassName private constructor(val j: com.squareup.javapoet.ClassName) {
+class ClassName
+private constructor(val j: com.squareup.javapoet.ClassName, val env: XProcessingEnv?) {
 
   val kt: com.squareup.kotlinpoet.ClassName by lazy {
     val className =
         com.squareup.kotlinpoet.ClassName(
             j.packageName(), j.simpleNames().first(), *j.simpleNames().drop(1).toTypedArray())
-    KotlinTypeWorkaround.javaToKotlinType(className) as com.squareup.kotlinpoet.ClassName
+    KotlinTypeWorkaround.javaToKotlinType(className, env) as com.squareup.kotlinpoet.ClassName
   }
 
   fun nestedClass(name: String): ClassName {
-    return ClassName(j.nestedClass(name))
+    return ClassName(j.nestedClass(name), env)
   }
 
   companion object {
 
     fun get(packageName: String, name: String): ClassName {
       val j = com.squareup.javapoet.ClassName.get(packageName, name)
-      return ClassName(j)
+      return ClassName(j, null)
     }
 
-    fun get(j: com.squareup.javapoet.TypeName): ClassName {
-      return ClassName(j as com.squareup.javapoet.ClassName)
+    fun get(j: com.squareup.javapoet.TypeName, env: XProcessingEnv): ClassName {
+      return ClassName(j as com.squareup.javapoet.ClassName, env)
     }
   }
 }

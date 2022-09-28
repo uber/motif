@@ -15,6 +15,9 @@
  */
 package motif.compiler
 
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toJavac
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.FieldSpec
@@ -22,10 +25,13 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeSpec
+import com.uber.xprocessing.ext.isKotlinSource
+import com.uber.xprocessing.ext.withRawTypeFix
 import javax.lang.model.element.Modifier
-import motif.compiler.JavaCodeGenerator.spec
+import javax.lang.model.type.DeclaredType
 import motif.internal.None
 
+@OptIn(ExperimentalProcessingApi::class)
 object JavaCodeGenerator {
 
   fun generate(scopeImpl: ScopeImpl): JavaFile {
@@ -102,7 +108,10 @@ object JavaCodeGenerator {
   }
 
   private fun AccessMethodImpl.spec(): MethodSpec {
-    return MethodSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env.typeUtils)
+    return MethodSpec.overriding(
+            overriddenMethod.element.toJavac(),
+            overriddenMethod.owner.toJavac() as DeclaredType,
+            env.toJavac().typeUtils)
         .addStatement("return \$N()", providerMethodName)
         .build()
   }
@@ -120,19 +129,28 @@ object JavaCodeGenerator {
   }
 
   private fun ChildDependenciesImpl.spec(): TypeSpec {
+    val isKotlinDepInterface = env.findTypeElement(childDependenciesClassName.j).isKotlinSource(env)
     return TypeSpec.anonymousClassBuilder("")
         .apply {
           addSuperinterface(childDependenciesClassName.j)
-          methods.forEach { addMethod(it.spec()) }
+          methods.forEach { addMethod(it.spec(env, isKotlinDepInterface)) }
         }
         .build()
   }
 
-  private fun ChildDependencyMethodImpl.spec(): MethodSpec {
+  private fun ChildDependencyMethodImpl.spec(
+      env: XProcessingEnv,
+      isKotlinDependenciesInterface: Boolean
+  ): MethodSpec {
     return MethodSpec.methodBuilder(name)
         .addAnnotation(Override::class.java)
         .addModifiers(Modifier.PUBLIC)
-        .returns(returnTypeName.j)
+        .returns(
+            if (isKotlinDependenciesInterface) {
+              returnTypeName.j.withRawTypeFix(env)
+            } else {
+              returnTypeName.j
+            })
         .addStatement(returnExpression.spec())
         .build()
   }
@@ -258,7 +276,16 @@ object JavaCodeGenerator {
   }
 
   private fun Qualifier.spec(): AnnotationSpec {
-    return AnnotationSpec.get(annotation.mirror)
+    val className =
+        annotation.mirror.type.typeElement?.className
+            ?: throw IllegalStateException("No ClassName found for: ${annotation.mirror.type}")
+    return AnnotationSpec.builder(className)
+        .apply {
+          annotation.mirror.annotationValues.forEach {
+            it.value?.let { value -> addMember(it.name, "\$S", value) }
+          }
+        }
+        .build()
   }
 
   private fun DependencyMethodJavaDoc.spec(): CodeBlock {
@@ -291,7 +318,10 @@ object JavaCodeGenerator {
   }
 
   private fun ObjectsAbstractMethod.spec(): MethodSpec {
-    return MethodSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env.typeUtils)
+    return MethodSpec.overriding(
+            overriddenMethod.element.toJavac(),
+            overriddenMethod.owner.toJavac() as DeclaredType,
+            env.toJavac().typeUtils)
         .addStatement("throw new \$T()", UnsupportedOperationException::class.java)
         .build()
   }

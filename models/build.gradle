@@ -15,6 +15,7 @@ dependencies {
     implementation project(':lib')
 
     testImplementation project(':compiler-ast')
+    testImplementation deps.roomCompilerProcessing
     testImplementation deps.test.truth
     testImplementation deps.test.compileTesting
 }

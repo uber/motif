@@ -207,7 +207,13 @@ fun KSType.isRaw(): Boolean {
 }
 
 fun XType.makeNonNullByDefault(): XType {
-  return if (nullability == XNullability.UNKNOWN) makeNonNullable() else this
+  return try {
+    if (nullability == XNullability.UNKNOWN) makeNonNullable() else this
+  } catch (e: IllegalStateException) {
+    // Workaround for tests since we can't call XType#nullibility for types
+    // created with TypeMirror#toXProcessing(XProcessingEnv)
+    this
+  }
 }
 
 @OptIn(KspExperimental::class)

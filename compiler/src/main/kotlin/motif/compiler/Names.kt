@@ -15,21 +15,8 @@
  */
 package motif.compiler
 
-import com.google.auto.common.AnnotationMirrors
-import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
-import javax.lang.model.type.ArrayType
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.ErrorType
-import javax.lang.model.type.NoType
-import javax.lang.model.type.PrimitiveType
-import javax.lang.model.type.TypeKind
-import javax.lang.model.type.TypeMirror
-import javax.lang.model.type.TypeVariable
-import javax.lang.model.type.WildcardType
-import javax.lang.model.util.SimpleElementVisitor8
-import javax.lang.model.util.SimpleTypeVisitor8
+import androidx.room.compiler.processing.XAnnotation
+import androidx.room.compiler.processing.XType
 import motif.ast.compiler.CompilerAnnotation
 import motif.ast.compiler.CompilerType
 import motif.models.Type
@@ -64,9 +51,9 @@ class Names {
   companion object {
 
     @JvmStatic
-    fun safeName(typeMirror: TypeMirror, annotation: AnnotationMirror?): String {
-      var name = NameVisitor.visit(typeMirror)
-      val annotationString = annotation?.let(this::annotationString) ?: ""
+    fun safeName(typeMirror: XType, annotation: XAnnotation?): String {
+      var name = XNameVisitor.visit(typeMirror)
+      val annotationString = annotationString(annotation)
       name = "$annotationString$name".decapitalize()
       if (name in KEYWORDS) {
         name += "_"
@@ -74,11 +61,11 @@ class Names {
       return name
     }
 
-    private fun annotationString(annotation: AnnotationMirror): String {
-      return if (annotation.annotationType.toString() == "javax.inject.Named") {
-        AnnotationMirrors.getAnnotationValue(annotation, "value").value.toString()
+    private fun annotationString(annotation: XAnnotation?): String {
+      return if (annotation?.qualifiedName == "javax.inject.Named") {
+        annotation.getAnnotationValue("value").value.toString()
       } else {
-        annotation.annotationType.asElement().simpleName.toString()
+        annotation?.type?.typeElement?.name.orEmpty()
       }
     }
   }
