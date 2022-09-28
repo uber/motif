@@ -15,6 +15,8 @@
  */
 package motif.ast.compiler
 
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
 import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.JavaFileObjects
@@ -25,6 +27,7 @@ import javax.lang.model.element.TypeElement
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 
+@OptIn(ExperimentalProcessingApi::class)
 class CompilerClassTest {
 
   @Test
@@ -149,9 +152,12 @@ class CompilerClassTest {
                   annotations: Set<TypeElement>,
                   roundEnv: RoundEnvironment
               ): Boolean {
-                val typeElement = processingEnv.elementUtils.getTypeElement(qualifiedName)
-                val declaredType = processingEnv.typeUtils.getDeclaredType(typeElement)
-                compilerClass = CompilerClass(processingEnv, declaredType)
+                val env = XProcessingEnv.create(processingEnv)
+                val typeElement =
+                    env.findTypeElement(qualifiedName)
+                        ?: throw IllegalStateException("No type element found for: $qualifiedName")
+                val declaredType = env.getDeclaredType(typeElement)
+                compilerClass = CompilerClass(env, declaredType)
                 return false
               }
             })

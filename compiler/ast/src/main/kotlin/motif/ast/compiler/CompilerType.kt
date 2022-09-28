@@ -15,53 +15,40 @@
  */
 package motif.ast.compiler
 
-import com.google.auto.common.MoreTypes
-import com.google.common.base.Equivalence
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeKind
-import javax.lang.model.type.TypeMirror
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XProcessingEnv
+import androidx.room.compiler.processing.XType
+import androidx.room.compiler.processing.isVoid
+import com.uber.xprocessing.ext.hash
+import com.uber.xprocessing.ext.isDeclaredType
+import com.uber.xprocessing.ext.isEquivalent
+import com.uber.xprocessing.ext.isInternal
+import com.uber.xprocessing.ext.isPrimitive
+import com.uber.xprocessing.ext.makeNonNullByDefault
+import com.uber.xprocessing.ext.mapToJavaType
+import com.uber.xprocessing.ext.mapToKotlinType
+import com.uber.xprocessing.ext.qualifiedName
+import com.uber.xprocessing.ext.typeUtils
 import motif.ast.IrClass
 import motif.ast.IrType
 
-class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirror) : IrType {
+@OptIn(ExperimentalProcessingApi::class)
+class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
 
-  private val key: Equivalence.Wrapper<TypeMirror> = MoreTypes.equivalence().wrap(mirror)
+  val mirror = mirror.makeNonNullByDefault()
 
   fun isInterface(): Boolean {
     return IrClass.Kind.INTERFACE == resolveClass()?.kind
   }
 
-  override val qualifiedName: String by lazy {
-    val candidate =
-        mirror.toString().let {
-          if (it.contains("$") && mirror.kind == TypeKind.DECLARED) {
-            val declaredType: DeclaredType = mirror as DeclaredType
-            declaredType.asElement().kind
-            mirror.toString()
-          } else {
-            it
-          }
-        }
-    return@lazy if (candidate.startsWith('(')) {
-      candidate.substringAfter(":: ").dropLast(1)
-    } else if (candidate.startsWith("@")) {
-      candidate.substringAfterLast(" ")
-    } else {
-      candidate
-    }
-  }
+  override val qualifiedName: String by lazy { mirror.qualifiedName(env) }
 
-  override val isVoid: Boolean by lazy { mirror.kind == TypeKind.VOID }
+  override val isVoid: Boolean by lazy { mirror.isVoid() }
 
-  override val isPrimitive: Boolean by lazy { mirror.kind.isPrimitive }
+  override val isPrimitive: Boolean by lazy { mirror.isPrimitive() }
 
   override fun resolveClass(): IrClass? {
-    if (mirror.kind != TypeKind.DECLARED) return null
-
-    val declaredType: DeclaredType = mirror as DeclaredType
-
-    return CompilerClass(env, declaredType)
+    return if (!mirror.isDeclaredType()) null else CompilerClass(env, mirror)
   }
 
   override fun isAssignableTo(type: IrType): Boolean {
@@ -75,7 +62,7 @@ class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirro
       return true
     }
 
-    if (mirror !is DeclaredType || baseMirror !is DeclaredType) {
+    if (!mirror.isDeclaredType() || !baseMirror.isDeclaredType()) {
       return env.typeUtils.isAssignable(mirror, baseMirror)
     }
 
@@ -89,12 +76,16 @@ class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirro
       return false
     }
 
-    return env.typeUtils.isAssignable(matchingType, baseMirror)
+    return if (matchingType.typeArguments.isEmpty() && baseMirror.typeArguments.isEmpty()) {
+      env.typeUtils.isAssignable(matchingType, baseMirror)
+    } else {
+      matchingType.rawType.isAssignableFrom(baseMirror.rawType)
+    }
   }
 
-  private fun getMatchingSuperType(baseType: DeclaredType, type: DeclaredType): DeclaredType? {
-    val baseErasure = env.typeUtils.erasure(baseType)
-    val erasure = env.typeUtils.erasure(type)
+  private fun getMatchingSuperType(baseType: XType, type: XType): XType? {
+    val baseErasure = env.typeUtils.erasure(baseType, env)
+    val erasure = env.typeUtils.erasure(type, env)
     if (env.typeUtils.isSameType(baseErasure, erasure)) {
       return type
     }
@@ -102,26 +93,35 @@ class CompilerType(private val env: ProcessingEnvironment, val mirror: TypeMirro
     return env.typeUtils
         .directSupertypes(type)
         .asSequence()
-        .mapNotNull { superType -> getMatchingSuperType(baseType, superType as DeclaredType) }
+        .mapNotNull { superType -> getMatchingSuperType(baseType, superType) }
         .firstOrNull()
   }
+
+  fun isInternal() = mirror.isInternal()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
 
     other as CompilerType
-
-    if (key != other.key) return false
+    if (!mirror.isEquivalent(other.mirror, env)) return false
 
     return true
   }
 
   override fun hashCode(): Int {
-    return key.hashCode()
+    return mirror.hash()
   }
 
   override fun toString(): String {
     return mirror.toString()
+  }
+
+  fun mapToJavaType(): CompilerType {
+    return CompilerType(env, mirror.mapToJavaType(env))
+  }
+
+  fun mapToKotlinType(): CompilerType {
+    return CompilerType(env, mirror.mapToKotlinType(env))
   }
 }

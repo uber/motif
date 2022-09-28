@@ -15,20 +15,23 @@
  */
 package motif.ast.compiler
 
-import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.Element
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.XElement
+import androidx.room.compiler.processing.XProcessingEnv
+import com.uber.xprocessing.ext.modifierNames
 import motif.ast.IrAnnotation
 import motif.ast.IrModifier
 
+@OptIn(ExperimentalProcessingApi::class)
 interface IrUtil {
 
-  val env: ProcessingEnvironment
+  val env: XProcessingEnv
 
-  fun Element.irModifiers(): Set<IrModifier> {
-    return modifiers.map { IrModifier.valueOf(it.name) }.toSet()
+  fun XElement.irModifiers(): Set<IrModifier> {
+    return modifierNames.map { IrModifier.valueOf(it) }.toSet()
   }
 
-  fun Element.irAnnotations(): List<IrAnnotation> {
-    return annotationMirrors.map { CompilerAnnotation(env, it) }
+  fun XElement.irAnnotations(): List<IrAnnotation> {
+    return getAllAnnotations().map { CompilerAnnotation(env, it) }
   }
 }
