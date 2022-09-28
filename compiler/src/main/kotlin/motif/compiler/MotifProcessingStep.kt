@@ -20,13 +20,23 @@ import androidx.room.compiler.processing.XElement
 import androidx.room.compiler.processing.XMessager
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XProcessingStep
+import androidx.room.compiler.processing.XTypeElement
+import javax.tools.Diagnostic
+import motif.Scope
+import motif.ast.compiler.CompilerClass
+import motif.ast.compiler.CompilerType
+import motif.core.AlreadySatisfiedError
+import motif.core.DependencyCycleError
 import motif.core.ResolvedGraph
+import motif.errormessage.ErrorMessage
 
 @ExperimentalProcessingApi
 class MotifProcessingStep(
     private val graphSetter: (ResolvedGraph) -> Unit,
     private val messageWatcher: XMessager? = null,
 ) : XProcessingStep {
+  private val initialScopeNames = mutableSetOf<String>()
+  private val createdScopeNames = mutableSetOf<String>()
 
   override fun annotations() = mutableSetOf(motif.Scope::class.qualifiedName!!)
 
@@ -35,6 +45,61 @@ class MotifProcessingStep(
       elementsByAnnotation: Map<String, Set<XElement>>
   ): Set<XElement> {
     messageWatcher?.let { env.messager.addMessageWatcher(messageWatcher) }
+
+    val scopeElements =
+        elementsByAnnotation[Scope::class.qualifiedName]
+            ?.filterIsInstance<XTypeElement>()
+            ?.mapNotNull { it }
+            ?.toList()
+            .orEmpty()
+    val initialScopeClasses = scopeElements.map { CompilerClass(env, it.type) }
+    if (initialScopeClasses.isEmpty()) {
+      return emptySet()
+    } else {
+      initialScopeNames += initialScopeClasses.map { it.qualifiedName }
+    }
+
+    val graph = ResolvedGraph.create(initialScopeClasses)
+    graphSetter(graph)
+
+    val graphErrors = graph.errors
+    val filteredGraphErrors =
+        graphErrors.filterNot {
+          when (it) {
+            is AlreadySatisfiedError ->
+                (it.existingSources.firstOrNull()?.type?.type as? CompilerType)?.mirror?.isError()
+                    ?: false
+            is DependencyCycleError ->
+                it.path.any { (it.type.type as? CompilerType)?.mirror?.isError() ?: false }
+            else -> false
+          }
+        }
+    if (filteredGraphErrors.isNotEmpty()) {
+      val errorMessage = ErrorMessage.toString(filteredGraphErrors)
+      env.messager.printMessage(Diagnostic.Kind.ERROR, errorMessage)
+      return emptySet()
+    }
+
+    val mode: Mode? =
+        try {
+          Mode.valueOf(env.options[OPTION_MODE]?.toUpperCase() ?: "")
+        } catch (ignore: IllegalArgumentException) {
+          if (env.backend == XProcessingEnv.Backend.KSP) Mode.KOTLIN else null
+        }
+
+    createdScopeNames += CodeGenerator.generate(env, graph, mode)
+    if (createdScopeNames.size < initialScopeNames.size) {
+      val missingScopeNames = HashSet(initialScopeNames).apply { removeAll(createdScopeNames) }
+      env.messager.printMessage(
+          Diagnostic.Kind.ERROR,
+          """
+      Not all scopes were generated.
+      Expected: ${initialScopeNames.sorted().joinToString(", ")}
+      Created:  ${createdScopeNames.sorted().joinToString(", ")}
+      Missing: ${missingScopeNames.sorted().joinToString(", ")}
+        """.trimIndent())
+      return emptySet()
+    }
 
     return emptySet()
   }
