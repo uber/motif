@@ -20,6 +20,7 @@ import androidx.room.compiler.processing.XExecutableElement
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
+import androidx.room.compiler.processing.compat.XConverters.toJavac
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -109,5 +110,10 @@ object XFunSpec {
     }
 
     return funBuilder
+  }
+
+  // TODO: remove after KSP support is checked in
+  private fun javaToKotlinType(mirror: XType): com.squareup.kotlinpoet.TypeName {
+    return KotlinTypeWorkaround.javaToKotlinType(mirror.toJavac())
   }
 }

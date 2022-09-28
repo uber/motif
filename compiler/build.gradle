@@ -14,6 +14,7 @@ dependencies {
     implementation deps.kotlinpoet
     implementation deps.dagger
     implementation deps.daggerCompiler
+    implementation deps.kspApi
     implementation deps.roomCompilerProcessing
     implementation project(':lib')
     implementation project(':compiler-ast')

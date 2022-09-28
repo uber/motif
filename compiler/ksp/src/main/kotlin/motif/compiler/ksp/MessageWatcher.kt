@@ -15,12 +15,12 @@
  */
 package motif.compiler.ksp
 
+import androidx.room.compiler.processing.XAnnotation
+import androidx.room.compiler.processing.XAnnotationValue
+import androidx.room.compiler.processing.XElement
+import androidx.room.compiler.processing.XMessager
 import com.google.devtools.ksp.KspErrorThrower
 import javax.tools.Diagnostic
-import motif.compiler.processing.XAnnotation
-import motif.compiler.processing.XAnnotationValue
-import motif.compiler.processing.XElement
-import motif.compiler.processing.XMessager
 
 /**
  * A message watcher that re-throws exceptions from the KSP devtools package to work around an issue
