@@ -15,7 +15,6 @@
  */
 package motif.compiler
 
-import androidx.room.compiler.processing.ExperimentalProcessingApi
 import androidx.room.compiler.processing.XProcessingEnv
 import motif.ast.IrClass
 import motif.ast.IrType
@@ -38,7 +37,6 @@ import motif.models.Sink
 import motif.models.Spread
 import motif.models.Type
 
-@OptIn(ExperimentalProcessingApi::class)
 class ScopeImplFactory
 private constructor(private val env: XProcessingEnv, private val graph: ResolvedGraph) {
 
