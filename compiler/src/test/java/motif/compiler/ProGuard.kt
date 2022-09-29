@@ -44,6 +44,11 @@ object ProGuard {
 
   @JvmStatic
   fun run(externalClassesDir: File?, classesDir: File, proguardFile: File): File {
+    return run(externalClassesDir, listOf(classesDir), proguardFile)
+  }
+
+  @JvmStatic
+  fun run(externalClassesDir: File?, classesDirs: List<File>, proguardFile: File): File {
     val outputDir = createTempDir()
     val outputJar = outputDir.resolve("proguarded.jar")
 
@@ -51,7 +56,7 @@ object ProGuard {
         Configuration().apply {
           programJars =
               ClassPath().apply {
-                add(ClassPathEntry(classesDir, false))
+                classesDirs.forEach { add(ClassPathEntry(it, false)) }
                 add(ClassPathEntry(outputJar, true))
               }
           libraryJars =
