@@ -57,9 +57,21 @@ class NamesTest {
   }
 
   @Test
+  fun wildcardUnbounded() {
+    val name = getSafeName("java.util.HashMap<?, ?>")
+    assertThat(name).isEqualTo("hashMap")
+  }
+
+  @Test
   fun typeVariable() {
     val name = getSafeName("java.util.HashMap<String, A>")
     assertThat(name).isEqualTo("stringAHashMap")
+  }
+
+  @Test
+  fun typeVariableUnbounded() {
+    val name = getSafeName("java.util.HashMap<String, B>")
+    assertThat(name).isEqualTo("stringBHashMap")
   }
 
   @Test
@@ -154,7 +166,7 @@ class NamesTest {
                     ERROR
                 }
 
-                class Test<A extends String> {
+                class Test<A extends String, B> {
                     $classString  test() { return null; }
                 }
             """
