@@ -1,0 +1,48 @@
+plugins {
+    id 'com.google.devtools.ksp'
+    id 'com.android.application'
+}
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion deps.build.compileSdkVersion
+    buildToolsVersion deps.build.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion deps.build.minSdkVersion
+        targetSdkVersion deps.build.targetSdkVersion
+    }
+
+    // No need for lint. This is just a tutorial.
+    lintOptions {
+        abortOnError false
+        quiet true
+    }
+
+    sourceSets {
+        applicationVariants.all { variant ->
+            main.java.srcDirs += ["build/generated/ksp/${variant.name}/kotlin"]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    variantFilter { variant ->
+        if (variant.buildType.name == 'release') {
+            variant.setIgnore(true)
+        }
+    }
+}
+
+dependencies {
+    ksp project(':compiler-ksp')
+
+    implementation project(':lib')
+    implementation deps.kotlin.stdlib
+}
+repositories {
+    mavenCentral()
+}
