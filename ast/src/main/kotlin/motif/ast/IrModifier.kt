@@ -19,6 +19,7 @@ enum class IrModifier {
   PUBLIC,
   PROTECTED,
   PRIVATE,
+  INTERNAL,
   STATIC,
   ABSTRACT,
   FINAL,
