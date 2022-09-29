@@ -81,7 +81,7 @@ object TestRenderer {
       requiredDependency: RequiredDependency,
       topLevel: Boolean
   ) {
-    var header = requiredDependency.type.simpleName
+    var header = requiredDependency.type.simpleName.toJvmSimpleName()
     header = if (topLevel) "---- $header ----" else header
     appendLine(indent, header)
     renderProvidedBy(indent + 1, requiredDependency.providedBy)
@@ -119,7 +119,7 @@ object TestRenderer {
           is SpreadSource ->
               "${source.scope.objects!!.clazz.simpleName}.${source.spreadMethod.spread.factoryMethod.name}"
         }
-    val prefix = if (showType) source.type.simpleName else source.scope.simpleName
+    val prefix = if (showType) source.type.simpleName.toJvmSimpleName() else source.scope.simpleName
     return "$prefix | $referenceString"
   }
 
@@ -136,5 +136,15 @@ object TestRenderer {
   private fun StringBuilder.appendLine(count: Int, value: String) {
     append("  ".repeat(count))
     this.appendLine(value)
+  }
+}
+
+/** HACK: Map kotlin types to Java for graph validation (issue when KSP processes Java sources) */
+private fun String.toJvmSimpleName(): String {
+  return when (this) {
+    "Int" -> "int"
+    "Boolean" -> "boolean"
+    "Byte" -> "byte"
+    else -> this
   }
 }
