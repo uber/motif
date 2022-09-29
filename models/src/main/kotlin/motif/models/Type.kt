@@ -73,12 +73,15 @@ data class Type(val type: IrType, val qualifier: IrAnnotation?) : Comparable<Typ
 
       if (members.size == 1) {
         val member = members[0]
-        if (member.name != "value" || member.returnType.qualifiedName != "java.lang.String") {
+        if (member.name !in setOf("value", "getValue") ||
+            member.returnType.qualifiedName !in STRING_NAMES) {
           throw InvalidQualifier(this, qualifier)
         }
       }
 
       return qualifier
     }
+
+    private val STRING_NAMES = setOf("java.lang.String", "kotlin.String", "String")
   }
 }
