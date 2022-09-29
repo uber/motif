@@ -15,7 +15,6 @@
  */
 package motif.compiler
 
-import androidx.room.compiler.processing.ExperimentalProcessingApi
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.compat.XConverters.toJavac
 import com.squareup.javapoet.AnnotationSpec
@@ -31,7 +30,6 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import motif.internal.None
 
-@OptIn(ExperimentalProcessingApi::class)
 object JavaCodeGenerator {
 
   fun generate(scopeImpl: ScopeImpl): JavaFile {

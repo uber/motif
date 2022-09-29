@@ -15,7 +15,6 @@
  */
 package com.uber.xprocessing.ext
 
-import androidx.room.compiler.processing.ExperimentalProcessingApi
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XTypeElement
@@ -33,7 +32,6 @@ import com.uber.xprocessing.ext.XOverrides.overrides
  * that method in a way that is more consistent between compilers, in particular between javac and
  * ecj (the Eclipse compiler).
  */
-@OptIn(ExperimentalProcessingApi::class)
 object XOverrides {
   fun overrides(
       overrider: XMethodElement,
