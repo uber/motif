@@ -23,11 +23,6 @@ import motif.core.ResolvedGraph
 const val OPTION_KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
 const val OPTION_MODE = "motif.mode"
 
-enum class Mode {
-  JAVA, // Generate pure Java implementation
-  KOTLIN, // Generate pure Kotlin implementation
-}
-
 class Processor : JavacBasicAnnotationProcessor() {
   lateinit var graph: ResolvedGraph
 
