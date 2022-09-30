@@ -77,7 +77,13 @@ object XNameVisitor {
             } else {
               t.typeElement?.name.orEmpty()
             }
-    val enclosingElementString = t.typeElement?.enclosingTypeElement?.name.orEmpty()
+    val enclosingElementString = t.typeElement?.enclosingTypeElement?.name.orEmpty().let {
+      return@let if ("kotlin.collections.Mutable" in t.typeElement?.enclosingTypeElement?.qualifiedName.orEmpty()) {
+        it.replace("Mutable", "")
+      } else {
+        it
+      }
+    }
 
     val rawString = "$enclosingElementString$simpleName"
 
