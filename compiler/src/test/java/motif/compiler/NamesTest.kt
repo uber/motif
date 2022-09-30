@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Uber Technologies, Inc.
+ * Copyright (c) 2022 Uber Technologies, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,146 +15,168 @@
  */
 package motif.compiler
 
-import androidx.room.compiler.processing.XProcessingEnv
-import androidx.room.compiler.processing.compat.XConverters.toXProcessing
-import com.google.common.collect.ImmutableSet
+import androidx.room.compiler.processing.ExperimentalProcessingApi
+import androidx.room.compiler.processing.util.Source
+import androidx.room.compiler.processing.util.XTestInvocation
+import androidx.room.compiler.processing.util.runKspTest
+import androidx.room.compiler.processing.util.runProcessorTestWithoutKsp
+import com.google.common.collect.Sets.cartesianProduct
 import com.google.common.truth.Truth.assertThat
-import com.google.common.truth.Truth.assertWithMessage
-import com.tschuchort.compiletesting.KotlinCompilation
-import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.COMPILATION_ERROR
-import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.INTERNAL_ERROR
-import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.OK
-import com.tschuchort.compiletesting.SourceFile.Companion.java
-import dagger.shaded.auto.common.AnnotationMirrors
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Processor
-import javax.annotation.processing.RoundEnvironment
+import com.squareup.javapoet.ClassName
 import javax.inject.Qualifier
-import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
-import javax.lang.model.util.ElementFilter
 import motif.compiler.Names.Companion.safeName
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-class NamesTest {
+@RunWith(Parameterized::class)
+@OptIn(ExperimentalProcessingApi::class)
+class XNamesTest(private val processorType: ProcessorType, private val srcLang: SourceLanguage) {
+
+  companion object {
+    @JvmStatic
+    @Parameterized.Parameters(name = "{0}_{1}")
+    fun data(): Collection<Array<Any>> {
+      return cartesianProduct(
+              ProcessorType.values().toSortedSet(), SourceLanguage.values().toSortedSet())
+          .filterNot { (proc, srcLang) ->
+            proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
+          }
+          .map { it.toTypedArray() as Array<Any> }
+          .toList()
+    }
+  }
 
   @Test
-  fun basic() {
-    val name = getSafeName("java.util.HashMap")
-    assertThat(name).isEqualTo("hashMap")
+  fun primitive() {
+    assertSafeName("int", "kotlin.Int", "integer")
+  }
+
+  @Test
+  fun boxed() {
+    assertSafeName("java.lang.Integer", "kotlin.Int?", "integer")
+  }
+
+  @Test
+  fun raw() {
+    assertSafeName("java.util.HashMap", "java.util.HashMap<*, *>", "hashMap")
   }
 
   @Test
   fun typeArgument() {
-    val name = getSafeName("java.util.HashMap<String, Integer>")
-    assertThat(name).isEqualTo("stringIntegerHashMap")
+    assertSafeName(
+        "java.util.HashMap<String, Integer>",
+        "java.util.HashMap<String, Integer>",
+        "stringIntegerHashMap")
   }
 
   @Test
   fun wildcard() {
-    val name = getSafeName("java.util.HashMap<? extends String, ? super Integer>")
-    assertThat(name).isEqualTo("stringIntegerHashMap")
+    assertSafeName(
+        "java.util.HashMap<? extends String, ? super Integer>",
+        "java.util.HashMap<out String, out Integer>",
+        "stringIntegerHashMap")
   }
 
   @Test
   fun wildcardUnbounded() {
-    val name = getSafeName("java.util.HashMap<?, ?>")
-    assertThat(name).isEqualTo("hashMap")
+    assertSafeName("java.util.HashMap<?, ?>", "java.util.HashMap<*, *>", "hashMap")
   }
 
   @Test
   fun typeVariable() {
-    val name = getSafeName("java.util.HashMap<String, A>")
-    assertThat(name).isEqualTo("stringAHashMap")
+    assertSafeName("java.util.HashMap<String, A>", "java.util.HashMap<String, A>", "stringAHashMap")
   }
 
   @Test
   fun typeVariableUnbounded() {
-    val name = getSafeName("java.util.HashMap<String, B>")
-    assertThat(name).isEqualTo("stringBHashMap")
+    assertSafeName("java.util.HashMap<String, B>", "java.util.HashMap<String, B>", "stringBHashMap")
   }
 
   @Test
   fun nested() {
-    val name = getSafeName("java.util.HashMap<java.util.HashMap<String, Integer>, Integer>")
-    assertThat(name).isEqualTo("stringIntegerHashMapIntegerHashMap")
+    assertSafeName(
+        "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
+        "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
+        "stringIntegerHashMapIntegerHashMap")
   }
 
   @Test
   fun innerClass() {
-    val name = getSafeName("java.util.Map.Entry<String, Integer>")
-    assertThat(name).isEqualTo("stringIntegerMapEntry")
+    assertSafeName(
+        "java.util.Map.Entry<String, Integer>",
+        "java.util.Map.Entry<String, Integer>",
+        "stringIntegerMapEntry")
   }
 
   @Test
   fun keyword() {
-    val name = getSafeName("java.lang.Boolean")
-    assertThat(name).isEqualTo("boolean_")
+    assertSafeName("java.lang.Boolean", "java.lang.Boolean", "boolean_")
   }
 
   @Test
   fun named() {
-    val name = getSafeName("@javax.inject.Named(\"Foo\") String")
-    assertThat(name).isEqualTo("fooString")
+    assertSafeName(
+        "String", "String", "fooString", "@javax.inject.Named(\"Foo\")")
   }
 
   @Test
   fun customQualifier() {
-    val name = getSafeName("@Foo String")
-    assertThat(name).isEqualTo("fooString")
+    assertSafeName("String", "String", "fooString", qualifierString = "@Foo")
   }
 
   @Test
   fun array() {
-    val name = getSafeName("String[]")
-    assertThat(name).isEqualTo("stringArray")
+    assertSafeName("String[]", "Array<String>", "stringArray")
   }
 
   @Test
   fun enum() {
-    val name = getSafeName("LogLevel")
-    assertThat(name).isEqualTo("logLevel")
+    assertSafeName("LogLevel", "LogLevel", "logLevel")
   }
 
   @Test
   fun errorType() {
-    val errorMessage = getErrorMessage("DoesNotExist")
-    assertThat(errorMessage).contains("DoesNotExist")
+    assertErrorMessage("DoesNotExist", "DoesNotExist")
   }
 
   @Test
   fun errorType_typeArgument() {
-    val errorMessage = getErrorMessage("java.util.HashMap<DoesNotExist, Integer>")
-    assertThat(errorMessage).contains("DoesNotExist")
+    assertErrorMessage("java.util.HashMap<DoesNotExist, Integer>", "DoesNotExist")
   }
 
-  private class SafeNameProcessor : AbstractProcessor() {
-    lateinit var safeName: String
-
-    override fun getSupportedAnnotationTypes(): Set<String> = ImmutableSet.of("*")
-
-    override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
-
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-      val env = XProcessingEnv.create(processingEnv)
-      if (roundEnv.processingOver()) {
-        return true
+  private fun compile(classString: String, qualifierString: String, assertion: (XTestInvocation, String) -> Unit) {
+    when (processorType) {
+      ProcessorType.AP -> {
+        runProcessorTestWithoutKsp(sources = getSources(classString, qualifierString)) { invocation ->
+          val safeName = process(invocation)
+          assertion(invocation, safeName)
+        }
       }
-      val typeElement = processingEnv.elementUtils.getTypeElement("test.Test")
-      assertThat(typeElement).isNotNull()
-      val methods = ElementFilter.methodsIn(typeElement.enclosedElements)
-      assertThat(methods).isNotEmpty()
-      val testMethod = methods[0]
-      val returnType = testMethod.returnType
-      val qualifiers = AnnotationMirrors.getAnnotatedAnnotations(testMethod, Qualifier::class.java)
-      val qualifier = if (qualifiers.isEmpty()) null else qualifiers.iterator().next()
-      safeName = safeName(returnType.toXProcessing(env), qualifier?.toXProcessing(env))
-      return true
+      ProcessorType.KSP -> {
+        runKspTest(sources = getSources(classString, qualifierString)) { invocation ->
+          val safeName = process(invocation)
+          assertion(invocation, safeName)
+        }
+      }
     }
   }
 
-  private fun compile(processor: Processor, classString: String): KotlinCompilation.Result {
-    val content =
+  private fun process(invocation: XTestInvocation): String {
+    val env = invocation.processingEnv
+    val typeElement = env.findTypeElement("test.Test")
+    assertThat(typeElement).isNotNull()
+    val methods = typeElement?.getDeclaredMethods().orEmpty()
+    assertThat(methods).isNotEmpty()
+    val testMethod = methods[0]
+    val returnType = testMethod.returnType
+    val qualifiers = testMethod.getAnnotationsAnnotatedWith(ClassName.get(Qualifier::class.java))
+    val qualifier = if (qualifiers.isEmpty()) null else qualifiers.iterator().next()
+    return safeName(returnType, qualifier)
+  }
+
+  private fun getSources(classString: String, qualifierString: String = ""): List<Source> {
+    val contentJava =
         """
                 package test;
                 import javax.inject.Qualifier;
@@ -166,33 +188,63 @@ class NamesTest {
                     ERROR
                 }
 
-                class Test<A extends String, B> {
-                    $classString  test() { return null; }
+                interface Test<A extends String, B> {
+                    $qualifierString
+                    $classString test();
                 }
             """
-    return KotlinCompilation()
-        .apply {
-          inheritClassPath = true
-          annotationProcessors = listOf(processor)
-          sources = listOf(java("Test.java", content, true))
+    val contentKotlin =
+        """
+                package test
+                import javax.inject.Qualifier
+
+                @Qualifier annotation class Foo
+
+                enum class LogLevel {
+                    INFO,
+                    ERROR
+                }
+
+                interface Test<A : String, B : Any> {
+                    $qualifierString
+                    fun test(): $classString
+                }
+            """
+    val source =
+        when (srcLang) {
+          SourceLanguage.JAVA -> Source.java("test.Test", contentJava)
+          SourceLanguage.KOTLIN -> Source.kotlin("test/Test.kt", contentKotlin)
         }
-        .compile()
+    return listOf(source)
   }
 
-  private fun getErrorMessage(classString: String): String {
-    val result = compile(SafeNameProcessor(), classString)
-    if (result.exitCode != COMPILATION_ERROR && result.exitCode != INTERNAL_ERROR) {
-      assertWithMessage(result.messages).fail()
+  private fun assertErrorMessage(classString: String, expectedError: String) {
+    val assertion = { invocation: XTestInvocation, _: String ->
+      invocation.assertCompilationResult {
+        hasError()
+        hasErrorContaining(expectedError)
+      }
     }
-    return result.messages
+    compile(classString, "", assertion)
   }
 
-  private fun getSafeName(classString: String): String {
-    val processor = SafeNameProcessor()
-    val result = compile(processor, classString)
-    if (result.exitCode != OK) {
-      assertWithMessage(result.messages).fail()
+  private fun assertSafeName(
+      javaClassString: String,
+      ktClassString: String,
+      expectedSafeName: String,
+      qualifierString: String = ""
+  ) {
+    val assertion = { invocation: XTestInvocation, safeName: String ->
+      invocation.assertCompilationResult {
+        hasErrorCount(0)
+        assertThat(safeName).isEqualTo(expectedSafeName)
+      }
     }
-    return processor.safeName
+    val classString =
+        when (srcLang) {
+          SourceLanguage.JAVA -> javaClassString
+          SourceLanguage.KOTLIN -> ktClassString
+        }
+    compile(classString, qualifierString, assertion)
   }
 }
