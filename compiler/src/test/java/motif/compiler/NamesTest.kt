@@ -116,8 +116,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
 
   @Test
   fun named() {
-    assertSafeName(
-        "String", "String", "fooString", "@javax.inject.Named(\"Foo\")")
+    assertSafeName("String", "String", "fooString", "@javax.inject.Named(\"Foo\")")
   }
 
   @Test
@@ -145,10 +144,15 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertErrorMessage("java.util.HashMap<DoesNotExist, Integer>", "DoesNotExist")
   }
 
-  private fun compile(classString: String, qualifierString: String, assertion: (XTestInvocation, String) -> Unit) {
+  private fun compile(
+      classString: String,
+      qualifierString: String,
+      assertion: (XTestInvocation, String) -> Unit
+  ) {
     when (processorType) {
       ProcessorType.AP -> {
-        runProcessorTestWithoutKsp(sources = getSources(classString, qualifierString)) { invocation ->
+        runProcessorTestWithoutKsp(sources = getSources(classString, qualifierString)) { invocation
+          ->
           val safeName = process(invocation)
           assertion(invocation, safeName)
         }
