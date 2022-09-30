@@ -70,3 +70,8 @@ object CodeGenerator {
         .map { "${it.packageName}.${it.name}" }
   }
 }
+
+enum class Mode {
+  JAVA, // Generate pure Java implementation
+  KOTLIN, // Generate pure Kotlin implementation
+}
