@@ -24,11 +24,11 @@ data class TestParameters(
 )
 
 enum class ProcessorType {
-    AP,
-    KSP
+  AP,
+  KSP
 }
 
 enum class SourceLanguage {
-    JAVA,
-    KOTLIN
+  JAVA,
+  KOTLIN
 }

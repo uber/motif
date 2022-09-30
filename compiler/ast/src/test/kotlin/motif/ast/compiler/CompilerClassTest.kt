@@ -38,7 +38,8 @@ class XCompilerClassTest(
     @JvmStatic
     @Parameterized.Parameters(name = "{0}_{1}")
     fun data(): Collection<Array<Any>> {
-      return cartesianProduct(ProcessorType.values().toSortedSet(), SourceLanguage.values().toSortedSet())
+      return cartesianProduct(
+              ProcessorType.values().toSortedSet(), SourceLanguage.values().toSortedSet())
           .filterNot { (proc, _) -> proc == ProcessorType.KSP } // Investigate this after ksp#1086
           .filterNot { (proc, srcLang) ->
             proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
@@ -170,30 +171,37 @@ class XCompilerClassTest(
       @Language("JAVA") text: String,
       assertions: (CompilerClass) -> Unit
   ) {
-    val pkg = text.lines().firstOrNull { it.startsWith("package ")  }?.substringAfter(" ")?.substringBefore(";") ?: "test"
+    val pkg =
+        text.lines()
+            .firstOrNull { it.startsWith("package ") }
+            ?.substringAfter(" ")
+            ?.substringBefore(";")
+            ?: "test"
     val srcFiles = text.split("\n{2,}".toRegex()).filterNot { it.startsWith("package") }
-    val sources = when (srcLang) {
-      SourceLanguage.JAVA -> createJavaSources(srcFiles, pkg)
-      SourceLanguage.KOTLIN -> createKotlinSources(srcFiles, pkg)
-    }
+    val sources =
+        when (srcLang) {
+          SourceLanguage.JAVA -> createJavaSources(srcFiles, pkg)
+          SourceLanguage.KOTLIN -> createKotlinSources(srcFiles, pkg)
+        }
     return when (processorType) {
-      ProcessorType.AP -> runProcessorTestWithoutKsp(sources) { invocation ->
-        process(invocation, qualifiedName, assertions)
-      }
-      ProcessorType.KSP -> runKspTest(sources) { invocation ->
-        process(invocation, qualifiedName, assertions)
-      }
+      ProcessorType.AP ->
+          runProcessorTestWithoutKsp(sources) { invocation ->
+            process(invocation, qualifiedName, assertions)
+          }
+      ProcessorType.KSP ->
+          runKspTest(sources) { invocation -> process(invocation, qualifiedName, assertions) }
     }
   }
 
   private fun process(
-    invocation: XTestInvocation,
-    qualifiedName: String,
-    assertions: (CompilerClass) -> Unit
+      invocation: XTestInvocation,
+      qualifiedName: String,
+      assertions: (CompilerClass) -> Unit
   ): CompilerClass {
     val env = invocation.processingEnv
-    val typeElement = env.findTypeElement(qualifiedName)
-        ?: throw IllegalStateException("No type element found for: $qualifiedName")
+    val typeElement =
+        env.findTypeElement(qualifiedName)
+            ?: throw IllegalStateException("No type element found for: $qualifiedName")
     val declaredType = env.getDeclaredType(typeElement)
     val compilerClass = CompilerClass(env, declaredType)
     assertions.invoke(compilerClass)
@@ -205,8 +213,13 @@ class XCompilerClassTest(
   private fun createJavaSources(srcFiles: List<String>, pkg: String): List<Source> {
     return srcFiles.map { src ->
       val name =
-        "(class|interface)\\s+\\w+".toRegex().find(src)?.value?.substringAfterLast(" ") ?: "Unknown"
-      val imports = setOf("Foo", "Bar", "Baz").filter { it != name && it in src }.map { "import $pkg.$it;" }.joinToString("\n")
+          "(class|interface)\\s+\\w+".toRegex().find(src)?.value?.substringAfterLast(" ")
+              ?: "Unknown"
+      val imports =
+          setOf("Foo", "Bar", "Baz")
+              .filter { it != name && it in src }
+              .map { "import $pkg.$it;" }
+              .joinToString("\n")
       val code = """
         package $pkg;
         $imports
@@ -220,24 +233,32 @@ class XCompilerClassTest(
   // Map the 1 multiline Java string to multiple KT source files so that types are properly resolved
   private fun createKotlinSources(srcFiles: List<String>, pkg: String): List<Source> {
     return srcFiles
-      .map { it.replace("implements", ":").replace("extends", ":").replace(";", "") }
-      .map { src ->
-        val name =
-            "(class|interface)\\s+\\w+".toRegex().find(src)?.value?.substringAfterLast(" ") ?: "Unknown"
-        val imports = setOf("Foo", "Bar", "Baz").filter { it != name && it in src }.map { "import $pkg.$it" }.joinToString("\n")
-        val hasParentClass = ":" in src && src.substringAfter(" : ").substringBeforeLast(" ").substringBefore("<").let {
-          srcFiles.any { src -> "class $it" in src }
-        }
+        .map { it.replace("implements", ":").replace("extends", ":").replace(";", "") }
+        .map { src ->
+          val name =
+              "(class|interface)\\s+\\w+".toRegex().find(src)?.value?.substringAfterLast(" ")
+                  ?: "Unknown"
+          val imports =
+              setOf("Foo", "Bar", "Baz")
+                  .filter { it != name && it in src }
+                  .map { "import $pkg.$it" }
+                  .joinToString("\n")
+          val hasParentClass =
+              ":" in src &&
+                  src.substringAfter(" : ").substringBeforeLast(" ").substringBefore("<").let {
+                    srcFiles.any { src -> "class $it" in src }
+                  }
 
-        val code = """
+          val code =
+              """
           package $pkg
           import kotlin.String
           $imports
 
           ${if (hasParentClass) src.replace(" {}", "() {}") else src}
-        """.trimIndent()
-        return@map Source.kotlin("$pkg/$name.kt", code)
-      }
+          """.trimIndent()
+          return@map Source.kotlin("$pkg/$name.kt", code)
+        }
   }
 
   private fun String.toSourceFor(): String {
