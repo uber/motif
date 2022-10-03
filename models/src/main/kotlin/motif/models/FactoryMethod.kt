@@ -75,7 +75,8 @@ sealed class FactoryMethod(val method: IrMethod, val objects: Objects) {
 
     fun fromObjectsMethod(objects: Objects, method: IrMethod): FactoryMethod {
       if (method.isVoid()) throw VoidFactoryMethod(objects, method)
-      if (method.isNullable()) throw NullableFactoryMethod(objects, method)
+      if (method.isNullable() || method.returnType.toString().endsWith("?"))
+        throw NullableFactoryMethod(objects, method)
 
       ensureNonNullParameters(objects.scope, objects.clazz, method)
 
@@ -175,5 +176,6 @@ private fun ensureNonNullParameter(
     method: IrMethod,
     parameter: IrParameter
 ) {
-  if (parameter.isNullable()) throw NullableParameter(scope, owner, method, parameter)
+  if (parameter.isNullable() || parameter.type.toString().endsWith("?"))
+    throw NullableParameter(scope, owner, method, parameter)
 }
