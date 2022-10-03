@@ -85,7 +85,6 @@ class StubProcessor : AbstractProcessor() {
       builder.superclass(scopeClassName)
     }
 
-    // TODO: Fix after cleaning up all tests
     val xProcessingEnv = XProcessingEnv.create(env)
     CompilerClass(xProcessingEnv, scopeType.toXProcessing(xProcessingEnv))
         .methods

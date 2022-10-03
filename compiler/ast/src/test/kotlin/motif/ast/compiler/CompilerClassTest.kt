@@ -20,7 +20,7 @@ import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.XTestInvocation
 import androidx.room.compiler.processing.util.runKspTest
 import androidx.room.compiler.processing.util.runProcessorTestWithoutKsp
-import autovalue.shaded.com.`google$`.common.collect.`$Sets`.cartesianProduct
+import com.google.common.collect.Sets.cartesianProduct
 import com.google.common.truth.Truth.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.Test
