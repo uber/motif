@@ -80,11 +80,11 @@ class MotifProcessingStep(
       return emptySet()
     }
 
-    val mode: Mode? =
+    val mode: OutputMode? =
         try {
-          Mode.valueOf(env.options[OPTION_MODE]?.toUpperCase() ?: "")
+          OutputMode.valueOf(env.options[OPTION_MODE]?.toUpperCase() ?: "")
         } catch (ignore: IllegalArgumentException) {
-          if (env.backend == XProcessingEnv.Backend.KSP) Mode.KOTLIN else null
+          if (env.backend == XProcessingEnv.Backend.KSP) OutputMode.KOTLIN else null
         }
 
     createdScopeNames += CodeGenerator.generate(env, graph, mode)

@@ -22,14 +22,14 @@ import motif.core.ResolvedGraph
 
 object CodeGenerator {
 
-  fun generate(env: XProcessingEnv, graph: ResolvedGraph, mode: Mode?): List<String> {
+  fun generate(env: XProcessingEnv, graph: ResolvedGraph, mode: OutputMode?): List<String> {
     val kaptKotlinGeneratedDir = env.options[OPTION_KAPT_KOTLIN_GENERATED]
-    return if (mode == Mode.JAVA) {
+    return if (mode == OutputMode.JAVA) {
       generateJava(env, graph)
-    } else if (mode == Mode.KOTLIN) {
+    } else if (mode == OutputMode.KOTLIN) {
       if (env.backend == XProcessingEnv.Backend.JAVAC && kaptKotlinGeneratedDir == null) {
         throw IllegalStateException(
-            "-A$OPTION_MODE=${Mode.KOTLIN.name.toLowerCase()} " +
+            "-A$OPTION_MODE=${OutputMode.KOTLIN.name.toLowerCase()} " +
                 "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
       }
       generateKotlin(env, graph, kaptKotlinGeneratedDir)
@@ -71,7 +71,7 @@ object CodeGenerator {
   }
 }
 
-enum class Mode {
+enum class OutputMode {
   JAVA, // Generate pure Java implementation
   KOTLIN, // Generate pure Kotlin implementation
 }
