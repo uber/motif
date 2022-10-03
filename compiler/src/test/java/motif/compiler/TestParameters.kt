@@ -15,14 +15,6 @@
  */
 package motif.compiler
 
-import java.io.File
-
-data class TestParameters(
-    @get:JvmName("testDirectory") val testDirectory: File,
-    @get:JvmName("processorType") val processorType: ProcessorType,
-    @get:JvmName("sourceLanguage") val sourceLanguage: SourceLanguage,
-)
-
 enum class ProcessorType {
   AP,
   KSP
