@@ -37,7 +37,7 @@ internal class MessageWatcher : XMessager() {
       annotationValue: XAnnotationValue?
   ) {
     if (kind == Diagnostic.Kind.ERROR) {
-      KspErrorThrower.rethrowKspError(msg)
+      KspErrorThrower.rethrowKspError("\n$msg")
     }
   }
 }
