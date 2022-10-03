@@ -7,6 +7,7 @@ sourceCompatibility = 1.8
 dependencies {
     implementation deps.autoCommon
     implementation deps.kotlin.stdlib
+    implementation deps.kspApi
     implementation deps.javapoet
     implementation deps.roomCompilerProcessing
     implementation project(':compiler-ast')
