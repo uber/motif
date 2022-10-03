@@ -42,7 +42,8 @@ class MotifProcessingStep(
 
   override fun process(
       env: XProcessingEnv,
-      elementsByAnnotation: Map<String, Set<XElement>>
+      elementsByAnnotation: Map<String, Set<XElement>>,
+      isLastRound: Boolean
   ): Set<XElement> {
     messageWatcher?.let { env.messager.addMessageWatcher(messageWatcher) }
 
@@ -102,9 +103,5 @@ class MotifProcessingStep(
     }
 
     return emptySet()
-  }
-
-  override fun processOver(env: XProcessingEnv, elementsByAnnotation: Map<String, Set<XElement>>) {
-    process(env, elementsByAnnotation)
   }
 }
