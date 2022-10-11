@@ -54,3 +54,4 @@ include 'xprocessing-testing'
 project(':compiler-ast').projectDir = file('compiler/ast')
 project(':compiler-ksp').projectDir = file('compiler/ksp')
 project(':intellij-ast').projectDir = file('intellij/ast')
+include ':samples:sample-lib-ksp'

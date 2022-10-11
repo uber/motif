@@ -1,12 +1,12 @@
 plugins {
     id 'com.google.devtools.ksp'
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
 
 android {
+    namespace 'com.example.sample_lib_ksp'
     compileSdkVersion deps.build.compileSdkVersion
-    buildToolsVersion deps.build.buildToolsVersion
 
     defaultConfig {
         minSdkVersion deps.build.minSdkVersion
@@ -20,7 +20,7 @@ android {
     }
 
     sourceSets {
-        applicationVariants.all { variant ->
+        libraryVariants.all { variant ->
             main.java.srcDirs += ["build/generated/ksp/${variant.name}/kotlin"]
         }
     }
@@ -28,12 +28,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    variantFilter { variant ->
-        if (variant.buildType.name == 'release') {
-            variant.setIgnore(true)
-        }
     }
 }
 

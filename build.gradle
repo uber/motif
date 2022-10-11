@@ -39,6 +39,8 @@ subprojects {
                 useTarget(deps.autoCommon)
             } else if (requested.group == "org.jetbrains.kotlinx" && requested.name == "kotlinx-metadata") {
                 useTarget(deps.kotlinxMetadata)
+            } else if (requested.group == "com.google.devtools.ksp") {
+                useVersion(deps.versions.ksp)
             }
         }
     }
