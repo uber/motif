@@ -24,11 +24,11 @@ jobs:
         # Gradle configuration install deps 
         run: ./gradlew help
       - name: Build Project
-        run: ./gradlew spotlessCheck build --stacktrace
+        run: ./gradlew spotlessCheck build --stacktrace -x :samples:sample-lib-ksp:build
       - name : Testing 
-        run: ./gradlew test --stacktrace
+        run: ./gradlew test --stacktrace -x :samples:sample-lib-ksp:test
       - name: Final Checks
-        run: ./gradlew check --stacktrace
+        run: ./gradlew check --stacktrace -x :samples:sample-lib-ksp:check
       - name: Upload Snapshot 
         run: ./gradlew publish --no-daemon --no-parallel -PmavenCentralUsername="${{ secrets.SonatypeUsername }}" -PmavenCentralPassword="${{ secrets.SonatypePassword }}"
         if: success() && github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && matrix.java_version == '11'
