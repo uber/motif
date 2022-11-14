@@ -15,8 +15,8 @@
  */
 
 def versions = [
-        kotlin: '1.7.10',
-        ksp: '1.7.10-1.0.6',
+        kotlin: '1.7.20',
+        ksp: '1.7.20-1.0.8',
         ktlint: '0.41.0',
         ktfmt: '0.23',
         dagger: '2.24',
