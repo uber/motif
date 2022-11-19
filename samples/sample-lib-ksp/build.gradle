@@ -29,6 +29,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    androidComponents {
+        beforeVariants(selector().withBuildType("debug")) { variantBuilder ->
+            variantBuilder.enabled = false
+        }
+    }
 }
 
 dependencies {
