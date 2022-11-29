@@ -41,7 +41,6 @@ class MotifSymbolProcessorProvider(
       config: XProcessingEnvConfig
   ) : KspBasicAnnotationProcessor(environment, config) {
 
-    override fun processingSteps() =
-        listOf(MotifProcessingStep(graphSetter = { graph = it }, messageWatcher = MessageWatcher()))
+    override fun processingSteps() = listOf(MotifProcessingStep(graphSetter = { graph = it }))
   }
 }
