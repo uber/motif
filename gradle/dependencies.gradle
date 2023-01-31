@@ -23,9 +23,9 @@ def versions = [
         butterknife: '10.1.0',
         glide: '4.9.0',
         gjf: '1.7',
-        kotlinpoet: '1.10.2',
+        kotlinpoet: '1.12.0',
         room: '2.1.0',
-        roomCompilerProcessing: '2.5.0-alpha03',
+        roomCompilerProcessing: '2.5.0',
         dokka: '1.4.32',
         "gradleIntellijPlugin": [
                 ide: '2020.1'
