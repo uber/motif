@@ -18,6 +18,7 @@ package motif.compiler
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.compat.XConverters.getProcessingEnv
+import androidx.room.compiler.processing.compat.XConverters.toJavac
 import androidx.room.compiler.processing.compat.XConverters.toKS
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.WildcardTypeName
@@ -424,6 +425,16 @@ class TypeName private constructor(private val mirror: XType) {
               .typeArguments
               .map { WildcardTypeName.subtypeOf(Object::class.java) }
               .toTypedArray())
+    } else if (mirror.typeArguments.isNotEmpty() &&
+        "<" in jTypeName.toString() &&
+        "$" in jTypeName.toString()) {
+        // Work around issue where JavaPoet returns a TypeName with a '$' for a Kotlin inner class
+        ParameterizedTypeName.get(
+            com.squareup.javapoet.ClassName.get(mirror.typeElement?.toJavac()),
+            *mirror
+                .typeArguments
+                .map { it.typeName }
+                .toTypedArray())
     } else {
       jTypeName
     }
