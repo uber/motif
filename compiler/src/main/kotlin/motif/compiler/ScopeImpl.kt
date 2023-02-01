@@ -428,13 +428,10 @@ class TypeName private constructor(private val mirror: XType) {
     } else if (mirror.typeArguments.isNotEmpty() &&
         "<" in jTypeName.toString() &&
         "$" in jTypeName.toString()) {
-        // Work around issue where JavaPoet returns a TypeName with a '$' for a Kotlin inner class
-        ParameterizedTypeName.get(
-            com.squareup.javapoet.ClassName.get(mirror.typeElement?.toJavac()),
-            *mirror
-                .typeArguments
-                .map { it.typeName }
-                .toTypedArray())
+      // Work around issue where JavaPoet returns a TypeName with a '$' for a Kotlin inner class
+      ParameterizedTypeName.get(
+          com.squareup.javapoet.ClassName.get(mirror.typeElement?.toJavac()),
+          *mirror.typeArguments.map { it.typeName }.toTypedArray())
     } else {
       jTypeName
     }
