@@ -1,3 +1,12 @@
+# 0.4.0-alpha03
+* Update XProcessing version
+
+# 0.4.0-alpha02
+* Upgrade JavaPoet, KotlinPoet, & XProcessing
+
+# 0.4.0-alpha01
+* Initial support for KSP
+
 # 0.3.8
 
 * Throw CannotResolveType error when compiler cannot resolve it.
