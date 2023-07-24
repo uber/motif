@@ -41,6 +41,10 @@ subprojects {
                 useTarget(deps.kotlinxMetadata)
             } else if (requested.group == "com.google.devtools.ksp") {
                 useVersion(deps.versions.ksp)
+            } else if (requested.group == "androidx.room") {
+                if (requested.name != "room-compiler-processing" && requested.name != "room-compiler-processing-testing") {
+                    useVersion(deps.versions.room)
+                }
             }
         }
     }
