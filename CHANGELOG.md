@@ -1,3 +1,6 @@
+# 0.4.0-alpha04
+* Update Dagger version
+
 # 0.4.0-alpha03
 * Update XProcessing version
 
