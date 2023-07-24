@@ -19,7 +19,7 @@ def versions = [
         ksp: '1.8.20-1.0.11',
         ktlint: '0.41.0',
         ktfmt: '0.23',
-        dagger: '2.24',
+        dagger: '2.47',
         butterknife: '10.1.0',
         glide: '4.9.0',
         gjf: '1.7',
