@@ -1,3 +1,6 @@
+# 0.4.0-alpha05
+* Set JvmVersion to 1.8
+
 # 0.4.0-alpha04
 * Update Dagger version
 
