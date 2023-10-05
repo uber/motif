@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.uber.motif</id>
-    <name>Motif Plugin</name>
+    <name>Motif</name>
     <version>0.0.5</version>
     <vendor email="jetbrains-plugins@uber.com" url="https://www.uber.com/">Uber</vendor>
 
@@ -15,10 +15,10 @@
       </ul>
     ]]></description>
 
-    <idea-version since-build="163"/>
+    <idea-version since-build="232"/>
 
     <change-notes><![CDATA[
-      Release 0.0.5: Add logging extension point.<br>
+      Release 0.0.5: Add logging extension point + IntelliJ 2023.2 compatibility.<br>
       Release 0.0.4: Update plugin email address.<br>
       Release 0.0.3: Minor fixes.<br>
       Release 0.0.2: Minor fixes.<br>

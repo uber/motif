@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version "1.0"
+    id "org.jetbrains.intellij" version "1.15.0"
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
 }
@@ -9,6 +9,12 @@ intellij {
     plugins = [ 'java', 'Kotlin' ]
     pluginName = 'Motif Plugin'
     updateSinceUntilBuild = false
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 dependencies {
@@ -22,18 +28,6 @@ dependencies {
     testImplementation deps.test.assertj
     testImplementation deps.test.truth
     testImplementation project(':intellij:testing')
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 tasks {

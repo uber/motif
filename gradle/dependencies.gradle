@@ -28,7 +28,7 @@ def versions = [
         roomCompilerProcessing: '2.6.0-alpha02',
         dokka: '1.4.32',
         "gradleIntellijPlugin": [
-                ide: '2020.1'
+                ide: '2023.2'
         ],
 ]
 
