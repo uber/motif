@@ -116,7 +116,7 @@ class ScopeHierarchyBrowser(
     return null
   }
 
-  override fun createTrees(trees: MutableMap<String, JTree>) {
+  override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[TYPE_HIERARCHY_TYPE] = createTree(true)
   }
 
@@ -162,10 +162,6 @@ class ScopeHierarchyBrowser(
       }
     }
     return null
-  }
-
-  override fun getBrowserDataKey(): String {
-    return DATA_KEY.name
   }
 
   override fun configureTree(tree: Tree) {

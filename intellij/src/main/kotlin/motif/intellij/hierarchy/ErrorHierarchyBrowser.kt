@@ -92,7 +92,7 @@ class ErrorHierarchyBrowser(
     return null
   }
 
-  override fun createTrees(trees: MutableMap<String, JTree>) {
+  override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[ERROR_HIERARCHY_TYPE] = createTree(true)
   }
 
@@ -127,10 +127,6 @@ class ErrorHierarchyBrowser(
       return ScopeHierarchyTreeStructure(project, graph, descriptor)
     }
     return null
-  }
-
-  override fun getBrowserDataKey(): String {
-    return DATA_KEY.name
   }
 
   override fun doRefresh(currentBuilderOnly: Boolean) {

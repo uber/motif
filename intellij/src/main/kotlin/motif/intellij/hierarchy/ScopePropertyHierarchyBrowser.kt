@@ -113,7 +113,7 @@ class ScopePropertyHierarchyBrowser(
     return LABEL_GO_NEXT_SCOPE
   }
 
-  override fun createTrees(trees: MutableMap<String, JTree>) {
+  override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[PROPERTY_HIERARCHY_TYPE] = createTree(true)
   }
 
@@ -184,10 +184,6 @@ class ScopePropertyHierarchyBrowser(
       return ScopeHierarchyTreeStructure(project, graph, descriptor)
     }
     return null
-  }
-
-  override fun getBrowserDataKey(): String {
-    return DATA_KEY.name
   }
 
   override fun onGraphUpdated(graph: ResolvedGraph) {
