@@ -15,29 +15,25 @@
  */
 package motif.ast.intellij
 
-import com.intellij.pom.java.LanguageLevel
+import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
 import com.intellij.psi.PsiElementFactory
-import com.intellij.testFramework.LightProjectDescriptor
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import motif.intellij.testing.InternalJdk
+import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 
-class IntelliJClassTest : LightCodeInsightFixtureTestCase() {
+class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
 
   lateinit var psiElementFactory: PsiElementFactory
 
   override fun setUp() {
     super.setUp()
-
-    psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
+    psiElementFactory = PsiElementFactory.getInstance(project)
   }
 
-  override fun getProjectDescriptor(): LightProjectDescriptor {
-    return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
-      override fun getSdk() = InternalJdk.instance
-    }
+  override fun getProjectDescriptor() = DefaultLightProjectDescriptor {
+    JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
   }
 
   override fun getTestDataPath(): String {
