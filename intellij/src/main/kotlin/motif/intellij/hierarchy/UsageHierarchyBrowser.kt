@@ -30,7 +30,7 @@ import java.text.MessageFormat
 import javax.swing.JPanel
 import javax.swing.JTree
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
+import motif.intellij.MotifProjectService
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyUsageSectionDescriptor
@@ -42,7 +42,7 @@ class UsageHierarchyBrowser(
     project: Project,
     initialGraph: ResolvedGraph,
     private val rootElement: PsiElement
-) : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
+) : HierarchyBrowserBase(project, rootElement), MotifProjectService.Listener {
 
   private var graph: ResolvedGraph = initialGraph
 
