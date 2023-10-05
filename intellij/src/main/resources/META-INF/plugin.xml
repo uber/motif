@@ -30,16 +30,9 @@
     <depends>org.jetbrains.kotlin</depends>
     <depends>com.intellij.modules.lang</depends>
 
-    <project-components>
-        <component>
-            <implementation-class>motif.intellij.MotifProjectComponent</implementation-class>
-            <option name="workspace" value="true"/>
-        </component>
-        <component>
-            <implementation-class>motif.intellij.analytics.AnalyticsProjectComponent</implementation-class>
-            <option name="workspace" value="true"/>
-        </component>
-    </project-components>
+    <extensions defaultExtensionNs="com.intellij">
+        <backgroundPostStartupActivity implementation="motif.intellij.AttachMotifProjectServiceActivity"/>
+    </extensions>
 
     <actions>
         <action class="motif.intellij.actions.MotifGraphAction" description="Display entire Motif graph"

@@ -23,13 +23,13 @@ import javax.swing.JSplitPane
 import javax.swing.JTextArea
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
-import motif.intellij.MotifProjectComponent
+import motif.intellij.MotifProjectService
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.ErrorHierarchyBrowser
 import motif.models.MotifError
 
 class MotifErrorPanel(project: Project, graph: ResolvedGraph) :
-    JPanel(), MotifProjectComponent.Listener, ErrorHierarchyBrowser.Listener {
+    JPanel(), MotifProjectService.Listener, ErrorHierarchyBrowser.Listener {
 
   private val splitPane: JSplitPane
   private val errorBrowser: ErrorHierarchyBrowser

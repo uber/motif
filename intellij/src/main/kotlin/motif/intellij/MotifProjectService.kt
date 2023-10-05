@@ -19,10 +19,11 @@ import com.intellij.codeInsight.daemon.LineMarkerProviders
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.lang.Language
 import com.intellij.lang.java.JavaLanguage
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -36,15 +37,17 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
+import javax.swing.Icon
 import motif.core.ResolvedGraph
-import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.AnalyticsProjectService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
 import motif.intellij.ui.MotifUsagePanel
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
-class MotifProjectComponent(val project: Project) : ProjectComponent {
+@Service(Service.Level.PROJECT)
+class MotifProjectService(val project: Project) : Disposable {
 
   companion object {
     const val TOOL_WINDOW_ID: String = "Motif"
@@ -61,10 +64,6 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
         "Error computing Motif graph. If error persists after you rebuild your project and restart IDE, please make sure to report the issue."
 
     private val MOTIF_ACTION_IDS = listOf("motif_usage", "motif_graph", "motif_ancestor_graph")
-
-    fun getInstance(project: Project): MotifProjectComponent {
-      return project.getComponent(MotifProjectComponent::class.java)
-    }
   }
 
   private val graphFactory: GraphFactory by lazy { GraphFactory(project) }
@@ -79,18 +78,21 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
   private var isRefreshing: Boolean = false
   private var pendingAction: (() -> Unit)? = null
 
-  override fun projectOpened() {
+  fun attach() {
     DumbService.getInstance(project).runWhenSmart {
       ApplicationManager.getApplication().runReadAction {
         // Initialize plugin with empty graph to avoid IDE startup slowdown
         val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
         onGraphUpdated(emptyGraph)
 
-        AnalyticsProjectComponent.getInstance(project)
+        project
+            .getService(AnalyticsProjectService::class.java)
             .logEvent(MotifAnalyticsActions.PROJECT_OPENED)
       }
     }
   }
+
+  override fun dispose() {}
 
   fun refreshGraph() {
     if (isRefreshing) {
@@ -111,12 +113,13 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
                         if (updatedGraph.errors.isNotEmpty())
                             MotifAnalyticsActions.GRAPH_UPDATE_ERROR
                         else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
-                    AnalyticsProjectComponent.getInstance(project).logEvent(eventName)
+                    project.getService(AnalyticsProjectService::class.java).logEvent(eventName)
                   } catch (t: Throwable) {
                     val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
                     onGraphUpdated(emptyGraph)
 
-                    AnalyticsProjectComponent.getInstance(project)
+                    project
+                        .getService(AnalyticsProjectService::class.java)
                         .logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
                     PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, t)
                   } finally {
@@ -166,7 +169,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
       if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
         val toolWindow: ToolWindow =
             toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
-        toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg"))
+        toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg", Icon::class.java))
         toolWindow.title = TOOL_WINDOW_TITLE
 
         scopePanel = MotifScopePanel(project, graph)
@@ -211,16 +214,14 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
   }
 
   private fun createScopeContent(toolWindow: ToolWindow): Content {
-    val content =
-        ContentFactory.SERVICE.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
+    val content = ContentFactory.getInstance().createContent(scopePanel, TAB_NAME_SCOPES, true)
     content.isCloseable = false
     toolWindow.contentManager.addContent(content)
     return content
   }
 
   private fun createErrorContent(toolWindow: ToolWindow): Content {
-    val content =
-        ContentFactory.SERVICE.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
+    val content = ContentFactory.getInstance().createContent(errorPanel, TAB_NAME_ERRORS, true)
     content.isCloseable = false
     toolWindow.contentManager.addContent(content)
     return content
@@ -228,7 +229,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
   private fun createUsageContent(toolWindow: ToolWindow): Content {
     val content: Content =
-        ContentFactory.SERVICE.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
+        ContentFactory.getInstance().createContent(usagePanel, TAB_NAME_USAGE, true)
     content.description = TAB_NAME_USAGE
     content.isCloseable = true
     toolWindow.contentManager.addContent(content)
@@ -237,7 +238,7 @@ class MotifProjectComponent(val project: Project) : ProjectComponent {
 
   private fun createAncestorContent(toolWindow: ToolWindow): Content {
     val content: Content =
-        ContentFactory.SERVICE.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
+        ContentFactory.getInstance().createContent(ancestorPanel, TAB_NAME_ANCESTOR, true)
     content.description = TAB_NAME_ANCESTOR
     content.isCloseable = true
     toolWindow.contentManager.addContent(content)

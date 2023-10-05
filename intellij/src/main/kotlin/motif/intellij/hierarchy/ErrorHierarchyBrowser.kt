@@ -33,7 +33,7 @@ import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
-import motif.intellij.MotifProjectComponent
+import motif.intellij.MotifProjectService
 import motif.intellij.ScopeHierarchyUtils.Companion.isRootElement
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
@@ -49,7 +49,7 @@ class ErrorHierarchyBrowser(
     initialGraph: ResolvedGraph,
     private val rootElement: PsiElement,
     private val selectionListener: Listener?
-) : HierarchyBrowserBase(project, rootElement), MotifProjectComponent.Listener {
+) : HierarchyBrowserBase(project, rootElement), MotifProjectService.Listener {
 
   private var graph: ResolvedGraph = initialGraph
 
@@ -130,7 +130,7 @@ class ErrorHierarchyBrowser(
   }
 
   override fun doRefresh(currentBuilderOnly: Boolean) {
-    MotifProjectComponent.getInstance(project).refreshGraph()
+    project.getService(MotifProjectService::class.java).refreshGraph()
   }
 
   override fun onGraphUpdated(graph: ResolvedGraph) {

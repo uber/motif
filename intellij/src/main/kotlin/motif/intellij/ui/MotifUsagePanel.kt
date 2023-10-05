@@ -21,12 +21,12 @@ import com.intellij.psi.PsiElement
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
+import motif.intellij.MotifProjectService
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.UsageHierarchyBrowser
 
 class MotifUsagePanel(project: Project, graph: ResolvedGraph) :
-    JPanel(), MotifProjectComponent.Listener {
+    JPanel(), MotifProjectService.Listener {
 
   private val usageBrowser: UsageHierarchyBrowser
 

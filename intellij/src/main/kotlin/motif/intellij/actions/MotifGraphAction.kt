@@ -20,16 +20,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
-import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifProjectService
+import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
-import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.AnalyticsProjectService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger displaying entire scope hierarchy.
  */
-class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
+class MotifGraphAction : AnAction(), MotifProjectService.Listener {
 
   private var graph: ResolvedGraph? = null
 
@@ -42,7 +42,7 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
     val graph = graph ?: return
 
     if (!isInitializedGraph(graph)) {
-      MotifProjectComponent.getInstance(project).refreshGraph { actionPerformed(event) }
+      project.getService(MotifProjectService::class.java).refreshGraph { actionPerformed(event) }
       return
     }
 
@@ -50,7 +50,9 @@ class MotifGraphAction : AnAction(), MotifProjectComponent.Listener {
         ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
     toolWindow.activate {}
 
-    AnalyticsProjectComponent.getInstance(project).logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
+    project
+        .getService(AnalyticsProjectService::class.java)
+        .logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
   }
 
   override fun update(e: AnActionEvent) {

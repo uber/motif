@@ -32,17 +32,17 @@ import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.util.ConstantFunction
 import java.awt.event.MouseEvent
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectComponent
-import motif.intellij.MotifProjectComponent.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifProjectService
+import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.analytics.AnalyticsProjectComponent
+import motif.intellij.analytics.AnalyticsProjectService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@LineMarkerProvider} used to display icon in gutter to navigate to motif scope ancestors hierarchy.
  */
-class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectComponent.Listener {
+class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectService.Listener {
 
   companion object {
     const val LABEL_ANCESTORS_SCOPE: String = "View Scope Ancestors."
@@ -83,18 +83,21 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectCompone
           ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
       if (element is PsiClass) {
         toolWindow.activate {
-          MotifProjectComponent.getInstance(project).onSelectedAncestorScope(element)
+          project.getService(MotifProjectService::class.java).onSelectedAncestorScope(element)
         }
       } else if (element is PsiMethod) {
         if (element.returnType is PsiClassReferenceType) {
           val returnElementClass: PsiClass =
               (element.returnType as PsiClassReferenceType).resolve() ?: return
           toolWindow.activate {
-            MotifProjectComponent.getInstance(project).onSelectedAncestorScope(returnElementClass)
+            project
+                .getService(MotifProjectService::class.java)
+                .onSelectedAncestorScope(returnElementClass)
           }
         }
       }
-      AnalyticsProjectComponent.getInstance(project)
+      project
+          .getService(AnalyticsProjectService::class.java)
           .logEvent(MotifAnalyticsActions.ANCESTOR_GUTTER_CLICK)
     }
   }
