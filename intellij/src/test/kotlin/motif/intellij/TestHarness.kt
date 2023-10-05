@@ -17,11 +17,11 @@ package motif.intellij
 
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import com.intellij.pom.java.LanguageLevel
-import com.intellij.testFramework.LightProjectDescriptor
+import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
 import com.intellij.testFramework.Parameterized
 import com.intellij.testFramework.PsiTestUtil
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import java.io.File
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -30,7 +30,6 @@ import motif.Scope
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.testing.IntelliJRule
-import motif.intellij.testing.InternalJdk
 import motif.viewmodel.TestRenderer
 import org.junit.After
 import org.junit.Before
@@ -39,16 +38,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(Parameterized::class)
-class TestHarness : LightCodeInsightFixtureTestCase() {
+class TestHarness : LightJavaCodeInsightFixtureTestCase() {
 
   @get:Rule val rule = IntelliJRule()
 
   @org.junit.runners.Parameterized.Parameter(0) lateinit var testDir: File
 
-  override fun getProjectDescriptor(): LightProjectDescriptor {
-    return object : ProjectDescriptor(LanguageLevel.HIGHEST) {
-      override fun getSdk() = InternalJdk.instance
-    }
+  override fun getProjectDescriptor() = DefaultLightProjectDescriptor {
+    JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
   }
 
   @Before
