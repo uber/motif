@@ -23,6 +23,7 @@ import com.intellij.testFramework.PsiTestUtil
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import java.io.File
+import java.net.URI
 import javax.annotation.Nullable
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -63,10 +64,18 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
   }
 
   private fun addLibrary(clazz: KClass<*>) {
-    val path = clazz.java.protectionDomain.codeSource.location.path
-    val file = File(path)
-    val libName = file.name
-    PsiTestUtil.addLibrary(myFixture.projectDisposable, module, libName, file.parent, libName)
+    val fileUri =
+        clazz
+            .java
+            .getResource(clazz.simpleName + ".class")
+            ?.toString()
+            ?.let { Regex("file:.*[.]jar").find(it)?.value }
+            ?.let { URI.create(it) }
+    if (fileUri != null) {
+      val file = File(fileUri)
+      val libName = file.name
+      PsiTestUtil.addLibrary(myFixture.projectDisposable, module, libName, file.parent, libName)
+    }
   }
 
   @Test
