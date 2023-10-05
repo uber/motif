@@ -87,7 +87,7 @@ class UsageHierarchyBrowser(
     return null
   }
 
-  override fun createTrees(trees: MutableMap<String, JTree>) {
+  override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[USAGE_HIERARCHY_TYPE] = createTree(true)
   }
 
@@ -106,10 +106,6 @@ class UsageHierarchyBrowser(
       return ScopeHierarchyTreeStructure(project, graph, descriptor)
     }
     return null
-  }
-
-  override fun getBrowserDataKey(): String {
-    return DATA_KEY.name
   }
 
   override fun onGraphUpdated(graph: ResolvedGraph) {
