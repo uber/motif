@@ -24,7 +24,7 @@ import javax.swing.JPanel
 import javax.swing.JSplitPane
 import javax.swing.JSplitPane.RIGHT
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
+import motif.intellij.MotifService
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.hierarchy.ScopeHierarchyBrowser
 import motif.intellij.hierarchy.ScopePropertyHierarchyBrowser
@@ -32,7 +32,7 @@ import motif.intellij.hierarchy.ScopePropertyHierarchyBrowser.PropertyHierarchyT
 import motif.models.Scope
 
 class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) :
-    JPanel(), ScopeHierarchyBrowser.Listener, MotifProjectService.Listener {
+    JPanel(), ScopeHierarchyBrowser.Listener, MotifService.Listener {
 
   private var graph: ResolvedGraph = initialGraph
 

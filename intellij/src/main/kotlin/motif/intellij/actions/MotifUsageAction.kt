@@ -23,17 +23,17 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
-import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifService
+import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger navigation to a particular scope in the scope hierarchy window.
  */
-class MotifUsageAction : AnAction(), MotifProjectService.Listener {
+class MotifUsageAction : AnAction(), MotifService.Listener {
 
   private var graph: ResolvedGraph? = null
 
@@ -47,18 +47,16 @@ class MotifUsageAction : AnAction(), MotifProjectService.Listener {
     val graph = graph ?: return
 
     if (!ScopeHierarchyUtils.isInitializedGraph(graph)) {
-      project.getService(MotifProjectService::class.java).refreshGraph { actionPerformed(event) }
+      project.getService(MotifService::class.java).refreshGraph { actionPerformed(event) }
       return
     }
 
     val toolWindow: ToolWindow =
         ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
-    toolWindow.activate {
-      project.getService(MotifProjectService::class.java).onSelectedClass(element)
-    }
+    toolWindow.activate { project.getService(MotifService::class.java).onSelectedClass(element) }
 
     project
-        .getService(AnalyticsProjectService::class.java)
+        .getService(AnalyticsService::class.java)
         .logEvent(MotifAnalyticsActions.USAGE_MENU_CLICK)
   }
 

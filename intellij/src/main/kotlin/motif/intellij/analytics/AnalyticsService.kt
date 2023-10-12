@@ -22,7 +22,7 @@ import com.intellij.openapi.project.Project
 import java.util.UUID
 
 @Service(Service.Level.PROJECT)
-class AnalyticsProjectService(val project: Project) : Disposable {
+class AnalyticsService(val project: Project) : Disposable {
 
   companion object {
     private val LOGGER_EXTENSION_POINT_NAME: ExtensionPointName<MotifAnalyticsLogger> =
