@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.uber.motif</id>
-    <name>Motif</name>
+    <name>Uber Motif</name>
     <version>0.0.5</version>
     <vendor email="jetbrains-plugins@uber.com" url="https://www.uber.com/">Uber</vendor>
 

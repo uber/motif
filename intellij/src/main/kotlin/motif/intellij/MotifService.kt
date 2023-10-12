@@ -37,7 +37,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
-import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
@@ -169,7 +168,7 @@ class MotifService(val project: Project) : Disposable {
       if (toolWindowManager.getToolWindow(TOOL_WINDOW_ID) == null) {
         val toolWindow: ToolWindow =
             toolWindowManager.registerToolWindow(TOOL_WINDOW_ID, true, ToolWindowAnchor.RIGHT)
-        toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg", Icon::class.java))
+        toolWindow.setIcon(IconLoader.getIcon("/icons/icon.svg", this::class.java))
         toolWindow.title = TOOL_WINDOW_TITLE
 
         scopePanel = MotifScopePanel(project, graph)
