@@ -20,16 +20,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
-import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifService
+import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger displaying entire scope hierarchy.
  */
-class MotifGraphAction : AnAction(), MotifProjectService.Listener {
+class MotifGraphAction : AnAction(), MotifService.Listener {
 
   private var graph: ResolvedGraph? = null
 
@@ -42,7 +42,7 @@ class MotifGraphAction : AnAction(), MotifProjectService.Listener {
     val graph = graph ?: return
 
     if (!isInitializedGraph(graph)) {
-      project.getService(MotifProjectService::class.java).refreshGraph { actionPerformed(event) }
+      project.getService(MotifService::class.java).refreshGraph { actionPerformed(event) }
       return
     }
 
@@ -51,7 +51,7 @@ class MotifGraphAction : AnAction(), MotifProjectService.Listener {
     toolWindow.activate {}
 
     project
-        .getService(AnalyticsProjectService::class.java)
+        .getService(AnalyticsService::class.java)
         .logEvent(MotifAnalyticsActions.GRAPH_MENU_CLICK)
   }
 

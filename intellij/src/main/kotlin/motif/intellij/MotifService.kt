@@ -39,7 +39,7 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import javax.swing.Icon
 import motif.core.ResolvedGraph
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.ui.MotifErrorPanel
 import motif.intellij.ui.MotifScopePanel
@@ -47,7 +47,7 @@ import motif.intellij.ui.MotifUsagePanel
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
 @Service(Service.Level.PROJECT)
-class MotifProjectService(val project: Project) : Disposable {
+class MotifService(val project: Project) : Disposable {
 
   companion object {
     const val TOOL_WINDOW_ID: String = "Motif"
@@ -86,7 +86,7 @@ class MotifProjectService(val project: Project) : Disposable {
         onGraphUpdated(emptyGraph)
 
         project
-            .getService(AnalyticsProjectService::class.java)
+            .getService(AnalyticsService::class.java)
             .logEvent(MotifAnalyticsActions.PROJECT_OPENED)
       }
     }
@@ -113,13 +113,13 @@ class MotifProjectService(val project: Project) : Disposable {
                         if (updatedGraph.errors.isNotEmpty())
                             MotifAnalyticsActions.GRAPH_UPDATE_ERROR
                         else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
-                    project.getService(AnalyticsProjectService::class.java).logEvent(eventName)
+                    project.getService(AnalyticsService::class.java).logEvent(eventName)
                   } catch (t: Throwable) {
                     val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
                     onGraphUpdated(emptyGraph)
 
                     project
-                        .getService(AnalyticsProjectService::class.java)
+                        .getService(AnalyticsService::class.java)
                         .logEvent(MotifAnalyticsActions.GRAPH_COMPUTATION_ERROR)
                     PluginManager.getLogger().error(LABEL_GRAPH_COMPUTATION_ERROR, t)
                   } finally {

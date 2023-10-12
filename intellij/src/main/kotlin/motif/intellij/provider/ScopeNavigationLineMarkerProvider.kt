@@ -40,11 +40,11 @@ import java.awt.event.MouseEvent
 import motif.ast.intellij.IntelliJClass
 import motif.core.ResolvedGraph
 import motif.core.ScopeEdge
-import motif.intellij.MotifProjectService
+import motif.intellij.MotifService
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifChildScopeMethod
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.toPsiClass
 import motif.intellij.toPsiMethod
@@ -52,7 +52,7 @@ import motif.intellij.toPsiMethod
 /*
  * {@LineMarkerProvider} used to display navigation icons in gutter to navigate to parent/children of Motif scopes.
  */
-class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectService.Listener {
+class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Listener {
 
   companion object {
     const val LABEL_NAVIGATE_PARENT_SCOPE: String = "Navigate to parent Scope."
@@ -158,7 +158,7 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifProjectServic
         }
       }
       project
-          .getService(AnalyticsProjectService::class.java)
+          .getService(AnalyticsService::class.java)
           .logEvent(MotifAnalyticsActions.NAVIGATION_GUTTER_CLICK)
     }
 

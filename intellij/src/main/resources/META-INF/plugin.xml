@@ -31,7 +31,7 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <backgroundPostStartupActivity implementation="motif.intellij.AttachMotifProjectServiceActivity"/>
+        <backgroundPostStartupActivity implementation="motif.intellij.AttachMotifServiceActivity"/>
     </extensions>
 
     <actions>

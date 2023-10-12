@@ -32,17 +32,17 @@ import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.util.ConstantFunction
 import java.awt.event.MouseEvent
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
-import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifService
+import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@LineMarkerProvider} used to display icon in gutter to navigate to motif scope ancestors hierarchy.
  */
-class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectService.Listener {
+class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifService.Listener {
 
   companion object {
     const val LABEL_ANCESTORS_SCOPE: String = "View Scope Ancestors."
@@ -83,21 +83,19 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifProjectService
           ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
       if (element is PsiClass) {
         toolWindow.activate {
-          project.getService(MotifProjectService::class.java).onSelectedAncestorScope(element)
+          project.getService(MotifService::class.java).onSelectedAncestorScope(element)
         }
       } else if (element is PsiMethod) {
         if (element.returnType is PsiClassReferenceType) {
           val returnElementClass: PsiClass =
               (element.returnType as PsiClassReferenceType).resolve() ?: return
           toolWindow.activate {
-            project
-                .getService(MotifProjectService::class.java)
-                .onSelectedAncestorScope(returnElementClass)
+            project.getService(MotifService::class.java).onSelectedAncestorScope(returnElementClass)
           }
         }
       }
       project
-          .getService(AnalyticsProjectService::class.java)
+          .getService(AnalyticsService::class.java)
           .logEvent(MotifAnalyticsActions.ANCESTOR_GUTTER_CLICK)
     }
   }

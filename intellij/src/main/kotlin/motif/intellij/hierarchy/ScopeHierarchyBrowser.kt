@@ -42,10 +42,10 @@ import motif.ast.IrType
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
+import motif.intellij.MotifService
 import motif.intellij.ScopeHierarchyUtils
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyRootDescriptor
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyScopeAncestorDescriptor
@@ -60,7 +60,7 @@ class ScopeHierarchyBrowser(
     initialGraph: ResolvedGraph,
     private val rootElement: PsiElement,
     private val selectionListener: Listener?
-) : HierarchyBrowserBase(project, rootElement), MotifProjectService.Listener {
+) : HierarchyBrowserBase(project, rootElement), MotifService.Listener {
 
   companion object {
     const val LABEL_GO_PREVIOUS_SCOPE: String = "Go to previous Scope."
@@ -189,12 +189,12 @@ class ScopeHierarchyBrowser(
       else -> {}
     }
 
-    project.getService(MotifProjectService::class.java).refreshGraph()
+    project.getService(MotifService::class.java).refreshGraph()
 
     val action: String =
         if (status == Status.INITIALIZING) MotifAnalyticsActions.GRAPH_INIT
         else MotifAnalyticsActions.GRAPH_UPDATE
-    project.getService(AnalyticsProjectService::class.java).logEvent(action)
+    project.getService(AnalyticsService::class.java).logEvent(action)
   }
 
   /*

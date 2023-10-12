@@ -23,18 +23,18 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
-import motif.intellij.MotifProjectService
-import motif.intellij.MotifProjectService.Companion.TOOL_WINDOW_ID
+import motif.intellij.MotifService
+import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
 import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
 import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
-import motif.intellij.analytics.AnalyticsProjectService
+import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 
 /*
  * {@AnAction} used to trigger displaying a particular scope ancestors hierarchy.
  */
-class MotifAncestorGraphAction : AnAction(), MotifProjectService.Listener {
+class MotifAncestorGraphAction : AnAction(), MotifService.Listener {
 
   private var graph: ResolvedGraph? = null
 
@@ -48,18 +48,18 @@ class MotifAncestorGraphAction : AnAction(), MotifProjectService.Listener {
     val graph = graph ?: return
 
     if (!isInitializedGraph(graph)) {
-      project.getService(MotifProjectService::class.java).refreshGraph { actionPerformed(event) }
+      project.getService(MotifService::class.java).refreshGraph { actionPerformed(event) }
       return
     }
 
     val toolWindow: ToolWindow =
         ToolWindowManager.getInstance(project).getToolWindow(TOOL_WINDOW_ID) ?: return
     toolWindow.activate {
-      project.getService(MotifProjectService::class.java).onSelectedAncestorScope(element)
+      project.getService(MotifService::class.java).onSelectedAncestorScope(element)
     }
 
     project
-        .getService(AnalyticsProjectService::class.java)
+        .getService(AnalyticsService::class.java)
         .logEvent(MotifAnalyticsActions.ANCESTOR_MENU_CLICK)
   }
 
