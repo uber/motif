@@ -30,18 +30,12 @@ import kotlin.reflect.KClass
 import motif.Scope
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
-import motif.intellij.testing.IntelliJRule
 import motif.viewmodel.TestRenderer
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(Parameterized::class)
 class TestHarness : LightJavaCodeInsightFixtureTestCase() {
-
-  @get:Rule val rule = IntelliJRule()
 
   @org.junit.runners.Parameterized.Parameter(0) lateinit var testDir: File
 
@@ -49,18 +43,11 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
     JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
   }
 
-  @Before
   public override fun setUp() {
     super.setUp()
-
     addLibrary(Inject::class)
     addLibrary(Scope::class)
     addLibrary(Nullable::class)
-  }
-
-  @After
-  public override fun tearDown() {
-    super.tearDown()
   }
 
   private fun addLibrary(clazz: KClass<*>) {
