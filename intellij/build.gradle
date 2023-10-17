@@ -28,7 +28,6 @@ dependencies {
     implementation deps.kotlin.reflection
 
     testImplementation deps.test.truth
-    testImplementation project(':intellij:testing')
     testImplementation project(':viewmodel')
 }
 

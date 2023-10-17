@@ -27,7 +27,6 @@ dependencies {
     testImplementation deps.test.junit
     testImplementation deps.test.assertj
     testImplementation deps.test.truth
-    testImplementation project(':intellij:testing')
 }
 
 tasks {
