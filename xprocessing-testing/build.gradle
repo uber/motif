@@ -21,7 +21,7 @@ shadowJar {
     dependencies {
         include dependency(deps.test.roomCompilerProcessingTesting)
     }
-    classifier = ''
+    archiveClassifier = ''
     configurations = [shadedConfig]
     mergeServiceFiles()
     relocate 'androidx.room.compiler.processing', 'motif.compiler.processing'

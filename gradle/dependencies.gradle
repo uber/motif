@@ -42,13 +42,13 @@ ext.deps = [
                 targetSdkVersion: 30,
 
                 gradlePlugins: [
-                        android: 'com.android.tools.build:gradle:4.2.0',
+                        android: 'com.android.tools.build:gradle:7.4.2',
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         ksp: "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${versions.ksp}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
                         mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.18.0',
                         spotless: "com.diffplug.spotless:spotless-plugin-gradle:5.11.0",
-                        shadow: "com.github.jengelman.gradle.plugins:shadow:6.1.0",
+                        shadow: "com.github.johnrengelman:shadow:8.1.0",
                 ]
         ],
         "kotlin": [

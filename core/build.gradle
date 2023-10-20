@@ -3,7 +3,9 @@ plugins {
     id 'org.jetbrains.dokka'
 }
 
-sourceCompatibility = 1.8
+kotlin {
+    jvmToolchain(11)
+}
 
 dependencies {
     api project(':models')

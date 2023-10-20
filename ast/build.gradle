@@ -5,7 +5,9 @@ plugins {
 
 apply plugin: 'kotlin-kapt'
 
-sourceCompatibility = 1.8
+kotlin {
+    jvmToolchain(11)
+}
 
 dependencies {
     implementation deps.kotlin.stdlib
