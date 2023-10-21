@@ -1,5 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
+    id 'com.vanniktech.maven.publish'
 }
 
 kotlin {
@@ -29,5 +30,3 @@ dependencies {
     testImplementation deps.test.compileTesting
     testImplementation deps.test.compileTestingKotlin
 }
-
-apply plugin: 'com.vanniktech.maven.publish'

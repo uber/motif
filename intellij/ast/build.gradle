@@ -2,6 +2,7 @@ plugins {
     id "org.jetbrains.intellij" version "1.15.0"
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
+    id 'com.vanniktech.maven.publish'
 }
 
 intellij {
@@ -32,5 +33,3 @@ tasks {
         enabled = false
     }
 }
-
-apply plugin: 'com.vanniktech.maven.publish'

@@ -1,4 +1,7 @@
-apply plugin: 'java-library'
+plugins {
+    id 'java-library'
+    id 'com.vanniktech.maven.publish'
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -7,5 +10,3 @@ dependencies {
     // Dagger is part of the API since we generate code which depends on Dagger's API in the consuming gradle module.
     api deps.dagger
 }
-
-apply plugin: 'com.vanniktech.maven.publish'

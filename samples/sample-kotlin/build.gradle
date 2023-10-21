@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
 }
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 kotlin {
     jvmToolchain(11)
