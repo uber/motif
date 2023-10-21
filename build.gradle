@@ -74,13 +74,13 @@ subprojects {
         apply plugin: 'com.diffplug.spotless'
         spotless {
             format 'misc', {
-                target '**/*.md', '**/.gitignore'
+                target '*.md', '.gitignore'
 
                 trimTrailingWhitespace()
                 endWithNewline()
             }
             kotlin {
-                target "**/*.kt"
+                target "src/**/*.kt"
                 ktlint(deps.versions.ktlint).userData(['indent_size': '2', 'continuation_indent_size': '2'])
                 ktfmt(deps.versions.ktfmt)
                 licenseHeaderFile rootProject.file('config/spotless/copyright.kt')
@@ -88,7 +88,7 @@ subprojects {
                 endWithNewline()
             }
             java {
-                target "**/*.java"
+                target "src/**/*.java"
                 googleJavaFormat(deps.versions.gjf)
                 licenseHeaderFile rootProject.file('config/spotless/copyright.java')
                 removeUnusedImports()
@@ -96,7 +96,7 @@ subprojects {
                 endWithNewline()
             }
             groovyGradle {
-                target '**/*.gradle'
+                target '*.gradle'
                 trimTrailingWhitespace()
                 endWithNewline()
             }
