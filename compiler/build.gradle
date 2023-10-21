@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
+    id 'com.vanniktech.maven.publish'
 }
 
 kotlin {
@@ -37,5 +38,3 @@ dependencies {
 test {
     inputs.files(file("$rootDir/tests/src"))
 }
-
-apply plugin: 'com.vanniktech.maven.publish'

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow'
+    id 'com.vanniktech.maven.publish'
 }
 
 java {
@@ -43,5 +44,3 @@ artifacts {
     runtimeOnly shadowJar
     archives shadowJar
 }
-
-apply plugin: "com.vanniktech.maven.publish"

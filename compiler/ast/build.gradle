@@ -1,9 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
+    id 'kotlin-kapt'
+    id 'com.vanniktech.maven.publish'
 }
-
-apply plugin: 'kotlin-kapt'
 
 kotlin {
     jvmToolchain(11)
@@ -23,5 +23,3 @@ dependencies {
     testImplementation deps.test.compileTesting
     testImplementation deps.test.roomCompilerProcessingTesting
 }
-
-apply plugin: 'com.vanniktech.maven.publish'
