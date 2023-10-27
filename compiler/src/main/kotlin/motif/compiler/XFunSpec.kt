@@ -23,13 +23,10 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
-import com.squareup.kotlinpoet.javapoet.toKTypeName
 import com.uber.xprocessing.ext.modifiers
 import javax.lang.model.element.Modifier
 import motif.compiler.KotlinTypeWorkaround.javaToKotlinType
 
-@OptIn(KotlinPoetJavaPoetPreview::class)
 object XFunSpec {
   /** Copied from [FunSpec.overriding] and modified to leverage [javaToKotlinType]& XProcessing. */
   fun overriding(
@@ -50,23 +47,13 @@ object XFunSpec {
           env.requireType(method.returnType.typeName)
         }
 
-    val builder = overriding(methodElement)
-    builder.returns(javaToKotlinType(returnType))
-
-    var i = 0
-    val size = builder.parameters.size
-    val resolvedParameterTypes = method.parameterTypes
-    while (i < size) {
-      val parameter = builder.parameters[i]
-      val type = javaToKotlinType(resolvedParameterTypes[i])
-      builder.parameters[i] = parameter.toBuilder(parameter.name, type).build()
-      i++
-    }
-
-    return builder
+    return overriding(methodElement, method.parameterTypes).returns(javaToKotlinType(returnType))
   }
 
-  private fun overriding(method: XMethodElement): FunSpec.Builder {
+  private fun overriding(
+      method: XMethodElement,
+      resolvedParameterTypes: List<XType>
+  ): FunSpec.Builder {
     var modifiers: Set<Modifier> = method.modifiers.toMutableSet()
     require(
         Modifier.PRIVATE !in modifiers &&
@@ -90,9 +77,10 @@ object XFunSpec {
                 .forEach { funBuilder.addTypeVariable(it) }
     */
 
-    method.parameters.forEach {
+    method.parameters.forEachIndexed { index, parameter ->
       funBuilder.addParameter(
-          ParameterSpec.builder(it.name, it.type.typeName.toKTypeName()).build())
+          ParameterSpec.builder(parameter.name, javaToKotlinType(resolvedParameterTypes[index]))
+              .build())
     }
     if (method.isVarArgs()) {
       funBuilder.parameters[funBuilder.parameters.lastIndex] =
