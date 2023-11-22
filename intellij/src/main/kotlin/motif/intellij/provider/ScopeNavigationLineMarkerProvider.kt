@@ -48,6 +48,7 @@ import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.toPsiClass
 import motif.intellij.toPsiMethod
+import java.util.function.Supplier
 
 /*
  * {@LineMarkerProvider} used to display navigation icons in gutter to navigate to parent/children of Motif scopes.
@@ -81,10 +82,9 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
             element,
             identifier.textRange,
             AllIcons.Actions.PreviousOccurence,
-            UPDATE_ALL,
             ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_PARENT_SCOPE),
             NavigationScopeHandler(element.project, graph),
-            LEFT)
+            LEFT) { LABEL_NAVIGATE_PARENT_SCOPE }
       }
     } else {
       val methodElement = element.toPsiMethod()
@@ -93,10 +93,10 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
             element,
             element.textRange,
             AllIcons.Actions.NextOccurence,
-            UPDATE_ALL,
             ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
             NavigationScopeHandler(element.project, graph),
-            LEFT)
+            LEFT
+        ) { LABEL_NAVIGATE_CHILD_SCOPE }
       }
     }
     return null
