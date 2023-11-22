@@ -15,7 +15,6 @@
  */
 package motif.intellij.provider
 
-import com.intellij.codeHighlighting.Pass.UPDATE_ALL
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -48,7 +47,6 @@ import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.toPsiClass
 import motif.intellij.toPsiMethod
-import java.util.function.Supplier
 
 /*
  * {@LineMarkerProvider} used to display navigation icons in gutter to navigate to parent/children of Motif scopes.
@@ -95,8 +93,7 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
             AllIcons.Actions.NextOccurence,
             ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
             NavigationScopeHandler(element.project, graph),
-            LEFT
-        ) { LABEL_NAVIGATE_CHILD_SCOPE }
+            LEFT) { LABEL_NAVIGATE_CHILD_SCOPE }
       }
     }
     return null

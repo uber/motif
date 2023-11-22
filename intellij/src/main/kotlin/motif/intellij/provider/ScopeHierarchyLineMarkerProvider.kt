@@ -15,7 +15,6 @@
  */
 package motif.intellij.provider
 
-import com.intellij.codeHighlighting.Pass.UPDATE_ALL
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
