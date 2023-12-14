@@ -22,7 +22,7 @@ import com.intellij.psi.PsiElement
 import javax.swing.Icon
 import motif.core.ResolvedGraph
 import motif.intellij.ScopeHierarchyUtils
-import motif.intellij.ScopeHierarchyUtils.Companion.getVisibleSources
+import motif.intellij.ScopeHierarchyUtils.getVisibleSources
 import motif.models.Scope
 
 open class ScopeHierarchySourcesSectionDescriptor(

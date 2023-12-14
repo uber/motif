@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
+import motif.intellij.ScopeHierarchyUtils.formatQualifiedName
 import motif.models.Dependencies
 
 open class ScopeHierarchyDependencyDescriptor(

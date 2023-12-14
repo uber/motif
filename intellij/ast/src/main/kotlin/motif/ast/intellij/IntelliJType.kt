@@ -19,10 +19,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.GenericsUtil
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.TypeConversionUtil
 import kotlin.jvm.javaClass
 import kotlin.let
-import kotlin.text.contains
 import motif.ast.IrClass
 import motif.ast.IrType
 
@@ -32,18 +32,18 @@ class IntelliJType(private val project: Project, val psiType: PsiType) : IrType 
     GenericsUtil.getVariableTypeByExpressionType(psiType).getCanonicalText(false)
   }
 
-  override val isVoid: Boolean by lazy { psiType == PsiType.VOID }
+  override val isVoid: Boolean by lazy { psiType == PsiTypes.voidType() }
 
   override val isPrimitive: Boolean by lazy {
     when (psiType) {
-      PsiType.BOOLEAN,
-      PsiType.BYTE,
-      PsiType.SHORT,
-      PsiType.INT,
-      PsiType.LONG,
-      PsiType.CHAR,
-      PsiType.FLOAT,
-      PsiType.DOUBLE -> true
+      PsiTypes.booleanType(),
+      PsiTypes.byteType(),
+      PsiTypes.shortType(),
+      PsiTypes.intType(),
+      PsiTypes.longType(),
+      PsiTypes.charType(),
+      PsiTypes.floatType(),
+      PsiTypes.doubleType() -> true
       else -> false
     }
   }

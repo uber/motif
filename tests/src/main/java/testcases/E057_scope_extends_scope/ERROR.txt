@@ -17,7 +17,7 @@
   
   [SCOPE EXTENDS SCOPE]
   
-  Scopes can't extend other Scopes:
+  Scope can't extend other Scopes:
   
     testcases.E057_scope_extends_scope.FooScope
   

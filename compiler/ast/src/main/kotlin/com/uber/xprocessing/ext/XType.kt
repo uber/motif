@@ -304,7 +304,7 @@ fun XType.isDeclaredType(): Boolean {
 }
 
 fun XType.isEnum(): Boolean {
-  return typeElement?.let { it.isEnum() } ?: false
+  return typeElement?.isEnum() ?: false
 }
 
 fun XType.isPrimitive(): Boolean {

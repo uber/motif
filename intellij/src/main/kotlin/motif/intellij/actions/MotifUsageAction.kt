@@ -26,7 +26,7 @@ import motif.core.ResolvedGraph
 import motif.intellij.MotifService
 import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
 import motif.intellij.ScopeHierarchyUtils
-import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
+import motif.intellij.ScopeHierarchyUtils.getUsageCount
 import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 

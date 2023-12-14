@@ -22,8 +22,8 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import javax.swing.Icon
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
-import motif.intellij.ScopeHierarchyUtils.Companion.getUsageString
+import motif.intellij.ScopeHierarchyUtils.getUsageCount
+import motif.intellij.ScopeHierarchyUtils.getUsageString
 
 open class ScopeHierarchyUsageSourcesSectionDescriptor(
     private val nonNullProject: Project,

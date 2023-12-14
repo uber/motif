@@ -22,7 +22,7 @@ import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import java.awt.Font.BOLD
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
+import motif.intellij.ScopeHierarchyUtils.formatQualifiedName
 import motif.models.Scope
 
 open class ScopeHierarchySourcesAndSinksSectionDescriptor(

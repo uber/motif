@@ -34,7 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import motif.core.ResolvedGraph
 import motif.errormessage.ErrorMessage
 import motif.intellij.MotifService
-import motif.intellij.ScopeHierarchyUtils.Companion.isRootElement
+import motif.intellij.ScopeHierarchyUtils.isRootElement
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyErrorDescriptor

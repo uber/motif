@@ -22,7 +22,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import motif.core.ResolvedGraph
 import motif.intellij.MotifService
 import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
-import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
+import motif.intellij.ScopeHierarchyUtils.isInitializedGraph
 import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 

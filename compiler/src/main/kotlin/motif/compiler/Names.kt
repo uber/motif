@@ -46,27 +46,24 @@ private class UniqueNameSet(blacklist: Iterable<String>) {
   }
 }
 
-class Names {
+object Names {
 
-  companion object {
-
-    @JvmStatic
-    fun safeName(typeMirror: XType, annotation: XAnnotation?): String {
-      var name = XNameVisitor.visit(typeMirror)
-      val annotationString = annotationString(annotation)
-      name = "$annotationString$name".decapitalize()
-      if (name in KEYWORDS) {
-        name += "_"
-      }
-      return name
+  @JvmStatic
+  fun safeName(typeMirror: XType, annotation: XAnnotation?): String {
+    var name = XNameVisitor.visit(typeMirror)
+    val annotationString = annotationString(annotation)
+    name = "$annotationString$name".decapitalize()
+    if (name in KEYWORDS) {
+      name += "_"
     }
+    return name
+  }
 
-    private fun annotationString(annotation: XAnnotation?): String {
-      return if (annotation?.qualifiedName == "javax.inject.Named") {
-        annotation.getAnnotationValue("value").value.toString()
-      } else {
-        annotation?.type?.typeElement?.name.orEmpty()
-      }
+  private fun annotationString(annotation: XAnnotation?): String {
+    return if (annotation?.qualifiedName == "javax.inject.Named") {
+      annotation.getAnnotationValue("value").value.toString()
+    } else {
+      annotation?.type?.typeElement?.name.orEmpty()
     }
   }
 }

@@ -20,8 +20,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiClass
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.getUsageCount
-import motif.intellij.ScopeHierarchyUtils.Companion.getUsageString
+import motif.intellij.ScopeHierarchyUtils.getUsageCount
+import motif.intellij.ScopeHierarchyUtils.getUsageString
 
 open class ScopeHierarchyUsageSectionDescriptor(
     private val nonNullproject: Project,
