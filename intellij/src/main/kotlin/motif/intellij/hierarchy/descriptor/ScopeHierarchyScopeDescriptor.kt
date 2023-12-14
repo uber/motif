@@ -24,7 +24,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import javax.swing.Icon
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
+import motif.intellij.ScopeHierarchyUtils.formatQualifiedName
 import motif.models.ErrorScope
 import motif.models.Scope
 

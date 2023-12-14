@@ -105,8 +105,7 @@ object XOverrides {
         // one that declares the same method, and check that we haven't reached mA. We compare
         // the enclosing elements rather than the methods themselves for the reason described
         // at the start of the method.
-        var inherited: XMethodElement? = null
-        (inherited != null && overridden.enclosingElement != inherited.enclosingElement)
+        false
       } else if (overriddenType?.isInterface() == true) {
         // ...overrides from C another method mI declared in interface I. We've already checked
         // the conditions (assuming that the only alternative to mI being abstract or default is
@@ -121,8 +120,7 @@ object XOverrides {
         // to `overriddenType` (or the several paths if there are several) and apply similar logic
         // to methodFromSuperclasses above.
         if (overrider.isAbstract()) {
-          var inherited: XMethodElement? = null
-          (inherited != null && overridden.enclosingElement != inherited.enclosingElement)
+          false
         } else {
           true
         }

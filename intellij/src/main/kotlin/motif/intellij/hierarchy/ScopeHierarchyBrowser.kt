@@ -44,7 +44,7 @@ import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.intellij.MotifService
 import motif.intellij.ScopeHierarchyUtils
-import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.ScopeHierarchyUtils.isMotifScopeClass
 import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyRootDescriptor

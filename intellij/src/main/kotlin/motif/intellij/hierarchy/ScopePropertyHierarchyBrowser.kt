@@ -42,7 +42,7 @@ import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJType
 import motif.core.ResolvedGraph
 import motif.intellij.MotifService
-import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.ScopeHierarchyUtils.isMotifScopeClass
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_NEXT_SCOPE
 import motif.intellij.hierarchy.ScopeHierarchyBrowser.Companion.LABEL_GO_PREVIOUS_SCOPE
 import motif.intellij.hierarchy.descriptor.ScopeHierarchyDependenciesSectionDescriptor

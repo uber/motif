@@ -25,9 +25,9 @@ import com.intellij.psi.PsiElement
 import motif.core.ResolvedGraph
 import motif.intellij.MotifService
 import motif.intellij.MotifService.Companion.TOOL_WINDOW_ID
-import motif.intellij.ScopeHierarchyUtils.Companion.getParentScopes
-import motif.intellij.ScopeHierarchyUtils.Companion.isInitializedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.isMotifScopeClass
+import motif.intellij.ScopeHierarchyUtils.getParentScopes
+import motif.intellij.ScopeHierarchyUtils.isInitializedGraph
+import motif.intellij.ScopeHierarchyUtils.isMotifScopeClass
 import motif.intellij.analytics.AnalyticsService
 import motif.intellij.analytics.MotifAnalyticsActions
 

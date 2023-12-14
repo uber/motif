@@ -27,7 +27,7 @@ import javax.swing.Icon
 import motif.ast.intellij.IntelliJClass
 import motif.ast.intellij.IntelliJMethod
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
+import motif.intellij.ScopeHierarchyUtils.formatQualifiedName
 import motif.models.ChildParameterSource
 import motif.models.FactoryMethodSource
 import motif.models.ScopeSource

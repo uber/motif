@@ -38,7 +38,7 @@ class SimpleNameTest(private val qualifiedName: String, private val expectedSimp
     @JvmStatic
     @Parameterized.Parameters(name = "{0}")
     fun data(): Collection<Array<Any>> {
-      return tests.map { (key, value) -> arrayOf<Any>(key, value) }
+      return tests.map { (key, value) -> arrayOf(key, value) }
     }
   }
 

@@ -24,7 +24,7 @@ import com.google.common.collect.Sets.cartesianProduct
 import com.google.common.truth.Truth.assertThat
 import com.squareup.javapoet.ClassName
 import javax.inject.Qualifier
-import motif.compiler.Names.Companion.safeName
+import motif.compiler.Names.safeName
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

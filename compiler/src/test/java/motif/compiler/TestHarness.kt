@@ -90,7 +90,7 @@ class TestHarness(
             // We don't generate Java from KSP
             proc == ProcessorType.KSP && mode == OutputMode.JAVA
           }
-          .filterNot { (proc, mode, dir, name) ->
+          .filterNot { (proc, _, _, name) ->
             // Can't run KSP on Java sources until fixed: https://github.com/google/ksp/issues/1086
             proc == ProcessorType.KSP && "$name"[0] in setOf('T', 'E')
           }
@@ -98,7 +98,6 @@ class TestHarness(
             testFilter(proc as ProcessorType, mode as OutputMode, dir as File, name as String)
           }
           .map { it.toTypedArray() as Array<Any> }
-          .toList()
     }
 
     private fun isTestDir(file: File): Boolean {
@@ -119,7 +118,7 @@ class TestHarness(
           ProcessorType.AP -> annotationProcessor?.graph
           ProcessorType.KSP -> symbolProcessorProvider?.graph
         }
-            ?: throw IllegalStateException("No graph found during processing")
+    checkNotNull(graph) { "No graph found during processing" }
 
     if (isErrorTest) {
       runErrorTest(result, graph)
@@ -139,7 +138,7 @@ class TestHarness(
 
       if (externalClassesDirs.isEmpty()) {
         URLClassLoader(arrayOf(proguardedClasses.toURI().toURL()), javaClass.classLoader)
-      } else {}
+      }
       val testClass = classLoader.loadClass(testClassName)
 
       if (testClass.getAnnotation(Ignore::class.java) == null) {
@@ -173,7 +172,7 @@ class TestHarness(
       symbolProcessorProvider: SymbolProcessorProvider?,
       classpath: List<File> = emptyList()
   ): TestCompilationResult {
-    val processorOptions = mapOf("motif.mode" to outputMode.name.toLowerCase())
+    val processorOptions = mapOf("motif.mode" to outputMode.name.lowercase())
     val sources = getFiles(sourcesDir).asSources()
     val annotationProcessors =
         annotationProcessor?.let { listOf(it, ComponentProcessor()) } ?: emptyList()
@@ -359,12 +358,7 @@ class TestHarness(
 
 internal fun File.listFilesRecursively() = walkTopDown().filter { it.isFile }.toList()
 
-private fun TestCompilationResult.success() = success
-
 private fun TestCompilationResult.messages(): String {
-  return diagnostics[Diagnostic.Kind.ERROR]
-      .orEmpty()
-      .flatMap { it.msg.lines() }
-      .map { "  $it" }
-      .joinToString(separator = "\n")
+  return diagnostics[Diagnostic.Kind.ERROR].orEmpty().flatMap { it.msg.lines() }.joinToString(
+      separator = "\n") { "  $it" }
 }

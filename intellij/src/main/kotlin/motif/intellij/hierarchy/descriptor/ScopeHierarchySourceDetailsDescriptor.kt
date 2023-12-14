@@ -21,7 +21,7 @@ import com.intellij.openapi.roots.ui.util.CompositeAppearance
 import com.intellij.psi.PsiElement
 import javax.swing.Icon
 import motif.core.ResolvedGraph
-import motif.intellij.ScopeHierarchyUtils.Companion.formatQualifiedName
+import motif.intellij.ScopeHierarchyUtils.formatQualifiedName
 import motif.models.Source
 
 open class ScopeHierarchySourceDetailsDescriptor(
