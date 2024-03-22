@@ -38,7 +38,7 @@ dependencies {
     annotationProcessor deps.butterknifeCompiler
     annotationProcessor deps.glideCompiler
     annotationProcessor project(':compiler')
-    implementation project(':samples:sample-lib')
+    implementation project(':samples-sample-lib')
     implementation project(':lib')
     implementation deps.glide
     implementation deps.stetho
@@ -47,5 +47,4 @@ dependencies {
 
     testImplementation deps.test.junit
     testImplementation deps.test.truth
-
 }

@@ -17,7 +17,7 @@ kotlin {
 }
 
 dependencies {
-    kapt project(':tests:compiler')
+    kapt project(':tests-compiler')
     kapt deps.daggerCompiler
     implementation project(':core')
     implementation project(':lib')
