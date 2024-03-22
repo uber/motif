@@ -29,23 +29,24 @@ pluginManagement {
 }
 
 rootProject.name = 'motif'
-include 'lib'
+include 'ast'
 include 'compiler'
 include 'compiler-ast'
 include 'compiler-ksp'
-include 'samples:sample'
-include 'samples:sample-lib'
-include 'samples:sample-kotlin'
-include 'samples:sample-kotlin-ksp'
-include 'samples:dagger-comparison'
-include 'intellij'
-include 'intellij-ast'
 include 'core'
 include 'errormessage'
+include 'intellij'
+include 'intellij-ast'
+include 'lib'
 include 'models'
-include 'ast'
+include 'samples-dagger-comparison'
+include 'samples-sample'
+include 'samples-sample-kotlin'
+include 'samples-sample-kotlin-ksp'
+include 'samples-sample-lib'
+include 'samples-sample-lib-ksp'
 include 'tests'
-include 'tests:compiler'
+include 'tests-compiler'
 include 'viewmodel'
 include 'xprocessing'
 include 'xprocessing-testing'
@@ -53,4 +54,10 @@ include 'xprocessing-testing'
 project(':compiler-ast').projectDir = file('compiler/ast')
 project(':compiler-ksp').projectDir = file('compiler/ksp')
 project(':intellij-ast').projectDir = file('intellij/ast')
-include ':samples:sample-lib-ksp'
+project(':samples-dagger-comparison').projectDir = file('samples/dagger-comparison')
+project(':samples-sample').projectDir = file('samples/sample')
+project(':samples-sample-kotlin').projectDir = file('samples/sample-kotlin')
+project(':samples-sample-kotlin-ksp').projectDir = file('samples/sample-kotlin-ksp')
+project(':samples-sample-lib').projectDir = file('samples/sample-lib')
+project(':samples-sample-lib-ksp').projectDir = file('samples/sample-lib-ksp')
+project(':tests-compiler').projectDir = file('tests/compiler')

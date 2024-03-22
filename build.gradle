@@ -106,9 +106,11 @@ subprojects {
     }
 
     apply plugin: 'org.jetbrains.dokka'
-    tasks.withType(DokkaTaskPartial).configureEach {
-        outputDirectory.set(new File(buildDir, "docs/partial"))
-        moduleName.set(project.property("POM_ARTIFACT_ID").toString())
-        moduleVersion.set(project.property("VERSION_NAME").toString())
+    if (!project.name.contains("samples") && !project.name.contains("tests")) {
+        tasks.withType(DokkaTaskPartial).configureEach {
+            outputDirectory.set(new File(buildDir, "docs/partial"))
+            moduleName.set(project.property("POM_ARTIFACT_ID").toString())
+            moduleVersion.set(project.property("VERSION_NAME").toString())
+        }
     }
 }
