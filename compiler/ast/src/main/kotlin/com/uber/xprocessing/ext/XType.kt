@@ -312,8 +312,16 @@ fun XType.isPrimitive(): Boolean {
 }
 
 private fun XType.hasCollectionType(): Boolean {
-  return this.typeElement?.name.orEmpty() in collectionTypes ||
-      typeArguments.any { it.hasCollectionType() }
+  val visited = mutableSetOf<XType>()
+  val queue = mutableListOf(this@hasCollectionType)
+  while (queue.isNotEmpty()) {
+    val type = queue.removeFirst()
+    if (type in visited) continue
+    if (type.typeElement?.name in collectionTypes) return true
+    visited.add(type)
+    queue.addAll(type.typeArguments)
+  }
+  return false
 }
 
 private val collectionTypes =
