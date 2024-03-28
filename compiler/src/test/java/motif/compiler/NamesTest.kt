@@ -31,7 +31,7 @@ import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
 @OptIn(ExperimentalProcessingApi::class)
-class XNamesTest(private val processorType: ProcessorType, private val srcLang: SourceLanguage) {
+class NamesTest(private val processorType: ProcessorType, private val srcLang: SourceLanguage) {
 
   companion object {
     @JvmStatic
@@ -49,17 +49,17 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
 
   @Test
   fun primitive() {
-    assertSafeName("int", "kotlin.Int", "integer")
+    assertSafeName("int", "kotlin.Int", "integer_")
   }
 
   @Test
   fun boxed() {
-    assertSafeName("java.lang.Integer", "kotlin.Int?", "integer")
+    assertSafeName("java.lang.Integer", "kotlin.Int?", "integer_")
   }
 
   @Test
   fun raw() {
-    assertSafeName("java.util.HashMap", "java.util.HashMap<*, *>", "hashMap")
+    assertSafeName("java.util.HashMap", "java.util.HashMap<*, *>", "hashMap_")
   }
 
   @Test
@@ -67,7 +67,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<String, Integer>",
         "java.util.HashMap<String, Integer>",
-        "stringIntegerHashMap")
+        "stringIntegerHashMap_")
   }
 
   @Test
@@ -75,22 +75,24 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<? extends String, ? super Integer>",
         "java.util.HashMap<out String, out Integer>",
-        "stringIntegerHashMap")
+        "stringIntegerHashMap_")
   }
 
   @Test
   fun wildcardUnbounded() {
-    assertSafeName("java.util.HashMap<?, ?>", "java.util.HashMap<*, *>", "hashMap")
+    assertSafeName("java.util.HashMap<?, ?>", "java.util.HashMap<*, *>", "hashMap_")
   }
 
   @Test
   fun typeVariable() {
-    assertSafeName("java.util.HashMap<String, A>", "java.util.HashMap<String, A>", "stringAHashMap")
+    assertSafeName(
+        "java.util.HashMap<String, A>", "java.util.HashMap<String, A>", "stringAHashMap_")
   }
 
   @Test
   fun typeVariableUnbounded() {
-    assertSafeName("java.util.HashMap<String, B>", "java.util.HashMap<String, B>", "stringBHashMap")
+    assertSafeName(
+        "java.util.HashMap<String, B>", "java.util.HashMap<String, B>", "stringBHashMap_")
   }
 
   @Test
@@ -98,7 +100,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
         "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
-        "stringIntegerHashMapIntegerHashMap")
+        "stringIntegerHashMapIntegerHashMap_")
   }
 
   @Test
@@ -106,7 +108,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.Map.Entry<String, Integer>",
         "java.util.Map.Entry<String, Integer>",
-        "stringIntegerMapEntry")
+        "stringIntegerMapEntry_")
   }
 
   @Test
@@ -116,22 +118,22 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
 
   @Test
   fun named() {
-    assertSafeName("String", "String", "fooString", "@javax.inject.Named(\"Foo\")")
+    assertSafeName("String", "String", "fooString_", "@javax.inject.Named(\"Foo\")")
   }
 
   @Test
   fun customQualifier() {
-    assertSafeName("String", "String", "fooString", qualifierString = "@Foo")
+    assertSafeName("String", "String", "fooString_", qualifierString = "@Foo")
   }
 
   @Test
   fun array() {
-    assertSafeName("String[]", "Array<String>", "stringArray")
+    assertSafeName("String[]", "Array<String>", "stringArray_")
   }
 
   @Test
   fun enum() {
-    assertSafeName("LogLevel", "LogLevel", "logLevel")
+    assertSafeName("LogLevel", "LogLevel", "logLevel_")
   }
 
   @Test

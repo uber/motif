@@ -23,7 +23,7 @@
     ---- String | Objects.string ----
       [ Required ]
       [ Consumed By ]
-        * Scope | Scope.string()
+        * Scope | Scope.string_()
 
     ---- Scope | implicit ----
       [ Required ]
