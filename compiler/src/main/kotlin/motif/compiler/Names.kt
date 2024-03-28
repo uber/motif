@@ -17,6 +17,8 @@ package motif.compiler
 
 import androidx.room.compiler.processing.XAnnotation
 import androidx.room.compiler.processing.XType
+import com.google.common.annotations.VisibleForTesting
+import java.util.Locale
 import motif.ast.compiler.CompilerAnnotation
 import motif.ast.compiler.CompilerType
 import motif.models.Type
@@ -49,14 +51,11 @@ private class UniqueNameSet(blacklist: Iterable<String>) {
 object Names {
 
   @JvmStatic
+  @VisibleForTesting
   fun safeName(typeMirror: XType, annotation: XAnnotation?): String {
-    var name = XNameVisitor.visit(typeMirror)
+    val name = XNameVisitor.visit(typeMirror)
     val annotationString = annotationString(annotation)
-    name = "$annotationString$name".decapitalize()
-    if (name in KEYWORDS) {
-      name += "_"
-    }
-    return name
+    return "$annotationString${name}_".replaceFirstChar { it.lowercase(Locale.ENGLISH) }
   }
 
   private fun annotationString(annotation: XAnnotation?): String {
@@ -67,56 +66,3 @@ object Names {
     }
   }
 }
-
-private val KEYWORDS =
-    setOf(
-        "abstract",
-        "continue",
-        "for",
-        "new",
-        "switch",
-        "assert",
-        "default",
-        "goto",
-        "package",
-        "synchronized",
-        "boolean",
-        "do",
-        "if",
-        "private",
-        "this",
-        "break",
-        "double",
-        "implements",
-        "protected",
-        "throw",
-        "byte",
-        "else",
-        "import",
-        "public",
-        "throws",
-        "case",
-        "enum",
-        "instanceof",
-        "return",
-        "transient",
-        "catch",
-        "extends",
-        "int",
-        "short",
-        "try",
-        "char",
-        "final",
-        "interface",
-        "static",
-        "void",
-        "class",
-        "finally",
-        "long",
-        "strictfp",
-        "volatile",
-        "const",
-        "float",
-        "native",
-        "super",
-        "while")
