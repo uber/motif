@@ -48,6 +48,7 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
     addLibrary(Inject::class)
     addLibrary(Scope::class)
     addLibrary(Nullable::class)
+    addLibrary(JvmSuppressWildcards::class)
   }
 
   private fun addLibrary(clazz: KClass<*>) {
