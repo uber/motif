@@ -141,10 +141,5 @@ object TestRenderer {
 
 /** HACK: Map kotlin types to Java for graph validation (issue when KSP processes Java sources) */
 private fun String.toJvmSimpleName(): String {
-  return when (this) {
-    "Int" -> "int"
-    "Boolean" -> "boolean"
-    "Byte" -> "byte"
-    else -> this
-  }
+  return this.replace(", ", ",")
 }
