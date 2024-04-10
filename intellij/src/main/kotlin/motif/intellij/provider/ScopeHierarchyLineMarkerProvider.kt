@@ -15,7 +15,6 @@
  */
 package motif.intellij.provider
 
-import com.intellij.codeHighlighting.Pass.UPDATE_ALL
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -70,10 +69,9 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifService.Listen
         element,
         identifier.textRange,
         AllIcons.Hierarchy.Supertypes,
-        UPDATE_ALL,
         ConstantFunction<PsiElement, String>(LABEL_ANCESTORS_SCOPE),
         ScopeHierarchyHandler(element.project),
-        LEFT)
+        LEFT) { LABEL_ANCESTORS_SCOPE }
   }
 
   private class ScopeHierarchyHandler(val project: Project) :
