@@ -202,6 +202,37 @@ MainScope mainScope = new MainScopeImpl();
 ChildScope childScope = mainScope.child();
 ```
 
+## Dependency Resolution and Exposure
+
+Motif requires explicit dependency declarations to properly resolve and inject dependencies across scopes. When a parent scope needs to provide a dependency to a child scope, the dependency must be explicitly exposed using the `@Expose` annotation.
+
+For example:
+
+```kotlin
+@motif.Scope
+interface ParentScope {
+    @motif.Objects
+    class Objects {
+        fun provideImpl(): Impl {
+            return Impl()
+        }
+
+        @Expose
+        fun provideApi(impl: Impl): Api {
+            return impl
+        }
+    }
+}
+
+@motif.Scope
+interface ChildScope {
+    @motif.Objects
+    abstract class Objects {
+        abstract fun api(): Api
+    }
+}
+```
+
 ## Root Scopes
 
 By extending `Creatable<D>` you can specify exactly the dependencies you expect from the parent `Scope`. This allows
