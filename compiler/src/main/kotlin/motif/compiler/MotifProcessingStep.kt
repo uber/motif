@@ -83,7 +83,7 @@ class MotifProcessingStep(
 
     val mode: OutputMode? =
         try {
-          OutputMode.valueOf(env.options[OPTION_MODE]?.toUpperCase() ?: "")
+          OutputMode.valueOf(env.options[OPTION_MODE]?.uppercase() ?: "")
         } catch (ignore: IllegalArgumentException) {
           if (env.backend == XProcessingEnv.Backend.KSP) OutputMode.KOTLIN else null
         }
