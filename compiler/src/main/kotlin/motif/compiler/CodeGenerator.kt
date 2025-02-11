@@ -29,7 +29,7 @@ object CodeGenerator {
     } else if (mode == OutputMode.KOTLIN) {
       if (env.backend == XProcessingEnv.Backend.JAVAC && kaptKotlinGeneratedDir == null) {
         throw IllegalStateException(
-            "-A$OPTION_MODE=${OutputMode.KOTLIN.name.toLowerCase()} " +
+            "-A$OPTION_MODE=${OutputMode.KOTLIN.name.lowercase()} " +
                 "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
       }
       generateKotlin(env, graph, kaptKotlinGeneratedDir)

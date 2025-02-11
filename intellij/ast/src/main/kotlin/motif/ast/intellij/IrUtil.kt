@@ -19,11 +19,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotationOwner
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
-import java.util.Locale
 import kotlin.collections.filter
 import kotlin.collections.map
 import kotlin.collections.toSet
-import kotlin.text.toUpperCase
 import motif.ast.IrAnnotation
 import motif.ast.IrModifier
 
@@ -32,7 +30,7 @@ interface IrUtil {
   fun PsiModifierListOwner.irModifiers(): Set<IrModifier> {
     return PsiModifier.MODIFIERS
         .filter { hasModifierProperty(it) }
-        .map { IrModifier.valueOf(it.toUpperCase(Locale.getDefault())) }
+        .map { IrModifier.valueOf(it.uppercase()) }
         .toSet()
   }
 
