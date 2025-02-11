@@ -6,10 +6,6 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(11)
-}
-
-kotlin {
     sourceSets {
         main.kotlin.srcDirs += 'build/generated/ksp/main/kotlin'
         test.kotlin.srcDirs += 'build/generated/ksp/test/kotlin'
