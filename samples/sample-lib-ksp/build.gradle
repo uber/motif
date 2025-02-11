@@ -29,11 +29,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-
     androidComponents {
         beforeVariants(selector().withBuildType("debug")) { variantBuilder ->
             variantBuilder.enabled = false

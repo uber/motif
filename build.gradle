@@ -64,9 +64,34 @@ subprojects {
         }
         boolean isKotlinLibrary = project.plugins.hasPlugin("org.jetbrains.kotlin.jvm") || project.plugins.hasPlugin("org.jetbrains.kotlin.android")
         if (isKotlinLibrary) {
+            java {
+                toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+            }
+            kotlin {
+                jvmToolchain(11)
+            }
             it.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                 kotlinOptions {
                     freeCompilerArgs += extraKotlincArgs
+                }
+            }
+        }
+
+        boolean isAndroidLibraryOrApp = project.plugins.hasPlugin("org.jetbrains.kotlin.android")
+        if (isAndroidLibraryOrApp) {
+            android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+
+            }
+        }
+
+        if (isKotlinLibrary && isAndroidLibraryOrApp) {
+            android {
+                kotlinOptions {
+                    jvmTarget = "1.8"
                 }
             }
         }

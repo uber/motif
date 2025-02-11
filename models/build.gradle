@@ -3,10 +3,6 @@ plugins {
     id 'com.vanniktech.maven.publish'
 }
 
-kotlin {
-    jvmToolchain(11)
-}
-
 dependencies {
     api project(':ast')
 

@@ -22,11 +22,6 @@ android {
         quiet true
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     variantFilter { variant ->
         if (variant.buildType.name == 'release') {
             variant.setIgnore(true)
