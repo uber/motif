@@ -6,6 +6,10 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+}
+
 dependencies {
     // Dagger is part of the API since we generate code which depends on Dagger's API in the consuming gradle module.
     api deps.dagger
