@@ -15,18 +15,18 @@
  */
 
 def versions = [
-        kotlin: '1.8.20',
-        ksp: '1.8.20-1.0.11',
-        ktlint: '0.41.0',
-        ktfmt: '0.23',
+        kotlin: '2.1.0',
+        ksp: '2.1.0-1.0.28',
+        ktlint: '1.5.0',
+        ktfmt: '0.54',
         dagger: '2.47',
         butterknife: '10.1.0',
         glide: '4.9.0',
-        gjf: '1.7',
+        gjf: '1.8',
         kotlinpoet: '1.12.0',
         room: '2.1.0',
-        roomCompilerProcessing: '2.6.0-alpha02',
-        dokka: '1.9.10',
+        roomCompilerProcessing: '2.7.0-alpha13',
+        dokka: '2.0.0',
         "gradleIntellijPlugin": [
                 ide: '2023.2'
         ],
@@ -35,26 +35,27 @@ def versions = [
 ext.deps = [
         "versions": versions,
         "build": [
-                buildToolsVersion: '30.0.3',
-                compileSdkVersion: 31,
+                buildToolsVersion: '33.0.0',
+                compileSdkVersion: 33,
                 ci: 'true' == System.getenv('CI'),
                 minSdkVersion: 21,
                 targetSdkVersion: 30,
 
                 gradlePlugins: [
                         android: 'com.android.tools.build:gradle:7.4.2',
+                        intellij: 'org.jetbrains.intellij:org.jetbrains.intellij.gradle.plugin:1.15.0',
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         ksp: "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${versions.ksp}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
                         mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.27.0',
-                        spotless: "com.diffplug.spotless:spotless-plugin-gradle:5.11.0",
+                        spotless: "com.diffplug.spotless:spotless-plugin-gradle:7.0.2",
                         shadow: "com.github.johnrengelman:shadow:8.1.0",
                 ]
         ],
         "kotlin": [
                 kapt: "org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:${versions.kotlin}",
                 reflection: "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
-                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+                stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
         ],
         "rx": [
                 android: 'io.reactivex.rxjava2:rxandroid:2.1.1',
@@ -82,7 +83,7 @@ ext.deps = [
         javapoet: 'com.squareup:javapoet:1.13.0',
         kotlinpoet: "com.squareup:kotlinpoet:${versions.kotlinpoet}",
         kotlinpoetInteropMetadata: "com.squareup:kotlinpoet-metadata:${versions.kotlinpoet}",
-        kotlinxMetadata : 'org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.6.2',
+        kotlinxMetadata : 'org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0',
         autoCommon: 'com.google.auto:auto-common:1.1.2',
         autoService: "com.google.auto.service:auto-service:1.0",
         commonsCodec: 'commons-codec:commons-codec:1.13',
