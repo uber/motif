@@ -109,7 +109,10 @@ subprojects {
             }
             kotlin {
                 target "src/**/*.kt"
-                ktlint(deps.versions.ktlint).userData(['indent_size': '2', 'continuation_indent_size': '2'])
+                ktlint(deps.versions.ktlint).editorConfigOverride([
+                        "indent_size": "2",
+                        "continuation_indent_size": "4"
+                ])
                 ktfmt(deps.versions.ktfmt)
                 licenseHeaderFile rootProject.file('config/spotless/copyright.kt')
                 trimTrailingWhitespace()
