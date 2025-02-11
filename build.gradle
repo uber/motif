@@ -113,6 +113,10 @@ subprojects {
                         "indent_size": "2",
                         "continuation_indent_size": "4"
                 ])
+                suppressLintsFor {
+                    step = 'ktlint'
+                    shortCode = 'standard:function-naming'
+                }
                 ktfmt(deps.versions.ktfmt)
                 licenseHeaderFile rootProject.file('config/spotless/copyright.kt')
                 trimTrailingWhitespace()
