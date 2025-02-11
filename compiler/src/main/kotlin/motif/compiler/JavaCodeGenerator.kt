@@ -24,6 +24,7 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeSpec
+import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
 import com.uber.xprocessing.ext.isKotlinSource
 import com.uber.xprocessing.ext.withRawTypeFix
 import javax.lang.model.element.Modifier
@@ -126,6 +127,7 @@ object JavaCodeGenerator {
         .build()
   }
 
+  @OptIn(KotlinPoetJavaPoetPreview::class)
   private fun ChildDependenciesImpl.spec(): TypeSpec {
     val isKotlinDepInterface = env.findTypeElement(childDependenciesClassName.j).isKotlinSource(env)
     return TypeSpec.anonymousClassBuilder("")

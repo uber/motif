@@ -23,12 +23,14 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
 import com.uber.xprocessing.ext.modifiers
 import javax.lang.model.element.Modifier
 import motif.compiler.KotlinTypeWorkaround.javaToKotlinType
 
 object XFunSpec {
   /** Copied from [FunSpec.overriding] and modified to leverage [javaToKotlinType]& XProcessing. */
+  @OptIn(KotlinPoetJavaPoetPreview::class)
   fun overriding(
       executableElement: XExecutableElement,
       enclosing: XType,
