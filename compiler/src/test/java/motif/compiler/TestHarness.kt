@@ -184,6 +184,7 @@ class TestHarness(
                 classpath = classpath,
                 inheritClasspath = true,
                 kaptProcessors = annotationProcessors,
+                kotlincArguments = listOf("-language-version", "1.9", "-api-version", "1.9"),
                 symbolProcessorProviders = symbolProcessorProvider?.let { listOf(it) }
                         ?: emptyList(),
                 processorOptions = processorOptions,
