@@ -21,5 +21,5 @@ import motif.models.Source
 class ProvidedDependency(
     val source: Source,
     val consumedBy: List<Sink>,
-    val requiredDependencies: List<RequiredDependency>
+    val requiredDependencies: List<RequiredDependency>,
 )

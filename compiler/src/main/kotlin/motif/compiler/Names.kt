@@ -25,11 +25,13 @@ class NameScope(blacklist: Iterable<String> = emptySet()) {
 
   private val names = UniqueNameSet(blacklist)
 
-  fun name(type: Type): String {
-    return names.unique(
-        Names.safeName(
-            (type.type as CompilerType).mirror, (type.qualifier as? CompilerAnnotation)?.mirror))
-  }
+  fun name(type: Type): String =
+      names.unique(
+          Names.safeName(
+              (type.type as CompilerType).mirror,
+              (type.qualifier as? CompilerAnnotation)?.mirror,
+          ),
+      )
 }
 
 private class UniqueNameSet(blacklist: Iterable<String>) {
@@ -59,13 +61,12 @@ object Names {
     return name
   }
 
-  private fun annotationString(annotation: XAnnotation?): String {
-    return if (annotation?.qualifiedName == "javax.inject.Named") {
-      annotation.getAnnotationValue("value").value.toString()
-    } else {
-      annotation?.type?.typeElement?.name.orEmpty()
-    }
-  }
+  private fun annotationString(annotation: XAnnotation?): String =
+      if (annotation?.qualifiedName == "javax.inject.Named") {
+        annotation.getAnnotationValue("value").value.toString()
+      } else {
+        annotation?.type?.typeElement?.name.orEmpty()
+      }
 }
 
 private val KEYWORDS =
@@ -119,4 +120,5 @@ private val KEYWORDS =
         "float",
         "native",
         "super",
-        "while")
+        "while",
+    )

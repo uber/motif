@@ -31,6 +31,8 @@ internal class UnspreadableTypeHandler(private val error: UnspreadableType) : Er
 
               [Factory Method]
                 ${error.objects.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

@@ -27,7 +27,7 @@ open class ScopeHierarchyUsageSectionDescriptor(
     private val nonNullproject: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    val clazz: PsiClass
+    val clazz: PsiClass,
 ) : ScopeHierarchyNodeDescriptor(nonNullproject, graph, parentDescriptor, clazz, false) {
 
   override fun updateText(text: CompositeAppearance) {

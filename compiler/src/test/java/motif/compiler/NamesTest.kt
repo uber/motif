@@ -31,20 +31,21 @@ import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
 @OptIn(ExperimentalProcessingApi::class)
-class XNamesTest(private val processorType: ProcessorType, private val srcLang: SourceLanguage) {
+class NamesTest(private val processorType: ProcessorType, private val srcLang: SourceLanguage) {
 
   companion object {
     @JvmStatic
     @Parameterized.Parameters(name = "{0}_{1}")
-    fun data(): Collection<Array<Any>> {
-      return cartesianProduct(
-              ProcessorType.values().toSortedSet(), SourceLanguage.values().toSortedSet())
-          .filterNot { (proc, srcLang) ->
-            proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
-          }
-          .map { it.toTypedArray() as Array<Any> }
-          .toList()
-    }
+    fun data(): Collection<Array<Any>> =
+        cartesianProduct(
+                ProcessorType.values().toSortedSet(),
+                SourceLanguage.values().toSortedSet(),
+            )
+            .filterNot { (proc, srcLang) ->
+              proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
+            }
+            .map { it.toTypedArray() as Array<Any> }
+            .toList()
   }
 
   @Test
@@ -67,7 +68,8 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<String, Integer>",
         "java.util.HashMap<String, Integer>",
-        "stringIntegerHashMap")
+        "stringIntegerHashMap",
+    )
   }
 
   @Test
@@ -75,7 +77,8 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<? extends String, ? super Integer>",
         "java.util.HashMap<out String, out Integer>",
-        "stringIntegerHashMap")
+        "stringIntegerHashMap",
+    )
   }
 
   @Test
@@ -98,7 +101,8 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
         "java.util.HashMap<java.util.HashMap<String, Integer>, Integer>",
-        "stringIntegerHashMapIntegerHashMap")
+        "stringIntegerHashMapIntegerHashMap",
+    )
   }
 
   @Test
@@ -106,7 +110,8 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
     assertSafeName(
         "java.util.Map.Entry<String, Integer>",
         "java.util.Map.Entry<String, Integer>",
-        "stringIntegerMapEntry")
+        "stringIntegerMapEntry",
+    )
   }
 
   @Test
@@ -147,7 +152,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
   private fun compile(
       classString: String,
       qualifierString: String,
-      assertion: (XTestInvocation, String) -> Unit
+      assertion: (XTestInvocation, String) -> Unit,
   ) {
     when (processorType) {
       ProcessorType.AP -> {
@@ -236,7 +241,7 @@ class XNamesTest(private val processorType: ProcessorType, private val srcLang: 
       javaClassString: String,
       ktClassString: String,
       expectedSafeName: String,
-      qualifierString: String = ""
+      qualifierString: String = "",
   ) {
     val assertion = { invocation: XTestInvocation, safeName: String ->
       invocation.assertCompilationResult {

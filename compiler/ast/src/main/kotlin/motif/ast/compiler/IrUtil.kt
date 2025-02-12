@@ -27,11 +27,8 @@ interface IrUtil {
 
   val env: XProcessingEnv
 
-  fun XElement.irModifiers(): Set<IrModifier> {
-    return modifierNames.map { IrModifier.valueOf(it) }.toSet()
-  }
+  fun XElement.irModifiers(): Set<IrModifier> = modifierNames.map { IrModifier.valueOf(it) }.toSet()
 
-  fun XElement.irAnnotations(): List<IrAnnotation> {
-    return getAllAnnotations().map { CompilerAnnotation(env, it) }
-  }
+  fun XElement.irAnnotations(): List<IrAnnotation> =
+      getAllAnnotations().map { CompilerAnnotation(env, it) }
 }

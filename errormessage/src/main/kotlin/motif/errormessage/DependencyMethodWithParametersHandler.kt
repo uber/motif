@@ -18,7 +18,7 @@ package motif.errormessage
 import motif.models.DependencyMethodWithParameters
 
 internal class DependencyMethodWithParametersHandler(
-    private val error: DependencyMethodWithParameters
+    private val error: DependencyMethodWithParameters,
 ) : ErrorHandler {
 
   override val name = "DEPENDENCY METHOD PARAMETER"
@@ -29,6 +29,8 @@ internal class DependencyMethodWithParametersHandler(
             Methods on dependencies interfaces must be parameterless:
 
               ${error.dependenciesClass.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

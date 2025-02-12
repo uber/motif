@@ -33,13 +33,10 @@ val XElement.modifiers: List<Modifier>
       if (isFinal()) modifiers += Modifier.FINAL
       if (isTransient()) modifiers += Modifier.TRANSIENT
       return@let modifiers
-    }
-        ?: emptyList()
+    } ?: emptyList()
   }
 
 val XElement.modifierNames: List<String>
   get() = modifiers.map { it.name }
 
-fun XHasModifiers.isPackagePrivate(): Boolean {
-  return !isPrivate() && !isProtected() && !isPublic()
-}
+fun XHasModifiers.isPackagePrivate(): Boolean = !isPrivate() && !isProtected() && !isPublic()

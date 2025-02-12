@@ -26,7 +26,7 @@ class ScopeHierarchyRootDescriptor(
     project: Project,
     graph: ResolvedGraph,
     element: PsiElement,
-    private val status: ScopeHierarchyBrowser.Status
+    private val status: ScopeHierarchyBrowser.Status,
 ) : ScopeHierarchyNodeDescriptor(project, graph, null, element, true) {
 
   companion object {

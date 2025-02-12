@@ -27,7 +27,7 @@ open class ScopeHierarchyRootErrorDescriptor(
     project: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    element: PsiElement
+    element: PsiElement,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -38,7 +38,6 @@ open class ScopeHierarchyRootErrorDescriptor(
     }
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return if (graph.errors.isNotEmpty()) null else AllIcons.RunConfigurations.TestPassed
-  }
+  override fun getIcon(element: PsiElement): Icon? =
+      if (graph.errors.isNotEmpty()) null else AllIcons.RunConfigurations.TestPassed
 }

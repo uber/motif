@@ -33,36 +33,34 @@ import com.uber.xprocessing.ext.isPrimitive
 
 object XNameVisitor {
 
-  fun visit(t: XType): String {
-    return when {
-      t.isVoid() -> visitNoType(t)
-      t.isError() &&
-          t.typeElement?.qualifiedName.orEmpty().let { "ERROR" in it || "NonExistent" in it } ->
-          visitError(t)
-      t.isArray() -> visitArray(t)
-      t.isWildcard() -> visitWildcard(t)
-      t.isDeclaredType() -> visitDeclared(t)
-      t.isPrimitive() -> visitPrimitive(t)
-      t.isEnum() -> visitDeclared(t)
-      t.isKotlinUnit() -> visitDeclared(t)
-      t.isTypeVariable() -> visitTypeVariable(t)
-      else -> visitNoType(t)
-    }
-  }
+  fun visit(t: XType): String =
+      when {
+        t.isVoid() -> visitNoType(t)
+        t.isError() &&
+            t.typeElement?.qualifiedName.orEmpty().let { "ERROR" in it || "NonExistent" in it } ->
+            visitError(t)
+        t.isArray() -> visitArray(t)
+        t.isWildcard() -> visitWildcard(t)
+        t.isDeclaredType() -> visitDeclared(t)
+        t.isPrimitive() -> visitPrimitive(t)
+        t.isEnum() -> visitDeclared(t)
+        t.isKotlinUnit() -> visitDeclared(t)
+        t.isTypeVariable() -> visitTypeVariable(t)
+        else -> visitNoType(t)
+      }
 
-  private fun visitPrimitive(t: XType): String {
-    return when (t.typeName) {
-      TypeName.BOOLEAN -> "Boolean"
-      TypeName.BYTE -> "Byte"
-      TypeName.SHORT -> "Short"
-      TypeName.INT -> "Integer"
-      TypeName.LONG -> "Long"
-      TypeName.CHAR -> "Character"
-      TypeName.FLOAT -> "Float"
-      TypeName.DOUBLE -> "Double"
-      else -> throw IllegalStateException()
-    }
-  }
+  private fun visitPrimitive(t: XType): String =
+      when (t.typeName) {
+        TypeName.BOOLEAN -> "Boolean"
+        TypeName.BYTE -> "Byte"
+        TypeName.SHORT -> "Short"
+        TypeName.INT -> "Integer"
+        TypeName.LONG -> "Long"
+        TypeName.CHAR -> "Character"
+        TypeName.FLOAT -> "Float"
+        TypeName.DOUBLE -> "Double"
+        else -> throw IllegalStateException()
+      }
 
   private fun visitDeclared(t: XType, p: Void? = null): String {
     t.typeElement?.kindName()
@@ -105,13 +103,10 @@ object XNameVisitor {
     return "$typeArgumentString$rawString"
   }
 
-  private fun visitArray(t: XArrayType, p: Void? = null): String {
-    return visit(t.componentType) + "Array"
-  }
+  private fun visitArray(t: XArrayType, p: Void? = null): String = visit(t.componentType) + "Array"
 
-  private fun visitTypeVariable(t: XType, p: Void? = null): String {
-    return t.typeName.toString().capitalize()
-  }
+  private fun visitTypeVariable(t: XType, p: Void? = null): String =
+      t.typeName.toString().capitalize()
 
   private fun visitWildcard(t: XType, p: Void? = null): String {
     if (t.typeName.toString() == "?" || t.typeName.toString() == "*") {
@@ -119,28 +114,20 @@ object XNameVisitor {
     }
     return t.extendsBound()?.let {
       return visit(it)
-    }
-        ?: ""
+    } ?: ""
   }
 
-  private fun visitNoType(t: XType): String {
-    return if (t.isVoid()) "Void" else defaultAction(t)
-  }
+  private fun visitNoType(t: XType): String = if (t.isVoid()) "Void" else defaultAction(t)
 
-  private fun visitError(t: XType, p: Void? = null): String {
-    throw IllegalStateException(
-        "Could not generate name for ErrorType: $t. Check your code for missing imports or typos.")
-  }
+  private fun visitError(t: XType, p: Void? = null): String =
+      throw IllegalStateException(
+          "Could not generate name for ErrorType: $t. Check your code for missing imports or typos.",
+      )
 
-  private fun defaultAction(t: XType?): String {
-    throw IllegalArgumentException("Unexpected type mirror: $t")
-  }
+  private fun defaultAction(t: XType?): String =
+      throw IllegalArgumentException("Unexpected type mirror: $t")
 }
 
-private fun XType.isWildcard(): Boolean {
-  return typeName is WildcardTypeName
-}
+private fun XType.isWildcard(): Boolean = typeName is WildcardTypeName
 
-private fun XType.isTypeVariable(): Boolean {
-  return typeName is TypeVariableName
-}
+private fun XType.isTypeVariable(): Boolean = typeName is TypeVariableName

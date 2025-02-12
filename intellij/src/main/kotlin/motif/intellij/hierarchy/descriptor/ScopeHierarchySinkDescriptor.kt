@@ -35,33 +35,36 @@ open class ScopeHierarchySinkDescriptor(
     project: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    val sink: Sink
+    val sink: Sink,
 ) :
     ScopeHierarchyNodeDescriptor(
-        project, graph, parentDescriptor, getElementFromSink(sink), false) {
+        project,
+        graph,
+        parentDescriptor,
+        getElementFromSink(sink),
+        false,
+    ) {
 
   companion object {
-    fun getElementFromSink(sink: Sink): PsiElement {
-      return when (sink) {
-        is FactoryMethodSink -> {
-          (sink.parameter.factoryMethod.method as IntelliJMethod).psiMethod
+    fun getElementFromSink(sink: Sink): PsiElement =
+        when (sink) {
+          is FactoryMethodSink -> {
+            (sink.parameter.factoryMethod.method as IntelliJMethod).psiMethod
+          }
+          is AccessMethodSink -> {
+            (sink.accessMethod.method as IntelliJMethod).psiMethod
+          }
         }
-        is AccessMethodSink -> {
-          (sink.accessMethod.method as IntelliJMethod).psiMethod
-        }
-      }
-    }
 
-    fun getConsumingTypeFromSink(sink: Sink): Type {
-      return when (sink) {
-        is FactoryMethodSink -> {
-          sink.parameter.factoryMethod.returnType.type
+    fun getConsumingTypeFromSink(sink: Sink): Type =
+        when (sink) {
+          is FactoryMethodSink -> {
+            sink.parameter.factoryMethod.returnType.type
+          }
+          is AccessMethodSink -> {
+            sink.type
+          }
         }
-        is AccessMethodSink -> {
-          sink.type
-        }
-      }
-    }
   }
 
   override fun updateText(text: CompositeAppearance) {
@@ -70,10 +73,12 @@ open class ScopeHierarchySinkDescriptor(
     text.ending.addText(" → ${consumingType.simpleName}", getPackageNameAttributes())
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface
-    else AllIcons.Nodes.Class
-  }
+  override fun getIcon(element: PsiElement): Icon? =
+      if (element is PsiClass && element.isInterface) {
+        AllIcons.Nodes.Interface
+      } else {
+        AllIcons.Nodes.Class
+      }
 
   override fun getLegend(): String? {
     val sb: StringBuilder = StringBuilder()
@@ -89,7 +94,8 @@ open class ScopeHierarchySinkDescriptor(
                   "</b>" +
                   " has a dependency on type <b>" +
                   sink.type.simpleName +
-                  "</b>.")
+                  "</b>.",
+          )
         }
         graph.getProviders(sink).forEach { source ->
           when (source) {
@@ -100,7 +106,8 @@ open class ScopeHierarchySinkDescriptor(
                       "</b>" +
                       ", via Motif Factory method <b>" +
                       source.factoryMethod.name +
-                      "()</b>.")
+                      "()</b>.",
+              )
             }
             else -> {
               // TODO : Handle all types
@@ -116,7 +123,5 @@ open class ScopeHierarchySinkDescriptor(
     return null
   }
 
-  override fun toString(): String {
-    return sink.type.simpleName
-  }
+  override fun toString(): String = sink.type.simpleName
 }

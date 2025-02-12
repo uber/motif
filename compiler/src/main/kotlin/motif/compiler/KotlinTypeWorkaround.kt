@@ -33,51 +33,45 @@ import kotlin.reflect.jvm.internal.impl.name.FqName
 @OptIn(KotlinPoetJavaPoetPreview::class)
 object KotlinTypeWorkaround {
 
-  fun javaToKotlinType(mirror: XType): TypeName {
-    return javaToKotlinType(asTypeName(mirror), mirror.getProcessingEnv())
-  }
+  fun javaToKotlinType(mirror: XType): TypeName =
+      javaToKotlinType(asTypeName(mirror), mirror.getProcessingEnv())
 
   fun javaToKotlinType(
       className: com.squareup.kotlinpoet.ClassName,
-      env: XProcessingEnv?
-  ): TypeName {
-    return javaToKotlinType(className as TypeName, env)
-  }
+      env: XProcessingEnv?,
+  ): TypeName = javaToKotlinType(className as TypeName, env)
 
-  private fun asTypeName(mirror: XType): TypeName {
-    return mirror.typeName.toKTypeName()
-  }
+  private fun asTypeName(mirror: XType): TypeName = mirror.typeName.toKTypeName()
 
   /** https://github.com/square/kotlinpoet/issues/236#issuecomment-437961476 */
-  private fun javaToKotlinType(typeName: TypeName, env: XProcessingEnv?): TypeName {
-    return when (typeName) {
-      is ParameterizedTypeName ->
-          (javaToKotlinType(typeName.rawType, null) as com.squareup.kotlinpoet.ClassName)
-              .parameterizedBy(
-                  *typeName.typeArguments.map { javaToKotlinType(it, env) }.toTypedArray())
-      is WildcardTypeName ->
-          when {
-            typeName.inTypes.isNotEmpty() ->
-                WildcardTypeName.consumerOf(javaToKotlinType(typeName.inTypes.single(), env))
-            typeName.outTypes.isNotEmpty() ->
-                WildcardTypeName.producerOf(javaToKotlinType(typeName.outTypes.single(), env))
-            else -> throw IllegalStateException()
+  private fun javaToKotlinType(typeName: TypeName, env: XProcessingEnv?): TypeName =
+      when (typeName) {
+        is ParameterizedTypeName ->
+            (javaToKotlinType(typeName.rawType, null) as com.squareup.kotlinpoet.ClassName)
+                .parameterizedBy(
+                    *typeName.typeArguments.map { javaToKotlinType(it, env) }.toTypedArray(),
+                )
+        is WildcardTypeName ->
+            when {
+              typeName.inTypes.isNotEmpty() ->
+                  WildcardTypeName.consumerOf(javaToKotlinType(typeName.inTypes.single(), env))
+              typeName.outTypes.isNotEmpty() ->
+                  WildcardTypeName.producerOf(javaToKotlinType(typeName.outTypes.single(), env))
+              else -> throw IllegalStateException()
+            }
+        is TypeVariableName -> STAR
+        else -> {
+          val className =
+              JavaToKotlinClassMap.INSTANCE.mapJavaToKotlin(FqName(typeName.toString()))
+                  ?.asSingleFqName()
+                  ?.asString()
+          if (className == null) {
+            typeName.withRawTypeFix(env)
+          } else {
+            com.squareup.kotlinpoet.ClassName.bestGuess(className)
           }
-      is TypeVariableName -> STAR
-      else -> {
-        val className =
-            JavaToKotlinClassMap.INSTANCE
-                .mapJavaToKotlin(FqName(typeName.toString()))
-                ?.asSingleFqName()
-                ?.asString()
-        if (className == null) {
-          typeName.withRawTypeFix(env)
-        } else {
-          com.squareup.kotlinpoet.ClassName.bestGuess(className)
         }
       }
-    }
-  }
 
   private fun TypeName.withRawTypeFix(env: XProcessingEnv?): TypeName {
     if (env?.backend == XProcessingEnv.Backend.KSP && this is com.squareup.kotlinpoet.ClassName) {

@@ -70,7 +70,5 @@ class MotifUsageAction : AnAction(), MotifService.Listener {
                 getUsageCount(project, graph, element) > 0)
   }
 
-  private fun AnActionEvent.getPsiElement(): PsiElement? {
-    return getData(CommonDataKeys.PSI_ELEMENT)
-  }
+  private fun AnActionEvent.getPsiElement(): PsiElement? = getData(CommonDataKeys.PSI_ELEMENT)
 }

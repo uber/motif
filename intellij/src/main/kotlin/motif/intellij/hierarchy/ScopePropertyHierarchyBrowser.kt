@@ -60,7 +60,7 @@ class ScopePropertyHierarchyBrowser(
     project: Project,
     initialGraph: ResolvedGraph,
     private val rootElement: PsiElement,
-    private val hierarchyType: PropertyHierarchyType
+    private val hierarchyType: PropertyHierarchyType,
 ) : HierarchyBrowserBase(project, rootElement), MotifService.Listener {
 
   private var graph: ResolvedGraph = initialGraph
@@ -69,14 +69,15 @@ class ScopePropertyHierarchyBrowser(
     CONSUME,
     PROVIDE,
     CONSUME_AND_PROVIDE,
-    DEPENDENCIES
+    DEPENDENCIES,
   }
 
   companion object {
     const val PROPERTY_HIERARCHY_TYPE: String = "Properties"
     private val DATA_KEY =
         DataKey.create<ScopePropertyHierarchyBrowser>(
-            ScopePropertyHierarchyBrowser::class.java.name)
+            ScopePropertyHierarchyBrowser::class.java.name,
+        )
     private const val LABEL_NO_SCOPE: String = "No Scope is selected."
   }
 
@@ -87,31 +88,21 @@ class ScopePropertyHierarchyBrowser(
     }
   }
 
-  override fun isApplicableElement(element: PsiElement): Boolean {
-    return element is PsiClass
-  }
+  override fun isApplicableElement(element: PsiElement): Boolean = element is PsiClass
 
-  override fun getActionPlace(): String {
-    return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
-  }
+  override fun getActionPlace(): String = ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
 
   override fun prependActions(actionGroup: DefaultActionGroup) {}
 
-  override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
-    return JavaHierarchyUtil.getComparator(myProject)
-  }
+  override fun getComparator(): Comparator<NodeDescriptor<out Any>> =
+      JavaHierarchyUtil.getComparator(myProject)
 
-  override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
-    return descriptor.psiElement
-  }
+  override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? =
+      descriptor.psiElement
 
-  override fun getPrevOccurenceActionNameImpl(): String {
-    return LABEL_GO_PREVIOUS_SCOPE
-  }
+  override fun getPrevOccurenceActionNameImpl(): String = LABEL_GO_PREVIOUS_SCOPE
 
-  override fun getNextOccurenceActionNameImpl(): String {
-    return LABEL_GO_NEXT_SCOPE
-  }
+  override fun getNextOccurenceActionNameImpl(): String = LABEL_GO_NEXT_SCOPE
 
   override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[PROPERTY_HIERARCHY_TYPE] = createTree(true)
@@ -122,9 +113,7 @@ class ScopePropertyHierarchyBrowser(
     actionGroup.add(actionManager.getAction(IdeActions.ACTION_EXPAND_ALL))
   }
 
-  override fun createLegendPanel(): JPanel? {
-    return null
-  }
+  override fun createLegendPanel(): JPanel? = null
 
   override fun configureTree(tree: Tree) {
     super.configureTree(tree)
@@ -139,14 +128,15 @@ class ScopePropertyHierarchyBrowser(
     }
   }
 
-  override fun getContentDisplayName(typeName: String, element: PsiElement): String? {
-    return MessageFormat.format(
-        typeName, ClassPresentationUtil.getNameForClass(element as PsiClass, false))
-  }
+  override fun getContentDisplayName(typeName: String, element: PsiElement): String? =
+      MessageFormat.format(
+          typeName,
+          ClassPresentationUtil.getNameForClass(element as PsiClass, false),
+      )
 
   override fun createHierarchyTreeStructure(
       typeName: String,
-      psiElement: PsiElement
+      psiElement: PsiElement,
   ): HierarchyTreeStructure? {
     if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
       val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(psiElement)
@@ -156,25 +146,45 @@ class ScopePropertyHierarchyBrowser(
         PropertyHierarchyType.CONSUME -> {
           val descriptor: HierarchyNodeDescriptor =
               ScopeHierarchySinksSectionDescriptor(
-                  project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
+                  project,
+                  graph,
+                  null,
+                  (scope.clazz as IntelliJClass).psiClass,
+                  scope,
+              )
           ScopeHierarchyTreeStructure(project, graph, descriptor)
         }
         PropertyHierarchyType.PROVIDE -> {
           val descriptor: HierarchyNodeDescriptor =
               ScopeHierarchySourcesSectionDescriptor(
-                  project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
+                  project,
+                  graph,
+                  null,
+                  (scope.clazz as IntelliJClass).psiClass,
+                  scope,
+              )
           ScopeHierarchyTreeStructure(project, graph, descriptor)
         }
         PropertyHierarchyType.CONSUME_AND_PROVIDE -> {
           val descriptor: HierarchyNodeDescriptor =
               ScopeHierarchySourcesAndSinksSectionDescriptor(
-                  project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
+                  project,
+                  graph,
+                  null,
+                  (scope.clazz as IntelliJClass).psiClass,
+                  scope,
+              )
           ScopeHierarchyTreeStructure(project, graph, descriptor)
         }
         PropertyHierarchyType.DEPENDENCIES -> {
           val descriptor: HierarchyNodeDescriptor =
               ScopeHierarchyDependenciesSectionDescriptor(
-                  project, graph, null, (scope.clazz as IntelliJClass).psiClass, scope)
+                  project,
+                  graph,
+                  null,
+                  (scope.clazz as IntelliJClass).psiClass,
+                  scope,
+              )
           ScopeHierarchyTreeStructure(project, graph, descriptor)
         }
       }

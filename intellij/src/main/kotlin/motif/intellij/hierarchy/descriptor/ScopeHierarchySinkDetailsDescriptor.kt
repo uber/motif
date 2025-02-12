@@ -28,7 +28,7 @@ open class ScopeHierarchySinkDetailsDescriptor(
     project: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    sink: Sink
+    sink: Sink,
 ) : ScopeHierarchySinkDescriptor(project, graph, parentDescriptor, sink) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -38,10 +38,9 @@ open class ScopeHierarchySinkDetailsDescriptor(
             " (" +
             formatQualifiedName(sink.scope.qualifiedName) +
             ")",
-        getPackageNameAttributes())
+        getPackageNameAttributes(),
+    )
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return null
-  }
+  override fun getIcon(element: PsiElement): Icon? = null
 }

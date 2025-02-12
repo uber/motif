@@ -34,5 +34,5 @@ class UnexposedSourceError(val source: Source, val sink: Sink) : ProcessingError
 class AlreadySatisfiedError(
     val scope: Scope,
     val source: Source,
-    val existingSources: List<Source>
+    val existingSources: List<Source>,
 ) : ProcessingError()

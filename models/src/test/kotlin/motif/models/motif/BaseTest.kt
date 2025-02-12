@@ -71,12 +71,8 @@ abstract class BaseTest {
       return true
     }
 
-    override fun getSupportedSourceVersion(): SourceVersion {
-      return SourceVersion.latestSupported()
-    }
+    override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-    override fun getSupportedAnnotationTypes(): Set<String> {
-      return setOf(motif.Scope::class.java.name)
-    }
+    override fun getSupportedAnnotationTypes(): Set<String> = setOf(motif.Scope::class.java.name)
   }
 }

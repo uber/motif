@@ -38,28 +38,32 @@ open class ScopeHierarchySourceDescriptor(
     project: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    val source: Source
+    val source: Source,
 ) :
     ScopeHierarchyNodeDescriptor(
-        project, graph, parentDescriptor, getElementFromSource(source), false) {
+        project,
+        graph,
+        parentDescriptor,
+        getElementFromSource(source),
+        false,
+    ) {
 
   companion object {
-    fun getElementFromSource(source: Source): PsiElement {
-      return when (source) {
-        is FactoryMethodSource -> {
-          (source.factoryMethod.method as IntelliJMethod).psiMethod
+    fun getElementFromSource(source: Source): PsiElement =
+        when (source) {
+          is FactoryMethodSource -> {
+            (source.factoryMethod.method as IntelliJMethod).psiMethod
+          }
+          is ScopeSource -> {
+            (source.scope.clazz as IntelliJClass).psiClass
+          }
+          is SpreadSource -> {
+            (source.spreadMethod.method as IntelliJMethod).psiMethod
+          }
+          is ChildParameterSource -> {
+            (source.parameter.method.method as IntelliJMethod).psiMethod
+          }
         }
-        is ScopeSource -> {
-          (source.scope.clazz as IntelliJClass).psiClass
-        }
-        is SpreadSource -> {
-          (source.spreadMethod.method as IntelliJMethod).psiMethod
-        }
-        is ChildParameterSource -> {
-          (source.parameter.method.method as IntelliJMethod).psiMethod
-        }
-      }
-    }
   }
 
   override fun updateText(text: CompositeAppearance) {
@@ -68,7 +72,9 @@ open class ScopeHierarchySourceDescriptor(
     }
     text.ending.addText(source.type.simpleName)
     text.ending.addText(
-        " (" + formatQualifiedName(source.type.qualifiedName) + ")", getPackageNameAttributes())
+        " (" + formatQualifiedName(source.type.qualifiedName) + ")",
+        getPackageNameAttributes(),
+    )
   }
 
   override fun getLegend(): String? {
@@ -76,12 +82,12 @@ open class ScopeHierarchySourceDescriptor(
     return super.getLegend()
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return if (element is PsiClass && element.isInterface) AllIcons.Nodes.Interface
-    else AllIcons.Nodes.Class
-  }
+  override fun getIcon(element: PsiElement): Icon? =
+      if (element is PsiClass && element.isInterface) {
+        AllIcons.Nodes.Interface
+      } else {
+        AllIcons.Nodes.Class
+      }
 
-  override fun toString(): String {
-    return source.type.simpleName
-  }
+  override fun toString(): String = source.type.simpleName
 }

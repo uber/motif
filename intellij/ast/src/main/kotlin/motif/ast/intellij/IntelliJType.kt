@@ -43,7 +43,7 @@ class IntelliJType(private val project: Project, val psiType: PsiType) : IrType 
       PsiTypes.longType(),
       PsiTypes.charType(),
       PsiTypes.floatType(),
-      PsiTypes.doubleType() -> true
+      PsiTypes.doubleType(), -> true
       else -> false
     }
   }
@@ -54,9 +54,8 @@ class IntelliJType(private val project: Project, val psiType: PsiType) : IrType 
     return (psiType as? PsiClassType)?.let { IntelliJClass(project, it, psiClass) }
   }
 
-  override fun isAssignableTo(type: IrType): Boolean {
-    return TypeConversionUtil.isAssignable((type as IntelliJType).psiType, psiType, false)
-  }
+  override fun isAssignableTo(type: IrType): Boolean =
+      TypeConversionUtil.isAssignable((type as IntelliJType).psiType, psiType, false)
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -69,7 +68,5 @@ class IntelliJType(private val project: Project, val psiType: PsiType) : IrType 
     return true
   }
 
-  override fun hashCode(): Int {
-    return psiType.hashCode()
-  }
+  override fun hashCode(): Int = psiType.hashCode()
 }

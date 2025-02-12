@@ -24,9 +24,7 @@ import motif.models.Type
 
 private typealias SetMultiMap<K, V> = MutableMap<K, LinkedHashSet<V>>
 
-private fun <K, V> setMultiMap(): SetMultiMap<K, V> {
-  return LinkedHashMap()
-}
+private fun <K, V> setMultiMap(): SetMultiMap<K, V> = LinkedHashMap()
 
 /** Carries state through the ResolvedGraph creation logic. */
 internal class State(
@@ -38,7 +36,7 @@ internal class State(
     val irTypeToSinks: SetMultiMap<IrType, Sink> = setMultiMap(),
     val irTypeToSources: SetMultiMap<IrType, Source> = setMultiMap(),
     private val exposeNeeded: MutableSet<Sink> = mutableSetOf(),
-    private val visibleSinks: SetMultiMap<Sink, Source> = setMultiMap()
+    private val visibleSinks: SetMultiMap<Sink, Source> = setMultiMap(),
 ) {
 
   val edges = LinkedHashMap<Source, List<Sink>>()
@@ -95,10 +93,10 @@ internal class State(
 
   fun checkCycle() {
     Cycle.find(edges.keys) { source ->
-      edges.getOrDefault(source, emptyList()).flatMap { sink ->
-        sinkToSources.getOrDefault(sink, LinkedHashSet())
-      }
-    }
+          edges.getOrDefault(source, emptyList()).flatMap { sink ->
+            sinkToSources.getOrDefault(sink, LinkedHashSet())
+          }
+        }
         ?.let { cycle -> errors.add(DependencyCycleError(cycle.path)) }
   }
 
@@ -106,18 +104,18 @@ internal class State(
     exposeNeeded.addAll(visibleSinks.keys)
   }
 
-  fun copy(): State {
-    return State(
-        sinkToSources.copy(),
-        sourceToSinks.copy(),
-        unsatisfied.toMutableSet(),
-        errors.toMutableList(),
-        sinks.copy(),
-        irTypeToSinks.copy(),
-        irTypeToSources.copy(),
-        exposeNeeded.toMutableSet(),
-        visibleSinks.copy())
-  }
+  fun copy(): State =
+      State(
+          sinkToSources.copy(),
+          sourceToSinks.copy(),
+          unsatisfied.toMutableSet(),
+          errors.toMutableList(),
+          sinks.copy(),
+          irTypeToSinks.copy(),
+          irTypeToSources.copy(),
+          exposeNeeded.toMutableSet(),
+          visibleSinks.copy(),
+      )
 
   private fun satisfy(sink: Sink, source: Source) {
     if (!visibleSinks.contains(sink)) return
@@ -148,18 +146,18 @@ internal class State(
 
   companion object {
 
-    fun merge(states: List<State>): State {
-      return State(
-          states.map { it.sinkToSources }.merge(),
-          states.map { it.sourceToSinks }.merge(),
-          states.map { it.unsatisfied }.merge(),
-          states.map { it.errors }.merge(),
-          states.map { it.sinks }.merge(),
-          states.map { it.irTypeToSinks }.merge(),
-          states.map { it.irTypeToSources }.merge(),
-          states.map { it.exposeNeeded }.merge(),
-          states.map { it.visibleSinks }.merge())
-    }
+    fun merge(states: List<State>): State =
+        State(
+            states.map { it.sinkToSources }.merge(),
+            states.map { it.sourceToSinks }.merge(),
+            states.map { it.unsatisfied }.merge(),
+            states.map { it.errors }.merge(),
+            states.map { it.sinks }.merge(),
+            states.map { it.irTypeToSinks }.merge(),
+            states.map { it.irTypeToSources }.merge(),
+            states.map { it.exposeNeeded }.merge(),
+            states.map { it.visibleSinks }.merge(),
+        )
   }
 }
 

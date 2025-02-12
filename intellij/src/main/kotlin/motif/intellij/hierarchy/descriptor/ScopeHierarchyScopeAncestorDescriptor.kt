@@ -30,5 +30,5 @@ class ScopeHierarchyScopeAncestorDescriptor(
     parentDescriptor: HierarchyNodeDescriptor?,
     clazz: PsiClass,
     scope: Scope,
-    isBase: Boolean = false
+    isBase: Boolean = false,
 ) : ScopeHierarchyScopeDescriptor(project, graph, parentDescriptor, clazz, scope, isBase)

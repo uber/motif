@@ -34,6 +34,8 @@ internal class NullableParameterHandler(private val error: NullableParameter) : 
 
             Suggestions:
               * Consider using Optional<...> instead.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

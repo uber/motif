@@ -43,21 +43,20 @@ class StubProcessor : AbstractProcessor() {
 
   private val env: ProcessingEnvironment by lazy { processingEnv }
 
-  override fun getSupportedSourceVersion(): SourceVersion {
-    return SourceVersion.latestSupported()
-  }
+  override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-  override fun getSupportedAnnotationTypes(): Set<String> {
-    return Collections.singleton(Scope::class.java.name)
-  }
+  override fun getSupportedAnnotationTypes(): Set<String> =
+      Collections.singleton(Scope::class.java.name)
 
   override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-    roundEnv.getElementsAnnotatedWith(Scope::class.java).map { it as TypeElement }.forEach {
-        scopeElement ->
-      val packageName: String = MoreElements.getPackage(scopeElement).qualifiedName.toString()
-      val spec: TypeSpec = spec(scopeElement.asType() as DeclaredType) ?: return@forEach
-      JavaFile.builder(packageName, spec).build().writeTo(processingEnv.filer)
-    }
+    roundEnv
+        .getElementsAnnotatedWith(Scope::class.java)
+        .map { it as TypeElement }
+        .forEach { scopeElement ->
+          val packageName: String = MoreElements.getPackage(scopeElement).qualifiedName.toString()
+          val spec: TypeSpec = spec(scopeElement.asType() as DeclaredType) ?: return@forEach
+          JavaFile.builder(packageName, spec).build().writeTo(processingEnv.filer)
+        }
     return true
   }
 
@@ -76,7 +75,8 @@ class StubProcessor : AbstractProcessor() {
       builder.addMethod(
           MethodSpec.constructorBuilder()
               .addParameter(TypeName.get(dependenciesType), "dependencies")
-              .build())
+              .build(),
+      )
     }
 
     if (scopeType.asElement().kind == ElementKind.INTERFACE) {
@@ -103,8 +103,9 @@ class StubProcessor : AbstractProcessor() {
   private fun dependenciesType(scopeType: DeclaredType): DeclaredType? {
     val scopeElement = (scopeType.asElement() as? TypeElement) ?: return null
     val superInterface = scopeElement.interfaces.firstOrNull() as? DeclaredType ?: return null
-    if (Creatable::class.java.simpleName !in superInterface.asElement().simpleName.toString())
-        return null
+    if (Creatable::class.java.simpleName !in superInterface.asElement().simpleName.toString()) {
+      return null
+    }
     return superInterface.typeArguments.singleOrNull() as? DeclaredType ?: return null
   }
 
@@ -114,7 +115,6 @@ class StubProcessor : AbstractProcessor() {
     return ClassName.get(scopeClassName.packageName(), "${prefix}Impl")
   }
 
-  private fun ClassName.qualifiedName(): String {
-    return "${packageName()}.${simpleNames().joinToString(".")}"
-  }
+  private fun ClassName.qualifiedName(): String =
+      "${packageName()}.${simpleNames().joinToString(".")}"
 }

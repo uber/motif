@@ -44,7 +44,11 @@ object XOverrides {
       return when (env.backend) {
         XProcessingEnv.Backend.JAVAC -> {
           MoreElements.overrides(
-              overrider.toJavac(), overridden.toJavac(), inType.toJavac(), env.toJavac().typeUtils)
+              overrider.toJavac(),
+              overridden.toJavac(),
+              inType.toJavac(),
+              env.toJavac().typeUtils,
+          )
           false
         }
         XProcessingEnv.Backend.KSP -> {
@@ -141,7 +145,8 @@ enum class Visibility {
   DEFAULT,
   PROTECTED,
   INTERNAL,
-  PUBLIC;
+  PUBLIC,
+  ;
 
   companion object {
     fun of(element: XMethodElement) =

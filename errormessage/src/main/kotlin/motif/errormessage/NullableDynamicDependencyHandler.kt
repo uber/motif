@@ -35,6 +35,8 @@ internal class NullableDynamicDependencyHandler(private val error: NullableDynam
 
             Suggestions:
               * Consider using Optional<...> instead.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

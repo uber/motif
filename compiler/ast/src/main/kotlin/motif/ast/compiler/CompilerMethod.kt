@@ -38,7 +38,7 @@ class CompilerMethod(
     override val env: XProcessingEnv,
     val owner: XType,
     val type: XExecutableType,
-    val element: XExecutableElement
+    val element: XExecutableElement,
 ) : IrMethod, IrUtil {
 
   override val name: String =
@@ -47,7 +47,8 @@ class CompilerMethod(
         is XConstructorElement -> "<init>"
         else ->
             throw IllegalStateException(
-                "Could not find name for unknown XExecutableElement kind: ${element.kindName()}")
+                "Could not find name for unknown XExecutableElement kind: ${element.kindName()}",
+            )
       }
 
   override val isConstructor: Boolean = element.isConstructor()
@@ -75,19 +76,18 @@ class CompilerMethod(
     returnType
   }
 
-  override fun isVoid(): Boolean {
-    return when (env.backend) {
-      XProcessingEnv.Backend.JAVAC -> returnType.isVoid
-      XProcessingEnv.Backend.KSP -> {
-        val returnTypeMirror = (returnType as CompilerType).mirror
-        if (returnTypeMirror.isError()) {
-          element.toKS().returnType == null
-        } else {
-          returnTypeMirror.isVoid()
+  override fun isVoid(): Boolean =
+      when (env.backend) {
+        XProcessingEnv.Backend.JAVAC -> returnType.isVoid
+        XProcessingEnv.Backend.KSP -> {
+          val returnTypeMirror = (returnType as CompilerType).mirror
+          if (returnTypeMirror.isError()) {
+            element.toKS().returnType == null
+          } else {
+            returnTypeMirror.isVoid()
+          }
         }
       }
-    }
-  }
 
   val isSynthetic by lazy {
     env.backend == XProcessingEnv.Backend.KSP && "synthetic" in element.executableType.toString()

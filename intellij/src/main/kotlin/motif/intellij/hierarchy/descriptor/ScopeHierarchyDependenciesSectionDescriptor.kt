@@ -27,14 +27,12 @@ open class ScopeHierarchyDependenciesSectionDescriptor(
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
     element: PsiElement,
-    val scope: Scope
+    val scope: Scope,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
   override fun updateText(text: CompositeAppearance) {
     text.ending.addText(scope.simpleName)
   }
 
-  override fun toString(): String {
-    return scope.simpleName
-  }
+  override fun toString(): String = scope.simpleName
 }

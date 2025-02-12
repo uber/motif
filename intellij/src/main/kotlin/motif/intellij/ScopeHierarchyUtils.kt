@@ -40,21 +40,17 @@ import motif.models.Source
 object ScopeHierarchyUtils {
 
   object ScopeComparator : Comparator<Scope> {
-    override fun compare(o1: Scope, o2: Scope): Int {
-      return o1.simpleName.compareTo(o2.simpleName)
-    }
+    override fun compare(o1: Scope, o2: Scope): Int = o1.simpleName.compareTo(o2.simpleName)
   }
 
   object ScopeEdgeParentComparator : Comparator<ScopeEdge> {
-    override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int {
-      return o1.parent.simpleName.compareTo(o2.parent.simpleName)
-    }
+    override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int =
+        o1.parent.simpleName.compareTo(o2.parent.simpleName)
   }
 
   object ScopeEdgeChildComparator : Comparator<ScopeEdge> {
-    override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int {
-      return o1.child.simpleName.compareTo(o2.child.simpleName)
-    }
+    override fun compare(o1: ScopeEdge, o2: ScopeEdge): Int =
+        o1.child.simpleName.compareTo(o2.child.simpleName)
   }
 
   object SourceComparator : Comparator<Source> {
@@ -65,33 +61,25 @@ object ScopeHierarchyUtils {
   }
 
   object SinkComparator : Comparator<Sink> {
-    override fun compare(o1: Sink, o2: Sink): Int {
-      return o1.type.simpleName.compareTo(o2.type.simpleName)
-    }
+    override fun compare(o1: Sink, o2: Sink): Int = o1.type.simpleName.compareTo(o2.type.simpleName)
   }
 
   object MethodComparator : Comparator<Dependencies.Method> {
-    override fun compare(o1: Dependencies.Method, o2: Dependencies.Method): Int {
-      return o1.method.name.compareTo(o2.method.name)
-    }
+    override fun compare(o1: Dependencies.Method, o2: Dependencies.Method): Int =
+        o1.method.name.compareTo(o2.method.name)
   }
 
-  fun buildRootElement(project: Project): PsiClass {
-    return JavaPsiFacade.getInstance(project)
-        .findClass(Object::class.java.name, GlobalSearchScope.allScope(project))!!
-  }
+  fun buildRootElement(project: Project): PsiClass =
+      JavaPsiFacade.getInstance(project)
+          .findClass(Object::class.java.name, GlobalSearchScope.allScope(project))!!
 
-  fun isRootElement(element: PsiElement?): Boolean {
-    return element is PsiClass && element.qualifiedName == Object::class.java.name
-  }
+  fun isRootElement(element: PsiElement?): Boolean =
+      element is PsiClass && element.qualifiedName == Object::class.java.name
 
-  fun isInitializedGraph(graph: ResolvedGraph): Boolean {
-    return graph.roots.isNotEmpty()
-  }
+  fun isInitializedGraph(graph: ResolvedGraph): Boolean = graph.roots.isNotEmpty()
 
-  fun isMotifScopeClass(element: PsiClass?): Boolean {
-    return element?.hasAnnotation(motif.Scope::class.java.name) ?: false
-  }
+  fun isMotifScopeClass(element: PsiClass?): Boolean =
+      element?.hasAnnotation(motif.Scope::class.java.name) ?: false
 
   fun isMotifChildScopeMethod(element: PsiElement?): Boolean {
     if (element is PsiMethod) {
@@ -109,21 +97,23 @@ object ScopeHierarchyUtils {
   fun getParentScopes(
       project: Project,
       graph: ResolvedGraph,
-      element: PsiClass
+      element: PsiClass,
   ): Array<ScopeEdge>? {
     val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(element)
     val type: IrType = IntelliJType(project, scopeType)
     val scope: Scope? = graph.getScope(type)
-    return if (scope != null) Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java)
-    else null
+    return if (scope != null) {
+      Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java)
+    } else {
+      null
+    }
   }
 
   /*
    * Returns the list of sources for given scope to display in the UI
    */
-  fun getVisibleSources(graph: ResolvedGraph, scope: Scope): List<Source> {
-    return graph.getSources(scope).filter { it !is ChildParameterSource && it !is ScopeSource }
-  }
+  fun getVisibleSources(graph: ResolvedGraph, scope: Scope): List<Source> =
+      graph.getSources(scope).filter { it !is ChildParameterSource && it !is ScopeSource }
 
   /*
    * Returns the number of usage for the given class.
@@ -133,7 +123,7 @@ object ScopeHierarchyUtils {
       graph: ResolvedGraph,
       clazz: PsiClass,
       includeSources: Boolean = true,
-      includeSinks: Boolean = true
+      includeSinks: Boolean = true,
   ): Int {
     var count = 0
     val elementType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(clazz)
@@ -147,30 +137,26 @@ object ScopeHierarchyUtils {
     return count
   }
 
-  fun getUsageString(count: Int): String {
-    return when (count) {
-      0 -> "No usage"
-      1 -> "1 usage"
-      else -> "$count usages"
-    }
-  }
+  fun getUsageString(count: Int): String =
+      when (count) {
+        0 -> "No usage"
+        1 -> "1 usage"
+        else -> "$count usages"
+      }
 
-  fun getObjectString(count: Int): String {
-    return when (count) {
-      0 -> "No object"
-      1 -> "1 object"
-      else -> "$count objects"
-    }
-  }
+  fun getObjectString(count: Int): String =
+      when (count) {
+        0 -> "No object"
+        1 -> "1 object"
+        else -> "$count objects"
+      }
 
   fun formatQualifiedName(qualifiedName: String): String {
     val index: Int = qualifiedName.lastIndexOf(".")
     return if (index > 0) qualifiedName.substring(0, index) else qualifiedName
   }
 
-  fun formatMultilineText(text: String): String {
-    return "<html>" + text.replace("\n", "<br>") + "</html>"
-  }
+  fun formatMultilineText(text: String): String = "<html>" + text.replace("\n", "<br>") + "</html>"
 
   /*
    * Returns all the paths, starting from root scopes, leading to the provided scope.
@@ -187,7 +173,7 @@ object ScopeHierarchyUtils {
       scope: Scope,
       graph: ResolvedGraph,
       list: ArrayList<Scope>,
-      all: ArrayList<ArrayList<Scope>>
+      all: ArrayList<ArrayList<Scope>>,
   ) {
     list.add(scope)
     val parentEdgesIterator: Iterator<ScopeEdge> = graph.getParentEdges(scope).iterator()

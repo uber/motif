@@ -74,7 +74,5 @@ class MotifAncestorGraphAction : AnAction(), MotifService.Listener {
                 (getParentScopes(project, graph, element)?.isNotEmpty() == true))
   }
 
-  private fun AnActionEvent.getPsiElement(): PsiElement? {
-    return getData(CommonDataKeys.PSI_ELEMENT)
-  }
+  private fun AnActionEvent.getPsiElement(): PsiElement? = getData(CommonDataKeys.PSI_ELEMENT)
 }

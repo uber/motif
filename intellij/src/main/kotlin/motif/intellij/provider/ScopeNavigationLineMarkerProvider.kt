@@ -84,7 +84,8 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
             UPDATE_ALL,
             ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_PARENT_SCOPE),
             NavigationScopeHandler(element.project, graph),
-            LEFT)
+            LEFT,
+        )
       }
     } else {
       val methodElement = element.toPsiMethod()
@@ -96,7 +97,8 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
             UPDATE_ALL,
             ConstantFunction<PsiElement, String>(LABEL_NAVIGATE_CHILD_SCOPE),
             NavigationScopeHandler(element.project, graph),
-            LEFT)
+            LEFT,
+        )
       }
     }
     return null
@@ -123,19 +125,21 @@ class ScopeNavigationLineMarkerProvider : LineMarkerProvider, MotifService.Liste
                     .createListPopup(
                         object :
                             BaseListPopupStep<ScopeEdge>(
-                                "Select Parent Scope", scopeEdges.toMutableList()) {
-                          override fun getTextFor(value: ScopeEdge): String {
-                            return value.parent.clazz.simpleName
-                          }
+                                "Select Parent Scope",
+                                scopeEdges.toMutableList(),
+                            ) {
+                          override fun getTextFor(value: ScopeEdge): String =
+                              value.parent.clazz.simpleName
 
                           override fun onChosen(
                               selectedValue: ScopeEdge?,
-                              finalChoice: Boolean
+                              finalChoice: Boolean,
                           ): PopupStep<*>? {
                             selectedValue?.let { navigateToParent(it) }
                             return super.onChosen(selectedValue, finalChoice)
                           }
-                        })
+                        },
+                    )
             listPopup.show(RelativePoint(mouseEvent))
           }
         }

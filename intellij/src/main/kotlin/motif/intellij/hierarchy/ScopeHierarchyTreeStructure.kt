@@ -57,7 +57,7 @@ import motif.models.Dependencies
 class ScopeHierarchyTreeStructure(
     val project: Project,
     val graph: ResolvedGraph,
-    descriptor: HierarchyNodeDescriptor
+    descriptor: HierarchyNodeDescriptor,
 ) : HierarchyTreeStructure(project, descriptor) {
 
   companion object {
@@ -77,7 +77,13 @@ class ScopeHierarchyTreeStructure(
         graph.roots.sortedWith(ScopeComparator).forEach { scope ->
           descriptors.add(
               ScopeHierarchyScopeDescriptor(
-                  myProject, graph, descriptor, (scope.clazz as IntelliJClass).psiClass, scope))
+                  myProject,
+                  graph,
+                  descriptor,
+                  (scope.clazz as IntelliJClass).psiClass,
+                  scope,
+              ),
+          )
         }
       }
       is ScopeHierarchyScopeAncestorDescriptor -> {
@@ -89,7 +95,9 @@ class ScopeHierarchyTreeStructure(
                   graph,
                   descriptor,
                   (edge.parent.clazz as IntelliJClass).psiClass,
-                  edge.parent))
+                  edge.parent,
+              ),
+          )
         }
       }
       is ScopeHierarchyScopeDescriptor -> {
@@ -100,7 +108,9 @@ class ScopeHierarchyTreeStructure(
                   graph,
                   descriptor,
                   (edge.child.clazz as IntelliJClass).psiClass,
-                  edge.child))
+                  edge.child,
+              ),
+          )
         }
       }
       is ScopeHierarchySourcesSectionDescriptor -> {
@@ -110,7 +120,13 @@ class ScopeHierarchyTreeStructure(
         if (descriptors.isEmpty()) {
           descriptors.add(
               ScopeHierarchySimpleDescriptor(
-                  myProject, graph, descriptor, descriptor.element, LABEL_SCOPE_NO_PROVIDE))
+                  myProject,
+                  graph,
+                  descriptor,
+                  descriptor.element,
+                  LABEL_SCOPE_NO_PROVIDE,
+              ),
+          )
         }
       }
       is ScopeHierarchySinksSectionDescriptor -> {
@@ -120,16 +136,36 @@ class ScopeHierarchyTreeStructure(
         if (descriptors.isEmpty()) {
           descriptors.add(
               ScopeHierarchySimpleDescriptor(
-                  myProject, graph, descriptor, descriptor.element, LABEL_SCOPE_NO_CONSUME))
+                  myProject,
+                  graph,
+                  descriptor,
+                  descriptor.element,
+                  LABEL_SCOPE_NO_CONSUME,
+              ),
+          )
         }
       }
       is ScopeHierarchySourcesAndSinksSectionDescriptor -> {
         descriptors.add(
             ScopeHierarchySourcesSectionDescriptor(
-                myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
+                myProject,
+                graph,
+                descriptor,
+                descriptor.element,
+                descriptor.scope,
+                true,
+            ),
+        )
         descriptors.add(
             ScopeHierarchySinksSectionDescriptor(
-                myProject, graph, descriptor, descriptor.element, descriptor.scope, true))
+                myProject,
+                graph,
+                descriptor,
+                descriptor.element,
+                descriptor.scope,
+                true,
+            ),
+        )
       }
       is ScopeHierarchyDependenciesSectionDescriptor -> {
         val dependencies: Dependencies? = descriptor.scope.dependencies
@@ -141,7 +177,9 @@ class ScopeHierarchyTreeStructure(
                     graph,
                     descriptor,
                     (method.method as IntelliJMethod).psiMethod,
-                    method))
+                    method,
+                ),
+            )
           }
         }
         if (descriptors.isEmpty()) {
@@ -151,7 +189,9 @@ class ScopeHierarchyTreeStructure(
                   graph,
                   descriptor,
                   descriptor.psiElement!!,
-                  LABEL_SCOPE_NO_DEPENDENCIES))
+                  LABEL_SCOPE_NO_DEPENDENCIES,
+              ),
+          )
         }
       }
       is ScopeHierarchySinkDetailsDescriptor -> {
@@ -163,7 +203,8 @@ class ScopeHierarchyTreeStructure(
       is ScopeHierarchySinkDescriptor -> {
         graph.getProviders(descriptor.sink).sortedWith(SourceComparator).forEach { source ->
           descriptors.add(
-              ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source))
+              ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source),
+          )
         }
       }
       is ScopeHierarchySourceDescriptor -> {
@@ -175,25 +216,46 @@ class ScopeHierarchyTreeStructure(
         graph.errors.forEach { error ->
           val errorMessage: ErrorMessage = ErrorMessage.get(error)
           descriptors.add(
-              ScopeHierarchyErrorDescriptor(myProject, graph, descriptor, error, errorMessage))
+              ScopeHierarchyErrorDescriptor(myProject, graph, descriptor, error, errorMessage),
+          )
         }
       }
       is ScopeHierarchyUsageSectionDescriptor -> {
         val countSources: Int =
             ScopeHierarchyUtils.getUsageCount(
-                project, graph, descriptor.clazz, includeSources = true, includeSinks = false)
+                project,
+                graph,
+                descriptor.clazz,
+                includeSources = true,
+                includeSinks = false,
+            )
         val countSinks: Int =
             ScopeHierarchyUtils.getUsageCount(
-                project, graph, descriptor.clazz, includeSources = false, includeSinks = true)
+                project,
+                graph,
+                descriptor.clazz,
+                includeSources = false,
+                includeSinks = true,
+            )
         if (countSources > 0) {
           descriptors.add(
               ScopeHierarchyUsageSourcesSectionDescriptor(
-                  myProject, graph, descriptor, descriptor.clazz))
+                  myProject,
+                  graph,
+                  descriptor,
+                  descriptor.clazz,
+              ),
+          )
         }
         if (countSinks > 0) {
           descriptors.add(
               ScopeHierarchyUsageSinksSectionDescriptor(
-                  myProject, graph, descriptor, descriptor.clazz))
+                  myProject,
+                  graph,
+                  descriptor,
+                  descriptor.clazz,
+              ),
+          )
         }
       }
       is ScopeHierarchyUsageSourcesSectionDescriptor -> {
@@ -202,7 +264,8 @@ class ScopeHierarchyTreeStructure(
         val type: IrType = IntelliJType(project, elementType)
         graph.getSources(type).sortedWith(SourceComparator).forEach { source ->
           descriptors.add(
-              ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source))
+              ScopeHierarchySourceDetailsDescriptor(myProject, graph, descriptor, source),
+          )
         }
       }
       is ScopeHierarchyUsageSinksSectionDescriptor -> {

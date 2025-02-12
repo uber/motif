@@ -27,6 +27,8 @@ class ScopeExtendsScopeMethodHandler(private val error: ScopeExtendsScope) : Err
             Scope can't extend other Scopes:
 
               ${error.scope.qualifiedName}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

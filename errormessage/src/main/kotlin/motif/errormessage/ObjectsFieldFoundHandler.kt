@@ -27,6 +27,8 @@ internal class ObjectsFieldFoundHandler(private val error: ObjectsFieldFound) : 
             Objects class may not have fields:
 
               ${error.objectClass.qualifiedName}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

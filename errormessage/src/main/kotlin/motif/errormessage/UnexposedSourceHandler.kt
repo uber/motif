@@ -34,6 +34,8 @@ internal class UnexposedSourceHandler(private val error: UnexposedSourceError) :
         """Suggestions:
             |  * Annotate the source with @Expose.
             |  * Resolve the descendant dependency elsewhere.
-        """.trimMargin())
+      """
+            .trimMargin(),
+    )
   }
 }

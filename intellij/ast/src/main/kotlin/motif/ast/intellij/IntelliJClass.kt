@@ -35,7 +35,7 @@ import motif.ast.IrType
 class IntelliJClass(
     private val project: Project,
     private val psiClassType: PsiClassType,
-    val psiClass: PsiClass
+    val psiClass: PsiClass,
 ) : IrUtil, IrClass {
 
   private val jvmPsiConversionHelper =
@@ -48,9 +48,10 @@ class IntelliJClass(
   }
 
   override val typeArguments: List<IrType> by lazy {
-    psiClassType.typeArguments().map { jvmPsiConversionHelper.convertType(it) }.map {
-      IntelliJType(project, it)
-    }
+    psiClassType
+        .typeArguments()
+        .map { jvmPsiConversionHelper.convertType(it) }
+        .map { IntelliJType(project, it) }
   }
 
   override val kind: IrClass.Kind by lazy {
@@ -81,9 +82,9 @@ class IntelliJClass(
   }
 
   override val fields: List<IrField> by lazy {
-    psiClass.allFields.filter { it.containingClass?.qualifiedName != "java.lang.Object" }.map {
-      IntelliJField(project, it)
-    }
+    psiClass.allFields
+        .filter { it.containingClass?.qualifiedName != "java.lang.Object" }
+        .map { IntelliJField(project, it) }
   }
 
   override val constructors: List<IrMethod> by lazy {

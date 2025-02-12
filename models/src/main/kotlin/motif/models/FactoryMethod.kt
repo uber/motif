@@ -49,18 +49,17 @@ sealed class FactoryMethod(val method: IrMethod, val objects: Objects) {
   val name = method.name
   val qualifiedName: String by lazy { "${objects.qualifiedName}.${method.name}" }
 
-  protected fun getParameters(owner: IrClass, method: IrMethod): List<Parameter> {
-    return method.parameters.map { parameter ->
-      Parameter(owner, method, parameter, this, Type.fromParameter(parameter))
-    }
-  }
+  protected fun getParameters(owner: IrClass, method: IrMethod): List<Parameter> =
+      method.parameters.map { parameter ->
+        Parameter(owner, method, parameter, this, Type.fromParameter(parameter))
+      }
 
   class Parameter(
       val owner: IrClass,
       val method: IrMethod,
       val parameter: IrParameter,
       val factoryMethod: FactoryMethod,
-      val type: Type
+      val type: Type,
   ) {
 
     val qualifiedName: String by lazy { type.qualifiedName }
@@ -75,8 +74,9 @@ sealed class FactoryMethod(val method: IrMethod, val objects: Objects) {
 
     fun fromObjectsMethod(objects: Objects, method: IrMethod): FactoryMethod {
       if (method.isVoid()) throw VoidFactoryMethod(objects, method)
-      if (method.isNullable() || method.returnType.toString().endsWith("?"))
-          throw NullableFactoryMethod(objects, method)
+      if (method.isNullable() || method.returnType.toString().endsWith("?")) {
+        throw NullableFactoryMethod(objects, method)
+      }
 
       ensureNonNullParameters(objects.scope, objects.clazz, method)
 
@@ -98,9 +98,8 @@ class BasicFactoryMethod private constructor(objects: Objects, method: IrMethod)
 
   companion object {
 
-    fun create(objects: Objects, method: IrMethod): BasicFactoryMethod {
-      return BasicFactoryMethod(objects, method)
-    }
+    fun create(objects: Objects, method: IrMethod): BasicFactoryMethod =
+        BasicFactoryMethod(objects, method)
   }
 }
 
@@ -140,9 +139,8 @@ class ConstructorFactoryMethod private constructor(objects: Objects, method: IrM
 
   companion object {
 
-    fun create(objects: Objects, method: IrMethod): ConstructorFactoryMethod {
-      return ConstructorFactoryMethod(objects, method)
-    }
+    fun create(objects: Objects, method: IrMethod): ConstructorFactoryMethod =
+        ConstructorFactoryMethod(objects, method)
   }
 }
 
@@ -174,8 +172,9 @@ private fun ensureNonNullParameter(
     scope: Scope,
     owner: IrClass,
     method: IrMethod,
-    parameter: IrParameter
+    parameter: IrParameter,
 ) {
-  if (parameter.isNullable() || parameter.type.toString().endsWith("?"))
-      throw NullableParameter(scope, owner, method, parameter)
+  if (parameter.isNullable() || parameter.type.toString().endsWith("?")) {
+    throw NullableParameter(scope, owner, method, parameter)
+  }
 }

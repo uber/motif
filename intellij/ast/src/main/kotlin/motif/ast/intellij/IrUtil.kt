@@ -27,14 +27,11 @@ import motif.ast.IrModifier
 
 interface IrUtil {
 
-  fun PsiModifierListOwner.irModifiers(): Set<IrModifier> {
-    return PsiModifier.MODIFIERS
-        .filter { hasModifierProperty(it) }
-        .map { IrModifier.valueOf(it.uppercase()) }
-        .toSet()
-  }
+  fun PsiModifierListOwner.irModifiers(): Set<IrModifier> =
+      PsiModifier.MODIFIERS.filter { hasModifierProperty(it) }
+          .map { IrModifier.valueOf(it.uppercase()) }
+          .toSet()
 
-  fun PsiAnnotationOwner.irAnnotations(project: Project): List<IrAnnotation> {
-    return annotations.map { IntelliJAnnotation(project, it) }
-  }
+  fun PsiAnnotationOwner.irAnnotations(project: Project): List<IrAnnotation> =
+      annotations.map { IntelliJAnnotation(project, it) }
 }

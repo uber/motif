@@ -27,6 +27,8 @@ internal class VoidScopeMethodHandler(private val error: VoidScopeMethod) : Erro
             Scope methods must be non-void:
 
               ${error.scope.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

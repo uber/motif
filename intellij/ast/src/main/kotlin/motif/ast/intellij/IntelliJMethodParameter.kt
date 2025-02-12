@@ -25,7 +25,7 @@ import motif.ast.IrType
 class IntelliJMethodParameter(
     private val project: Project,
     val psiParameter: PsiParameter,
-    val substitutor: PsiSubstitutor
+    val substitutor: PsiSubstitutor,
 ) : IrUtil, IrParameter {
 
   override val type: IrType by lazy {

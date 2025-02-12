@@ -33,13 +33,12 @@ class SimpleNameTest(private val qualifiedName: String, private val expectedSimp
             "java.util.List<? super java.lang.String>" to "List<? super String>",
             "java.util.Map<java.lang.String, java.lang.Integer>" to "Map<String, Integer>",
             "java.util.Map<? extends java.lang.String, ? super java.lang.Integer>" to
-                "Map<? extends String, ? super Integer>")
+                "Map<? extends String, ? super Integer>",
+        )
 
     @JvmStatic
     @Parameterized.Parameters(name = "{0}")
-    fun data(): Collection<Array<Any>> {
-      return tests.map { (key, value) -> arrayOf(key, value) }
-    }
+    fun data(): Collection<Array<Any>> = tests.map { (key, value) -> arrayOf(key, value) }
   }
 
   @Test

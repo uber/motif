@@ -50,7 +50,7 @@ class ScopeImpl(
     val factoryProviderMethods: List<FactoryProviderMethod>,
     val dependencyProviderMethods: List<DependencyProviderMethod>,
     val objectsImpl: ObjectsImpl?,
-    val dependencies: Dependencies?
+    val dependencies: Dependencies?,
 )
 
 /**
@@ -65,7 +65,7 @@ class ScopeImpl(
 class ScopeImplAnnotation(
     val children: List<ClassName>,
     val scopeClassName: ClassName,
-    val dependenciesClassName: ClassName
+    val dependenciesClassName: ClassName,
 )
 
 /**
@@ -76,7 +76,7 @@ class ScopeImplAnnotation(
 class ObjectsField(
     val objectsClassName: ClassName,
     val objectsImplClassName: ClassName,
-    val name: String
+    val name: String,
 )
 
 /**
@@ -103,7 +103,7 @@ class CacheField(val name: String)
 class Constructor(
     val dependenciesClassName: ClassName,
     val dependenciesParameterName: String,
-    val dependenciesFieldName: String
+    val dependenciesFieldName: String,
 )
 
 /**
@@ -127,7 +127,7 @@ class AccessMethodImpl(
     // Required work around https://github.com/square/javapoet/issues/656
     val env: XProcessingEnv,
     val overriddenMethod: CompilerMethod,
-    val providerMethodName: String
+    val providerMethodName: String,
 )
 
 /**
@@ -143,7 +143,7 @@ class ChildMethodImpl(
     val childImplClassName: ClassName,
     val childMethodName: String,
     val parameters: List<ChildMethodImplParameter>,
-    val childDependenciesImpl: ChildDependenciesImpl
+    val childDependenciesImpl: ChildDependenciesImpl,
 )
 
 /**
@@ -165,7 +165,7 @@ class ChildDependenciesImpl(
     val childDependenciesClassName: ClassName,
     val methods: List<ChildDependencyMethodImpl>,
     val isAbstractClass: Boolean,
-    val env: XProcessingEnv
+    val env: XProcessingEnv,
 )
 
 /**
@@ -180,7 +180,7 @@ class ChildDependencyMethodImpl(
     val name: String,
     val returnTypeName: TypeName,
     val returnExpression: ReturnExpression,
-    val isInternal: Boolean
+    val isInternal: Boolean,
 ) {
 
   sealed class ReturnExpression {
@@ -222,7 +222,7 @@ class DependencyProviderMethod(
     val returnTypeName: TypeName,
     val dependenciesFieldName: String,
     val dependencyMethodName: String,
-    val env: XProcessingEnv
+    val env: XProcessingEnv,
 )
 
 /**
@@ -239,7 +239,7 @@ class FactoryProviderMethod(
     val returnTypeName: TypeName,
     val body: FactoryProviderMethodBody,
     val spreadProviderMethods: List<SpreadProviderMethod>,
-    val env: XProcessingEnv
+    val env: XProcessingEnv,
 )
 
 sealed class FactoryProviderMethodBody {
@@ -260,7 +260,7 @@ sealed class FactoryProviderMethodBody {
       val cacheFieldName: String,
       val returnTypeName: TypeName,
       val instantiation: FactoryProviderInstantiation,
-      val env: XProcessingEnv
+      val env: XProcessingEnv,
   ) : FactoryProviderMethodBody()
 
   /**
@@ -289,7 +289,7 @@ sealed class FactoryProviderInstantiation {
       val objectsClassName: ClassName,
       val isStatic: Boolean,
       val factoryMethodName: String,
-      val callProviders: CallProviders
+      val callProviders: CallProviders,
   ) : FactoryProviderInstantiation()
 
   /**
@@ -328,7 +328,7 @@ class SpreadProviderMethod(
     val returnTypeName: TypeName,
     val sourceTypeName: TypeName,
     val sourceProviderMethodName: String,
-    val spreadMethodName: String
+    val spreadMethodName: String,
 )
 
 /**
@@ -352,7 +352,7 @@ class DependencyMethod(
     val returnTypeName: TypeName,
     val qualifier: Qualifier?,
     val javaDoc: DependencyMethodJavaDoc,
-    val internal: Boolean
+    val internal: Boolean,
 )
 
 /**
@@ -380,7 +380,7 @@ class DependencyMethodJavaDoc(val requestedFrom: List<JavaDocMethodLink>)
 class JavaDocMethodLink(
     val owner: String,
     val methodName: String,
-    val parameterTypes: List<String>
+    val parameterTypes: List<String>,
 )
 
 /**
@@ -395,7 +395,7 @@ class ObjectsImpl(
     val className: ClassName,
     val superClassName: ClassName,
     val isInterface: Boolean,
-    val abstractMethods: List<ObjectsAbstractMethod>
+    val abstractMethods: List<ObjectsAbstractMethod>,
 )
 
 /**
@@ -409,7 +409,7 @@ class ObjectsImpl(
 class ObjectsAbstractMethod(
     // Required work around https://github.com/square/javapoet/issues/656
     val env: XProcessingEnv,
-    val overriddenMethod: CompilerMethod
+    val overriddenMethod: CompilerMethod,
 )
 
 class TypeName private constructor(private val mirror: XType) {
@@ -421,17 +421,18 @@ class TypeName private constructor(private val mirror: XType) {
         jTypeName is com.squareup.javapoet.ClassName) {
       ParameterizedTypeName.get(
           jTypeName,
-          *mirror
-              .typeArguments
+          *mirror.typeArguments
               .map { WildcardTypeName.subtypeOf(Object::class.java) }
-              .toTypedArray())
+              .toTypedArray(),
+      )
     } else if (mirror.typeArguments.isNotEmpty() &&
         "<" in jTypeName.toString() &&
         "$" in jTypeName.toString()) {
       // Work around issue where JavaPoet returns a TypeName with a '$' for a Kotlin inner class
       ParameterizedTypeName.get(
           com.squareup.javapoet.ClassName.get(mirror.typeElement?.toJavac()),
-          *mirror.typeArguments.map { it.typeName }.toTypedArray())
+          *mirror.typeArguments.map { it.typeName }.toTypedArray(),
+      )
     } else {
       jTypeName
     }
@@ -464,25 +465,27 @@ class TypeName private constructor(private val mirror: XType) {
 
   companion object {
 
-    fun get(mirror: XType): TypeName {
-      return TypeName(mirror)
-    }
+    fun get(mirror: XType): TypeName = TypeName(mirror)
   }
 }
 
 class ClassName
-private constructor(val j: com.squareup.javapoet.ClassName, val env: XProcessingEnv?) {
+private constructor(
+    val j: com.squareup.javapoet.ClassName,
+    val env: XProcessingEnv?,
+) {
 
   val kt: com.squareup.kotlinpoet.ClassName by lazy {
     val className =
         com.squareup.kotlinpoet.ClassName(
-            j.packageName(), j.simpleNames().first(), *j.simpleNames().drop(1).toTypedArray())
+            j.packageName(),
+            j.simpleNames().first(),
+            *j.simpleNames().drop(1).toTypedArray(),
+        )
     KotlinTypeWorkaround.javaToKotlinType(className, env) as com.squareup.kotlinpoet.ClassName
   }
 
-  fun nestedClass(name: String): ClassName {
-    return ClassName(j.nestedClass(name), env)
-  }
+  fun nestedClass(name: String): ClassName = ClassName(j.nestedClass(name), env)
 
   companion object {
 
@@ -491,8 +494,7 @@ private constructor(val j: com.squareup.javapoet.ClassName, val env: XProcessing
       return ClassName(j, null)
     }
 
-    fun get(j: com.squareup.javapoet.TypeName, env: XProcessingEnv): ClassName {
-      return ClassName(j as com.squareup.javapoet.ClassName, env)
-    }
+    fun get(j: com.squareup.javapoet.TypeName, env: XProcessingEnv): ClassName =
+        ClassName(j as com.squareup.javapoet.ClassName, env)
   }
 }

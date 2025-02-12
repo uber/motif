@@ -45,7 +45,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @interface A {}
-      """.trimIndent())
+      """
+            .trimIndent())
 
     val fooAnnotation =
         getClassAnnotation(
@@ -53,7 +54,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @A class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -61,7 +63,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @A class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isEqualTo(barAnnotation)
   }
@@ -72,14 +75,16 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @interface A {}
-      """.trimIndent())
+      """
+            .trimIndent())
 
     createAnnotationClass(
         """
             package test;
 
             @interface B {}
-      """.trimIndent())
+      """
+            .trimIndent())
 
     val fooAnnotation =
         getClassAnnotation(
@@ -87,7 +92,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @A class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -95,7 +101,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @B class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
   }
@@ -106,7 +113,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @interface A {}
-      """.trimIndent())
+      """
+            .trimIndent())
 
     val fooAnnotation =
         getClassAnnotation(
@@ -114,7 +122,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @test.A class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -122,7 +131,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             @A class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isEqualTo(barAnnotation)
   }
@@ -135,7 +145,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -144,7 +155,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isEqualTo(barAnnotation)
   }
@@ -157,7 +169,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -166,7 +179,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("b")
             class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
   }
@@ -181,7 +195,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo {
               static final String S = "a";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -192,7 +207,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
               static final String S = "a";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isEqualTo(barAnnotation)
   }
@@ -207,7 +223,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo {
               static final String S = "a";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -218,7 +235,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
               static final String S = "b";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
   }
@@ -231,7 +249,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -242,7 +261,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
               static final String S = "a";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isEqualTo(barAnnotation)
   }
@@ -255,7 +275,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     val barAnnotation =
         getClassAnnotation(
@@ -266,7 +287,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
               static final String S = "b";
             }
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation).isNotEqualTo(barAnnotation)
   }
@@ -279,7 +301,8 @@ class IntelliJAnnotationTest : LightJavaCodeInsightFixtureTestCase() {
 
             @javax.inject.Named("a")
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent())
 
     assertThat(fooAnnotation.className).isEqualTo("javax.inject.Named")
   }

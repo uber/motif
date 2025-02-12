@@ -25,14 +25,12 @@ val XProcessingEnv.typeUtils
   get() = XTypeUtils
 
 /** Provides access to KSP's resolver since XProcessing does not give us access */
-fun XProcessingEnv.resolver(): Resolver? {
-  return if (backend == XProcessingEnv.Backend.KSP) {
-    Class.forName("androidx.room.compiler.processing.ksp.KspProcessingEnv")
-        ?.getDeclaredField("_resolver")
-        ?.apply { isAccessible = true }
-        ?.get(this) as
-        Resolver?
-  } else {
-    null
-  }
-}
+fun XProcessingEnv.resolver(): Resolver? =
+    if (backend == XProcessingEnv.Backend.KSP) {
+      Class.forName("androidx.room.compiler.processing.ksp.KspProcessingEnv")
+          ?.getDeclaredField("_resolver")
+          ?.apply { isAccessible = true }
+          ?.get(this) as Resolver?
+    } else {
+      null
+    }

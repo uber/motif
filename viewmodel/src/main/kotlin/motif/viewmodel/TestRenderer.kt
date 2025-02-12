@@ -54,7 +54,7 @@ object TestRenderer {
   private fun StringBuilder.renderRequired(
       indent: Int,
       requiredDependencies: List<RequiredDependency>,
-      topLevel: Boolean = true
+      topLevel: Boolean = true,
   ) {
     var header = "Required"
     header = if (topLevel) "==== $header ====" else "[ $header ]"
@@ -67,7 +67,7 @@ object TestRenderer {
 
   private fun StringBuilder.renderProvided(
       indent: Int,
-      providedDependencies: List<ProvidedDependency>
+      providedDependencies: List<ProvidedDependency>,
   ) {
     appendLine(indent, "==== Provides ====")
     appendLine()
@@ -79,7 +79,7 @@ object TestRenderer {
   private fun StringBuilder.renderRequired(
       indent: Int,
       requiredDependency: RequiredDependency,
-      topLevel: Boolean
+      topLevel: Boolean,
   ) {
     var header = requiredDependency.type.simpleName.toJvmSimpleName()
     header = if (topLevel) "---- $header ----" else header
@@ -140,11 +140,10 @@ object TestRenderer {
 }
 
 /** HACK: Map kotlin types to Java for graph validation (issue when KSP processes Java sources) */
-private fun String.toJvmSimpleName(): String {
-  return when (this) {
-    "Int" -> "int"
-    "Boolean" -> "boolean"
-    "Byte" -> "byte"
-    else -> this
-  }
-}
+private fun String.toJvmSimpleName(): String =
+    when (this) {
+      "Int" -> "int"
+      "Boolean" -> "boolean"
+      "Byte" -> "byte"
+      else -> this
+    }

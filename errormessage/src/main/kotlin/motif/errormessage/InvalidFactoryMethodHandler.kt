@@ -27,6 +27,8 @@ internal class InvalidFactoryMethodHandler(private val error: InvalidFactoryMeth
             Factory method is invalid:
 
               ${error.objects.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

@@ -29,7 +29,7 @@ open class ScopeHierarchyUsageSinksSectionDescriptor(
     private val nonNullProject: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    val clazz: PsiClass
+    val clazz: PsiClass,
 ) : ScopeHierarchyNodeDescriptor(nonNullProject, graph, parentDescriptor, clazz, false) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -39,7 +39,5 @@ open class ScopeHierarchyUsageSinksSectionDescriptor(
     text.ending.addText(" " + getUsageString(count), getPackageNameAttributes())
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return null
-  }
+  override fun getIcon(element: PsiElement): Icon? = null
 }

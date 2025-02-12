@@ -31,6 +31,8 @@ internal class AccessMethodParametersHandler(private val error: AccessMethodPara
 
             Suggestions:
               * If this method was intended to be a child method, ensure that the return type is a Scope.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

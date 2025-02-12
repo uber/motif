@@ -25,6 +25,7 @@ interface IrType : IrEquivalence {
     get() = simpleName(qualifiedName)
 
   fun resolveClass(): IrClass?
+
   fun isAssignableTo(type: IrType): Boolean
 }
 

@@ -62,11 +62,13 @@ class Dependencies(val clazz: IrClass, val scope: Scope) {
         return clazz
       }
 
-      clazz.supertypes.mapNotNull { it.resolveClass() }.forEach { superinterface ->
-        findCreatableSuperinterface(superinterface)?.let {
-          return it
-        }
-      }
+      clazz.supertypes
+          .mapNotNull { it.resolveClass() }
+          .forEach { superinterface ->
+            findCreatableSuperinterface(superinterface)?.let {
+              return it
+            }
+          }
 
       return null
     }

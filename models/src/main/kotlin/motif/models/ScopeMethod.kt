@@ -40,9 +40,11 @@ sealed class ScopeMethod {
       }
 
       if (returnClass != null && returnClass.hasAnnotation(motif.Scope::class)) {
-        method.parameters.find { it.isNullable() }?.let { nullableParameter ->
-          throw NullableDynamicDependency(scope, method, nullableParameter)
-        }
+        method.parameters
+            .find { it.isNullable() }
+            ?.let { nullableParameter ->
+              throw NullableDynamicDependency(scope, method, nullableParameter)
+            }
         val childMethod = ChildMethod(method, scope, returnClass)
         val duplicatedParameterTypes =
             childMethod.parameters - childMethod.parameters.distinctBy { it.type }

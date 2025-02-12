@@ -25,8 +25,7 @@ class Spread(val clazz: IrClass, val factoryMethod: FactoryMethod) {
   val qualifiedName: String by lazy { clazz.qualifiedName }
 
   val methods: List<Method> =
-      clazz
-          .methods
+      clazz.methods
           .filter { method -> isSpreadMethod(method) }
           .onEach { method ->
             if (method.isNullable()) {
@@ -44,8 +43,7 @@ class Spread(val clazz: IrClass, val factoryMethod: FactoryMethod) {
 
   companion object {
 
-    private fun isSpreadMethod(method: IrMethod): Boolean {
-      return !method.isVoid() && method.isPublic() && !method.hasParameters()
-    }
+    private fun isSpreadMethod(method: IrMethod): Boolean =
+        !method.isVoid() && method.isPublic() && !method.hasParameters()
   }
 }

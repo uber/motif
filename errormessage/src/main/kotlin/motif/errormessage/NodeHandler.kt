@@ -25,44 +25,51 @@ import motif.models.SpreadSource
 
 object NodeHandler {
 
-  fun handle(node: Node): String {
-    return when (node) {
-      is ScopeSource -> {
-        """[SCOPE]
-                    |  TYPE: ${node.scope.qualifiedName}""".trimMargin()
-      }
-      is FactoryMethodSource -> {
-        """[FACTORY METHOD RETURN TYPE]
+  fun handle(node: Node): String =
+      when (node) {
+        is ScopeSource -> {
+          """[SCOPE]
+                    |  TYPE: ${node.scope.qualifiedName}
+      """
+              .trimMargin()
+        }
+        is FactoryMethodSource -> {
+          """[FACTORY METHOD RETURN TYPE]
                     |  TYPE:   ${node.factoryMethod.returnType.qualifiedName}
-                    |  METHOD: ${node.factoryMethod.qualifiedName}""".trimMargin()
-      }
-      is SpreadSource -> {
-        """[SPREAD METHOD]
+                    |  METHOD: ${node.factoryMethod.qualifiedName}
+      """
+              .trimMargin()
+        }
+        is SpreadSource -> {
+          """[SPREAD METHOD]
                     |  TYPE:           ${node.spreadMethod.returnType.qualifiedName}
                     |  METHOD:         ${node.spreadMethod.spread.qualifiedName}.${node.spreadMethod.method.name}
                     |  FACTORY METHOD: ${node.spreadMethod.spread.factoryMethod.qualifiedName}
-                """.trimMargin()
-      }
-      is ChildParameterSource -> {
-        """[CHILD METHOD PARAMETER]
+      """
+              .trimMargin()
+        }
+        is ChildParameterSource -> {
+          """[CHILD METHOD PARAMETER]
                     |  TYPE:      ${node.parameter.type.qualifiedName}
                     |  METHOD:    ${node.parameter.method.qualifiedName}
                     |  PARAMETER: ${node.parameter.parameter.name}
-                """.trimMargin()
-      }
-      is FactoryMethodSink -> {
-        """[FACTORY METHOD PARAMETER]
+      """
+              .trimMargin()
+        }
+        is FactoryMethodSink -> {
+          """[FACTORY METHOD PARAMETER]
                     |  TYPE:      ${node.parameter.type.qualifiedName}
                     |  METHOD:    ${node.parameter.factoryMethod.qualifiedName}
                     |  PARAMETER: ${node.parameter.parameter.name}
-                """.trimMargin()
-      }
-      is AccessMethodSink -> {
-        """[ACCESS METHOD]
+      """
+              .trimMargin()
+        }
+        is AccessMethodSink -> {
+          """[ACCESS METHOD]
                     |  TYPE:   ${node.accessMethod.returnType.qualifiedName}
                     |  METHOD: ${node.accessMethod.qualifiedName}
-                """.trimMargin()
+      """
+              .trimMargin()
+        }
       }
-    }
-  }
 }

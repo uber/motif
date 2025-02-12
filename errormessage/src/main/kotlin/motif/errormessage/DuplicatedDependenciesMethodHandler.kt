@@ -18,7 +18,7 @@ package motif.errormessage
 import motif.models.DuplicatedDependenciesMethod
 
 internal class DuplicatedDependenciesMethodHandler(
-    private val error: DuplicatedDependenciesMethod
+    private val error: DuplicatedDependenciesMethod,
 ) : ErrorHandler {
 
   override val name = "DUPLICATED DEPENDENCIES METHOD"
@@ -32,6 +32,8 @@ internal class DuplicatedDependenciesMethodHandler(
         """
             Suggestions:
               * Remove the redundant methods
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

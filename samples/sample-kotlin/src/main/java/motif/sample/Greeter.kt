@@ -17,7 +17,5 @@ package motif.sample
 
 class Greeter(private val name: String) {
 
-  fun greet(): String {
-    return "Hello $name!"
-  }
+  fun greet(): String = "Hello $name!"
 }

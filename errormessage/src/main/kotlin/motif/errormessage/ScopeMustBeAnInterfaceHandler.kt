@@ -28,6 +28,8 @@ internal class ScopeMustBeAnInterfaceHandler(private val error: ScopeMustBeAnInt
             Scope must be an interface:
 
               ${error.scopeClass.qualifiedName}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }
