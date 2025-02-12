@@ -103,7 +103,7 @@ object ScopeHierarchyUtils {
     val type: IrType = IntelliJType(project, scopeType)
     val scope: Scope? = graph.getScope(type)
     return if (scope != null) {
-      Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java)
+      Iterables.toArray(graph.getParentEdges(scope), ScopeEdge::class.java) as Array<ScopeEdge>?
     } else {
       null
     }
