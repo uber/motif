@@ -77,7 +77,8 @@ class GraphManager(private val project: Project) : ProjectComponent {
                   setGraphState(state)
                 }
               }
-            })
+            },
+        )
   }
 
   fun addListener(listener: Listener) {
@@ -105,8 +106,7 @@ class GraphInvalidator(private val project: Project, private val graph: Resolved
   private val psiElementFactory = PsiElementFactory.SERVICE.getInstance(project)
 
   private val relevantTypes: Set<IrType> by lazy {
-    graph
-        .scopes
+    graph.scopes
         .flatMap { scope ->
           (listOfNotNull(scope.objects?.clazz) +
                   scope.clazz +
@@ -118,22 +118,19 @@ class GraphInvalidator(private val project: Project, private val graph: Resolved
         .toSet()
   }
 
-  fun shouldInvalidate(changedElement: PsiElement): Boolean {
-    return (sequenceOf(changedElement) + changedElement.parentsWithSelf)
-        .mapNotNull { it as? PsiClass }
-        .map { psiElementFactory.createType(it) }
-        .any { IntelliJType(project, it) in relevantTypes }
-  }
+  fun shouldInvalidate(changedElement: PsiElement): Boolean =
+      (sequenceOf(changedElement) + changedElement.parentsWithSelf)
+          .mapNotNull { it as? PsiClass }
+          .map { psiElementFactory.createType(it) }
+          .any { IntelliJType(project, it) in relevantTypes }
 
-  private fun spreadClasses(scope: Scope): List<IrClass> {
-    return scope.factoryMethods.mapNotNull { it.spread }.map { spread -> spread.clazz }
-  }
+  private fun spreadClasses(scope: Scope): List<IrClass> =
+      scope.factoryMethods.mapNotNull { it.spread }.map { spread -> spread.clazz }
 
-  private fun constructorClasses(scope: Scope): List<IrClass> {
-    return scope.factoryMethods.filterIsInstance<ConstructorFactoryMethod>().mapNotNull {
-      it.returnType.type.type.resolveClass()
-    }
-  }
+  private fun constructorClasses(scope: Scope): List<IrClass> =
+      scope.factoryMethods.filterIsInstance<ConstructorFactoryMethod>().mapNotNull {
+        it.returnType.type.type.resolveClass()
+      }
 
   private fun typeAndSupertypes(psiClass: PsiClass): Set<PsiClass> {
     if (psiClass.qualifiedName == "java.lang.Object") {

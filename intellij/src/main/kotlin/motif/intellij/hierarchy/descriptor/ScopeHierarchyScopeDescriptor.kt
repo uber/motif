@@ -37,7 +37,7 @@ open class ScopeHierarchyScopeDescriptor(
     parentDescriptor: HierarchyNodeDescriptor?,
     private val clazz: PsiClass,
     val scope: Scope,
-    isBase: Boolean = false
+    isBase: Boolean = false,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, clazz, isBase) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -49,11 +49,7 @@ open class ScopeHierarchyScopeDescriptor(
     }
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return AllIcons.Nodes.Interface
-  }
+  override fun getIcon(element: PsiElement): Icon? = AllIcons.Nodes.Interface
 
-  override fun toString(): String {
-    return clazz.name ?: ""
-  }
+  override fun toString(): String = clazz.name ?: ""
 }

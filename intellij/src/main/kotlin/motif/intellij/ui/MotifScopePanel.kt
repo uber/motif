@@ -51,7 +51,11 @@ class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) :
 
     consumeAndProvideBrowser =
         buildPropertyHierarchyBrowser(
-            project, graph, rootElement, PropertyHierarchyType.CONSUME_AND_PROVIDE)
+            project,
+            graph,
+            rootElement,
+            PropertyHierarchyType.CONSUME_AND_PROVIDE,
+        )
 
     tabs = JBTabbedPane()
     splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, scopeBrowser, consumeAndProvideBrowser)
@@ -79,7 +83,11 @@ class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) :
     val previousDividerLocation = splitPane.dividerLocation
     consumeAndProvideBrowser =
         buildPropertyHierarchyBrowser(
-            project, graph, element, PropertyHierarchyType.CONSUME_AND_PROVIDE)
+            project,
+            graph,
+            element,
+            PropertyHierarchyType.CONSUME_AND_PROVIDE,
+        )
     splitPane.add(consumeAndProvideBrowser, RIGHT)
     splitPane.dividerLocation = previousDividerLocation
   }
@@ -88,7 +96,7 @@ class MotifScopePanel(val project: Project, initialGraph: ResolvedGraph) :
       project: Project,
       graph: ResolvedGraph,
       rootElement: PsiElement,
-      type: PropertyHierarchyType
+      type: PropertyHierarchyType,
   ): ScopePropertyHierarchyBrowser {
     val propertyBrowser = ScopePropertyHierarchyBrowser(project, graph, rootElement, type)
     propertyBrowser.changeView(ScopePropertyHierarchyBrowser.PROPERTY_HIERARCHY_TYPE)

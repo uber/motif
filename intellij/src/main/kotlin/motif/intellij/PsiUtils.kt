@@ -23,18 +23,16 @@ import org.jetbrains.kotlin.asJava.toLightMethods
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFunction
 
-internal fun PsiElement.toPsiClass(): PsiElement? {
-  return when (this) {
-    is PsiClass -> this
-    is KtClass -> toLightClass()
-    else -> this
-  }
-}
+internal fun PsiElement.toPsiClass(): PsiElement? =
+    when (this) {
+      is PsiClass -> this
+      is KtClass -> toLightClass()
+      else -> this
+    }
 
-internal fun PsiElement.toPsiMethod(): PsiElement? {
-  return when (this) {
-    is PsiMethod -> this
-    is KtFunction -> toLightMethods().singleOrNull()
-    else -> this
-  }
-}
+internal fun PsiElement.toPsiMethod(): PsiElement? =
+    when (this) {
+      is PsiMethod -> this
+      is KtFunction -> toLightMethods().singleOrNull()
+      else -> this
+    }

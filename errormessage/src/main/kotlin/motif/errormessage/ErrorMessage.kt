@@ -30,16 +30,17 @@ class ErrorMessage(val name: String, val text: String) {
             ====================================
 
 
-      """.trimIndent()
+      """
+            .trimIndent()
 
-    val footer = """
+    val footer =
+        """
 
             ====================================
-    """.trimIndent()
+    """
+            .trimIndent()
 
-    fun toString(graph: ResolvedGraph): String {
-      return toString(graph.errors)
-    }
+    fun toString(graph: ResolvedGraph): String = toString(graph.errors)
 
     fun toString(errors: List<MotifError>): String {
       val content: String =

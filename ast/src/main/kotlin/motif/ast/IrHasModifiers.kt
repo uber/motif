@@ -19,19 +19,11 @@ interface IrHasModifiers {
 
   val modifiers: Set<IrModifier>
 
-  fun isStatic(): Boolean {
-    return IrModifier.STATIC in modifiers
-  }
+  fun isStatic(): Boolean = IrModifier.STATIC in modifiers
 
-  fun isPrivate(): Boolean {
-    return IrModifier.PRIVATE in modifiers
-  }
+  fun isPrivate(): Boolean = IrModifier.PRIVATE in modifiers
 
-  fun isPublic(): Boolean {
-    return IrModifier.PUBLIC in modifiers
-  }
+  fun isPublic(): Boolean = IrModifier.PUBLIC in modifiers
 
-  fun isAbstract(): Boolean {
-    return IrModifier.ABSTRACT in modifiers
-  }
+  fun isAbstract(): Boolean = IrModifier.ABSTRACT in modifiers
 }

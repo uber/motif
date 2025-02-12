@@ -35,6 +35,8 @@ internal class NotAssignableBindsMethodHandler(private val error: NotAssignableB
 
               [Parameter Type]
                 ${error.parameterType.qualifiedName}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

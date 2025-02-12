@@ -32,6 +32,8 @@ internal class NoSuitableConstructorHandler(private val error: NoSuitableConstru
 
               [Factory Method]
                 ${error.objects.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

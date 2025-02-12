@@ -39,9 +39,7 @@ data class Type(val type: IrType, val qualifier: IrAnnotation?) : Comparable<Typ
     "$qualifierString${type.simpleName}"
   }
 
-  override fun compareTo(other: Type): Int {
-    return compareKey.compareTo(other.compareKey)
-  }
+  override fun compareTo(other: Type): Int = compareKey.compareTo(other.compareKey)
 
   private val compareKey: String by lazy {
     val qualifierString = qualifier?.let { "$it " } ?: ""
@@ -50,21 +48,16 @@ data class Type(val type: IrType, val qualifier: IrAnnotation?) : Comparable<Typ
 
   companion object {
 
-    fun fromParameter(parameter: IrParameter): Type {
-      return Type(parameter.type, parameter.getQualifier())
-    }
+    fun fromParameter(parameter: IrParameter): Type = Type(parameter.type, parameter.getQualifier())
 
-    fun fromReturnType(method: IrMethod): Type {
-      return Type(method.returnType, method.getQualifier())
-    }
+    fun fromReturnType(method: IrMethod): Type = Type(method.returnType, method.getQualifier())
 
     private fun IrAnnotated.getQualifier(): IrAnnotation? {
       val qualifier =
           annotations.find { annotation ->
             val annotationClass: IrClass = annotation.type?.resolveClass() ?: return@find false
             annotationClass.hasAnnotation(Qualifier::class)
-          }
-              ?: return null
+          } ?: return null
 
       val members = qualifier.members
       if (members.size > 1) {

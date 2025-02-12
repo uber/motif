@@ -43,14 +43,14 @@ class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrA
       val executableElement =
           annotationMethods.firstOrNull { it.jvmName == annotationValue.name }
               ?: throw IllegalStateException(
-                  "No matching annotations for ${annotationValue.name} in ${mirror.annotationValues.map { it.name }.joinToString(separator = ", ")}")
+                  "No matching annotations for ${annotationValue.name} in ${mirror.annotationValues.map { it.name }.joinToString(separator = ", ")}",
+              )
       CompilerMethod(env, mirror.type, executableElement.executableType, executableElement)
     }
   }
 
-  override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
-    return annotationClass.java.name == className
-  }
+  override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean =
+      annotationClass.java.name == className
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -63,11 +63,7 @@ class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrA
     return true
   }
 
-  override fun hashCode(): Int {
-    return pretty.hashCode()
-  }
+  override fun hashCode(): Int = pretty.hashCode()
 
-  override fun toString(): String {
-    return pretty
-  }
+  override fun toString(): String = pretty
 }

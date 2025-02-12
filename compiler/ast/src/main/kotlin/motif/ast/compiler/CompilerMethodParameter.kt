@@ -27,7 +27,7 @@ import motif.ast.IrType
 class CompilerMethodParameter(
     override val env: XProcessingEnv,
     val element: XVariableElement,
-    val typeMirror: XType
+    val typeMirror: XType,
 ) : IrUtil, IrParameter {
 
   override val type: IrType by lazy {

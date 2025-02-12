@@ -27,18 +27,17 @@ import motif.core.ResolvedGraph
 
 @AutoService(SymbolProcessorProvider::class)
 class MotifSymbolProcessorProvider(
-    private val config: XProcessingEnvConfig = XProcessingEnvConfig.DEFAULT
+    private val config: XProcessingEnvConfig = XProcessingEnvConfig.DEFAULT,
 ) : SymbolProcessorProvider {
   lateinit var graph: ResolvedGraph
 
-  override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-    return MotifSymbolProcessor(environment, config)
-  }
+  override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
+      MotifSymbolProcessor(environment, config)
 
   @OptIn(ExperimentalProcessingApi::class)
   private inner class MotifSymbolProcessor(
       environment: SymbolProcessorEnvironment,
-      config: XProcessingEnvConfig
+      config: XProcessingEnvConfig,
   ) : KspBasicAnnotationProcessor(environment, config) {
 
     override fun processingSteps() = listOf(MotifProcessingStep(graphSetter = { graph = it }))

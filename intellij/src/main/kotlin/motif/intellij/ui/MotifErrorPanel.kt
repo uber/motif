@@ -62,7 +62,7 @@ class MotifErrorPanel(project: Project, graph: ResolvedGraph) :
   override fun onSelectedErrorChanged(
       element: PsiElement,
       error: MotifError,
-      errorMessage: ErrorMessage
+      errorMessage: ErrorMessage,
   ) {
     errorDetails.text = errorMessage.text
   }

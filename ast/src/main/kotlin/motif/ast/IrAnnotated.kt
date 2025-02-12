@@ -21,11 +21,8 @@ interface IrAnnotated {
 
   val annotations: List<IrAnnotation>
 
-  fun hasAnnotation(annotationClass: KClass<out Annotation>): Boolean {
-    return annotations.any { it.matchesClass(annotationClass) }
-  }
+  fun hasAnnotation(annotationClass: KClass<out Annotation>): Boolean =
+      annotations.any { it.matchesClass(annotationClass) }
 
-  fun isNullable(): Boolean {
-    return annotations.any { it.className?.endsWith("Nullable") == true }
-  }
+  fun isNullable(): Boolean = annotations.any { it.className?.endsWith("Nullable") == true }
 }

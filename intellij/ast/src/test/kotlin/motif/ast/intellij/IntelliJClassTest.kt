@@ -36,9 +36,7 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
     JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
   }
 
-  override fun getTestDataPath(): String {
-    return "testData"
-  }
+  override fun getTestDataPath(): String = "testData"
 
   fun testInheritedMethod() {
     val fooClass =
@@ -51,7 +49,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             interface Bar {
                 String a();
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.methods).hasSize(1)
   }
@@ -67,7 +67,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             interface Bar<T> {
                 T a(T t);
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.methods).hasSize(1)
     assertThat(fooClass.methods[0].returnType.qualifiedName).isEqualTo("java.lang.String")
@@ -85,7 +87,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
                 static String a() {}
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.methods).hasSize(1)
   }
@@ -101,7 +105,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
                 private static String a() {}
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.methods).isEmpty()
   }
@@ -117,7 +123,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar {
                 String a;
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.fields).hasSize(1)
   }
@@ -133,7 +141,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar<T> {
                 T t;
             }
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.fields).hasSize(1)
 
@@ -150,7 +160,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             package motif.intellij;
 
             class Foo extends motif.intellij.Bar {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val barClass =
         createIntelliJClass(
@@ -158,7 +170,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             package motif.intellij;
 
             class Bar {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     assertThat(fooClass.type.isAssignableTo(barClass.type)).isTrue()
   }
@@ -172,7 +186,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo extends Bar<String> {}
 
             class Bar<T> {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val stringBarType = createIntelliJType("motif.intellij.Bar<String>")
 
@@ -190,7 +206,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar<T> extends Baz<T> {}
 
             class Baz<T> {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val stringBazType = createIntelliJType("motif.intellij.Baz<String>")
 
@@ -206,7 +224,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo extends Bar<String> {}
 
             class Bar<T> {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val superClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
     assertThat(superClass.typeArguments.map { it.qualifiedName })
@@ -225,7 +245,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Bar<T> extends Baz<T> {}
 
             class Baz<T> {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val barClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
     val bazClass = barClass.supertypes.single().resolveClass() as IntelliJClass
@@ -241,7 +263,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo<T> extends Bar<T> {}
 
             class Bar<T> {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val superClass = fooClass.supertypes.single().resolveClass() as IntelliJClass
     assertThat(superClass.typeArguments).isEmpty()
@@ -254,7 +278,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             package test;
 
             class Foo {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val objectClass = fooClass.supertypes.single().resolveClass()!!
     assertThat(objectClass.qualifiedName).isEqualTo("java.lang.Object")
@@ -270,7 +296,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             class Foo implements Bar {}
 
             interface Bar {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val superTypes = fooClass.supertypes.map { it.qualifiedName }
     assertThat(superTypes).containsExactly("java.lang.Object", "test.Bar")
@@ -288,7 +316,9 @@ class IntelliJClassTest : LightJavaCodeInsightFixtureTestCase() {
             interface Bar {}
 
             interface Baz {}
-        """.trimIndent())
+        """
+                .trimIndent(),
+        )
 
     val superTypes = fooClass.supertypes.map { it.qualifiedName }
     assertThat(superTypes).containsExactly("java.lang.Object", "test.Bar", "test.Baz")

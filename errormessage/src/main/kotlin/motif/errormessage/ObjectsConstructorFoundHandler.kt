@@ -28,6 +28,8 @@ internal class ObjectsConstructorFoundHandler(private val error: ObjectsConstruc
             Objects class may not define constructors:
 
               ${error.objectClass.qualifiedName}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

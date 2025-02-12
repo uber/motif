@@ -32,8 +32,9 @@ class Objects private constructor(val clazz: IrClass, val scope: Scope) {
       val objectsClass = scope.clazz.annotatedInnerClass(motif.Objects::class) ?: return null
 
       if (objectsClass.fields.any { !it.isStatic() }) throw ObjectsFieldFound(scope, objectsClass)
-      if (objectsClass.hasNonDefaultConstructor())
-          throw ObjectsConstructorFound(scope, objectsClass)
+      if (objectsClass.hasNonDefaultConstructor()) {
+        throw ObjectsConstructorFound(scope, objectsClass)
+      }
 
       return Objects(objectsClass, scope)
     }

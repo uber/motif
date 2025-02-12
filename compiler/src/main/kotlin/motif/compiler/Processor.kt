@@ -26,15 +26,10 @@ const val OPTION_MODE = "motif.mode"
 class Processor : JavacBasicAnnotationProcessor() {
   lateinit var graph: ResolvedGraph
 
-  override fun getSupportedSourceVersion(): SourceVersion {
-    return SourceVersion.latestSupported()
-  }
+  override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-  override fun processingSteps(): Iterable<XProcessingStep> {
-    return listOf<XProcessingStep>(MotifProcessingStep(graphSetter = { graph = it }))
-  }
+  override fun processingSteps(): Iterable<XProcessingStep> =
+      listOf<XProcessingStep>(MotifProcessingStep(graphSetter = { graph = it }))
 
-  override fun getSupportedOptions(): Set<String> {
-    return setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
-  }
+  override fun getSupportedOptions(): Set<String> = setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
 }

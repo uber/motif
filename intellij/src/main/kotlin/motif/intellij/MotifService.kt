@@ -109,9 +109,11 @@ class MotifService(val project: Project) : Disposable {
                     onGraphUpdated(updatedGraph)
 
                     val eventName: String =
-                        if (updatedGraph.errors.isNotEmpty())
-                            MotifAnalyticsActions.GRAPH_UPDATE_ERROR
-                        else MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
+                        if (updatedGraph.errors.isNotEmpty()) {
+                          MotifAnalyticsActions.GRAPH_UPDATE_ERROR
+                        } else {
+                          MotifAnalyticsActions.GRAPH_UPDATE_SUCCESS
+                        }
                     project.getService(AnalyticsService::class.java).logEvent(eventName)
                   } catch (t: Throwable) {
                     val emptyGraph: ResolvedGraph = ResolvedGraph.create(emptyList())
@@ -126,7 +128,8 @@ class MotifService(val project: Project) : Disposable {
                   }
                 }
               }
-            })
+            },
+        )
   }
 
   fun refreshGraph(action: () -> Unit) {
@@ -244,9 +247,8 @@ class MotifService(val project: Project) : Disposable {
     return content
   }
 
-  private fun findContentByDescription(toolWindow: ToolWindow, description: String): Content? {
-    return toolWindow.contentManager.contents.firstOrNull { it.description == description }
-  }
+  private fun findContentByDescription(toolWindow: ToolWindow, description: String): Content? =
+      toolWindow.contentManager.contents.firstOrNull { it.description == description }
 
   interface Listener {
 

@@ -36,6 +36,8 @@ internal class InjectAnnotationRequiredHandler(private val error: InjectAnnotati
             Suggestions:
               * Annotation the desired constructor with @Inject.
               * Update the type to have only one constructor.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

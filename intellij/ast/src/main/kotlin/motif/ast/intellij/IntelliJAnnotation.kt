@@ -59,9 +59,8 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
     annotationClass.methods.map { IntelliJMethod(project, it, PsiSubstitutor.EMPTY) }
   }
 
-  override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean {
-    return psiAnnotation.qualifiedName == annotationClass.java.name
-  }
+  override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean =
+      psiAnnotation.qualifiedName == annotationClass.java.name
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -70,9 +69,7 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
     return key == other.key
   }
 
-  override fun hashCode(): Int {
-    return key.hashCode()
-  }
+  override fun hashCode(): Int = key.hashCode()
 
   override fun toString(): String {
     val value = stringValue?.let { "(\"$it\")" } ?: ""
@@ -84,7 +81,7 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
     private fun getStringConstantValue(
         project: Project,
         annotation: PsiAnnotation,
-        attributeName: String
+        attributeName: String,
     ): String? {
       val value = annotation.findAttributeValue(attributeName) ?: return null
 
@@ -101,8 +98,7 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
       val constant =
           JavaPsiFacade.getInstance(project)
               .constantEvaluationHelper
-              .computeConstantExpression(referenceTarget.initializer)
-              ?: return null
+              .computeConstantExpression(referenceTarget.initializer) ?: return null
 
       return constant as? String
     }

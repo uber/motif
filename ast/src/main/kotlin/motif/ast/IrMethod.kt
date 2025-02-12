@@ -21,11 +21,7 @@ interface IrMethod : IrAnnotated, IrHasModifiers {
   val name: String
   val isConstructor: Boolean
 
-  fun hasParameters(): Boolean {
-    return parameters.isNotEmpty()
-  }
+  fun hasParameters(): Boolean = parameters.isNotEmpty()
 
-  fun isVoid(): Boolean {
-    return returnType.isVoid
-  }
+  fun isVoid(): Boolean = returnType.isVoid
 }

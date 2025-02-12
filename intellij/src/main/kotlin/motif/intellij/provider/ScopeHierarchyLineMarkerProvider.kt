@@ -73,7 +73,8 @@ class ScopeHierarchyLineMarkerProvider : LineMarkerProvider, MotifService.Listen
         UPDATE_ALL,
         ConstantFunction<PsiElement, String>(LABEL_ANCESTORS_SCOPE),
         ScopeHierarchyHandler(element.project),
-        LEFT)
+        LEFT,
+    )
   }
 
   private class ScopeHierarchyHandler(val project: Project) :

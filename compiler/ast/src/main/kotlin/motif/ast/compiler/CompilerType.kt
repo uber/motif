@@ -37,9 +37,7 @@ class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
 
   val mirror = mirror.makeNonNullByDefault()
 
-  fun isInterface(): Boolean {
-    return IrClass.Kind.INTERFACE == resolveClass()?.kind
-  }
+  fun isInterface(): Boolean = IrClass.Kind.INTERFACE == resolveClass()?.kind
 
   override val qualifiedName: String by lazy { mirror.qualifiedName(env) }
 
@@ -47,9 +45,8 @@ class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
 
   override val isPrimitive: Boolean by lazy { mirror.isPrimitive() }
 
-  override fun resolveClass(): IrClass? {
-    return if (!mirror.isDeclaredType()) null else CompilerClass(env, mirror)
-  }
+  override fun resolveClass(): IrClass? =
+      if (!mirror.isDeclaredType()) null else CompilerClass(env, mirror)
 
   override fun isAssignableTo(type: IrType): Boolean {
     val baseMirror = (type as CompilerType).mirror
@@ -109,19 +106,11 @@ class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
     return true
   }
 
-  override fun hashCode(): Int {
-    return mirror.hash()
-  }
+  override fun hashCode(): Int = mirror.hash()
 
-  override fun toString(): String {
-    return mirror.toString()
-  }
+  override fun toString(): String = mirror.toString()
 
-  fun mapToJavaType(): CompilerType {
-    return CompilerType(env, mirror.mapToJavaType(env))
-  }
+  fun mapToJavaType(): CompilerType = CompilerType(env, mirror.mapToJavaType(env))
 
-  fun mapToKotlinType(): CompilerType {
-    return CompilerType(env, mirror.mapToKotlinType(env))
-  }
+  fun mapToKotlinType(): CompilerType = CompilerType(env, mirror.mapToKotlinType(env))
 }

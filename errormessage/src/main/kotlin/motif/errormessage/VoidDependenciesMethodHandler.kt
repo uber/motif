@@ -28,6 +28,8 @@ internal class VoidDependenciesMethodHandler(private val error: VoidDependencies
             Methods on dependencies interfaces must be non-void:
 
               void ${error.dependenciesClass.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

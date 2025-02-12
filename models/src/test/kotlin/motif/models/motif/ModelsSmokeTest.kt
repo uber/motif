@@ -22,15 +22,16 @@ import org.junit.Test
  * Smoke test for :models.
  *
  * There are a couple reasons why the tests in this module should remain minimal:
- *
  * 1. Running the integration tests in the :tests module should give us full confidence that our
- * implementation is
+ *    implementation is
+ *
  * ```
  *      correct. We should not rely on ModelsSmokeTest for validating correctness. Full coverage in this module
  *      would likely result in missing coverage in :tests.
  * ```
  * 2. Full coverage in this module would couple us to a specific implementation. We want it to be
- * possible to
+ *    possible to
+ *
  * ```
  *      safely rewrite the compiler with minimal changes to our test suite.
  * ```
@@ -46,7 +47,9 @@ class ModelsSmokeTest : BaseTest() {
 
                     @motif.Scope
                     interface FooScope {}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val scopes = getScopes()
 
@@ -71,7 +74,9 @@ class ModelsSmokeTest : BaseTest() {
                       @motif.Objects
                       class Objects {}
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val scope = getScopes()[0]
 
@@ -95,7 +100,9 @@ class ModelsSmokeTest : BaseTest() {
                         }
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val factoryMethods = getScopes()[0].factoryMethods
 
@@ -119,7 +126,9 @@ class ModelsSmokeTest : BaseTest() {
                     class Foo {
                       Foo(int i) {}
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
     addClass(
         "test.FooScope",
         """
@@ -133,7 +142,9 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo foo();
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val factoryMethod = getScopes()[0].factoryMethods[0]
 
@@ -150,7 +161,9 @@ class ModelsSmokeTest : BaseTest() {
                     package test;
 
                     class Foo {}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     addClass(
         "test.Bar",
@@ -158,7 +171,9 @@ class ModelsSmokeTest : BaseTest() {
                     package test;
 
                     class Bar extends Foo {}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
     addClass(
         "test.FooScope",
         """
@@ -172,7 +187,9 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo bar(Bar bar);
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val factoryMethod = getScopes()[0].factoryMethods[0]
 
@@ -195,7 +212,9 @@ class ModelsSmokeTest : BaseTest() {
                         return "";
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
     addClass(
         "test.FooScope",
         """
@@ -211,7 +230,9 @@ class ModelsSmokeTest : BaseTest() {
                         abstract Foo foo();
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val factoryMethod = getScopes()[0].factoryMethods[0]
 
@@ -235,7 +256,9 @@ class ModelsSmokeTest : BaseTest() {
                     interface FooScope {
                       String string();
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val scope = getScopes()[0]
 
@@ -258,7 +281,9 @@ class ModelsSmokeTest : BaseTest() {
                     interface FooScope {
                       BarScope bar(String string);
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     addClass(
         "test.BarScope",
@@ -267,7 +292,9 @@ class ModelsSmokeTest : BaseTest() {
 
                     @motif.Scope
                     interface BarScope {}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     // getScopes is alphabetically sorted so FooScope is last
     val fooScope = getScopes()[1]
@@ -296,7 +323,9 @@ class ModelsSmokeTest : BaseTest() {
                         String string();
                       }
                     }
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
 
     val scope = getScopes()[0]
 

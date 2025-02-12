@@ -43,7 +43,7 @@ class MotifProcessingStep(
   override fun process(
       env: XProcessingEnv,
       elementsByAnnotation: Map<String, Set<XElement>>,
-      isLastRound: Boolean
+      isLastRound: Boolean,
   ): Set<XElement> {
     messageWatcher?.let { env.messager.addMessageWatcher(messageWatcher) }
 
@@ -98,7 +98,9 @@ class MotifProcessingStep(
       Expected: ${initialScopeNames.sorted().joinToString(", ")}
       Created:  ${createdScopeNames.sorted().joinToString(", ")}
       Missing: ${missingScopeNames.sorted().joinToString(", ")}
-        """.trimIndent())
+        """
+              .trimIndent(),
+      )
       return emptySet()
     }
 

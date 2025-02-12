@@ -35,14 +35,12 @@ open class ScopeHierarchyNodeDescriptor(
     val graph: ResolvedGraph,
     val parentDescriptor: HierarchyNodeDescriptor?,
     val element: PsiElement,
-    isBase: Boolean
+    isBase: Boolean,
 ) : HierarchyNodeDescriptor(project, parentDescriptor, element, isBase) {
 
   open fun updateText(text: CompositeAppearance) {}
 
-  open fun getLegend(): String? {
-    return null
-  }
+  open fun getLegend(): String? = null
 
   override fun update(): Boolean {
     val changes = super.update()
@@ -60,7 +58,10 @@ open class ScopeHierarchyNodeDescriptor(
 
   fun getDefaultTextAttributes(isError: Boolean = false): TextAttributes {
     val font: Int = if (myIsBase) Font.BOLD else Font.PLAIN
-    return if (isError) TextAttributes(myColor, null, Color.red, EffectType.WAVE_UNDERSCORE, font)
-    else TextAttributes(myColor, null, null, null, font)
+    return if (isError) {
+      TextAttributes(myColor, null, Color.red, EffectType.WAVE_UNDERSCORE, font)
+    } else {
+      TextAttributes(myColor, null, null, null, font)
+    }
   }
 }

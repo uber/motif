@@ -34,7 +34,7 @@ object XFunSpec {
   fun overriding(
       executableElement: XExecutableElement,
       enclosing: XType,
-      env: XProcessingEnv
+      env: XProcessingEnv,
   ): FunSpec.Builder {
     val methodElement =
         (executableElement as? XMethodElement)
@@ -54,13 +54,16 @@ object XFunSpec {
 
   private fun overriding(
       method: XMethodElement,
-      resolvedParameterTypes: List<XType>
+      resolvedParameterTypes: List<XType>,
   ): FunSpec.Builder {
     var modifiers: Set<Modifier> = method.modifiers.toMutableSet()
     require(
         Modifier.PRIVATE !in modifiers &&
             Modifier.FINAL !in modifiers &&
-            Modifier.STATIC !in modifiers) { "cannot override method with modifiers: $modifiers" }
+            Modifier.STATIC !in modifiers,
+    ) {
+      "cannot override method with modifiers: $modifiers"
+    }
 
     val methodName = method.name
     val funBuilder = FunSpec.builder(methodName)
@@ -73,16 +76,17 @@ object XFunSpec {
 
     // TODO: Unsupported until XProcessing is updated
     /*
-            method as XParam
-                .map { it.asType() as TypeVariable }
-                .map { it.asTypeVariableName() }
-                .forEach { funBuilder.addTypeVariable(it) }
-    */
+    method as XParam
+        .map { it.asType() as TypeVariable }
+        .map { it.asTypeVariableName() }
+        .forEach { funBuilder.addTypeVariable(it) }
+     */
 
     method.parameters.forEachIndexed { index, parameter ->
       funBuilder.addParameter(
           ParameterSpec.builder(parameter.name, javaToKotlinType(resolvedParameterTypes[index]))
-              .build())
+              .build(),
+      )
     }
     if (method.isVarArgs()) {
       funBuilder.parameters[funBuilder.parameters.lastIndex] =
@@ -94,7 +98,8 @@ object XFunSpec {
       funBuilder.addAnnotation(
           AnnotationSpec.builder(Throws::class)
               .addMember(throwsValueString, *method.thrownTypes.toTypedArray())
-              .build())
+              .build(),
+      )
     }
 
     return funBuilder

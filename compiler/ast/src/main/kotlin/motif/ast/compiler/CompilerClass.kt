@@ -90,7 +90,8 @@ class CompilerClass(override val env: XProcessingEnv, val declaredType: XType) :
     typeElement.getEnclosedTypeElements().map { typeElement ->
       if (typeElement.type.isError()) {
         throw IllegalStateException(
-            "Could not resolve type for nested class: ${typeElement.qualifiedName}")
+            "Could not resolve type for nested class: ${typeElement.qualifiedName}",
+        )
       }
       CompilerClass(env, typeElement.type)
     }

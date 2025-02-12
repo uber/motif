@@ -25,7 +25,7 @@ import motif.ast.IrType
 @OptIn(ExperimentalProcessingApi::class)
 class CompilerField(
     override val env: XProcessingEnv,
-    private val variableElement: XVariableElement
+    private val variableElement: XVariableElement,
 ) : IrUtil, IrField {
 
   override val type: IrType by lazy { CompilerType(env, variableElement.type) }

@@ -18,7 +18,7 @@ package motif.errormessage
 import motif.models.DuplicatedChildParameterSource
 
 internal class DuplicatedChildParameterSourceHandler(
-    private val error: DuplicatedChildParameterSource
+    private val error: DuplicatedChildParameterSource,
 ) : ErrorHandler {
 
   override val name = "DUPLICATED CHILD PARAMETER SOURCE"
@@ -29,7 +29,9 @@ internal class DuplicatedChildParameterSourceHandler(
             Multiple child method parameters of the same type:
 
               ${error.childScopeMethod.qualifiedName}(${highlightDuplicatedParameters()})
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 
   private fun highlightDuplicatedParameters(): String {

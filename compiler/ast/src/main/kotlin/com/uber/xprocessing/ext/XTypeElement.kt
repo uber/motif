@@ -35,7 +35,7 @@ import motif.ast.compiler.CompilerClass
  */
 fun XTypeElement.getLocalAndInheritedMethods(
     env: XProcessingEnv,
-    useMoreElements: Boolean = true
+    useMoreElements: Boolean = true,
 ): List<XMethodElement> {
   val nonPrivateInstanceMethods =
       this.getAllNonPrivateInstanceMethods()
@@ -71,14 +71,13 @@ fun XTypeElement.getLocalAndInheritedMethods(
 
 /** Return where or not this XTypeElement was from an XType defined in Kotlin */
 @OptIn(KotlinPoetMetadataPreview::class)
-fun XTypeElement?.isKotlinSource(env: XProcessingEnv): Boolean {
-  return when (env.backend) {
-    XProcessingEnv.Backend.JAVAC ->
-        try {
-          this?.toJavac()?.toKmClass() != null
-        } catch (e: Throwable) {
-          false
-        }
-    XProcessingEnv.Backend.KSP -> true
-  }
-}
+fun XTypeElement?.isKotlinSource(env: XProcessingEnv): Boolean =
+    when (env.backend) {
+      XProcessingEnv.Backend.JAVAC ->
+          try {
+            this?.toJavac()?.toKmClass() != null
+          } catch (e: Throwable) {
+            false
+          }
+      XProcessingEnv.Backend.KSP -> true
+    }

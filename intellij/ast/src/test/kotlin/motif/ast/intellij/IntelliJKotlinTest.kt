@@ -37,9 +37,7 @@ class IntelliJKotlinTest : LightJavaCodeInsightFixtureTestCase() {
     JavaAwareProjectJdkTableImpl.getInstanceEx().internalJdk
   }
 
-  override fun getTestDataPath(): String {
-    return "testData"
-  }
+  override fun getTestDataPath(): String = "testData"
 
   fun testImplicitNullabilityAnnotationType() {
     val fooPsiFile =
@@ -50,8 +48,9 @@ class IntelliJKotlinTest : LightJavaCodeInsightFixtureTestCase() {
 
                 internal fun a() {}
             }
-        """.trimIndent()) as
-            KtFile
+        """
+                .trimIndent(),
+        ) as KtFile
 
     val fooPsiClass = fooPsiFile.declarations[0].toUElementOfType<UClass>()!!.javaPsi
     val psiAnnotation = fooPsiClass.constructors[0].parameterList.parameters[0].annotations[0]

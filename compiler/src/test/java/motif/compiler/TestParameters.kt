@@ -17,10 +17,10 @@ package motif.compiler
 
 enum class ProcessorType {
   AP,
-  KSP
+  KSP,
 }
 
 enum class SourceLanguage {
   JAVA,
-  KOTLIN
+  KOTLIN,
 }

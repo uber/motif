@@ -95,20 +95,18 @@ fun TypeName.containsWildcardType(): Boolean {
 }
 
 /** Returns a TypeName with any Wildcard types recursively removed. */
-fun TypeName.removeWildcardType(): TypeName {
-  return when (this) {
-    is WildcardTypeName -> this.upperBounds.first() ?: TypeName.OBJECT
-    is ParameterizedTypeName -> {
-      val args = this.typeArguments.map { it.removeWildcardType() }.toTypedArray()
-      ParameterizedTypeName.get(this.rawType, *args)
+fun TypeName.removeWildcardType(): TypeName =
+    when (this) {
+      is WildcardTypeName -> this.upperBounds.first() ?: TypeName.OBJECT
+      is ParameterizedTypeName -> {
+        val args = this.typeArguments.map { it.removeWildcardType() }.toTypedArray()
+        ParameterizedTypeName.get(this.rawType, *args)
+      }
+      else -> this
     }
-    else -> this
-  }
-}
 
-fun TypeName.removeWildcardTypeIfContains(): TypeName {
-  return if (this.containsWildcardType()) this.removeWildcardType() else this
-}
+fun TypeName.removeWildcardTypeIfContains(): TypeName =
+    if (this.containsWildcardType()) this.removeWildcardType() else this
 
 /**
  * This adds extra handling to Java TypeNames so that when it is based on an XType that has type
@@ -116,7 +114,7 @@ fun TypeName.removeWildcardTypeIfContains(): TypeName {
  * with Kotlin types.
  */
 fun com.squareup.javapoet.TypeName.withRawTypeFix(
-    env: XProcessingEnv
+    env: XProcessingEnv,
 ): com.squareup.javapoet.TypeName {
   if (env.backend == XProcessingEnv.Backend.JAVAC) {
     return when (this) {
@@ -128,8 +126,7 @@ fun com.squareup.javapoet.TypeName.withRawTypeFix(
         val mirror = env.findType(this.toString())
         if (mirror != null && mirror.typeArguments.isNotEmpty() && "<" !in this.toString()) {
           val args =
-              mirror
-                  .typeArguments
+              mirror.typeArguments
                   .map { WildcardTypeName.subtypeOf(com.squareup.javapoet.TypeName.OBJECT) }
                   .toTypedArray()
           ParameterizedTypeName.get(this, *args)
@@ -147,42 +144,40 @@ fun com.squareup.javapoet.TypeName.withRawTypeFix(
  * Used to find equivalence of two XType since MoreTypes.equivalence() only applies to the Javac
  * backend.
  */
-fun XType.isEquivalent(other: XType, env: XProcessingEnv): Boolean {
-  return when (env.backend) {
-    XProcessingEnv.Backend.JAVAC -> {
-      val key = MoreTypes.equivalence().wrap(this.toJavac())
-      val otherKey = MoreTypes.equivalence().wrap(other.toJavac())
-      key == otherKey
-    }
-    XProcessingEnv.Backend.KSP -> {
-      if ("NonExistentClass" in typeName.toString() ||
-          "NonExistentClass" in other.typeName.toString()) {
-        this.qualifiedName(env) == other.qualifiedName(env)
-      } else {
-        this.typeName.removeWildcardTypeIfContains() ==
-            other.typeName.removeWildcardTypeIfContains()
+fun XType.isEquivalent(other: XType, env: XProcessingEnv): Boolean =
+    when (env.backend) {
+      XProcessingEnv.Backend.JAVAC -> {
+        val key = MoreTypes.equivalence().wrap(this.toJavac())
+        val otherKey = MoreTypes.equivalence().wrap(other.toJavac())
+        key == otherKey
+      }
+      XProcessingEnv.Backend.KSP -> {
+        if ("NonExistentClass" in typeName.toString() ||
+            "NonExistentClass" in other.typeName.toString()) {
+          this.qualifiedName(env) == other.qualifiedName(env)
+        } else {
+          this.typeName.removeWildcardTypeIfContains() ==
+              other.typeName.removeWildcardTypeIfContains()
+        }
       }
     }
-  }
-}
 
 /**
  * Used to find the hash of an XType since MoreTypes.equivalence().hashCode() only applies to the
  * Javac backend.
  */
-fun XType.hash(): Int {
-  return try {
-    MoreTypes.equivalence().wrap(this.toJavac()).hashCode()
-  } catch (t: Throwable) {
-    if (typeArguments.any { it.typeName is WildcardTypeName && it.typeName.toString() != "?" }) {
-      extendsBoundOrSelf().typeName.toString().hashCode()
-    } else if (this.hasCollectionType()) {
-      typeName.removeWildcardTypeIfContains().toString().hashCode()
-    } else {
-      hashCode()
+fun XType.hash(): Int =
+    try {
+      MoreTypes.equivalence().wrap(this.toJavac()).hashCode()
+    } catch (t: Throwable) {
+      if (typeArguments.any { it.typeName is WildcardTypeName && it.typeName.toString() != "?" }) {
+        extendsBoundOrSelf().typeName.toString().hashCode()
+      } else if (this.hasCollectionType()) {
+        typeName.removeWildcardTypeIfContains().toString().hashCode()
+      } else {
+        hashCode()
+      }
     }
-  }
-}
 
 fun XType.isInternal(): Boolean {
   val ksType =
@@ -190,8 +185,7 @@ fun XType.isInternal(): Boolean {
         Class.forName("androidx.room.compiler.processing.ksp.KspType")
             ?.getDeclaredField("ksType")
             ?.apply { isAccessible = true }
-            ?.get(this) as?
-            KSType
+            ?.get(this) as? KSType
       } catch (throwable: Throwable) {
         null
       }
@@ -206,15 +200,14 @@ fun KSType.isRaw(): Boolean {
   return toString().startsWith("raw ")
 }
 
-fun XType.makeNonNullByDefault(): XType {
-  return try {
-    if (nullability == XNullability.UNKNOWN) makeNonNullable() else this
-  } catch (e: IllegalStateException) {
-    // Workaround for tests since we can't call XType#nullibility for types
-    // created with TypeMirror#toXProcessing(XProcessingEnv)
-    this
-  }
-}
+fun XType.makeNonNullByDefault(): XType =
+    try {
+      if (nullability == XNullability.UNKNOWN) makeNonNullable() else this
+    } catch (e: IllegalStateException) {
+      // Workaround for tests since we can't call XType#nullibility for types
+      // created with TypeMirror#toXProcessing(XProcessingEnv)
+      this
+    }
 
 @OptIn(KspExperimental::class)
 fun XType.mapToJavaType(env: XProcessingEnv): XType {
@@ -225,12 +218,12 @@ fun XType.mapToJavaType(env: XProcessingEnv): XType {
           env.resolver()
               ?.getJavaClassByName(toKS().declaration.qualifiedName?.asString().orEmpty())
               ?.toXProcessing(env)
-              ?.type
-              ?: return this
+              ?.type ?: return this
         } else {
           val rawTypeName =
               resolver.mapKotlinNameToJava(
-                  typeElement?.type?.toKS()?.declaration?.qualifiedName?.asString().orEmpty())
+                  typeElement?.type?.toKS()?.declaration?.qualifiedName?.asString().orEmpty(),
+              )
           val rawType =
               env.resolver()?.getJavaClassByName(rawTypeName)?.toXProcessing(env) ?: return this
           val types =
@@ -238,7 +231,8 @@ fun XType.mapToJavaType(env: XProcessingEnv): XType {
                   .map {
                     val typeArgName =
                         resolver.mapKotlinNameToJava(
-                            it.toKS().declaration.qualifiedName?.asString().orEmpty())
+                            it.toKS().declaration.qualifiedName?.asString().orEmpty(),
+                        )
                     env.resolver()?.getJavaClassByName(typeArgName)?.toXProcessing(env)?.type
                         ?: return this
                   }
@@ -289,32 +283,25 @@ internal fun Resolver.mapJavaNameToKotlin(qualifiedName: String): String {
   return mapJavaNameToKotlin(ksName)?.asString() ?: qualifiedName
 }
 
-fun XType.isDeclaredType(): Boolean {
-  return typeElement?.let {
-    when {
-      it.isClass() -> true
-      it.isInterface() -> true
-      it.isEnum() -> true
-      it.isAnnotationClass() -> true
-      it.isKotlinObject() -> true
-      else -> false
-    }
-  }
-      ?: false
-}
+fun XType.isDeclaredType(): Boolean =
+    typeElement?.let {
+      when {
+        it.isClass() -> true
+        it.isInterface() -> true
+        it.isEnum() -> true
+        it.isAnnotationClass() -> true
+        it.isKotlinObject() -> true
+        else -> false
+      }
+    } ?: false
 
-fun XType.isEnum(): Boolean {
-  return typeElement?.isEnum() ?: false
-}
+fun XType.isEnum(): Boolean = typeElement?.isEnum() ?: false
 
-fun XType.isPrimitive(): Boolean {
-  return typeName.isPrimitive
-}
+fun XType.isPrimitive(): Boolean = typeName.isPrimitive
 
-private fun XType.hasCollectionType(): Boolean {
-  return this.typeElement?.name.orEmpty() in collectionTypes ||
-      typeArguments.any { it.hasCollectionType() }
-}
+private fun XType.hasCollectionType(): Boolean =
+    this.typeElement?.name.orEmpty() in collectionTypes ||
+        typeArguments.any { it.hasCollectionType() }
 
 private val collectionTypes =
     setOf("MutableList", "MutableSet", "MutableCollection", "List", "Set", "Collection")

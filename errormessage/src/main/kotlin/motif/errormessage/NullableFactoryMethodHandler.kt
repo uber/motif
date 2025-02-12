@@ -31,6 +31,8 @@ internal class NullableFactoryMethodHandler(private val error: NullableFactoryMe
 
             Suggestions:
               * Consider using Optional<...> instead.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

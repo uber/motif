@@ -28,25 +28,23 @@ import com.google.auto.common.AnnotationMirrors
  * Used to find equivalence of two XAnnotation since AnnotationMirrors.equivalence() only applies to
  * the Javac backend.
  */
-fun XAnnotation.isEquivalent(other: XAnnotation, env: XProcessingEnv): Boolean {
-  return if (env.backend == XProcessingEnv.Backend.JAVAC) {
-    val key = AnnotationMirrors.equivalence().wrap(this.toJavac())
-    val otherKey = AnnotationMirrors.equivalence().wrap(other.toJavac())
-    key == otherKey
-  } else {
-    (type.isEquivalent(other.type, env) &&
-        annotationValues.size == other.annotationValues.size &&
-        annotationValues.zip(other.annotationValues).all { (lhs, rhs) -> lhs.isEquivalent(rhs) })
-  }
-}
+fun XAnnotation.isEquivalent(other: XAnnotation, env: XProcessingEnv): Boolean =
+    if (env.backend == XProcessingEnv.Backend.JAVAC) {
+      val key = AnnotationMirrors.equivalence().wrap(this.toJavac())
+      val otherKey = AnnotationMirrors.equivalence().wrap(other.toJavac())
+      key == otherKey
+    } else {
+      (type.isEquivalent(other.type, env) &&
+          annotationValues.size == other.annotationValues.size &&
+          annotationValues.zip(other.annotationValues).all { (lhs, rhs) -> lhs.isEquivalent(rhs) })
+    }
 
 /**
  * Used to find equivalence of two XAnnotation since AnnotationMirrors.equivalence() only applies to
  * the Javac backend.
  */
-fun XAnnotationValue.isEquivalent(other: XAnnotationValue): Boolean {
-  return this.name == other.name && this.value == other.value
-}
+fun XAnnotationValue.isEquivalent(other: XAnnotationValue): Boolean =
+    this.name == other.name && this.value == other.value
 
 /** Cleans up differences in the toString() methods between the JAVAC and KSP backends. */
 fun XAnnotation.toPrettyString(): String {
@@ -55,7 +53,9 @@ fun XAnnotation.toPrettyString(): String {
           .map {
             if (it.name == "value") {
               "\"${it.value}\""
-            } else "${it.name} = ${it.value}"
+            } else {
+              "${it.name} = ${it.value}"
+            }
           }
           .joinToString(", ")
   val annotationValuesList =

@@ -27,6 +27,8 @@ internal class InvalidQualifierHandler(private val error: InvalidQualifier) : Er
             Qualifier must define either no members or a single value member of type String:
 
               ${error.annotation.className}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

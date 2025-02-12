@@ -34,6 +34,8 @@ internal class NullableSpreadMethodHandler(private val error: NullableSpreadMeth
 
             Suggestions:
               * Use Optional<...> instead.
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

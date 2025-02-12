@@ -59,7 +59,7 @@ class ScopeHierarchyBrowser(
     project: Project,
     initialGraph: ResolvedGraph,
     private val rootElement: PsiElement,
-    private val selectionListener: Listener?
+    private val selectionListener: Listener?,
 ) : HierarchyBrowserBase(project, rootElement), MotifService.Listener {
 
   companion object {
@@ -85,21 +85,14 @@ class ScopeHierarchyBrowser(
     super.doRefresh(true)
   }
 
-  fun isUpdating(): Boolean {
-    return status == Status.INITIALIZING || status == Status.REFRESHING
-  }
+  fun isUpdating(): Boolean = status == Status.INITIALIZING || status == Status.REFRESHING
 
-  override fun isApplicableElement(element: PsiElement): Boolean {
-    return element is PsiClass
-  }
+  override fun isApplicableElement(element: PsiElement): Boolean = element is PsiClass
 
-  override fun getActionPlace(): String {
-    return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
-  }
+  override fun getActionPlace(): String = ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
 
-  override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
-    return JavaHierarchyUtil.getComparator(myProject)
-  }
+  override fun getComparator(): Comparator<NodeDescriptor<out Any>> =
+      JavaHierarchyUtil.getComparator(myProject)
 
   override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
     if (ScopeHierarchyUtils.isRootElement(descriptor.psiElement)) {
@@ -108,21 +101,15 @@ class ScopeHierarchyBrowser(
     return descriptor.psiElement
   }
 
-  override fun getPrevOccurenceActionNameImpl(): String {
-    return LABEL_GO_PREVIOUS_SCOPE
-  }
+  override fun getPrevOccurenceActionNameImpl(): String = LABEL_GO_PREVIOUS_SCOPE
 
-  override fun createLegendPanel(): JPanel? {
-    return null
-  }
+  override fun createLegendPanel(): JPanel? = null
 
   override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[TYPE_HIERARCHY_TYPE] = createTree(true)
   }
 
-  override fun getNextOccurenceActionNameImpl(): String {
-    return LABEL_GO_NEXT_SCOPE
-  }
+  override fun getNextOccurenceActionNameImpl(): String = LABEL_GO_NEXT_SCOPE
 
   override fun getContentDisplayName(typeName: String, element: PsiElement): String? {
     if (element !is PsiClass) {
@@ -144,12 +131,15 @@ class ScopeHierarchyBrowser(
 
   override fun createHierarchyTreeStructure(
       typeName: String,
-      psiElement: PsiElement
+      psiElement: PsiElement,
   ): HierarchyTreeStructure? {
     if (psiElement == rootElement) {
       // Display entire graph hierarchy
       return ScopeHierarchyTreeStructure(
-          myProject, graph, ScopeHierarchyRootDescriptor(myProject, graph, psiElement, status))
+          myProject,
+          graph,
+          ScopeHierarchyRootDescriptor(myProject, graph, psiElement, status),
+      )
     } else if (psiElement is PsiClass && isMotifScopeClass(psiElement)) {
       // Display the scope ancestors hierarchy
       val scopeType: PsiType = PsiElementFactory.SERVICE.getInstance(project).createType(psiElement)
@@ -192,8 +182,11 @@ class ScopeHierarchyBrowser(
     project.getService(MotifService::class.java).refreshGraph()
 
     val action: String =
-        if (status == Status.INITIALIZING) MotifAnalyticsActions.GRAPH_INIT
-        else MotifAnalyticsActions.GRAPH_UPDATE
+        if (status == Status.INITIALIZING) {
+          MotifAnalyticsActions.GRAPH_INIT
+        } else {
+          MotifAnalyticsActions.GRAPH_UPDATE
+        }
     project.getService(AnalyticsService::class.java).logEvent(action)
   }
 
@@ -214,7 +207,8 @@ class ScopeHierarchyBrowser(
       com.intellij.ide.actions.RefreshAction(
           IdeBundle.message("action.refresh"),
           IdeBundle.message("action.refresh"),
-          AllIcons.Actions.Refresh) {
+          AllIcons.Actions.Refresh,
+      ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       doRefresh(false)
@@ -229,7 +223,8 @@ class ScopeHierarchyBrowser(
       AnAction(
           IdeBundle.message("action.help"),
           IdeBundle.message("action.help"),
-          AllIcons.General.TodoQuestion) {
+          AllIcons.General.TodoQuestion,
+      ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       BrowserUtil.open("https://github.com/uber/motif/wiki/Motif-IntelliJ-IDE-Plugin-Help")
@@ -244,11 +239,13 @@ class ScopeHierarchyBrowser(
       AnAction(
           "File an issue",
           "File an issue or feature request",
-          AllIcons.Toolwindows.ToolWindowDebugger) {
+          AllIcons.Toolwindows.ToolWindowDebugger,
+      ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       BrowserUtil.open(
-          "https://github.com/uber/motif/issues/new?title=[Motif%20IDE%20Plugin]%20:%20%3Center%20issue%20title%20here%3E")
+          "https://github.com/uber/motif/issues/new?title=[Motif%20IDE%20Plugin]%20:%20%3Center%20issue%20title%20here%3E",
+      )
     }
 
     override fun update(event: AnActionEvent) {

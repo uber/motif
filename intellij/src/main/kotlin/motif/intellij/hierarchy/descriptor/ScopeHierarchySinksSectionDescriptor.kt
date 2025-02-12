@@ -30,7 +30,7 @@ open class ScopeHierarchySinksSectionDescriptor(
     parentDescriptor: HierarchyNodeDescriptor?,
     element: PsiElement,
     val scope: Scope,
-    private val useLabel: Boolean = false
+    private val useLabel: Boolean = false,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -38,10 +38,10 @@ open class ScopeHierarchySinksSectionDescriptor(
     val count: Int = graph.getSinks(scope).count()
     text.ending.addText(label)
     text.ending.addText(
-        " " + ScopeHierarchyUtils.getObjectString(count), getPackageNameAttributes())
+        " " + ScopeHierarchyUtils.getObjectString(count),
+        getPackageNameAttributes(),
+    )
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return null
-  }
+  override fun getIcon(element: PsiElement): Icon? = null
 }

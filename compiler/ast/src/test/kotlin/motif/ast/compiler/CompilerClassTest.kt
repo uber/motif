@@ -31,22 +31,23 @@ import org.junit.runners.Parameterized
 @OptIn(ExperimentalProcessingApi::class)
 class XCompilerClassTest(
     private val processorType: ProcessorType,
-    private val srcLang: SourceLanguage
+    private val srcLang: SourceLanguage,
 ) {
 
   companion object {
     @JvmStatic
     @Parameterized.Parameters(name = "{0}_{1}")
-    fun data(): Collection<Array<Any>> {
-      return cartesianProduct(
-              ProcessorType.values().toSortedSet(), SourceLanguage.values().toSortedSet())
-          .filterNot { (proc, _) -> proc == ProcessorType.KSP } // Investigate this after ksp#1086
-          .filterNot { (proc, srcLang) ->
-            proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
-          }
-          .map { it.toTypedArray() as Array<Any> }
-          .toList()
-    }
+    fun data(): Collection<Array<Any>> =
+        cartesianProduct(
+                ProcessorType.values().toSortedSet(),
+                SourceLanguage.values().toSortedSet(),
+            )
+            .filterNot { (proc, _) -> proc == ProcessorType.KSP } // Investigate this after ksp#1086
+            .filterNot { (proc, srcLang) ->
+              proc == ProcessorType.AP && srcLang == SourceLanguage.KOTLIN
+            }
+            .map { it.toTypedArray() as Array<Any> }
+            .toList()
   }
 
   @Test
@@ -59,8 +60,9 @@ class XCompilerClassTest(
           abstract class Bar<T> {}
 
           class Foo extends Bar<String> {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val superClass = fooClass.supertypes.single().resolveClass() as CompilerClass
       assertThat(superClass.typeArguments.map { it.qualifiedName })
           .containsExactly("java.lang.String")
@@ -79,8 +81,9 @@ class XCompilerClassTest(
           class Bar<T> extends Baz<T> {}
 
           class Foo extends Bar<String> {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val barClass = fooClass.supertypes.single().resolveClass() as CompilerClass
       val bazClass = barClass.supertypes.single().resolveClass() as CompilerClass
       assertThat(bazClass.typeArguments.map { it.qualifiedName })
@@ -98,8 +101,9 @@ class XCompilerClassTest(
           class Bar<T> {}
 
           class Foo<T> extends Bar<T> {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val superClass = fooClass.supertypes.single().resolveClass() as CompilerClass
       assertThat(superClass.typeArguments).isEmpty()
     }
@@ -108,12 +112,14 @@ class XCompilerClassTest(
   @Test
   fun testObjectSupertype() {
     createClass(
-        "test.Foo", """
+        "test.Foo",
+        """
           package test;
 
           class Foo {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val objectClass = fooClass.supertypes.single().resolveClass()!!
       assertThat(objectClass.qualifiedName).isEqualTo(listOf("java.lang.Object").forLang().first())
       assertThat(objectClass.supertypes).isEmpty()
@@ -130,15 +136,17 @@ class XCompilerClassTest(
           interface Bar {}
 
           class Foo implements Bar {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val superTypes = fooClass.supertypes.map { it.qualifiedName }
       assertThat(superTypes)
           .containsExactly(
               *listOf("java.lang.Object", "test.Bar")
                   .forLang()
                   .filter { it != "kotlin.Any" }
-                  .toTypedArray())
+                  .toTypedArray(),
+          )
     }
   }
 
@@ -154,29 +162,31 @@ class XCompilerClassTest(
           interface Baz {}
 
           class Foo implements Bar, Baz {}
-      """.trimIndent()) {
-        fooClass ->
+      """
+            .trimIndent(),
+    ) { fooClass ->
       val superTypes = fooClass.supertypes.map { it.qualifiedName }
       assertThat(superTypes)
           .containsExactly(
               *listOf("java.lang.Object", "test.Bar", "test.Baz")
                   .forLang()
                   .filter { it != "kotlin.Any" }
-                  .toTypedArray())
+                  .toTypedArray(),
+          )
     }
   }
 
   private fun createClass(
       qualifiedName: String,
       @Language("JAVA") text: String,
-      assertions: (CompilerClass) -> Unit
+      assertions: (CompilerClass) -> Unit,
   ) {
     val pkg =
-        text.lines()
+        text
+            .lines()
             .firstOrNull { it.startsWith("package ") }
             ?.substringAfter(" ")
-            ?.substringBefore(";")
-            ?: "test"
+            ?.substringBefore(";") ?: "test"
     val srcFiles = text.split("\n{2,}".toRegex()).filterNot { it.startsWith("package") }
     val sources =
         when (srcLang) {
@@ -196,7 +206,7 @@ class XCompilerClassTest(
   private fun process(
       invocation: XTestInvocation,
       qualifiedName: String,
-      assertions: (CompilerClass) -> Unit
+      assertions: (CompilerClass) -> Unit,
   ): CompilerClass {
     val env = invocation.processingEnv
     val typeElement =
@@ -220,12 +230,14 @@ class XCompilerClassTest(
               .filter { it != name && it in src }
               .map { "import $pkg.$it;" }
               .joinToString("\n")
-      val code = """
+      val code =
+          """
         package $pkg;
         $imports
 
         $src
-      """.trimIndent()
+      """
+              .trimIndent()
       return@map Source.java("$pkg.$name", code)
     }
   }
@@ -256,41 +268,40 @@ class XCompilerClassTest(
           $imports
 
           ${if (hasParentClass) src.replace(" {}", "() {}") else src}
-          """.trimIndent()
+          """
+                  .trimIndent()
           return@map Source.kotlin("$pkg/$name.kt", code)
         }
   }
 
-  private fun String.toSourceFor(): String {
-    return if (srcLang == SourceLanguage.KOTLIN) {
-      this
-    } else {
-      this.replace("open ", "")
-    }
-  }
+  private fun String.toSourceFor(): String =
+      if (srcLang == SourceLanguage.KOTLIN) {
+        this
+      } else {
+        this.replace("open ", "")
+      }
 
-  private fun List<String>.forLang(): Array<String> {
-    return if (srcLang == SourceLanguage.KOTLIN) {
-          map {
-            when (it) {
-              "java.lang.Object" -> "kotlin.Any"
-              "java.lang.String" -> "kotlin.String"
-              else -> it
+  private fun List<String>.forLang(): Array<String> =
+      if (srcLang == SourceLanguage.KOTLIN) {
+            map {
+              when (it) {
+                "java.lang.Object" -> "kotlin.Any"
+                "java.lang.String" -> "kotlin.String"
+                else -> it
+              }
             }
+          } else {
+            this
           }
-        } else {
-          this
-        }
-        .toTypedArray()
-  }
+          .toTypedArray()
 }
 
 enum class ProcessorType {
   AP,
-  KSP
+  KSP,
 }
 
 enum class SourceLanguage {
   JAVA,
-  KOTLIN
+  KOTLIN,
 }

@@ -39,92 +39,85 @@ object KotlinCodeGenerator {
     return FileSpec.get(scopeImpl.className.kt.packageName, typeSpec)
   }
 
-  private fun ScopeImpl.spec(): TypeSpec {
-    return TypeSpec.classBuilder(className.kt)
-        .apply {
-          addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
-          addAnnotation(scopeImplAnnotation.spec())
-          addModifiers(if (internalScope) KModifier.INTERNAL else KModifier.PUBLIC)
-          addSuperinterface(superClassName.kt)
-          objectsField?.let { addProperty(it.spec()) }
-          addProperty(dependenciesField.spec())
-          cacheFields.forEach { addProperty(it.spec()) }
-          primaryConstructor(constructor.spec())
-          alternateConstructor?.let { addFunction(it.spec()) }
-          accessMethodImpls.filter { !it.overriddenMethod.isSynthetic }.forEach {
-            addFunction(it.spec())
+  private fun ScopeImpl.spec(): TypeSpec =
+      TypeSpec.classBuilder(className.kt)
+          .apply {
+            addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
+            addAnnotation(scopeImplAnnotation.spec())
+            addModifiers(if (internalScope) KModifier.INTERNAL else KModifier.PUBLIC)
+            addSuperinterface(superClassName.kt)
+            objectsField?.let { addProperty(it.spec()) }
+            addProperty(dependenciesField.spec())
+            cacheFields.forEach { addProperty(it.spec()) }
+            primaryConstructor(constructor.spec())
+            alternateConstructor?.let { addFunction(it.spec()) }
+            accessMethodImpls
+                .filter { !it.overriddenMethod.isSynthetic }
+                .forEach { addFunction(it.spec()) }
+            accessMethodImpls
+                .filter { it.overriddenMethod.isSynthetic }
+                .forEach { addProperty(it.propSpec()) }
+            childMethodImpls.forEach { addFunction(it.spec()) }
+            addFunction(scopeProviderMethod.spec())
+            factoryProviderMethods.forEach { addFunctions(it.specs()) }
+            dependencyProviderMethods.forEach { addFunction(it.spec()) }
+            dependencies?.let { addType(it.spec()) }
+            objectsImpl?.let { addType(it.spec()) }
           }
-          accessMethodImpls.filter { it.overriddenMethod.isSynthetic }.forEach {
-            addProperty(it.propSpec())
-          }
-          childMethodImpls.forEach { addFunction(it.spec()) }
-          addFunction(scopeProviderMethod.spec())
-          factoryProviderMethods.forEach { addFunctions(it.specs()) }
-          dependencyProviderMethods.forEach { addFunction(it.spec()) }
-          dependencies?.let { addType(it.spec()) }
-          objectsImpl?.let { addType(it.spec()) }
-        }
-        .build()
-  }
+          .build()
 
-  private fun ScopeImplAnnotation.spec(): AnnotationSpec {
-    return AnnotationSpec.builder(motif.ScopeImpl::class)
-        .apply {
-          addMember(
-              CodeBlock.builder()
-                  .apply {
-                    add("children = [")
-                    children.forEachIndexed { i, child ->
-                      val prefix = if (i == 0) "" else ", "
-                      add("%L%T::class", prefix, child.kt)
+  private fun ScopeImplAnnotation.spec(): AnnotationSpec =
+      AnnotationSpec.builder(motif.ScopeImpl::class)
+          .apply {
+            addMember(
+                CodeBlock.builder()
+                    .apply {
+                      add("children = [")
+                      children.forEachIndexed { i, child ->
+                        val prefix = if (i == 0) "" else ", "
+                        add("%L%T::class", prefix, child.kt)
+                      }
+                      add("]")
                     }
-                    add("]")
-                  }
-                  .build())
-          addMember("scope = %T::class", scopeClassName.kt)
-          addMember("dependencies = %T::class", dependenciesClassName.kt)
-        }
-        .build()
-  }
+                    .build(),
+            )
+            addMember("scope = %T::class", scopeClassName.kt)
+            addMember("dependencies = %T::class", dependenciesClassName.kt)
+          }
+          .build()
 
-  private fun ObjectsField.spec(): PropertySpec {
-    return PropertySpec.builder(name, objectsClassName.kt, KModifier.PRIVATE, KModifier.FINAL)
-        .initializer("%T()", objectsImplClassName.kt)
-        .build()
-  }
+  private fun ObjectsField.spec(): PropertySpec =
+      PropertySpec.builder(name, objectsClassName.kt, KModifier.PRIVATE, KModifier.FINAL)
+          .initializer("%T()", objectsImplClassName.kt)
+          .build()
 
-  private fun DependenciesField.spec(): PropertySpec {
-    return PropertySpec.builder(name, dependenciesClassName.kt, KModifier.PRIVATE)
-        .initializer(name)
-        .build()
-  }
+  private fun DependenciesField.spec(): PropertySpec =
+      PropertySpec.builder(name, dependenciesClassName.kt, KModifier.PRIVATE)
+          .initializer(name)
+          .build()
 
-  private fun CacheField.spec(): PropertySpec {
-    return PropertySpec.builder(name, Any::class, KModifier.PRIVATE)
-        .mutable(true)
-        .addAnnotation(Volatile::class)
-        .initializer("%T.NONE", None::class)
-        .build()
-  }
+  private fun CacheField.spec(): PropertySpec =
+      PropertySpec.builder(name, Any::class, KModifier.PRIVATE)
+          .mutable(true)
+          .addAnnotation(Volatile::class)
+          .initializer("%T.NONE", None::class)
+          .build()
 
-  private fun Constructor.spec(): FunSpec {
-    return FunSpec.constructorBuilder()
-        .addParameter(dependenciesParameterName, dependenciesClassName.kt)
-        .build()
-  }
+  private fun Constructor.spec(): FunSpec =
+      FunSpec.constructorBuilder()
+          .addParameter(dependenciesParameterName, dependenciesClassName.kt)
+          .build()
 
-  private fun AlternateConstructor.spec(): FunSpec {
-    return FunSpec.constructorBuilder()
-        .addModifiers(KModifier.PUBLIC)
-        .callThisConstructor(CodeBlock.of("object : %T {}", dependenciesClassName.kt))
-        .build()
-  }
+  private fun AlternateConstructor.spec(): FunSpec =
+      FunSpec.constructorBuilder()
+          .addModifiers(KModifier.PUBLIC)
+          .callThisConstructor(CodeBlock.of("object : %T {}", dependenciesClassName.kt))
+          .build()
 
-  private fun AccessMethodImpl.spec(): FunSpec {
-    return XFunSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env)
-        .addStatement("return %N()", providerMethodName)
-        .build()
-  }
+  private fun AccessMethodImpl.spec(): FunSpec =
+      XFunSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env)
+          .addStatement("return %N()", providerMethodName)
+          .build()
 
   private fun AccessMethodImpl.propSpec(): PropertySpec {
     val propName =
@@ -136,7 +129,9 @@ object KotlinCodeGenerator {
           }
         }
     return PropertySpec.builder(
-            propName, ClassName.bestGuess(overriddenMethod.returnType.qualifiedName))
+            propName,
+            ClassName.bestGuess(overriddenMethod.returnType.qualifiedName),
+        )
         .addModifiers(KModifier.OVERRIDE)
         .initializer("%N()", providerMethodName)
         .build()
@@ -154,57 +149,50 @@ object KotlinCodeGenerator {
         .build()
   }
 
-  private fun ChildDependenciesImpl.spec(): TypeSpec {
-    return TypeSpec.anonymousClassBuilder()
-        .apply {
-          if (isAbstractClass) {
-            superclass(childDependenciesClassName.kt)
-          } else {
-            addSuperinterface(childDependenciesClassName.kt)
+  private fun ChildDependenciesImpl.spec(): TypeSpec =
+      TypeSpec.anonymousClassBuilder()
+          .apply {
+            if (isAbstractClass) {
+              superclass(childDependenciesClassName.kt)
+            } else {
+              addSuperinterface(childDependenciesClassName.kt)
+            }
+            methods.forEach { addFunction(it.spec()) }
           }
-          methods.forEach { addFunction(it.spec()) }
-        }
-        .build()
-  }
+          .build()
 
-  private fun ChildDependencyMethodImpl.spec(): FunSpec {
-    return FunSpec.builder(name)
-        .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
-        .returns(returnTypeName.kt)
-        .addCode(returnExpression.spec())
-        .build()
-  }
+  private fun ChildDependencyMethodImpl.spec(): FunSpec =
+      FunSpec.builder(name)
+          .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
+          .returns(returnTypeName.kt)
+          .addCode(returnExpression.spec())
+          .build()
 
-  private fun ChildDependencyMethodImpl.ReturnExpression.spec(): CodeBlock {
-    return when (this) {
-      is ChildDependencyMethodImpl.ReturnExpression.Parameter -> spec()
-      is ChildDependencyMethodImpl.ReturnExpression.Provider -> spec()
-    }
-  }
+  private fun ChildDependencyMethodImpl.ReturnExpression.spec(): CodeBlock =
+      when (this) {
+        is ChildDependencyMethodImpl.ReturnExpression.Parameter -> spec()
+        is ChildDependencyMethodImpl.ReturnExpression.Provider -> spec()
+      }
 
-  private fun ChildDependencyMethodImpl.ReturnExpression.Parameter.spec(): CodeBlock {
-    return CodeBlock.of("return %N", parameterName)
-  }
+  private fun ChildDependencyMethodImpl.ReturnExpression.Parameter.spec(): CodeBlock =
+      CodeBlock.of("return %N", parameterName)
 
-  private fun ChildDependencyMethodImpl.ReturnExpression.Provider.spec(): CodeBlock {
-    return CodeBlock.of("return this@%T.%N()", scopeImplName.kt, providerName)
-  }
+  private fun ChildDependencyMethodImpl.ReturnExpression.Provider.spec(): CodeBlock =
+      CodeBlock.of("return this@%T.%N()", scopeImplName.kt, providerName)
 
-  private fun ChildMethodImplParameter.spec(): ParameterSpec {
-    return ParameterSpec.builder(name, typeName.kt).build()
-  }
+  private fun ChildMethodImplParameter.spec(): ParameterSpec =
+      ParameterSpec.builder(name, typeName.kt).build()
 
-  private fun ScopeProviderMethod.spec(): FunSpec {
-    return FunSpec.builder(name)
-        .apply {
-          if (isInternal) {
-            addModifiers(KModifier.INTERNAL)
+  private fun ScopeProviderMethod.spec(): FunSpec =
+      FunSpec.builder(name)
+          .apply {
+            if (isInternal) {
+              addModifiers(KModifier.INTERNAL)
+            }
           }
-        }
-        .returns(scopeClassName.kt)
-        .addStatement("return this")
-        .build()
-  }
+          .returns(scopeClassName.kt)
+          .addStatement("return this")
+          .build()
 
   private fun FactoryProviderMethod.specs(): List<FunSpec> {
     val primarySpec =
@@ -217,46 +205,41 @@ object KotlinCodeGenerator {
     return listOf(primarySpec) + spreadSpecs
   }
 
-  private fun FactoryProviderMethodBody.spec(): CodeBlock {
-    return when (this) {
-      is FactoryProviderMethodBody.Cached -> spec()
-      is FactoryProviderMethodBody.Uncached -> spec()
-    }
-  }
+  private fun FactoryProviderMethodBody.spec(): CodeBlock =
+      when (this) {
+        is FactoryProviderMethodBody.Cached -> spec()
+        is FactoryProviderMethodBody.Uncached -> spec()
+      }
 
-  private fun FactoryProviderMethodBody.Cached.spec(): CodeBlock {
-    return CodeBlock.builder()
-        .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
-        .beginControlFlow("synchronized (this)")
-        .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
-        .addStatement("%N=%L", cacheFieldName, instantiation.spec())
-        .endControlFlow()
-        .endControlFlow()
-        .endControlFlow()
-        .add("return ( %N as %T )", cacheFieldName, returnTypeName.reloadedForTypeArgs(env))
-        .build()
-  }
+  private fun FactoryProviderMethodBody.Cached.spec(): CodeBlock =
+      CodeBlock.builder()
+          .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
+          .beginControlFlow("synchronized (this)")
+          .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
+          .addStatement("%N=%L", cacheFieldName, instantiation.spec())
+          .endControlFlow()
+          .endControlFlow()
+          .endControlFlow()
+          .add("return ( %N as %T )", cacheFieldName, returnTypeName.reloadedForTypeArgs(env))
+          .build()
 
-  private fun motif.compiler.TypeName.reloadedForTypeArgs(env: XProcessingEnv): TypeName {
-    return if (kt is ParameterizedTypeName) {
-      kt
-    } else {
-      // ensures that type arguments get loaded
-      KotlinTypeWorkaround.javaToKotlinType(env.requireType(j))
-    }
-  }
+  private fun motif.compiler.TypeName.reloadedForTypeArgs(env: XProcessingEnv): TypeName =
+      if (kt is ParameterizedTypeName) {
+        kt
+      } else {
+        // ensures that type arguments get loaded
+        KotlinTypeWorkaround.javaToKotlinType(env.requireType(j))
+      }
 
-  private fun FactoryProviderMethodBody.Uncached.spec(): CodeBlock {
-    return CodeBlock.of("return %L", instantiation.spec())
-  }
+  private fun FactoryProviderMethodBody.Uncached.spec(): CodeBlock =
+      CodeBlock.of("return %L", instantiation.spec())
 
-  private fun FactoryProviderInstantiation.spec(): CodeBlock {
-    return when (this) {
-      is FactoryProviderInstantiation.Basic -> spec()
-      is FactoryProviderInstantiation.Constructor -> spec()
-      is FactoryProviderInstantiation.Binds -> spec()
-    }
-  }
+  private fun FactoryProviderInstantiation.spec(): CodeBlock =
+      when (this) {
+        is FactoryProviderInstantiation.Basic -> spec()
+        is FactoryProviderInstantiation.Constructor -> spec()
+        is FactoryProviderInstantiation.Binds -> spec()
+      }
 
   private fun FactoryProviderInstantiation.Basic.spec(): CodeBlock {
     val methodName = factoryMethodName.substringBeforeLast('$')
@@ -267,39 +250,35 @@ object KotlinCodeGenerator {
     }
   }
 
-  private fun FactoryProviderInstantiation.Constructor.spec(): CodeBlock {
-    return CodeBlock.of("%T%L", returnTypeName.kt, callProviders.spec())
-  }
+  private fun FactoryProviderInstantiation.Constructor.spec(): CodeBlock =
+      CodeBlock.of("%T%L", returnTypeName.kt, callProviders.spec())
 
-  private fun FactoryProviderInstantiation.Binds.spec(): CodeBlock {
-    return CodeBlock.of("%N()", providerMethodName)
-  }
+  private fun FactoryProviderInstantiation.Binds.spec(): CodeBlock =
+      CodeBlock.of("%N()", providerMethodName)
 
   private fun CallProviders.spec(): String {
     val callString = providerMethodNames.joinToString { "$it()" }
     return "($callString)"
   }
 
-  private fun SpreadProviderMethod.spec(): FunSpec {
-    return FunSpec.builder(name)
-        .apply {
-          returns(returnTypeName.kt)
-          if (isStatic) {
-            addStatement("return %T.%N()", sourceTypeName.kt, spreadMethodName)
-          } else {
-            addStatement("return %N().%N()", sourceProviderMethodName, spreadMethodName)
+  private fun SpreadProviderMethod.spec(): FunSpec =
+      FunSpec.builder(name)
+          .apply {
+            returns(returnTypeName.kt)
+            if (isStatic) {
+              addStatement("return %T.%N()", sourceTypeName.kt, spreadMethodName)
+            } else {
+              addStatement("return %N().%N()", sourceProviderMethodName, spreadMethodName)
+            }
           }
-        }
-        .build()
-  }
+          .build()
 
-  private fun DependencyProviderMethod.spec(): FunSpec {
-    return FunSpec.builder(name)
-        .addModifiers(KModifier.INTERNAL)
-        .returns(returnTypeName.kt)
-        .addStatement("return %N.%N()", dependenciesFieldName, dependencyMethodName)
-        .build()
-  }
+  private fun DependencyProviderMethod.spec(): FunSpec =
+      FunSpec.builder(name)
+          .addModifiers(KModifier.INTERNAL)
+          .returns(returnTypeName.kt)
+          .addStatement("return %N.%N()", dependenciesFieldName, dependencyMethodName)
+          .build()
 
   private fun Dependencies.spec(): TypeSpec {
     val typeSpecBuilder =
@@ -311,17 +290,16 @@ object KotlinCodeGenerator {
     return typeSpecBuilder.apply { methods.forEach { addFunction(it.spec()) } }.build()
   }
 
-  private fun DependencyMethod.spec(): FunSpec {
-    return FunSpec.builder(name)
-        .apply {
-          qualifier?.let { addAnnotation(it.spec()) }
-          addModifiers(if (internal) KModifier.INTERNAL else KModifier.PUBLIC)
-          addModifiers(KModifier.ABSTRACT)
-          returns(returnTypeName.kt)
-          addKdoc(javaDoc.spec())
-        }
-        .build()
-  }
+  private fun DependencyMethod.spec(): FunSpec =
+      FunSpec.builder(name)
+          .apply {
+            qualifier?.let { addAnnotation(it.spec()) }
+            addModifiers(if (internal) KModifier.INTERNAL else KModifier.PUBLIC)
+            addModifiers(KModifier.ABSTRACT)
+            returns(returnTypeName.kt)
+            addKdoc(javaDoc.spec())
+          }
+          .build()
 
   private fun Qualifier.spec(): AnnotationSpec {
     val className =
@@ -336,39 +314,34 @@ object KotlinCodeGenerator {
         .build()
   }
 
-  private fun DependencyMethodJavaDoc.spec(): CodeBlock {
-    return CodeBlock.builder()
-        .apply {
-          add("\nRequested from:\n")
-          requestedFrom.forEach { add(it.spec()) }
-          add("\n")
-        }
-        .build()
-  }
-
-  private fun JavaDocMethodLink.spec(): CodeBlock {
-    return CodeBlock.of("* [%L.%N]\n", owner, methodName)
-  }
-
-  private fun ObjectsImpl.spec(): TypeSpec {
-    return TypeSpec.classBuilder(className.kt)
-        .apply {
-          addModifiers(KModifier.PRIVATE)
-          if (isInterface) {
-            addSuperinterface(superClassName.kt)
-          } else {
-            superclass(superClassName.kt)
+  private fun DependencyMethodJavaDoc.spec(): CodeBlock =
+      CodeBlock.builder()
+          .apply {
+            add("\nRequested from:\n")
+            requestedFrom.forEach { add(it.spec()) }
+            add("\n")
           }
-          abstractMethods.forEach { addFunction(it.spec()) }
-        }
-        .build()
-  }
+          .build()
 
-  private fun ObjectsAbstractMethod.spec(): FunSpec {
-    return XFunSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env)
-        .addStatement("throw %T()", UnsupportedOperationException::class)
-        .build()
-  }
+  private fun JavaDocMethodLink.spec(): CodeBlock = CodeBlock.of("* [%L.%N]\n", owner, methodName)
+
+  private fun ObjectsImpl.spec(): TypeSpec =
+      TypeSpec.classBuilder(className.kt)
+          .apply {
+            addModifiers(KModifier.PRIVATE)
+            if (isInterface) {
+              addSuperinterface(superClassName.kt)
+            } else {
+              superclass(superClassName.kt)
+            }
+            abstractMethods.forEach { addFunction(it.spec()) }
+          }
+          .build()
+
+  private fun ObjectsAbstractMethod.spec(): FunSpec =
+      XFunSpec.overriding(overriddenMethod.element, overriddenMethod.owner, env)
+          .addStatement("throw %T()", UnsupportedOperationException::class)
+          .build()
 
   private fun suppressAnnotationSpec(vararg names: String): AnnotationSpec =
       AnnotationSpec.builder(Suppress::class.java)

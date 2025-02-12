@@ -27,6 +27,8 @@ internal class VoidFactoryMethodHandler(private val error: VoidFactoryMethod) : 
             Factory methods must be non-void:
 
               void ${error.objects.qualifiedName}.${error.method.name}
-      """.trimIndent())
+      """
+            .trimIndent(),
+    )
   }
 }

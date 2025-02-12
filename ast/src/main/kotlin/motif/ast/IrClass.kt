@@ -34,16 +34,13 @@ interface IrClass : IrAnnotated, IrHasModifiers {
   val simpleName: String
     get() = type.simpleName
 
-  fun hasNonDefaultConstructor(): Boolean {
-    return constructors.any { it.hasParameters() }
-  }
+  fun hasNonDefaultConstructor(): Boolean = constructors.any { it.hasParameters() }
 
-  fun annotatedInnerClass(annotationClass: KClass<out Annotation>): IrClass? {
-    return nestedClasses.find { it.hasAnnotation(annotationClass) }
-  }
+  fun annotatedInnerClass(annotationClass: KClass<out Annotation>): IrClass? =
+      nestedClasses.find { it.hasAnnotation(annotationClass) }
 
   enum class Kind {
     CLASS,
-    INTERFACE
+    INTERFACE,
   }
 }

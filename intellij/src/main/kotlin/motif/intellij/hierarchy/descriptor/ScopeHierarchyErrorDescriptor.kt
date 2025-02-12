@@ -57,104 +57,102 @@ open class ScopeHierarchyErrorDescriptor(
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
     val error: MotifError,
-    val errorMessage: ErrorMessage
+    val errorMessage: ErrorMessage,
 ) :
     ScopeHierarchyNodeDescriptor(
-        project, graph, parentDescriptor, getElementFromError(error), false) {
+        project,
+        graph,
+        parentDescriptor,
+        getElementFromError(error),
+        false,
+    ) {
 
   companion object {
-    fun getElementFromError(error: MotifError): PsiElement {
-      return when (error) {
-        is ScopeMustBeAnInterface -> {
-          (error.scopeClass as IntelliJClass).psiClass
+    fun getElementFromError(error: MotifError): PsiElement =
+        when (error) {
+          is ScopeMustBeAnInterface -> {
+            (error.scopeClass as IntelliJClass).psiClass
+          }
+          is VoidScopeMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is AccessMethodParameters -> {
+            (error.scope.clazz as IntelliJClass).psiClass
+          }
+          is ObjectsFieldFound -> {
+            (error.scope.clazz as IntelliJClass).psiClass
+          }
+          is ObjectsConstructorFound -> {
+            (error.scope.clazz as IntelliJClass).psiClass
+          }
+          is VoidFactoryMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is NullableFactoryMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is NullableParameter -> {
+            (error.parameter as IntelliJMethodParameter).psiParameter
+          }
+          is NullableDynamicDependency -> {
+            (error.parameter as IntelliJMethodParameter).psiParameter
+          }
+          is InvalidFactoryMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is UnspreadableType -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is NoSuitableConstructor -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is InjectAnnotationRequired -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is NotAssignableBindsMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is VoidDependenciesMethod -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is DependencyMethodWithParameters -> {
+            (error.method as IntelliJMethod).psiMethod
+          }
+          is NullableSpreadMethod -> {
+            (error.spreadMethod as IntelliJMethod).psiMethod
+          }
+          is InvalidQualifier -> {
+            (error.annotated.annotations[0].members[0] as IntelliJMethod).psiMethod
+          }
+          is DuplicatedChildParameterSource -> {
+            (error.childScopeMethod.method as IntelliJMethod).psiMethod
+          }
+          is ScopeCycleError -> {
+            (error.path[0].clazz as IntelliJClass).psiClass
+          }
+          is UnsatisfiedDependencyError -> {
+            (error.top.clazz as IntelliJClass).psiClass
+          }
+          is DependencyCycleError -> {
+            (error.path[0].scope.clazz as IntelliJClass).psiClass
+          }
+          is UnexposedSourceError -> {
+            (error.source.scope.clazz as IntelliJClass).psiClass
+          }
+          is AlreadySatisfiedError -> {
+            (error.scope.clazz as IntelliJClass).psiClass
+          }
+          else -> throw UnsupportedOperationException()
         }
-        is VoidScopeMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is AccessMethodParameters -> {
-          (error.scope.clazz as IntelliJClass).psiClass
-        }
-        is ObjectsFieldFound -> {
-          (error.scope.clazz as IntelliJClass).psiClass
-        }
-        is ObjectsConstructorFound -> {
-          (error.scope.clazz as IntelliJClass).psiClass
-        }
-        is VoidFactoryMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is NullableFactoryMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is NullableParameter -> {
-          (error.parameter as IntelliJMethodParameter).psiParameter
-        }
-        is NullableDynamicDependency -> {
-          (error.parameter as IntelliJMethodParameter).psiParameter
-        }
-        is InvalidFactoryMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is UnspreadableType -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is NoSuitableConstructor -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is InjectAnnotationRequired -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is NotAssignableBindsMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is VoidDependenciesMethod -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is DependencyMethodWithParameters -> {
-          (error.method as IntelliJMethod).psiMethod
-        }
-        is NullableSpreadMethod -> {
-          (error.spreadMethod as IntelliJMethod).psiMethod
-        }
-        is InvalidQualifier -> {
-          (error.annotated.annotations[0].members[0] as IntelliJMethod).psiMethod
-        }
-        is DuplicatedChildParameterSource -> {
-          (error.childScopeMethod.method as IntelliJMethod).psiMethod
-        }
-        is ScopeCycleError -> {
-          (error.path[0].clazz as IntelliJClass).psiClass
-        }
-        is UnsatisfiedDependencyError -> {
-          (error.top.clazz as IntelliJClass).psiClass
-        }
-        is DependencyCycleError -> {
-          (error.path[0].scope.clazz as IntelliJClass).psiClass
-        }
-        is UnexposedSourceError -> {
-          (error.source.scope.clazz as IntelliJClass).psiClass
-        }
-        is AlreadySatisfiedError -> {
-          (error.scope.clazz as IntelliJClass).psiClass
-        }
-        else -> throw UnsupportedOperationException()
-      }
-    }
   }
 
   override fun updateText(text: CompositeAppearance) {
     text.ending.addText(errorMessage.name)
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return AllIcons.RunConfigurations.TestFailed
-  }
+  override fun getIcon(element: PsiElement): Icon? = AllIcons.RunConfigurations.TestFailed
 
-  override fun getLegend(): String? {
-    return errorMessage.text
-  }
+  override fun getLegend(): String? = errorMessage.text
 
-  override fun toString(): String {
-    return errorMessage.name
-  }
+  override fun toString(): String = errorMessage.name
 }

@@ -128,18 +128,31 @@ private class ErrorGraph(error: MotifError) : ResolvedGraph {
   override val roots = emptyList<Scope>()
   override val scopes = emptyList<Scope>()
   override val errors = listOf(error)
+
   override fun getScope(scopeType: IrType) = null
+
   override fun getChildEdges(scope: Scope) = emptyList<ScopeEdge>()
+
   override fun getParentEdges(scope: Scope) = emptyList<ScopeEdge>()
+
   override fun getChildUnsatisfied(scopeEdge: ScopeEdge) = emptyList<Sink>()
+
   override fun getUnsatisfied(scope: Scope) = emptyMap<Type, List<Sink>>()
+
   override fun getSources(scope: Scope) = emptyList<Source>()
+
   override fun getSinks(type: Type) = emptyList<Sink>()
+
   override fun getSinks(irType: IrType) = emptyList<Sink>()
+
   override fun getSources(irType: IrType) = emptyList<Source>()
+
   override fun getSinks(scope: Scope) = emptyList<Sink>()
+
   override fun getProviders(sink: Sink) = emptyList<Source>()
+
   override fun getConsumers(source: Source) = emptyList<Sink>()
+
   override fun getRequired(source: Source) = emptyList<Sink>()
 }
 
@@ -147,7 +160,7 @@ private class ValidResolvedGraph(
     private val scopeGraph: ScopeGraph,
     private val scopeStates: Map<Scope, State>,
     private val childStates: Map<ScopeEdge, State>,
-    private val graphState: State
+    private val graphState: State,
 ) : ResolvedGraph {
 
   private val scopeSinks = mutableMapOf<Scope, Set<Sink>>()

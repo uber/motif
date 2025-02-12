@@ -65,21 +65,16 @@ class GraphFactory(private val project: Project) {
         .map { type -> IntelliJClass(project, type, type.resolve()!!) }
   }
 
-  private fun getScopeClasses(psiFile: PsiJavaFile): Iterable<PsiClass> {
-    return psiFile.classes.toList()
-  }
+  private fun getScopeClasses(psiFile: PsiJavaFile): Iterable<PsiClass> = psiFile.classes.toList()
 
-  private fun getScopeClasses(psiFile: KtFile): Iterable<PsiClass> {
-    return psiFile.declarations.filterIsInstance<KtClass>().map {
-      it.toUElement(UClass::class.java)!!.javaPsi
-    }
-  }
+  private fun getScopeClasses(psiFile: KtFile): Iterable<PsiClass> =
+      psiFile.declarations.filterIsInstance<KtClass>().map {
+        it.toUElement(UClass::class.java)!!.javaPsi
+      }
 
-  private fun getClasses(psiClass: PsiClass): List<PsiClass> {
-    return listOf(psiClass) + psiClass.innerClasses.flatMap(this::getClasses)
-  }
+  private fun getClasses(psiClass: PsiClass): List<PsiClass> =
+      listOf(psiClass) + psiClass.innerClasses.flatMap(this::getClasses)
 
-  private fun isScopeClass(psiClass: PsiClass): Boolean {
-    return psiClass.annotations.find { it.qualifiedName == Scope::class.qualifiedName } != null
-  }
+  private fun isScopeClass(psiClass: PsiClass): Boolean =
+      psiClass.annotations.find { it.qualifiedName == Scope::class.qualifiedName } != null
 }

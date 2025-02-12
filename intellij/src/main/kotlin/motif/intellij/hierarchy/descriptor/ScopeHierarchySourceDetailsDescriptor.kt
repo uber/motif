@@ -28,7 +28,7 @@ open class ScopeHierarchySourceDetailsDescriptor(
     project: Project,
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
-    source: Source
+    source: Source,
 ) : ScopeHierarchySourceDescriptor(project, graph, parentDescriptor, source) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -38,10 +38,9 @@ open class ScopeHierarchySourceDetailsDescriptor(
             " (" +
             formatQualifiedName(source.scope.qualifiedName) +
             ")",
-        getPackageNameAttributes())
+        getPackageNameAttributes(),
+    )
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return null
-  }
+  override fun getIcon(element: PsiElement): Icon? = null
 }

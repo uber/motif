@@ -41,7 +41,7 @@ import motif.intellij.hierarchy.descriptor.ScopeHierarchyUsageSectionDescriptor
 class UsageHierarchyBrowser(
     project: Project,
     initialGraph: ResolvedGraph,
-    private val rootElement: PsiElement
+    private val rootElement: PsiElement,
 ) : HierarchyBrowserBase(project, rootElement), MotifService.Listener {
 
   private var graph: ResolvedGraph = initialGraph
@@ -57,48 +57,37 @@ class UsageHierarchyBrowser(
     super.doRefresh(true)
   }
 
-  override fun isApplicableElement(element: PsiElement): Boolean {
-    return element is PsiClass
-  }
+  override fun isApplicableElement(element: PsiElement): Boolean = element is PsiClass
 
-  override fun getActionPlace(): String {
-    return ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
-  }
+  override fun getActionPlace(): String = ActionPlaces.METHOD_HIERARCHY_VIEW_TOOLBAR
 
   override fun prependActions(actionGroup: DefaultActionGroup) {}
 
-  override fun getComparator(): Comparator<NodeDescriptor<out Any>> {
-    return JavaHierarchyUtil.getComparator(myProject)
-  }
+  override fun getComparator(): Comparator<NodeDescriptor<out Any>> =
+      JavaHierarchyUtil.getComparator(myProject)
 
-  override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
-    return descriptor.psiElement
-  }
+  override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? =
+      descriptor.psiElement
 
-  override fun getPrevOccurenceActionNameImpl(): String {
-    return LABEL_GO_PREVIOUS_SCOPE
-  }
+  override fun getPrevOccurenceActionNameImpl(): String = LABEL_GO_PREVIOUS_SCOPE
 
-  override fun getNextOccurenceActionNameImpl(): String {
-    return LABEL_GO_NEXT_SCOPE
-  }
+  override fun getNextOccurenceActionNameImpl(): String = LABEL_GO_NEXT_SCOPE
 
-  override fun createLegendPanel(): JPanel? {
-    return null
-  }
+  override fun createLegendPanel(): JPanel? = null
 
   override fun createTrees(trees: MutableMap<in String, in JTree>) {
     trees[USAGE_HIERARCHY_TYPE] = createTree(true)
   }
 
-  override fun getContentDisplayName(typeName: String, element: PsiElement): String? {
-    return MessageFormat.format(
-        typeName, ClassPresentationUtil.getNameForClass(element as PsiClass, false))
-  }
+  override fun getContentDisplayName(typeName: String, element: PsiElement): String? =
+      MessageFormat.format(
+          typeName,
+          ClassPresentationUtil.getNameForClass(element as PsiClass, false),
+      )
 
   override fun createHierarchyTreeStructure(
       typeName: String,
-      psiElement: PsiElement
+      psiElement: PsiElement,
   ): HierarchyTreeStructure? {
     if (psiElement is PsiClass) {
       val descriptor: HierarchyNodeDescriptor =

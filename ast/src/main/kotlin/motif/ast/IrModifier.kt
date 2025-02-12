@@ -30,5 +30,5 @@ enum class IrModifier {
   VOLATILE,
   DEFAULT,
   OPEN,
-  TRANSITIVE
+  TRANSITIVE,
 }

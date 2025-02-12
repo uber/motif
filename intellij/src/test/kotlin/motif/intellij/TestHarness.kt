@@ -52,8 +52,7 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
 
   private fun addLibrary(clazz: KClass<*>) {
     val fileUri =
-        clazz
-            .java
+        clazz.java
             .getResource(clazz.simpleName + ".class")
             ?.toString()
             ?.let { Regex("file:.*[.]jar").find(it)?.value }
@@ -69,13 +68,15 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
   fun test() {
     val testFiles = testDir.walk()
     val externalFiles = EXTERNAL_ROOT.resolve(testDir.name).walk()
-    (testFiles + externalFiles).filter { !it.isDirectory }.forEach { sourceFile ->
-      when {
-        sourceFile.name.endsWith(".java") -> myFixture.addClass(sourceFile.readText())
-        sourceFile.name.endsWith(".kt") ->
-            myFixture.addFileToProject(sourceFile.name, sourceFile.readText())
-      }
-    }
+    (testFiles + externalFiles)
+        .filter { !it.isDirectory }
+        .forEach { sourceFile ->
+          when {
+            sourceFile.name.endsWith(".java") -> myFixture.addClass(sourceFile.readText())
+            sourceFile.name.endsWith(".kt") ->
+                myFixture.addFileToProject(sourceFile.name, sourceFile.readText())
+          }
+        }
     val graph = GraphFactory(project).compute()
 
     val errorFile = testDir.resolve("ERROR.txt")
@@ -150,9 +151,9 @@ class TestHarness : LightJavaCodeInsightFixtureTestCase() {
     @JvmStatic
     fun data(clazz: Class<*>): List<Array<Any>> {
       val testDirs = TEST_CASE_ROOT.listFiles() ?: throw IllegalStateException()
-      return testDirs.filter { !it.resolve("SKIP_INTELLIJ").exists() }.map { testDir ->
-        arrayOf<Any>(testDir)
-      }
+      return testDirs
+          .filter { !it.resolve("SKIP_INTELLIJ").exists() }
+          .map { testDir -> arrayOf<Any>(testDir) }
     }
 
     @org.junit.runners.Parameterized.Parameters

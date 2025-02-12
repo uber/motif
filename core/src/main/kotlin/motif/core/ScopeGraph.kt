@@ -45,28 +45,21 @@ internal class ScopeGraph private constructor(val scopes: List<Scope>) {
   val parsingErrors: List<ParsingError> =
       scopes.filterIsInstance<ErrorScope>().map { it.parsingError }
 
-  fun getChildEdges(scope: Scope): List<ScopeEdge> {
-    return childEdges[scope]
-        ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
-  }
+  fun getChildEdges(scope: Scope): List<ScopeEdge> =
+      childEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
 
-  fun getParentEdges(scope: Scope): List<ScopeEdge> {
-    return parentEdges[scope]
-        ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
-  }
+  fun getParentEdges(scope: Scope): List<ScopeEdge> =
+      parentEdges[scope] ?: throw NullPointerException("Scope not found: ${scope.qualifiedName}")
 
-  fun getScope(scopeType: IrType): Scope? {
-    return scopeMap[scopeType]
-  }
+  fun getScope(scopeType: IrType): Scope? = scopeMap[scopeType]
 
-  private fun createChildren(scope: Scope): List<ScopeEdge> {
-    return scope.childMethods.map { method ->
-      val childScope =
-          getScope(method.childScopeClass.type)
-              ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
-      ScopeEdge(scope, childScope, method)
-    }
-  }
+  private fun createChildren(scope: Scope): List<ScopeEdge> =
+      scope.childMethods.map { method ->
+        val childScope =
+            getScope(method.childScopeClass.type)
+                ?: throw IllegalStateException("Scope not found: ${scope.qualifiedName}")
+        ScopeEdge(scope, childScope, method)
+      }
 
   private fun calculateCycle(): ScopeCycleError? {
     // Sort for stable tests
@@ -78,8 +71,6 @@ internal class ScopeGraph private constructor(val scopes: List<Scope>) {
 
   companion object {
 
-    fun create(scopes: List<Scope>): ScopeGraph {
-      return ScopeGraph(scopes)
-    }
+    fun create(scopes: List<Scope>): ScopeGraph = ScopeGraph(scopes)
   }
 }

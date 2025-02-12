@@ -80,7 +80,10 @@ class TestHarness(
       val testCaseDirs = TEST_CASE_ROOT.listFiles { file: File -> isTestDir(file) }
       val combos =
           cartesianProduct(
-              ProcessorType.values().toList(), OutputMode.values().toList(), testCaseDirs.toList())
+              ProcessorType.values().toList(),
+              OutputMode.values().toList(),
+              testCaseDirs.toList(),
+          )
       return combos
           .filterNot { (_, mode, dir) ->
             mode == OutputMode.KOTLIN && (dir as File).resolve("SKIP_KOTLIN").exists()
@@ -100,11 +103,10 @@ class TestHarness(
           .map { it.toTypedArray() as Array<Any> }
     }
 
-    private fun isTestDir(file: File): Boolean {
-      return file.isDirectory &&
-          file.listFiles().isNotEmpty() &&
-          file.name.matches("^K?[TE].*".toRegex())
-    }
+    private fun isTestDir(file: File): Boolean =
+        file.isDirectory &&
+            file.listFiles().isNotEmpty() &&
+            file.name.matches("^K?[TE].*".toRegex())
   }
 
   @Test
@@ -131,7 +133,8 @@ class TestHarness(
               result.outputClasspath.filterNot {
                 "/ksp/" in it.absolutePath || "/kapt/" in it.absolutePath
               },
-              proguardFile)
+              proguardFile,
+          )
 
       val urls = (externalClassesDirs + proguardedClasses).map { it.toURI().toURL() }.toTypedArray()
       val classLoader: ClassLoader = URLClassLoader(urls, javaClass.classLoader)
@@ -158,7 +161,8 @@ class TestHarness(
                 externalDir,
                 if (shouldProcess) annotationProcessor else null,
                 if (shouldProcess) symbolProcessorProvider else null,
-                emptyList())
+                emptyList(),
+            )
         assertSucceeded(externalResult)
         return externalResult.outputClasspath.filter { it.listFilesRecursively().isNotEmpty() }
       }
@@ -170,7 +174,7 @@ class TestHarness(
       sourcesDir: File,
       annotationProcessor: javax.annotation.processing.Processor?,
       symbolProcessorProvider: SymbolProcessorProvider?,
-      classpath: List<File> = emptyList()
+      classpath: List<File> = emptyList(),
   ): TestCompilationResult {
     val processorOptions = mapOf("motif.mode" to outputMode.name.lowercase())
     val sources = getFiles(sourcesDir).asSources()
@@ -185,10 +189,11 @@ class TestHarness(
                 inheritClasspath = true,
                 kaptProcessors = annotationProcessors,
                 kotlincArguments = listOf("-language-version", "1.9", "-api-version", "1.9"),
-                symbolProcessorProviders = symbolProcessorProvider?.let { listOf(it) }
-                        ?: emptyList(),
+                symbolProcessorProviders =
+                    symbolProcessorProvider?.let { listOf(it) } ?: emptyList(),
                 processorOptions = processorOptions,
-            ))
+            ),
+    )
   }
 
   private fun List<File>.asSources(): List<Source> {
@@ -203,13 +208,12 @@ class TestHarness(
     }
   }
 
-  private fun getFiles(dir: File): List<File> {
-    return dir.walkTopDown()
-        .filter {
-          !it.isDirectory && it.extension in setOf("kt", "java") && it.name != "ScopeImpl.java"
-        }
-        .toList()
-  }
+  private fun getFiles(dir: File): List<File> =
+      dir.walkTopDown()
+          .filter {
+            !it.isDirectory && it.extension in setOf("kt", "java") && it.name != "ScopeImpl.java"
+          }
+          .toList()
 
   private fun createProcessors(): Pair<Processor?, MotifSymbolProcessorProvider?> {
     val xProcConfig = XProcessingEnvConfig.DEFAULT.copy(false, true)
@@ -250,7 +254,9 @@ class TestHarness(
         Error message has changed. The ERROR.txt file has been automatically updated by this test:
           1. Verify that the changes are correct.
           2. Commit the changes to source control.
-        """.trimIndent())
+        """
+                  .trimIndent(),
+          )
           .that(actualErrorString)
           .isEqualTo(expectedErrorString)
     }
@@ -278,7 +284,9 @@ class TestHarness(
         Graph representation has changed. The GRAPH.txt file has been automatically updated by this test:
           1. Verify that the changes are correct.
           2. Commit the changes to source control.
-        """.trimIndent())
+        """
+                  .trimIndent(),
+          )
           .fail()
     }
   }
@@ -301,18 +309,18 @@ class TestHarness(
       #                                                                      #
       ########################################################################
 
-      """.trimIndent()
+      """
+            .trimIndent()
     return "$header\n$message\n"
   }
 
   @Throws(IOException::class)
-  private fun getExistingGraphString(): String {
-    return if (graphFile.exists()) {
-      com.google.common.io.Files.asCharSource(graphFile, Charset.defaultCharset()).read()
-    } else {
-      ""
-    }
-  }
+  private fun getExistingGraphString(): String =
+      if (graphFile.exists()) {
+        com.google.common.io.Files.asCharSource(graphFile, Charset.defaultCharset()).read()
+      } else {
+        ""
+      }
 
   private fun getActualErrorString(result: TestCompilationResult): String {
     val message = getMessage(result)
@@ -331,7 +339,8 @@ class TestHarness(
       #                                                                      #
       ########################################################################
 
-      """.trimIndent()
+      """
+            .trimIndent()
     return "$header\n$message\n"
   }
 
@@ -343,23 +352,25 @@ class TestHarness(
     return "$header$resultMessage$footer".prependIndent("  ")
   }
 
-  private fun toCompilerMessage(message: String): String {
-    return message.trim().prependIndent("  ")
-  }
+  private fun toCompilerMessage(message: String): String = message.trim().prependIndent("  ")
 
   @Throws(IOException::class)
-  private fun getExistingErrorString(): String {
-    return if (errorFile.exists()) {
-      com.google.common.io.Files.asCharSource(errorFile, Charset.defaultCharset()).read()
-    } else {
-      ""
-    }
-  }
+  private fun getExistingErrorString(): String =
+      if (errorFile.exists()) {
+        com.google.common.io.Files.asCharSource(errorFile, Charset.defaultCharset()).read()
+      } else {
+        ""
+      }
 }
 
 internal fun File.listFilesRecursively() = walkTopDown().filter { it.isFile }.toList()
 
-private fun TestCompilationResult.messages(): String {
-  return diagnostics[Diagnostic.Kind.ERROR].orEmpty().flatMap { it.msg.lines() }.joinToString(
-      separator = "\n") { "  $it" }
-}
+private fun TestCompilationResult.messages(): String =
+    diagnostics[Diagnostic.Kind.ERROR]
+        .orEmpty()
+        .flatMap { it.msg.lines() }
+        .joinToString(
+            separator = "\n",
+        ) {
+          "  $it"
+        }

@@ -38,7 +38,10 @@ import motif.models.Spread
 import motif.models.Type
 
 class ScopeImplFactory
-private constructor(private val env: XProcessingEnv, private val graph: ResolvedGraph) {
+private constructor(
+    private val env: XProcessingEnv,
+    private val graph: ResolvedGraph,
+) {
 
   private val scopeImplClassNames = mutableMapOf<Scope, ClassName>()
   private val dependenciesClassNames = mutableMapOf<Scope, ClassName>()
@@ -80,7 +83,8 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
           factoryProviderMethods(),
           dependencyProviderMethods(),
           objectsImpl(),
-          dependencies())
+          dependencies(),
+      )
     }
 
     private fun scopeImplAnnotation(): ScopeImplAnnotation {
@@ -94,19 +98,16 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       return ObjectsField(objectsClassName, objectsImplClassName, OBJECTS_FIELD_NAME)
     }
 
-    private fun dependenciesField(): DependenciesField {
-      return DependenciesField(scope.dependenciesClassName, DEPENDENCIES_FIELD_NAME)
-    }
+    private fun dependenciesField(): DependenciesField =
+        DependenciesField(scope.dependenciesClassName, DEPENDENCIES_FIELD_NAME)
 
-    private fun cacheFields(): List<CacheField> {
-      return scope.factoryMethods.filter { it.isCached }.map { factoryMethod ->
-        CacheField(getCacheFieldName(factoryMethod.returnType.type))
-      }
-    }
+    private fun cacheFields(): List<CacheField> =
+        scope.factoryMethods
+            .filter { it.isCached }
+            .map { factoryMethod -> CacheField(getCacheFieldName(factoryMethod.returnType.type)) }
 
-    private fun constructor(): Constructor {
-      return Constructor(scope.dependenciesClassName, "dependencies", DEPENDENCIES_FIELD_NAME)
-    }
+    private fun constructor(): Constructor =
+        Constructor(scope.dependenciesClassName, "dependencies", DEPENDENCIES_FIELD_NAME)
 
     private fun alternateConstructor(): AlternateConstructor? {
       if (getDependencyMethodData(scope).isNotEmpty() ||
@@ -116,35 +117,34 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       return AlternateConstructor(scope.dependenciesClassName)
     }
 
-    private fun accessMethodImpls(): List<AccessMethodImpl> {
-      return scope.accessMethods.map { accessMethod ->
-        AccessMethodImpl(
-            env,
-            accessMethod.method as CompilerMethod,
-            getProviderMethodName(accessMethod.returnType))
-      }
-    }
+    private fun accessMethodImpls(): List<AccessMethodImpl> =
+        scope.accessMethods.map { accessMethod ->
+          AccessMethodImpl(
+              env,
+              accessMethod.method as CompilerMethod,
+              getProviderMethodName(accessMethod.returnType),
+          )
+        }
 
-    private fun childMethodImpls(): List<ChildMethodImpl> {
-      return graph.getChildEdges(scope).map(this::childMethodImpl)
-    }
+    private fun childMethodImpls(): List<ChildMethodImpl> =
+        graph.getChildEdges(scope).map(this::childMethodImpl)
 
-    private fun childMethodImpl(childEdge: ScopeEdge): ChildMethodImpl {
-
-      return ChildMethodImpl(
-          childEdge.child.typeName,
-          childEdge.child.implClassName,
-          childEdge.method.method.name,
-          childEdge.method.parameters.map(this::childMethodImplParameter),
-          childDependenciesImpl(childEdge))
-    }
+    private fun childMethodImpl(childEdge: ScopeEdge): ChildMethodImpl =
+        ChildMethodImpl(
+            childEdge.child.typeName,
+            childEdge.child.implClassName,
+            childEdge.method.method.name,
+            childEdge.method.parameters.map(this::childMethodImplParameter),
+            childDependenciesImpl(childEdge),
+        )
 
     private fun childMethodImplParameter(
-        childMethodParameter: ChildMethod.Parameter
-    ): ChildMethodImplParameter {
-      return ChildMethodImplParameter(
-          childMethodParameter.parameter.type.typeName, childMethodParameter.parameter.name)
-    }
+        childMethodParameter: ChildMethod.Parameter,
+    ): ChildMethodImplParameter =
+        ChildMethodImplParameter(
+            childMethodParameter.parameter.type.typeName,
+            childMethodParameter.parameter.name,
+        )
 
     private fun childDependenciesImpl(childEdge: ScopeEdge): ChildDependenciesImpl {
       val parameters: Map<Type, ChildMethod.Parameter> =
@@ -155,24 +155,34 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
           }
       val isAbstractClass = dependencyMethodImpls.any { it.isInternal }
       return ChildDependenciesImpl(
-          childEdge.child.dependenciesClassName, dependencyMethodImpls, isAbstractClass, env)
+          childEdge.child.dependenciesClassName,
+          dependencyMethodImpls,
+          isAbstractClass,
+          env,
+      )
     }
 
     private fun childDependencyMethodImpl(
         parameters: Map<Type, ChildMethod.Parameter>,
-        methodData: DependencyMethodData
+        methodData: DependencyMethodData,
     ): ChildDependencyMethodImpl {
       val parameter = parameters[methodData.returnType]
       val returnExpression =
           if (parameter == null) {
             ChildDependencyMethodImpl.ReturnExpression.Provider(
-                scope.implClassName, getProviderMethodName(methodData.returnType))
+                scope.implClassName,
+                getProviderMethodName(methodData.returnType),
+            )
           } else {
             ChildDependencyMethodImpl.ReturnExpression.Parameter(parameter.parameter.name)
           }
       val isInternal = (methodData.returnType.type as? CompilerType)?.isInternal() ?: false
       return ChildDependencyMethodImpl(
-          methodData.name, methodData.returnTypeName, returnExpression, isInternal)
+          methodData.name,
+          methodData.returnTypeName,
+          returnExpression,
+          isInternal,
+      )
     }
 
     private fun scopeProviderMethod(): ScopeProviderMethod {
@@ -181,19 +191,19 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       return ScopeProviderMethod(name, scope.typeName, isInternal)
     }
 
-    private fun factoryProviderMethods(): List<FactoryProviderMethod> {
-      return scope.factoryMethods.map { factoryMethod ->
-        val returnType = factoryMethod.returnType.type
-        val spreadProviderMethods =
-            factoryMethod.spread?.let { spreadProviderMethods(it) } ?: emptyList()
-        FactoryProviderMethod(
-            getProviderMethodName(returnType),
-            returnType.type.typeName,
-            factoryProviderMethodBody(factoryMethod),
-            spreadProviderMethods,
-            env)
-      }
-    }
+    private fun factoryProviderMethods(): List<FactoryProviderMethod> =
+        scope.factoryMethods.map { factoryMethod ->
+          val returnType = factoryMethod.returnType.type
+          val spreadProviderMethods =
+              factoryMethod.spread?.let { spreadProviderMethods(it) } ?: emptyList()
+          FactoryProviderMethod(
+              getProviderMethodName(returnType),
+              returnType.type.typeName,
+              factoryProviderMethodBody(factoryMethod),
+              spreadProviderMethods,
+              env,
+          )
+        }
 
     private fun factoryProviderMethodBody(factoryMethod: FactoryMethod): FactoryProviderMethodBody {
       val instantiation =
@@ -207,48 +217,50 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
             getCacheFieldName(factoryMethod.returnType.type),
             factoryMethod.returnType.type.type.typeName,
             instantiation,
-            env)
+            env,
+        )
       } else {
         FactoryProviderMethodBody.Uncached(instantiation)
       }
     }
 
-    private fun spreadProviderMethods(spread: Spread): List<SpreadProviderMethod> {
-      return spread.methods.map { method ->
-        SpreadProviderMethod(
-            getProviderMethodName(method.returnType),
-            method.method.isStatic(),
-            method.returnType.type.typeName,
-            method.sourceType.type.typeName,
-            getProviderMethodName(method.sourceType),
-            method.name)
-      }
-    }
+    private fun spreadProviderMethods(spread: Spread): List<SpreadProviderMethod> =
+        spread.methods.map { method ->
+          SpreadProviderMethod(
+              getProviderMethodName(method.returnType),
+              method.method.isStatic(),
+              method.returnType.type.typeName,
+              method.sourceType.type.typeName,
+              getProviderMethodName(method.sourceType),
+              method.name,
+          )
+        }
 
     private fun basicInstantiation(
-        factoryMethod: BasicFactoryMethod
-    ): FactoryProviderInstantiation.Basic {
-      return FactoryProviderInstantiation.Basic(
-          OBJECTS_FIELD_NAME,
-          factoryMethod.objects.clazz.typeName,
-          factoryMethod.isStatic,
-          factoryMethod.name,
-          callProviders(factoryMethod))
-    }
+        factoryMethod: BasicFactoryMethod,
+    ): FactoryProviderInstantiation.Basic =
+        FactoryProviderInstantiation.Basic(
+            OBJECTS_FIELD_NAME,
+            factoryMethod.objects.clazz.typeName,
+            factoryMethod.isStatic,
+            factoryMethod.name,
+            callProviders(factoryMethod),
+        )
 
     private fun constructorInstantiation(
-        factoryMethod: ConstructorFactoryMethod
-    ): FactoryProviderInstantiation.Constructor {
-      return FactoryProviderInstantiation.Constructor(
-          factoryMethod.returnType.type.type.typeName, callProviders(factoryMethod))
-    }
+        factoryMethod: ConstructorFactoryMethod,
+    ): FactoryProviderInstantiation.Constructor =
+        FactoryProviderInstantiation.Constructor(
+            factoryMethod.returnType.type.type.typeName,
+            callProviders(factoryMethod),
+        )
 
     private fun bindsInstantiation(
-        factoryMethod: BindsFactoryMethod
-    ): FactoryProviderInstantiation.Binds {
-      return FactoryProviderInstantiation.Binds(
-          getProviderMethodName(factoryMethod.parameters.single().type))
-    }
+        factoryMethod: BindsFactoryMethod,
+    ): FactoryProviderInstantiation.Binds =
+        FactoryProviderInstantiation.Binds(
+            getProviderMethodName(factoryMethod.parameters.single().type),
+        )
 
     private fun callProviders(factoryMethod: FactoryMethod): CallProviders {
       val names =
@@ -256,29 +268,30 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       return CallProviders(names)
     }
 
-    private fun dependencyProviderMethods(): List<DependencyProviderMethod> {
-      return getDependencyMethodData(scope).map { methodData ->
-        DependencyProviderMethod(
-            getProviderMethodName(methodData.returnType),
-            methodData.returnTypeName,
-            DEPENDENCIES_FIELD_NAME,
-            methodData.name,
-            env)
-      }
-    }
+    private fun dependencyProviderMethods(): List<DependencyProviderMethod> =
+        getDependencyMethodData(scope).map { methodData ->
+          DependencyProviderMethod(
+              getProviderMethodName(methodData.returnType),
+              methodData.returnTypeName,
+              DEPENDENCIES_FIELD_NAME,
+              methodData.name,
+              env,
+          )
+        }
 
     private fun objectsImpl(): ObjectsImpl? {
       val objects = scope.objects ?: return null
       val objectsClassName = scope.objectsClassName ?: return null
       val abstractMethods =
-          objects.factoryMethods.filter { it.method.isAbstract() }.map {
-            ObjectsAbstractMethod(env, it.method as CompilerMethod)
-          }
+          objects.factoryMethods
+              .filter { it.method.isAbstract() }
+              .map { ObjectsAbstractMethod(env, it.method as CompilerMethod) }
       return ObjectsImpl(
           scope.objectsImplClassName,
           objectsClassName,
           objects.clazz.kind == IrClass.Kind.INTERFACE,
-          abstractMethods)
+          abstractMethods,
+      )
     }
 
     private fun dependencies(): Dependencies? {
@@ -297,7 +310,8 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
                 methodData.returnTypeName,
                 qualifier,
                 javaDoc(methodData),
-                isInternal)
+                isInternal,
+            )
           }
       return Dependencies(scope.dependenciesClassName, methods)
     }
@@ -313,8 +327,11 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
 
             val owner = removeGenerics(ownerType.qualifiedName)
             val methodName =
-                if (callerMethod.isConstructor) ownerType.simpleName.substringBefore('<')
-                else callerMethod.name
+                if (callerMethod.isConstructor) {
+                  ownerType.simpleName.substringBefore('<')
+                } else {
+                  callerMethod.name
+                }
             val paramList = callerMethod.parameters.map { removeGenerics(it.type.qualifiedName) }
 
             JavaDocMethodLink(owner, methodName, paramList)
@@ -322,9 +339,7 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       return DependencyMethodJavaDoc(requestedFrom)
     }
 
-    private fun removeGenerics(name: String): String {
-      return name.takeWhile { it != '<' }
-    }
+    private fun removeGenerics(name: String): String = name.takeWhile { it != '<' }
 
     private fun getProviderMethodName(type: Type): String {
       // val key = getTypeOrMappedType(type, providerMethodNames.keys)
@@ -354,12 +369,11 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
       val name: String,
       val returnTypeName: TypeName,
       val returnType: Type,
-      val sinks: List<Sink>
+      val sinks: List<Sink>,
   )
 
-  private fun getDependencyMethodData(scope: Scope): List<DependencyMethodData> {
-    return dependencyMethods.computeIfAbsent(scope) { createDependencyMethods(scope) }
-  }
+  private fun getDependencyMethodData(scope: Scope): List<DependencyMethodData> =
+      dependencyMethods.computeIfAbsent(scope) { createDependencyMethods(scope) }
 
   private fun createDependencyMethods(scope: Scope): List<DependencyMethodData> {
     val nameScope = NameScope()
@@ -416,8 +430,7 @@ private constructor(private val env: XProcessingEnv, private val graph: Resolved
     private const val OBJECTS_FIELD_NAME = "objects"
     private const val DEPENDENCIES_FIELD_NAME = "dependencies"
 
-    fun create(env: XProcessingEnv, graph: ResolvedGraph): List<ScopeImpl> {
-      return ScopeImplFactory(env, graph).create()
-    }
+    fun create(env: XProcessingEnv, graph: ResolvedGraph): List<ScopeImpl> =
+        ScopeImplFactory(env, graph).create()
   }
 }

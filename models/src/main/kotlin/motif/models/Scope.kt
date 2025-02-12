@@ -33,9 +33,7 @@ sealed class Scope(val clazz: IrClass) {
 
   companion object {
 
-    fun fromClasses(scopeClasses: List<IrClass>): List<Scope> {
-      return ScopeFactory(scopeClasses).create()
-    }
+    fun fromClasses(scopeClasses: List<IrClass>): List<Scope> = ScopeFactory(scopeClasses).create()
   }
 }
 

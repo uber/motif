@@ -30,7 +30,8 @@ object CodeGenerator {
       if (env.backend == XProcessingEnv.Backend.JAVAC && kaptKotlinGeneratedDir == null) {
         throw IllegalStateException(
             "-A$OPTION_MODE=${OutputMode.KOTLIN.name.lowercase()} " +
-                "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.")
+                "requires -A$OPTION_KAPT_KOTLIN_GENERATED to be set.",
+        )
       }
       generateKotlin(env, graph, kaptKotlinGeneratedDir)
     } else {
@@ -46,29 +47,27 @@ object CodeGenerator {
     }
   }
 
-  private fun generateJava(env: XProcessingEnv, graph: ResolvedGraph): List<String> {
-    return ScopeImplFactory.create(env, graph)
-        .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
-        .onEach { javaFile -> javaFile.writeTo(env.filer) }
-        .map { "${it.packageName}.${it.typeSpec.name}" }
-  }
+  private fun generateJava(env: XProcessingEnv, graph: ResolvedGraph): List<String> =
+      ScopeImplFactory.create(env, graph)
+          .map { scopeImpl -> JavaCodeGenerator.generate(scopeImpl) }
+          .onEach { javaFile -> javaFile.writeTo(env.filer) }
+          .map { "${it.packageName}.${it.typeSpec.name}" }
 
   private fun generateKotlin(
       env: XProcessingEnv,
       graph: ResolvedGraph,
-      kaptKotlinGeneratedDir: String? = null
-  ): List<String> {
-    return ScopeImplFactory.create(env, graph)
-        .map { scopeImpl -> KotlinCodeGenerator.generate(scopeImpl) }
-        .onEach { fileSpec ->
-          if (kaptKotlinGeneratedDir != null) {
-            fileSpec.writeTo(File(kaptKotlinGeneratedDir))
-          } else {
-            fileSpec.writeTo(env.filer)
+      kaptKotlinGeneratedDir: String? = null,
+  ): List<String> =
+      ScopeImplFactory.create(env, graph)
+          .map { scopeImpl -> KotlinCodeGenerator.generate(scopeImpl) }
+          .onEach { fileSpec ->
+            if (kaptKotlinGeneratedDir != null) {
+              fileSpec.writeTo(File(kaptKotlinGeneratedDir))
+            } else {
+              fileSpec.writeTo(env.filer)
+            }
           }
-        }
-        .map { "${it.packageName}.${it.name}" }
-  }
+          .map { "${it.packageName}.${it.name}" }
 }
 
 enum class OutputMode {

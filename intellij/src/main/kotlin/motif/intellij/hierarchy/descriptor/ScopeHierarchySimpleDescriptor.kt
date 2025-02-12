@@ -32,7 +32,7 @@ class ScopeHierarchySimpleDescriptor(
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
     element: PsiElement,
-    private val label: String
+    private val label: String,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
   override fun updateText(text: CompositeAppearance) {
@@ -40,11 +40,7 @@ class ScopeHierarchySimpleDescriptor(
     text.ending.addText(label, textAttr)
   }
 
-  override fun getIcon(element: PsiElement): Icon? {
-    return null
-  }
+  override fun getIcon(element: PsiElement): Icon? = null
 
-  override fun toString(): String {
-    return label
-  }
+  override fun toString(): String = label
 }

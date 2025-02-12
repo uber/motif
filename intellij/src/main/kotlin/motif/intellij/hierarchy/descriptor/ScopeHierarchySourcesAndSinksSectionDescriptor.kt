@@ -30,16 +30,16 @@ open class ScopeHierarchySourcesAndSinksSectionDescriptor(
     graph: ResolvedGraph,
     parentDescriptor: HierarchyNodeDescriptor?,
     element: PsiElement,
-    val scope: Scope
+    val scope: Scope,
 ) : ScopeHierarchyNodeDescriptor(project, graph, parentDescriptor, element, false) {
 
   override fun updateText(text: CompositeAppearance) {
     text.ending.addText(scope.simpleName, TextAttributes(myColor, null, null, null, BOLD))
     text.ending.addText(
-        " (" + formatQualifiedName(scope.qualifiedName) + ")", getPackageNameAttributes())
+        " (" + formatQualifiedName(scope.qualifiedName) + ")",
+        getPackageNameAttributes(),
+    )
   }
 
-  override fun toString(): String {
-    return scope.simpleName
-  }
+  override fun toString(): String = scope.simpleName
 }

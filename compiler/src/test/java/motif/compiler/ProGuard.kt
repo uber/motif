@@ -32,20 +32,20 @@ object ProGuard {
 
   private val classPathFiles: List<File> by lazy {
     listOf(
-        Scope::class,
-        Truth::class,
-        Inject::class,
-        Nullable::class,
-        Component::class,
-        Unit::class,
-        NotNull::class)
+            Scope::class,
+            Truth::class,
+            Inject::class,
+            Nullable::class,
+            Component::class,
+            Unit::class,
+            NotNull::class,
+        )
         .map { libraryPath(it) }
   }
 
   @JvmStatic
-  fun run(externalClassesDirs: List<File>, classesDir: File, proguardFile: File): File {
-    return run(externalClassesDirs, listOf(classesDir), proguardFile)
-  }
+  fun run(externalClassesDirs: List<File>, classesDir: File, proguardFile: File): File =
+      run(externalClassesDirs, listOf(classesDir), proguardFile)
 
   @JvmStatic
   fun run(externalClassesDirs: List<File>, classesDirs: List<File>, proguardFile: File): File {
@@ -76,7 +76,6 @@ object ProGuard {
     return outputJar
   }
 
-  private fun libraryPath(clazz: KClass<*>): File {
-    return File(clazz.java.protectionDomain.codeSource.location.toURI())
-  }
+  private fun libraryPath(clazz: KClass<*>): File =
+      File(clazz.java.protectionDomain.codeSource.location.toURI())
 }

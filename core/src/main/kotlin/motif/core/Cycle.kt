@@ -25,15 +25,14 @@ class Cycle<T>(val path: List<T>) {
 
   companion object {
 
-    fun <T> find(items: Iterable<T>, getChildren: (T) -> Iterable<T>): Cycle<T>? {
-      return CycleFinder(items, getChildren).find()
-    }
+    fun <T> find(items: Iterable<T>, getChildren: (T) -> Iterable<T>): Cycle<T>? =
+        CycleFinder(items, getChildren).find()
   }
 }
 
 private class CycleFinder<T>(
     private val items: Iterable<T>,
-    private val getChildren: (T) -> Iterable<T>
+    private val getChildren: (T) -> Iterable<T>,
 ) {
 
   fun find(): Cycle<T>? {

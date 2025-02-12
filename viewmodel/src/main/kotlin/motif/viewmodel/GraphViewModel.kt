@@ -25,9 +25,7 @@ class GraphViewModel(val rootScopes: List<ScopeViewModel>) {
 
   companion object {
 
-    fun create(graph: ResolvedGraph): GraphViewModel {
-      return GraphViewModelFactory(graph).create()
-    }
+    fun create(graph: ResolvedGraph): GraphViewModel = GraphViewModelFactory(graph).create()
   }
 }
 
@@ -40,16 +38,15 @@ private class GraphViewModelFactory(private val graph: ResolvedGraph) {
     return GraphViewModel(rootScopes)
   }
 
-  private fun getScopeViewModel(scope: Scope): ScopeViewModel {
-    return scopeViewModels[scope]
-        ?: createScopeViewModel(scope).apply { scopeViewModels[scope] = this }
-  }
+  private fun getScopeViewModel(scope: Scope): ScopeViewModel =
+      scopeViewModels[scope] ?: createScopeViewModel(scope).apply { scopeViewModels[scope] = this }
 
   private fun createScopeViewModel(scope: Scope): ScopeViewModel {
     val children =
-        graph.getChildEdges(scope).map { edge -> getScopeViewModel(edge.child) }.sortedBy {
-          it.scope.qualifiedName
-        }
+        graph
+            .getChildEdges(scope)
+            .map { edge -> getScopeViewModel(edge.child) }
+            .sortedBy { it.scope.qualifiedName }
     val providedDependencies =
         graph
             .getSources(scope)
@@ -83,7 +80,8 @@ private class GraphViewModelFactory(private val graph: ResolvedGraph) {
             sources = graph.getProviders(sink)
             if (prevSources != null && sources != prevSources) {
               throw IllegalStateException(
-                  "Inconsistent sources for sinks of the same type: $scope, $type")
+                  "Inconsistent sources for sinks of the same type: $scope, $type",
+              )
             }
           }
 
