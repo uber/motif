@@ -22,7 +22,7 @@ import motif.sample.app.photo_list.PhotoListScope;
 import motif.sample.lib.bottom_header.BottomHeaderScope;
 import motif.sample.lib.controller.ControllerObjects;
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 public interface BottomSheetScope {
 
   BottomSheetView view();

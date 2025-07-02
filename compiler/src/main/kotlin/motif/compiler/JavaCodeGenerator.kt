@@ -46,13 +46,13 @@ object JavaCodeGenerator {
             addSuperinterface(superClassName.j)
             objectsField?.let { addField(it.spec()) }
             addField(dependenciesField.spec())
-            cacheFields.forEach { addField(it.spec()) }
+            cacheFields.forEach { addField(it.spec(useNullFieldInitialization)) }
             addMethod(constructor.spec())
             alternateConstructor?.let { addMethod(it.spec()) }
             accessMethodImpls.forEach { addMethod(it.spec()) }
             childMethodImpls.forEach { addMethod(it.spec()) }
             addMethod(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addMethods(it.specs()) }
+            factoryProviderMethods.forEach { addMethods(it.specs(useNullFieldInitialization)) }
             dependencyProviderMethods.forEach { addMethod(it.spec()) }
             dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
@@ -80,10 +80,14 @@ object JavaCodeGenerator {
   private fun DependenciesField.spec(): FieldSpec =
       FieldSpec.builder(dependenciesClassName.j, name, Modifier.PRIVATE, Modifier.FINAL).build()
 
-  private fun CacheField.spec(): FieldSpec =
-      FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE)
-          .initializer("\$T.NONE", None::class.java)
-          .build()
+  private fun CacheField.spec(useNullFieldInitialization: Boolean): FieldSpec =
+      if (useNullFieldInitialization) {
+        FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE).build()
+      } else {
+        FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE)
+            .initializer("\$T.NONE", None::class.java)
+            .build()
+      }
 
   private fun Constructor.spec(): MethodSpec =
       MethodSpec.constructorBuilder()
@@ -164,30 +168,59 @@ object JavaCodeGenerator {
   private fun ScopeProviderMethod.spec(): MethodSpec =
       MethodSpec.methodBuilder(name).returns(scopeClassName.j).addStatement("return this").build()
 
-  private fun FactoryProviderMethod.specs(): List<MethodSpec> {
+  private fun FactoryProviderMethod.specs(useNullFieldInitialization: Boolean): List<MethodSpec> {
     val primarySpec =
-        MethodSpec.methodBuilder(name).returns(returnTypeName.j).addStatement(body.spec()).build()
+        MethodSpec.methodBuilder(name)
+            .returns(returnTypeName.j)
+            .addStatement(body.spec(useNullFieldInitialization))
+            .build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs
   }
 
-  private fun FactoryProviderMethodBody.spec(): CodeBlock =
+  private fun FactoryProviderMethodBody.spec(useNullFieldInitialization: Boolean): CodeBlock =
       when (this) {
-        is FactoryProviderMethodBody.Cached -> spec()
+        is FactoryProviderMethodBody.Cached -> spec(useNullFieldInitialization)
         is FactoryProviderMethodBody.Uncached -> spec()
       }
 
-  private fun FactoryProviderMethodBody.Cached.spec(): CodeBlock =
-      CodeBlock.builder()
-          .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
+  private fun FactoryProviderMethodBody.Cached.spec(
+      useNullFieldInitialization: Boolean,
+  ): CodeBlock {
+    if (useNullFieldInitialization) {
+      val localFieldName = "_$cacheFieldName"
+      return CodeBlock.builder()
+          // Using a local variable reduces atomic read overhead
+          .add("Object $localFieldName = \$N;\n", cacheFieldName)
+          .beginControlFlow("if (\$N == null)", localFieldName)
           .beginControlFlow("synchronized (this)")
-          .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
-          .add("\$N = \$L;", cacheFieldName, instantiation.spec())
+          .beginControlFlow("if (\$N == null)", cacheFieldName)
+          .add("\$N = \$L;\n", localFieldName, instantiation.spec())
+          .beginControlFlow("if (\$N == null)", localFieldName)
+          .add(
+              "throw new \$T(\$S);\n",
+              NullPointerException::class.java,
+              "Factory method cannot return null",
+          )
+          .endControlFlow()
+          .add("\$N = \$L;\n", cacheFieldName, localFieldName)
           .endControlFlow()
           .endControlFlow()
           .endControlFlow()
-          .add("return (\$T) \$N", returnTypeName.j, cacheFieldName)
+          .add("return (\$T) \$N", returnTypeName.j, localFieldName)
           .build()
+    }
+    return CodeBlock.builder()
+        .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
+        .beginControlFlow("synchronized (this)")
+        .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
+        .add("\$N = \$L;", cacheFieldName, instantiation.spec())
+        .endControlFlow()
+        .endControlFlow()
+        .endControlFlow()
+        .add("return (\$T) \$N", returnTypeName.j, cacheFieldName)
+        .build()
+  }
 
   private fun FactoryProviderMethodBody.Uncached.spec(): CodeBlock =
       CodeBlock.of("return \$L", instantiation.spec())

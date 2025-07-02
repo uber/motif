@@ -37,6 +37,9 @@ class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrA
 
   override val type: IrType = CompilerType(env, mirror.type)
 
+  override val annotationValueMap: Map<String, Any?>
+    get() = mirror.annotationValues.associate { it.name to it.value }
+
   override val members: List<IrMethod> by lazy {
     val annotationMethods = mirror.type.typeElement?.getDeclaredMethods().orEmpty()
     mirror.annotationValues.map { annotationValue ->

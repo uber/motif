@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.KT008_use_null_field_init_kotlin;
 
-public @interface Scope {
-  /**
-   * @return on false, the field will be initialized with [None.NONE]. Otherwise, null &
-   *     [Initialized.INITIALIZED] will be used to skip the field initialization.
-   */
-  boolean useNullFieldInitialization() default false;
+import static com.google.common.truth.Truth.assertThat;
+
+public class Test {
+
+    public static void run() {
+        Scope scope = new ScopeImpl();
+        assertThat(scope.fooString()).isEqualTo("fooString");
+        assertThat(scope.fooInt()).isEqualTo(3);
+        assertThat(scope.fooObject()).isNotNull();
+        assertThat(scope.fooObject()).isEqualTo(scope.fooObject());
+    }
 }

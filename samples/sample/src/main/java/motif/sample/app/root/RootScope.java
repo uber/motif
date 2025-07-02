@@ -27,7 +27,7 @@ import motif.sample.lib.controller.ControllerObjects;
 import motif.sample.lib.db.Database;
 import motif.sample.lib.multiselect.MultiSelector;
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 public interface RootScope {
 
   RootView view();

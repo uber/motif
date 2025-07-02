@@ -25,6 +25,7 @@ import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiSubstitutor
+import java.util.Collections
 import kotlin.jvm.java
 import kotlin.jvm.javaClass
 import kotlin.reflect.KClass
@@ -61,6 +62,9 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
 
   override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean =
       psiAnnotation.qualifiedName == annotationClass.java.name
+
+  override val annotationValueMap: Map<String, Any?>
+    get() = Collections.emptyMap()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
