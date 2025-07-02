@@ -16,13 +16,16 @@
 package motif.sample.app.bottom_sheet;
 
 import android.view.ViewGroup;
+
+import javax.inject.Named;
+
 import motif.Scope;
 import motif.sample.app.photo_grid.PhotoGridScope;
 import motif.sample.app.photo_list.PhotoListScope;
 import motif.sample.lib.bottom_header.BottomHeaderScope;
 import motif.sample.lib.controller.ControllerObjects;
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 public interface BottomSheetScope {
 
   BottomSheetView view();
@@ -33,6 +36,15 @@ public interface BottomSheetScope {
 
   PhotoGridScope photoGrid(ViewGroup parent);
 
+  @Named("photoGridEnable")
+  boolean photoGridEnable();
+
   @motif.Objects
-  abstract class Objects extends ControllerObjects<BottomSheetController, BottomSheetView> {}
+  abstract class Objects extends ControllerObjects<BottomSheetController, BottomSheetView> {
+
+    @Named("photoGridEnable")
+    public boolean photoGridEnable() {
+      return false;
+    }
+  }
 }

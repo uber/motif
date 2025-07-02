@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Uber Technologies, Inc.
+ * Copyright (c) 2022 Uber Technologies, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import javax.inject.Named
 import motif.Creatable
 import motif.Scope
 
-@Scope(useNullFieldInitialization = false)
-interface MainScope : Creatable<MainScope.Dependencies> {
+@Scope(useNullFieldInitialization = true)
+interface MainKotlinScope : Creatable<MainKotlinScope.Dependencies> {
 
   fun greeter(): Greeter
 

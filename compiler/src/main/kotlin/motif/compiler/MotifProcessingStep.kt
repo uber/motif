@@ -47,13 +47,26 @@ class MotifProcessingStep(
   ): Set<XElement> {
     messageWatcher?.let { env.messager.addMessageWatcher(messageWatcher) }
 
-    val scopeElements =
+    val scopeElements: List<XTypeElement> =
         elementsByAnnotation[Scope::class.qualifiedName]
             ?.filterIsInstance<XTypeElement>()
             ?.mapNotNull { it }
             ?.toList()
             .orEmpty()
-    val initialScopeClasses = scopeElements.map { CompilerClass(env, it.type) }
+//      if(scopeElements.isNotEmpty()) {
+//          throw RuntimeException(toReadableString(scopeElements[0]))
+//      }
+//      it.getAnnotation(Scope::class)!!.value.useNullFieldInitialization
+//      it.getAnnotation(Scope::class)!!.value.useNullFieldInitialization
+//      getAllAnnotations().map { CompilerAnnotation(env, it) }
+    val initialScopeClasses = scopeElements.map { scopeElement ->
+//        val annotations = scopeElement.getAllAnnotations()
+//            .map { annotation -> CompilerAnnotation(env, annotation) }
+        val compilerClass = CompilerClass(env, scopeElement.type)
+//        if(true)
+//            throw RuntimeException(compilerClass.annotations.joinToString { it.annotationValueMap.toString() })
+        compilerClass
+    }
     if (initialScopeClasses.isEmpty()) {
       return emptySet()
     } else {
@@ -88,7 +101,7 @@ class MotifProcessingStep(
           if (env.backend == XProcessingEnv.Backend.KSP) OutputMode.KOTLIN else null
         }
 
-    createdScopeNames += CodeGenerator.generate(env, graph, mode)
+    createdScopeNames += CodeGenerator.generate(env, graph, mode) // generate code
     if (createdScopeNames.size < initialScopeNames.size) {
       val missingScopeNames = HashSet(initialScopeNames).apply { removeAll(createdScopeNames) }
       env.messager.printMessage(
@@ -106,4 +119,65 @@ class MotifProcessingStep(
 
     return emptySet()
   }
+
+    fun toReadableString(element: XTypeElement): String = buildString {
+        appendLine("  annotations:")
+         element.getAnnotation(Scope::class)?.let {
+            appendLine("    @motif.Scope ${it.value.useNullFieldInitialization}")
+         }
+        for (annotation in element.getAllAnnotations()) {
+            appendLine("    @${annotation.qualifiedName}")
+        }
+
+        appendLine("  declared fields:")
+        for (field in element.getDeclaredFields()) {
+            appendLine("    ${field.name}: ${field.type}")
+        }
+
+        appendLine("  all fields including private supers:")
+        for (field in element.getAllFieldsIncludingPrivateSupers()) {
+            appendLine("    ${field.name}: ${field.type}")
+        }
+
+        appendLine("  declared methods:")
+        for (method in element.getDeclaredMethods()) {
+            val params = method.parameters.joinToString(", ") { "${it.name}: ${it.type}" }
+            appendLine("    ${method.name}($params): ${method.returnType}")
+        }
+
+        appendLine("  all methods:")
+        for (method in element.getAllMethods()) {
+            val params = method.parameters.joinToString(", ") { "${it.name}: ${it.type}" }
+            appendLine("    ${method.name}($params): ${method.returnType}")
+        }
+
+        appendLine("  constructors:")
+        for (ctor in element.getConstructors()) {
+            val params = ctor.parameters.joinToString(", ") { "${it.name}: ${it.type}" }
+            appendLine("    ${ctor.name}($params)")
+        }
+
+        val primaryCtor = element.findPrimaryConstructor()
+        if (primaryCtor != null) {
+            val params = primaryCtor.parameters.joinToString(", ") { "${it.name}: ${it.type}" }
+            appendLine("  primary constructor: ${primaryCtor.name}($params)")
+        }
+
+        appendLine("  enclosed type elements:")
+        for (inner in element.getEnclosedTypeElements()) {
+            appendLine("    ${inner.qualifiedName}")
+        }
+
+        appendLine("  super interface elements:")
+        for (iface in element.getSuperInterfaceElements()) {
+            appendLine("    ${iface.qualifiedName}")
+        }
+
+        appendLine("  enclosed elements:")
+        for (el in element.getEnclosedElements()) {
+            appendLine("    ${el.fallbackLocationText}")
+        }
+    }
+
+
 }

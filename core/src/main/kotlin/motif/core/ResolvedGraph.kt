@@ -61,6 +61,15 @@ interface ResolvedGraph {
   companion object {
 
     fun create(initialScopeClasses: List<IrClass>): ResolvedGraph {
+//      if(true) {
+//        throw RuntimeException(
+//          initialScopeClasses.joinToString {
+//            it.annotations.joinToString { annotation ->
+//              "Rubin ${annotation.className}"
+//            } + "[] ${it.simpleName} () (${it.qualifiedName})"
+//          }
+//        )
+//      }
       val scopes = Scope.fromClasses(initialScopeClasses)
       val scopeGraph = ScopeGraph.create(scopes)
       scopeGraph.scopeCycleError?.let {

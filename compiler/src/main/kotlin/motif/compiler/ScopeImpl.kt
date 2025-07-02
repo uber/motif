@@ -35,6 +35,7 @@ import motif.ast.compiler.CompilerMethod
  * implementations.
  */
 class ScopeImpl(
+    val useNullFieldInitialization: Boolean,
     val className: ClassName,
     val superClassName: ClassName,
     val internalScope: Boolean,
@@ -261,7 +262,11 @@ sealed class FactoryProviderMethodBody {
       val returnTypeName: TypeName,
       val instantiation: FactoryProviderInstantiation,
       val env: XProcessingEnv,
-  ) : FactoryProviderMethodBody()
+  ) : FactoryProviderMethodBody() {
+      internal fun privateCacheFieldName() : String{
+          return "_${cacheFieldName}"
+      }
+  }
 
   /**
    * ```

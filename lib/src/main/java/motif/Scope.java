@@ -15,4 +15,10 @@
  */
 package motif;
 
-public @interface Scope {}
+public @interface Scope {
+    /**
+     *
+     * @return on false, the field will be initialized with [None.NONE]. Otherwise, null & [Initialized.INITIALIZED] will be used to skip the field initialization.
+     */
+    boolean useNullFieldInitialization() default false;
+}

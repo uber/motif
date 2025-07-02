@@ -67,7 +67,9 @@ private constructor(
 
     fun create(): ScopeImpl {
       val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
-      return ScopeImpl(
+        return ScopeImpl(
+            (scope.clazz.annotations.find {
+                it.className == motif.Scope::class.java.name }!!.annotationValueMap["useNullFieldInitialization"] as? Boolean) ?: false,
           scope.implClassName,
           scope.typeName,
           isInternal,

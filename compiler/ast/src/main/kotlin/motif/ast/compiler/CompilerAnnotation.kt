@@ -28,7 +28,40 @@ import motif.ast.IrType
 @OptIn(ExperimentalProcessingApi::class)
 class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrAnnotation {
 
-  override val className: String by lazy {
+    init {
+//        if(mirror.name == "Scope") {
+//        if(true) {
+//            throw RuntimeException(dumpXAnnotation(mirror))
+//        }
+    }
+
+    fun dumpXAnnotation(annotation: XAnnotation): String = buildString {
+        appendLine("XAnnotation:")
+        appendLine("  name: ${annotation.name}")
+        appendLine("  qualifiedName: ${annotation.qualifiedName}")
+        appendLine("  className: ${annotation.className}")
+        appendLine("  type: ${annotation.type}")
+        appendLine("  typeElement: ${annotation.typeElement.qualifiedName}")
+        appendLine()
+
+        appendLine("  declaredAnnotationValues:")
+        for (value in annotation.declaredAnnotationValues) {
+            appendLine("    ${value.name} = ${value.value}")
+        }
+
+        appendLine("  annotationValues:")
+        for (value in annotation.annotationValues) {
+            appendLine("    ${value.name} = ${value.value}")
+        }
+
+        appendLine("  defaultValues:")
+        for (value in annotation.defaultValues) {
+            appendLine("    ${value.name} = ${value.value}")
+        }
+    }
+
+
+    override val className: String by lazy {
     mirror.type.typeElement?.qualifiedName
         ?: throw IllegalStateException("Compiler annotation has no qualified class name")
   }
@@ -37,7 +70,10 @@ class CompilerAnnotation(val env: XProcessingEnv, val mirror: XAnnotation) : IrA
 
   override val type: IrType = CompilerType(env, mirror.type)
 
-  override val members: List<IrMethod> by lazy {
+    override val annotationValueMap: Map<String, Any?>
+        get() = mirror.annotationValues.associate { it.name to it.value }
+
+    override val members: List<IrMethod> by lazy {
     val annotationMethods = mirror.type.typeElement?.getDeclaredMethods().orEmpty()
     mirror.annotationValues.map { annotationValue ->
       val executableElement =

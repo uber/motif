@@ -27,6 +27,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
 import com.squareup.kotlinpoet.javapoet.toKClassName
 import motif.internal.None
@@ -35,6 +36,9 @@ import motif.internal.None
 object KotlinCodeGenerator {
 
   fun generate(scopeImpl: ScopeImpl): FileSpec {
+//      if(true) {
+//          throw RuntimeException(scopeImpl.scopeImplAnnotation.scopeClassName .toString())
+//      }
     val typeSpec: TypeSpec = scopeImpl.spec()
     return FileSpec.get(scopeImpl.className.kt.packageName, typeSpec)
   }
@@ -48,7 +52,7 @@ object KotlinCodeGenerator {
             addSuperinterface(superClassName.kt)
             objectsField?.let { addProperty(it.spec()) }
             addProperty(dependenciesField.spec())
-            cacheFields.forEach { addProperty(it.spec()) }
+            cacheFields.forEach { addProperty(it.spec(useNullFieldInitialization)) }
             primaryConstructor(constructor.spec())
             alternateConstructor?.let { addFunction(it.spec()) }
             accessMethodImpls
@@ -59,7 +63,7 @@ object KotlinCodeGenerator {
                 .forEach { addProperty(it.propSpec()) }
             childMethodImpls.forEach { addFunction(it.spec()) }
             addFunction(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addFunctions(it.specs()) }
+            factoryProviderMethods.forEach { addFunctions(it.specs(useNullFieldInitialization)) }
             dependencyProviderMethods.forEach { addFunction(it.spec()) }
             dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
@@ -96,12 +100,21 @@ object KotlinCodeGenerator {
           .initializer(name)
           .build()
 
-  private fun CacheField.spec(): PropertySpec =
-      PropertySpec.builder(name, Any::class, KModifier.PRIVATE)
-          .mutable(true)
-          .addAnnotation(Volatile::class)
-          .initializer("%T.NONE", None::class)
-          .build()
+  private fun CacheField.spec(useNullFieldInitialization: Boolean): PropertySpec {
+      return if(useNullFieldInitialization) {
+          PropertySpec.builder(name, Any::class.asTypeName().copy(true), KModifier.PRIVATE)
+              .mutable(true)
+              .addAnnotation(Volatile::class)
+              .initializer("null")
+              .build()
+      } else {
+          PropertySpec.builder(name, Any::class, KModifier.PRIVATE)
+              .mutable(true)
+              .addAnnotation(Volatile::class)
+              .initializer("%T.NONE", None::class)
+              .build()
+      }
+  }
 
   private fun Constructor.spec(): FunSpec =
       FunSpec.constructorBuilder()
@@ -194,25 +207,41 @@ object KotlinCodeGenerator {
           .addStatement("return this")
           .build()
 
-  private fun FactoryProviderMethod.specs(): List<FunSpec> {
+  private fun FactoryProviderMethod.specs(useNullFieldInitialization : Boolean): List<FunSpec> {
     val primarySpec =
         FunSpec.builder(name)
             .addModifiers(KModifier.INTERNAL)
             .returns(returnTypeName.reloadedForTypeArgs(env))
-            .addCode(body.spec())
+            .addCode(body.spec(useNullFieldInitialization))
             .build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs
   }
 
-  private fun FactoryProviderMethodBody.spec(): CodeBlock =
+  private fun FactoryProviderMethodBody.spec(useNullFieldInitialization : Boolean): CodeBlock =
       when (this) {
-        is FactoryProviderMethodBody.Cached -> spec()
+        is FactoryProviderMethodBody.Cached -> spec(useNullFieldInitialization)
         is FactoryProviderMethodBody.Uncached -> spec()
       }
 
-  private fun FactoryProviderMethodBody.Cached.spec(): CodeBlock =
-      CodeBlock.builder()
+  private fun FactoryProviderMethodBody.Cached.spec(useNullFieldInitialization : Boolean): CodeBlock {
+      if(useNullFieldInitialization) {
+          val localFieldName = "_$cacheFieldName"
+          val codeBlockBuilder = CodeBlock.builder()
+              .addStatement("var $localFieldName = %N;\n", cacheFieldName)
+              .beginControlFlow("if (%N == null)", localFieldName)
+              .beginControlFlow("synchronized (this)")
+              .beginControlFlow("if (%N == null)", cacheFieldName)
+              .addStatement("%N = %L", localFieldName, instantiation.spec())
+              .addStatement("%N = %N", cacheFieldName, localFieldName)
+              .endControlFlow()
+              .endControlFlow()
+              .endControlFlow()
+          return codeBlockBuilder
+              .add("return ( %N as %T )", localFieldName, returnTypeName.reloadedForTypeArgs(env))
+              .build()
+      }
+      return CodeBlock.builder()
           .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
           .beginControlFlow("synchronized (this)")
           .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
@@ -222,6 +251,7 @@ object KotlinCodeGenerator {
           .endControlFlow()
           .add("return ( %N as %T )", cacheFieldName, returnTypeName.reloadedForTypeArgs(env))
           .build()
+  }
 
   private fun motif.compiler.TypeName.reloadedForTypeArgs(env: XProcessingEnv): TypeName =
       if (kt is ParameterizedTypeName) {

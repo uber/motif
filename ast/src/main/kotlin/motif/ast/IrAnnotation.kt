@@ -25,5 +25,7 @@ interface IrAnnotation : IrEquivalence {
 
   val members: List<IrMethod>
 
+  val annotationValueMap: Map<String, Any?>
+
   fun matchesClass(annotationClass: KClass<out Annotation>): Boolean
 }

@@ -66,7 +66,10 @@ abstract class BaseTest {
       scopeClasses =
           roundEnv
               .getElementsAnnotatedWith(motif.Scope::class.java)
-              .map { CompilerClass(env, (it.asType() as DeclaredType).toXProcessing(env)) }
+              .map { CompilerClass(
+                  env,
+                  (it.asType() as DeclaredType).toXProcessing(env)
+              ) }
               .toSet()
       return true
     }

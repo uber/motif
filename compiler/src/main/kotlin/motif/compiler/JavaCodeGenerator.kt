@@ -27,6 +27,7 @@ import com.squareup.javapoet.TypeSpec
 import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
 import com.uber.xprocessing.ext.isKotlinSource
 import com.uber.xprocessing.ext.withRawTypeFix
+import motif.internal.Initialized
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import motif.internal.None
@@ -38,26 +39,27 @@ object JavaCodeGenerator {
     return JavaFile.builder(scopeImpl.className.j.packageName(), typeSpec).build()
   }
 
-  private fun ScopeImpl.spec(): TypeSpec =
-      TypeSpec.classBuilder(className.j)
+  private fun ScopeImpl.spec(): TypeSpec {
+      return TypeSpec.classBuilder(className.j)
           .apply {
-            addAnnotation(scopeImplAnnotation.spec())
-            addModifiers(Modifier.PUBLIC)
-            addSuperinterface(superClassName.j)
-            objectsField?.let { addField(it.spec()) }
-            addField(dependenciesField.spec())
-            cacheFields.forEach { addField(it.spec()) }
-            addMethod(constructor.spec())
-            alternateConstructor?.let { addMethod(it.spec()) }
-            accessMethodImpls.forEach { addMethod(it.spec()) }
-            childMethodImpls.forEach { addMethod(it.spec()) }
-            addMethod(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addMethods(it.specs()) }
-            dependencyProviderMethods.forEach { addMethod(it.spec()) }
-            dependencies?.let { addType(it.spec()) }
-            objectsImpl?.let { addType(it.spec()) }
+              addAnnotation(scopeImplAnnotation.spec())
+              addModifiers(Modifier.PUBLIC)
+              addSuperinterface(superClassName.j)
+              objectsField?.let { addField(it.spec()) }
+              addField(dependenciesField.spec())
+              cacheFields.forEach { addField(it.spec(useNullFieldInitialization)) }
+              addMethod(constructor.spec())
+              alternateConstructor?.let { addMethod(it.spec()) }
+              accessMethodImpls.forEach { addMethod(it.spec()) }
+              childMethodImpls.forEach { addMethod(it.spec()) }
+              addMethod(scopeProviderMethod.spec())
+              factoryProviderMethods.forEach { addMethods(it.specs(useNullFieldInitialization)) }
+              dependencyProviderMethods.forEach { addMethod(it.spec()) }
+              dependencies?.let { addType(it.spec()) }
+              objectsImpl?.let { addType(it.spec()) }
           }
           .build()
+  }
 
   private fun ScopeImplAnnotation.spec(): AnnotationSpec =
       AnnotationSpec.builder(motif.ScopeImpl::class.java)
@@ -80,10 +82,17 @@ object JavaCodeGenerator {
   private fun DependenciesField.spec(): FieldSpec =
       FieldSpec.builder(dependenciesClassName.j, name, Modifier.PRIVATE, Modifier.FINAL).build()
 
-  private fun CacheField.spec(): FieldSpec =
-      FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE)
-          .initializer("\$T.NONE", None::class.java)
-          .build()
+  private fun CacheField.spec(useNullFieldInitialization: Boolean): FieldSpec {
+      return if(useNullFieldInitialization) {
+          FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE)
+              .build()
+      } else {
+          FieldSpec.builder(Object::class.java, name, Modifier.PRIVATE, Modifier.VOLATILE)
+              .initializer("\$T.NONE", None::class.java)
+              .build()
+      }
+  }
+
 
   private fun Constructor.spec(): MethodSpec =
       MethodSpec.constructorBuilder()
@@ -164,21 +173,51 @@ object JavaCodeGenerator {
   private fun ScopeProviderMethod.spec(): MethodSpec =
       MethodSpec.methodBuilder(name).returns(scopeClassName.j).addStatement("return this").build()
 
-  private fun FactoryProviderMethod.specs(): List<MethodSpec> {
+  private fun FactoryProviderMethod.specs(useNullFieldInitialization : Boolean): List<MethodSpec> {
     val primarySpec =
-        MethodSpec.methodBuilder(name).returns(returnTypeName.j).addStatement(body.spec()).build()
+        MethodSpec.methodBuilder(name).returns(returnTypeName.j).addStatement(body.spec(useNullFieldInitialization)).build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs
   }
 
-  private fun FactoryProviderMethodBody.spec(): CodeBlock =
+  private fun FactoryProviderMethodBody.spec(useNullFieldInitialization: Boolean): CodeBlock =
       when (this) {
-        is FactoryProviderMethodBody.Cached -> spec()
+        is FactoryProviderMethodBody.Cached -> spec(useNullFieldInitialization)
         is FactoryProviderMethodBody.Uncached -> spec()
       }
 
-  private fun FactoryProviderMethodBody.Cached.spec(): CodeBlock =
-      CodeBlock.builder()
+  private fun FactoryProviderMethodBody.Cached.spec(useNullFieldInitialization : Boolean): CodeBlock {
+      if(useNullFieldInitialization) {
+          val localFieldName = "_$cacheFieldName"
+          val useInitialized = !returnTypeName.j.isPrimitive
+          val codeBlockBuilder = CodeBlock.builder()
+              .add("Object $localFieldName = \$N;\n", cacheFieldName)
+              .beginControlFlow("if (\$N == null)", localFieldName)
+              .beginControlFlow("synchronized (this)")
+              .beginControlFlow("if (\$N == null)", cacheFieldName)
+              .add("\$N = \$L;\n", localFieldName, instantiation.spec())
+          if(useInitialized)  {
+              codeBlockBuilder
+                  .beginControlFlow("if (\$N == null)", localFieldName)
+                  .add("\$N = \$T.INITIALIZED;\n", localFieldName, Initialized::class.java)
+                  .endControlFlow()
+          }
+          codeBlockBuilder
+              .add("\$N = \$L;\n", cacheFieldName, localFieldName)
+              .endControlFlow()
+              .endControlFlow()
+              .endControlFlow()
+          if(useInitialized)  {
+              codeBlockBuilder
+                  .beginControlFlow("if (\$N == \$T.INITIALIZED)", localFieldName, Initialized::class.java)
+                  .add("return null;\n")
+                  .endControlFlow()
+          }
+          return codeBlockBuilder
+              .add("return (\$T) \$N", returnTypeName.j, localFieldName)
+              .build()
+      }
+      return CodeBlock.builder()
           .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
           .beginControlFlow("synchronized (this)")
           .beginControlFlow("if (\$N == \$T.NONE)", cacheFieldName, None::class.java)
@@ -188,6 +227,7 @@ object JavaCodeGenerator {
           .endControlFlow()
           .add("return (\$T) \$N", returnTypeName.j, cacheFieldName)
           .build()
+  }
 
   private fun FactoryProviderMethodBody.Uncached.spec(): CodeBlock =
       CodeBlock.of("return \$L", instantiation.spec())
@@ -295,4 +335,18 @@ object JavaCodeGenerator {
           )
           .addStatement("throw new \$T()", UnsupportedOperationException::class.java)
           .build()
+
+    fun isNonPrimitiveJavaType(type: com.squareup.javapoet.TypeName): Boolean {
+        return !type.isPrimitive &&
+                type != com.squareup.javapoet.TypeName.BOOLEAN &&
+                type != com.squareup.javapoet.TypeName.BYTE &&
+                type != com.squareup.javapoet.TypeName.CHAR &&
+                type != com.squareup.javapoet.TypeName.SHORT &&
+                type != com.squareup.javapoet.TypeName.INT &&
+                type != com.squareup.javapoet.TypeName.LONG &&
+                type != com.squareup.javapoet.TypeName.FLOAT &&
+                type != com.squareup.javapoet.TypeName.DOUBLE &&
+                type != com.squareup.javapoet.TypeName.BOOLEAN
+    }
+
 }

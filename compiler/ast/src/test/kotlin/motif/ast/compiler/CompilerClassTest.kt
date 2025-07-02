@@ -213,7 +213,10 @@ class XCompilerClassTest(
         env.findTypeElement(qualifiedName)
             ?: throw IllegalStateException("No type element found for: $qualifiedName")
     val declaredType = env.getDeclaredType(typeElement)
-    val compilerClass = CompilerClass(env, declaredType)
+    val compilerClass = CompilerClass(
+        env,
+        declaredType
+    )
     assertions.invoke(compilerClass)
     invocation.assertCompilationResult { this.hasErrorCount(0) }
     return compilerClass

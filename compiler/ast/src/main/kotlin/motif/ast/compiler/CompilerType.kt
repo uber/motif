@@ -46,7 +46,10 @@ class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
   override val isPrimitive: Boolean by lazy { mirror.isPrimitive() }
 
   override fun resolveClass(): IrClass? =
-      if (!mirror.isDeclaredType()) null else CompilerClass(env, mirror)
+      if (!mirror.isDeclaredType()) null else CompilerClass(
+        env,
+        mirror
+      )
 
   override fun isAssignableTo(type: IrType): Boolean {
     val baseMirror = (type as CompilerType).mirror

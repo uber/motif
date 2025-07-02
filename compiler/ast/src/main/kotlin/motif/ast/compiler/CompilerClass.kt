@@ -30,9 +30,13 @@ import motif.ast.IrField
 import motif.ast.IrMethod
 import motif.ast.IrModifier
 import motif.ast.IrType
+import java.util.Collections
 
 @OptIn(ExperimentalProcessingApi::class)
-class CompilerClass(override val env: XProcessingEnv, val declaredType: XType) : IrUtil, IrClass {
+class CompilerClass(
+  override val env: XProcessingEnv,
+  val declaredType: XType
+) : IrUtil, IrClass {
 
   private val typeElement: XTypeElement by lazy { declaredType.typeElement as XTypeElement }
 
@@ -93,7 +97,10 @@ class CompilerClass(override val env: XProcessingEnv, val declaredType: XType) :
             "Could not resolve type for nested class: ${typeElement.qualifiedName}",
         )
       }
-      CompilerClass(env, typeElement.type)
+      CompilerClass(
+        env,
+        typeElement.type
+      )
     }
   }
 

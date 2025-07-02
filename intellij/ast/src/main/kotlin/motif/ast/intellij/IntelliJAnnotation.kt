@@ -31,6 +31,7 @@ import kotlin.reflect.KClass
 import motif.ast.IrAnnotation
 import motif.ast.IrMethod
 import motif.ast.IrType
+import java.util.Collections
 
 class IntelliJAnnotation(private val project: Project, private val psiAnnotation: PsiAnnotation) :
     IrAnnotation {
@@ -61,6 +62,9 @@ class IntelliJAnnotation(private val project: Project, private val psiAnnotation
 
   override fun matchesClass(annotationClass: KClass<out Annotation>): Boolean =
       psiAnnotation.qualifiedName == annotationClass.java.name
+
+  override val annotationValueMap: Map<String, Any?>
+    get() = Collections.emptyMap()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
