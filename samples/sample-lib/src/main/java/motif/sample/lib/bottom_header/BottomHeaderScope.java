@@ -18,7 +18,7 @@ package motif.sample.lib.bottom_header;
 import motif.Scope;
 import motif.sample.lib.controller.ControllerObjects;
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 public interface BottomHeaderScope {
 
   BottomHeaderView view();

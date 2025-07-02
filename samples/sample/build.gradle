@@ -11,6 +11,11 @@ android {
         targetSdkVersion deps.build.targetSdkVersion
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
     defaultConfig {
         minSdkVersion deps.build.minSdkVersion
         targetSdkVersion deps.build.targetSdkVersion

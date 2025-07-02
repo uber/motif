@@ -21,7 +21,7 @@ import motif.sample.app.photo_grid_item.PhotoGridItemView;
 import motif.sample.lib.controller.ControllerObjects;
 import motif.sample.lib.db.Photo;
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 public interface PhotoGridScope {
 
   PhotoGridView view();

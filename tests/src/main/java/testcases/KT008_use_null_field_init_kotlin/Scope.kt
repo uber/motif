@@ -13,12 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.KT008_use_null_field_init_kotlin
 
-public @interface Scope {
-  /**
-   * @return on false, the field will be initialized with [None.NONE]. Otherwise, null &
-   *     [Initialized.INITIALIZED] will be used to skip the field initialization.
-   */
-  boolean useNullFieldInitialization() default false;
+import motif.Creatable
+
+@motif.Scope(useNullFieldInitialization = true)
+interface Scope : Creatable<Scope.Dependencies> {
+    fun fooObject(): Any
+
+    fun fooInt(): Int
+
+    fun fooString(): String
+
+    @motif.Objects
+    abstract class Objects {
+        fun fooObject(): Any {
+            return Any()
+        }
+
+        fun fooInt(): Int {
+            return 3
+        }
+
+        fun fooString(): String {
+            return "fooString"
+        }
+    }
+
+    interface Dependencies
 }

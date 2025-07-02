@@ -19,7 +19,7 @@ import javax.inject.Named
 import motif.Creatable
 import motif.Scope
 
-@Scope
+@Scope(useNullFieldInitialization = true)
 interface MainScope : Creatable<MainScope.Dependencies> {
 
   fun greeter(): Greeter

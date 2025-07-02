@@ -68,6 +68,10 @@ private constructor(
     fun create(): ScopeImpl {
       val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
       return ScopeImpl(
+          (scope.clazz.annotations
+              .find { it.className == motif.Scope::class.java.name }!!
+              .annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL]
+              as? Boolean) ?: false,
           scope.implClassName,
           scope.typeName,
           isInternal,
@@ -429,6 +433,7 @@ private constructor(
 
     private const val OBJECTS_FIELD_NAME = "objects"
     private const val DEPENDENCIES_FIELD_NAME = "dependencies"
+    private const val SCOPE_ANNOTATION_FIELD_USE_NULL = "useNullFieldInitialization"
 
     fun create(env: XProcessingEnv, graph: ResolvedGraph): List<ScopeImpl> =
         ScopeImplFactory(env, graph).create()

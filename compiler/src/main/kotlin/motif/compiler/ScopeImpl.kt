@@ -35,6 +35,7 @@ import motif.ast.compiler.CompilerMethod
  * implementations.
  */
 class ScopeImpl(
+    val useNullFieldInitialization: Boolean,
     val className: ClassName,
     val superClassName: ClassName,
     val internalScope: Boolean,
