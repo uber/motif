@@ -43,11 +43,11 @@ ext.deps = [
 
                 gradlePlugins: [
                         android: 'com.android.tools.build:gradle:7.4.2',
-                        intellij: 'org.jetbrains.intellij:org.jetbrains.intellij.gradle.plugin:1.15.0',
+                        intellij: 'org.jetbrains.intellij:org.jetbrains.intellij.gradle.plugin:1.17.4',
                         kotlin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
                         ksp: "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${versions.ksp}",
                         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
-                        mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.27.0',
+                        mavenPublish: 'com.vanniktech:gradle-maven-publish-plugin:0.34.0',
                         spotless: "com.diffplug.spotless:spotless-plugin-gradle:7.0.2",
                         shadow: "com.github.johnrengelman:shadow:8.1.0",
                 ]
