@@ -1,3 +1,6 @@
+# 0.4.0-alpha08
+* Add support for skipping field initialization when initializing a scope.
+
 # 0.4.0-alpha06
 * Add support for Kotlin 2.1.0
 
