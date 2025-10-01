@@ -194,7 +194,8 @@ object JavaCodeGenerator {
           .add("Object $localFieldName = \$N;\n", cacheFieldName)
           .beginControlFlow("if (\$N == null)", localFieldName)
           .beginControlFlow("synchronized (this)")
-          .beginControlFlow("if (\$N == null)", cacheFieldName)
+          .add("\$N = \$N;\n", localFieldName, cacheFieldName)
+          .beginControlFlow("if (\$N == null)", localFieldName)
           .add("\$N = \$L;\n", localFieldName, instantiation.spec())
           .beginControlFlow("if (\$N == null)", localFieldName)
           .add(
@@ -203,7 +204,7 @@ object JavaCodeGenerator {
               "Factory method cannot return null",
           )
           .endControlFlow()
-          .add("\$N = \$L;\n", cacheFieldName, localFieldName)
+          .add("\$N = \$N;\n", cacheFieldName, localFieldName)
           .endControlFlow()
           .endControlFlow()
           .endControlFlow()
