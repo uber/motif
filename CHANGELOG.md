@@ -1,3 +1,6 @@
+# 0.4.0-alpha09
+* Fix race condition when skipping field initialization 
+* 
 # 0.4.0-alpha08
 * Add support for skipping field initialization when initializing a scope.
 
