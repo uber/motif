@@ -37,7 +37,7 @@ import motif.ast.compiler.CompilerMethod
 class ScopeImpl(
     val useNullFieldInitialization: Boolean,
     val className: ClassName,
-    val superClassName: ClassName,
+    val superClassName: SuperClassName,
     val internalScope: Boolean,
     val scopeImplAnnotation: ScopeImplAnnotation,
     val objectsField: ObjectsField?,
@@ -53,6 +53,12 @@ class ScopeImpl(
     val objectsImpl: ObjectsImpl?,
     val dependencies: Dependencies?,
 )
+
+sealed interface SuperClassName {
+  data class Interface(val name: ClassName) : SuperClassName
+
+  data class AbstractClass(val name: ClassName) : SuperClassName
+}
 
 /**
  * ```

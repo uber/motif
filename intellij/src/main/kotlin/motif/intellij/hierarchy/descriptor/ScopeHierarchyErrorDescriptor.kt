@@ -46,7 +46,7 @@ import motif.models.NullableParameter
 import motif.models.NullableSpreadMethod
 import motif.models.ObjectsConstructorFound
 import motif.models.ObjectsFieldFound
-import motif.models.ScopeMustBeAnInterface
+import motif.models.ScopeMustBeAnInterfaceOrAbstractClass
 import motif.models.UnspreadableType
 import motif.models.VoidDependenciesMethod
 import motif.models.VoidFactoryMethod
@@ -70,7 +70,7 @@ open class ScopeHierarchyErrorDescriptor(
   companion object {
     fun getElementFromError(error: MotifError): PsiElement =
         when (error) {
-          is ScopeMustBeAnInterface -> {
+          is ScopeMustBeAnInterfaceOrAbstractClass -> {
             (error.scopeClass as IntelliJClass).psiClass
           }
           is VoidScopeMethod -> {

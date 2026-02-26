@@ -33,6 +33,7 @@ import motif.models.ConstructorFactoryMethod
 import motif.models.FactoryMethod
 import motif.models.FactoryMethodSink
 import motif.models.Scope
+import motif.models.ScopeMustBeAnInterfaceOrAbstractClass
 import motif.models.Sink
 import motif.models.Spread
 import motif.models.Type
@@ -67,13 +68,19 @@ private constructor(
 
     fun create(): ScopeImpl {
       val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
+      val superType =
+          when {
+            scope.clazz.kind == IrClass.Kind.INTERFACE -> SuperClassName.Interface(scope.typeName)
+            scope.clazz.isAbstract() -> SuperClassName.AbstractClass(scope.typeName)
+            else -> throw ScopeMustBeAnInterfaceOrAbstractClass(scope.clazz)
+          }
       return ScopeImpl(
           (scope.clazz.annotations
               .find { it.className == motif.Scope::class.java.name }!!
               .annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL]
               as? Boolean) ?: false,
           scope.implClassName,
-          scope.typeName,
+          superType,
           isInternal,
           scopeImplAnnotation(),
           objectsField(),
