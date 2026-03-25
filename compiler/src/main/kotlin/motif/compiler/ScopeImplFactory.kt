@@ -67,11 +67,13 @@ private constructor(
 
     fun create(): ScopeImpl {
       val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
+      val scopeAnnotation = scope.clazz.annotations.find { it.className == motif.Scope::class.java.name }!!
+      // Observer code is only generated if both the annotation is enabled AND the environment variable is set
+      val shouldGenerateObserverCode = scope.enableObserver && OBSERVER_ENABLED
       return ScopeImpl(
-          (scope.clazz.annotations
-              .find { it.className == motif.Scope::class.java.name }!!
-              .annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL]
-              as? Boolean) ?: false,
+          (scopeAnnotation.annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL] as? Boolean) ?: false,
+          scope.enableObserver,
+          shouldGenerateObserverCode,
           scope.implClassName,
           scope.typeName,
           isInternal,
@@ -434,6 +436,12 @@ private constructor(
     private const val OBJECTS_FIELD_NAME = "objects"
     private const val DEPENDENCIES_FIELD_NAME = "dependencies"
     private const val SCOPE_ANNOTATION_FIELD_USE_NULL = "useNullFieldInitialization"
+
+    // Check environment variable once for observer code generation
+    private val OBSERVER_ENABLED: Boolean by lazy {
+      val envValue = System.getenv("MOTIF_OBSERVE")
+      envValue == "1" || envValue.equals("True", ignoreCase = true)
+    }
 
     fun create(env: XProcessingEnv, graph: ResolvedGraph): List<ScopeImpl> =
         ScopeImplFactory(env, graph).create()

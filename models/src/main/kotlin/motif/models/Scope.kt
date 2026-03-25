@@ -19,7 +19,11 @@ import motif.ast.IrClass
 import motif.ast.IrType
 
 /** [Wiki](https://github.com/uber/motif/wiki#scope) */
-sealed class Scope(val useNullFieldInitialization: Boolean, val clazz: IrClass) {
+sealed class Scope(
+    val useNullFieldInitialization: Boolean,
+    val enableObserver: Boolean,
+    val clazz: IrClass,
+) {
   val source by lazy { ScopeSource(this) }
   val simpleName: String by lazy { clazz.simpleName }
   val qualifiedName: String by lazy { clazz.qualifiedName }
@@ -37,7 +41,7 @@ sealed class Scope(val useNullFieldInitialization: Boolean, val clazz: IrClass) 
 }
 
 class ErrorScope internal constructor(clazz: IrClass, val parsingError: ParsingError) :
-    Scope(useNullFieldInitialization = false, clazz) {
+    Scope(useNullFieldInitialization = false, enableObserver = false, clazz) {
   override val objects: Objects? = null
   override val accessMethods: List<AccessMethod> = emptyList()
   override val childMethods: List<ChildMethod> = emptyList()
@@ -45,8 +49,12 @@ class ErrorScope internal constructor(clazz: IrClass, val parsingError: ParsingE
   override val dependencies: Dependencies? = null
 }
 
-class ValidScope internal constructor(clazz: IrClass, useNullFieldInitialization: Boolean = false) :
-    Scope(useNullFieldInitialization, clazz) {
+class ValidScope
+internal constructor(
+    clazz: IrClass,
+    useNullFieldInitialization: Boolean = false,
+    enableObserver: Boolean = false,
+) : Scope(useNullFieldInitialization, enableObserver, clazz) {
 
   init {
     if (clazz.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(clazz)
@@ -103,7 +111,10 @@ private class ScopeFactory(private val initialScopeClasses: List<IrClass>) {
     if (!scopeMap.containsKey(scopeType)) {
       val scope =
           try {
-            ValidScope(scopeClass)
+            val scopeAnnotation = scopeClass.annotations.find { it.className == motif.Scope::class.java.name }
+            val useNullFieldInit = scopeAnnotation?.annotationValueMap?.get("useNullFieldInitialization") as? Boolean ?: false
+            val enableObserver = scopeAnnotation?.annotationValueMap?.get("enableObserver") as? Boolean ?: false
+            ValidScope(scopeClass, useNullFieldInit, enableObserver)
           } catch (e: ParsingError) {
             ErrorScope(scopeClass, e)
           }

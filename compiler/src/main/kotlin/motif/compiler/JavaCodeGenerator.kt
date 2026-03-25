@@ -30,6 +30,7 @@ import com.uber.xprocessing.ext.withRawTypeFix
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import motif.internal.None
+import motif.observe.MotifObserver
 
 object JavaCodeGenerator {
 
@@ -47,12 +48,15 @@ object JavaCodeGenerator {
             objectsField?.let { addField(it.spec()) }
             addField(dependenciesField.spec())
             cacheFields.forEach { addField(it.spec(useNullFieldInitialization)) }
-            addMethod(constructor.spec())
+            val scopeNameString = superClassName.j.toString()
+            addMethod(constructor.spec(shouldGenerateObserverCode, scopeNameString))
             alternateConstructor?.let { addMethod(it.spec()) }
             accessMethodImpls.forEach { addMethod(it.spec()) }
             childMethodImpls.forEach { addMethod(it.spec()) }
             addMethod(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addMethods(it.specs(useNullFieldInitialization)) }
+            factoryProviderMethods.forEach {
+              addMethods(it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString))
+            }
             dependencyProviderMethods.forEach { addMethod(it.spec()) }
             dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
@@ -94,6 +98,22 @@ object JavaCodeGenerator {
           .addModifiers(Modifier.PUBLIC)
           .addParameter(dependenciesClassName.j, dependenciesParameterName)
           .addStatement("this.\$N = \$N", dependenciesFieldName, dependenciesParameterName)
+          .build()
+
+  private fun Constructor.spec(shouldGenerateObserverCode: Boolean, scopeName: String): MethodSpec =
+      MethodSpec.constructorBuilder()
+          .addModifiers(Modifier.PUBLIC)
+          .addParameter(dependenciesClassName.j, dependenciesParameterName)
+          .apply {
+            if (shouldGenerateObserverCode) {
+              addStatement(
+                  "\$T.notifyScopeInitializing(\$S)",
+                  MotifObserver::class.java,
+                  scopeName,
+              )
+            }
+            addStatement("this.\$N = \$N", dependenciesFieldName, dependenciesParameterName)
+          }
           .build()
 
   private fun AlternateConstructor.spec(): MethodSpec =
@@ -168,11 +188,36 @@ object JavaCodeGenerator {
   private fun ScopeProviderMethod.spec(): MethodSpec =
       MethodSpec.methodBuilder(name).returns(scopeClassName.j).addStatement("return this").build()
 
-  private fun FactoryProviderMethod.specs(useNullFieldInitialization: Boolean): List<MethodSpec> {
+  private fun FactoryProviderMethod.specs(
+      useNullFieldInitialization: Boolean,
+      shouldGenerateObserverCode: Boolean,
+      scopeName: String,
+  ): List<MethodSpec> {
     val primarySpec =
         MethodSpec.methodBuilder(name)
             .returns(returnTypeName.j)
-            .addStatement(body.spec(useNullFieldInitialization))
+            .apply {
+              if (shouldGenerateObserverCode) {
+                addStatement(
+                    "\$T.notifyProvideStart(\$S, \$S)",
+                    MotifObserver::class.java,
+                    scopeName,
+                    name,
+                )
+                beginControlFlow("try")
+                addStatement(body.spec(useNullFieldInitialization))
+                nextControlFlow("finally")
+                addStatement(
+                    "\$T.notifyProvideComplete(\$S, \$S)",
+                    MotifObserver::class.java,
+                    scopeName,
+                    name,
+                )
+                endControlFlow()
+              } else {
+                addStatement(body.spec(useNullFieldInitialization))
+              }
+            }
             .build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs

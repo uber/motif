@@ -13,17 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package motif;
+package testcases.T079_observer;
 
-public @interface Scope {
-  /**
-   * @return on false, the field will be initialized with [None.NONE]. Otherwise, null &
-   *     [Initialized.INITIALIZED] will be used to skip the field initialization.
-   */
-  boolean useNullFieldInitialization() default false;
+import motif.Creatable;
 
-  /**
-   * @return true if this scope should register with MotifObserver and fire lifecycle events.
-   */
-  boolean enableObserver() default false;
+@motif.Scope(enableObserver = true)
+public interface Scope extends Creatable<Scope.Dependencies> {
+
+    String string();
+
+    Integer number();
+
+    @motif.Objects
+    class Objects {
+
+        String string() {
+            return "test";
+        }
+
+        Integer number() {
+            return 42;
+        }
+    }
+
+    interface Dependencies {}
 }

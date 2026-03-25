@@ -32,4 +32,5 @@ dependencies {
 
 test {
     inputs.files(file("$rootDir/tests/src"))
+    environment "MOTIF_OBSERVE", "1"
 }

@@ -31,6 +31,7 @@ import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview
 import com.squareup.kotlinpoet.javapoet.toKClassName
 import motif.internal.None
+import motif.observe.MotifObserver
 
 @OptIn(KotlinPoetJavaPoetPreview::class)
 object KotlinCodeGenerator {
@@ -50,7 +51,8 @@ object KotlinCodeGenerator {
             objectsField?.let { addProperty(it.spec()) }
             addProperty(dependenciesField.spec())
             cacheFields.forEach { addProperty(it.spec(useNullFieldInitialization)) }
-            primaryConstructor(constructor.spec())
+            val scopeNameString = superClassName.kt.toString()
+            primaryConstructor(constructor.spec(shouldGenerateObserverCode, scopeNameString))
             alternateConstructor?.let { addFunction(it.spec()) }
             accessMethodImpls
                 .filter { !it.overriddenMethod.isSynthetic }
@@ -60,7 +62,9 @@ object KotlinCodeGenerator {
                 .forEach { addProperty(it.propSpec()) }
             childMethodImpls.forEach { addFunction(it.spec()) }
             addFunction(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addFunctions(it.specs(useNullFieldInitialization)) }
+            factoryProviderMethods.forEach {
+              addFunctions(it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString))
+            }
             dependencyProviderMethods.forEach { addFunction(it.spec()) }
             dependencies?.let { addType(it.spec()) }
             objectsImpl?.let { addType(it.spec()) }
@@ -112,9 +116,18 @@ object KotlinCodeGenerator {
             .build()
       }
 
-  private fun Constructor.spec(): FunSpec =
+  private fun Constructor.spec(shouldGenerateObserverCode: Boolean, scopeName: String): FunSpec =
       FunSpec.constructorBuilder()
           .addParameter(dependenciesParameterName, dependenciesClassName.kt)
+          .apply {
+            if (shouldGenerateObserverCode) {
+              addStatement(
+                  "%T.notifyScopeInitializing(%S)",
+                  MotifObserver::class,
+                  scopeName,
+              )
+            }
+          }
           .build()
 
   private fun AlternateConstructor.spec(): FunSpec =
@@ -203,12 +216,37 @@ object KotlinCodeGenerator {
           .addStatement("return this")
           .build()
 
-  private fun FactoryProviderMethod.specs(useNullFieldInitialization: Boolean): List<FunSpec> {
+  private fun FactoryProviderMethod.specs(
+      useNullFieldInitialization: Boolean,
+      shouldGenerateObserverCode: Boolean,
+      scopeName: String,
+  ): List<FunSpec> {
     val primarySpec =
         FunSpec.builder(name)
             .addModifiers(KModifier.INTERNAL)
             .returns(returnTypeName.reloadedForTypeArgs(env))
-            .addCode(body.spec(useNullFieldInitialization))
+            .apply {
+              if (shouldGenerateObserverCode) {
+                addStatement(
+                    "%T.notifyProvideStart(%S, %S)",
+                    MotifObserver::class,
+                    scopeName,
+                    name,
+                )
+                beginControlFlow("try")
+                addCode(body.spec(useNullFieldInitialization))
+                nextControlFlow("finally")
+                addStatement(
+                    "%T.notifyProvideComplete(%S, %S)",
+                    MotifObserver::class,
+                    scopeName,
+                    name,
+                )
+                endControlFlow()
+              } else {
+                addCode(body.spec(useNullFieldInitialization))
+              }
+            }
             .build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs
