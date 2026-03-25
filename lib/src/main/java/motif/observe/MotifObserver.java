@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Central registry for Motif observers. This class manages a list of {@link Observer}
- * instances and dispatches lifecycle events to all registered observers.
+ * Central registry for Motif observers. This class manages a list of {@link Observer} instances and
+ * dispatches lifecycle events to all registered observers.
  *
- * Events are not cached, observers will only receive events post registration.
+ * <p>Events are not cached, observers will only receive events post registration.
+ *
  * <p>This class is thread-safe.
  *
- * Use -motif.
+ * <p>Use -motif.
  */
 public final class MotifObserver {
 
@@ -55,9 +56,7 @@ public final class MotifObserver {
     observers.remove(observer);
   }
 
-  /**
-   * Clears all registered observers.
-   */
+  /** Clears all registered observers. */
   public static void clearAll() {
     observers.clear();
   }

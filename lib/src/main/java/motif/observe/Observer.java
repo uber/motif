@@ -16,8 +16,8 @@
 package motif.observe;
 
 /**
- * Observer interface for tracking Scope lifecycle events.
- * Implementations can be registered via {@link MotifObserver#register(Observer)}.
+ * Observer interface for tracking Scope lifecycle events. Implementations can be registered via
+ * {@link MotifObserver#register(Observer)}.
  */
 public interface Observer {
 

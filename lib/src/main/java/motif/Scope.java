@@ -22,8 +22,6 @@ public @interface Scope {
    */
   boolean useNullFieldInitialization() default false;
 
-  /**
-   * @return true if this scope should register with MotifObserver and fire lifecycle events.
-   */
+  /** @return true if this scope should register with MotifObserver and fire lifecycle events. */
   boolean enableObserver() default false;
 }
