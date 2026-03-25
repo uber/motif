@@ -67,11 +67,14 @@ private constructor(
 
     fun create(): ScopeImpl {
       val isInternal = (scope.clazz as? CompilerClass)?.isInternal() ?: false
-      val scopeAnnotation = scope.clazz.annotations.find { it.className == motif.Scope::class.java.name }!!
-      // Observer code is only generated if both the annotation is enabled AND the environment variable is set
+      val scopeAnnotation =
+          scope.clazz.annotations.find { it.className == motif.Scope::class.java.name }!!
+      // Observer code is only generated if both the annotation is enabled AND the environment
+      // variable is set
       val shouldGenerateObserverCode = scope.enableObserver && OBSERVER_ENABLED
       return ScopeImpl(
-          (scopeAnnotation.annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL] as? Boolean) ?: false,
+          (scopeAnnotation.annotationValueMap[SCOPE_ANNOTATION_FIELD_USE_NULL] as? Boolean)
+              ?: false,
           scope.enableObserver,
           shouldGenerateObserverCode,
           scope.implClassName,

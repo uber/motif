@@ -63,7 +63,9 @@ object KotlinCodeGenerator {
             childMethodImpls.forEach { addFunction(it.spec()) }
             addFunction(scopeProviderMethod.spec())
             factoryProviderMethods.forEach {
-              addFunctions(it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString))
+              addFunctions(
+                  it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString),
+              )
             }
             dependencyProviderMethods.forEach { addFunction(it.spec()) }
             dependencies?.let { addType(it.spec()) }

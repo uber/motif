@@ -55,7 +55,9 @@ object JavaCodeGenerator {
             childMethodImpls.forEach { addMethod(it.spec()) }
             addMethod(scopeProviderMethod.spec())
             factoryProviderMethods.forEach {
-              addMethods(it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString))
+              addMethods(
+                  it.specs(useNullFieldInitialization, shouldGenerateObserverCode, scopeNameString),
+              )
             }
             dependencyProviderMethods.forEach { addMethod(it.spec()) }
             dependencies?.let { addType(it.spec()) }
