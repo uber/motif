@@ -172,10 +172,8 @@ fun XType.hash(): Int =
     } catch (t: Throwable) {
       if (typeArguments.any { it.typeName is WildcardTypeName && it.typeName.toString() != "?" }) {
         extendsBoundOrSelf().typeName.toString().hashCode()
-      } else if (this.hasCollectionType()) {
-        typeName.removeWildcardTypeIfContains().toString().hashCode()
       } else {
-        hashCode()
+        typeName.removeWildcardTypeIfContains().toString().hashCode()
       }
     }
 
@@ -298,10 +296,6 @@ fun XType.isDeclaredType(): Boolean =
 fun XType.isEnum(): Boolean = typeElement?.isEnum() ?: false
 
 fun XType.isPrimitive(): Boolean = typeName.isPrimitive
-
-private fun XType.hasCollectionType(): Boolean =
-    this.typeElement?.name.orEmpty() in collectionTypes ||
-        typeArguments.any { it.hasCollectionType() }
 
 private val collectionTypes =
     setOf("MutableList", "MutableSet", "MutableCollection", "List", "Set", "Collection")
