@@ -1,3 +1,6 @@
+# 0.4.0-alpha10
+* Fix hashCode/equals contract violation in XType.hash()
+
 # 0.4.0-alpha09
 * Fix race condition when skipping field initialization 
 * 
