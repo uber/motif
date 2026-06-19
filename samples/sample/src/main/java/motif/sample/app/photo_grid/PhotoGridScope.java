@@ -22,14 +22,14 @@ import motif.sample.lib.controller.ControllerObjects;
 import motif.sample.lib.db.Photo;
 
 @Scope(useNullFieldInitialization = true)
-public interface PhotoGridScope {
+public abstract class PhotoGridScope {
 
-  PhotoGridView view();
+  public abstract PhotoGridView view();
 
-  PhotoGridItemScope photoRow(PhotoGridItemView view, Photo photo);
+  abstract PhotoGridItemScope photoRow(PhotoGridItemView view, Photo photo);
 
   @motif.Objects
-  abstract class Objects extends ControllerObjects<PhotoGridController, PhotoGridView> {
+  abstract static class Objects extends ControllerObjects<PhotoGridController, PhotoGridView> {
 
     abstract PhotoGridAdapter adapter();
   }

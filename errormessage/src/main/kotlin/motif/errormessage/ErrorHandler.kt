@@ -41,7 +41,7 @@ import motif.models.ObjectsConstructorFound
 import motif.models.ObjectsFieldFound
 import motif.models.ParsingError
 import motif.models.ScopeExtendsScope
-import motif.models.ScopeMustBeAnInterface
+import motif.models.ScopeMustBeAnInterfaceOrAbstractClass
 import motif.models.UnspreadableType
 import motif.models.VoidDependenciesMethod
 import motif.models.VoidFactoryMethod
@@ -60,7 +60,8 @@ internal interface ErrorHandler {
         when (error) {
           is ParsingError ->
               when (error) {
-                is ScopeMustBeAnInterface -> ScopeMustBeAnInterfaceHandler(error)
+                is ScopeMustBeAnInterfaceOrAbstractClass ->
+                    ScopeMustBeAnInterfaceOrAbstractClassHandler(error)
                 is VoidScopeMethod -> VoidScopeMethodHandler(error)
                 is AccessMethodParameters -> AccessMethodParametersHandler(error)
                 is ObjectsFieldFound -> ObjectsFieldFoundHandler(error)

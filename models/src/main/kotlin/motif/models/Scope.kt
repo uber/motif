@@ -49,7 +49,9 @@ class ValidScope internal constructor(clazz: IrClass, useNullFieldInitialization
     Scope(useNullFieldInitialization, clazz) {
 
   init {
-    if (clazz.kind != IrClass.Kind.INTERFACE) throw ScopeMustBeAnInterface(clazz)
+    if (clazz.kind != IrClass.Kind.INTERFACE && !clazz.isAbstract()) {
+      throw ScopeMustBeAnInterfaceOrAbstractClass(clazz)
+    }
     detectScopeSuperinterface(this)
   }
 

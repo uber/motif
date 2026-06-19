@@ -17,7 +17,7 @@
   
   [SCOPE CLASS]
   
-  Scope must be an interface:
+  Scope must be an interface or abstract class:
   
     testcases.E024_scope_class.Scope
   

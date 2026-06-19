@@ -46,7 +46,10 @@ object KotlinCodeGenerator {
             addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
             addAnnotation(scopeImplAnnotation.spec())
             addModifiers(if (internalScope) KModifier.INTERNAL else KModifier.PUBLIC)
-            addSuperinterface(superClassName.kt)
+            when (superClassName) {
+              is SuperClassName.Interface -> addSuperinterface(superClassName.name.kt)
+              is SuperClassName.AbstractClass -> superclass(superClassName.name.kt)
+            }
             objectsField?.let { addProperty(it.spec()) }
             addProperty(dependenciesField.spec())
             cacheFields.forEach { addProperty(it.spec(useNullFieldInitialization)) }

@@ -24,7 +24,7 @@ import motif.ast.IrType
 
 sealed class ParsingError : RuntimeException(), MotifError
 
-class ScopeMustBeAnInterface(val scopeClass: IrClass) : ParsingError()
+class ScopeMustBeAnInterfaceOrAbstractClass(val scopeClass: IrClass) : ParsingError()
 
 class VoidScopeMethod(val scope: Scope, val method: IrMethod) : ParsingError()
 

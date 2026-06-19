@@ -43,7 +43,10 @@ object JavaCodeGenerator {
           .apply {
             addAnnotation(scopeImplAnnotation.spec())
             addModifiers(Modifier.PUBLIC)
-            addSuperinterface(superClassName.j)
+            when (superClassName) {
+              is SuperClassName.Interface -> addSuperinterface(superClassName.name.j)
+              is SuperClassName.AbstractClass -> superclass(superClassName.name.j)
+            }
             objectsField?.let { addField(it.spec()) }
             addField(dependenciesField.spec())
             cacheFields.forEach { addField(it.spec(useNullFieldInitialization)) }

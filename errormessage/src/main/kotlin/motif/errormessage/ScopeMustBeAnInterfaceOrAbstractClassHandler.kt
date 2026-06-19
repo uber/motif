@@ -15,17 +15,18 @@
  */
 package motif.errormessage
 
-import motif.models.ScopeMustBeAnInterface
+import motif.models.ScopeMustBeAnInterfaceOrAbstractClass
 
-internal class ScopeMustBeAnInterfaceHandler(private val error: ScopeMustBeAnInterface) :
-    ErrorHandler {
+internal class ScopeMustBeAnInterfaceOrAbstractClassHandler(
+    private val error: ScopeMustBeAnInterfaceOrAbstractClass,
+) : ErrorHandler {
 
   override val name = "SCOPE CLASS"
 
   override fun StringBuilder.handle() {
     appendLine(
         """
-            Scope must be an interface:
+            Scope must be an interface or abstract class:
 
               ${error.scopeClass.qualifiedName}
       """
