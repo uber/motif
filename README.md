@@ -164,12 +164,15 @@ interface MainScope {
 
     @motif.Objects
     class Objects {
-
-        @Expose
-        Database database() {
-            return new Database();
+        DatabaseImpl databaseImpl() {
+            return new DatabaseImpl();
         }
 
+        // Motif requires explicit dependency declarations to properly resolve and inject dependencies across scopes
+        @Expose
+        Database database(DatabaseImpl impl) {
+            return impl;
+        }
         // ...
     }
 }
