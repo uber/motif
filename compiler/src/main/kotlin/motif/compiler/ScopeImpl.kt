@@ -36,6 +36,8 @@ import motif.ast.compiler.CompilerMethod
  */
 class ScopeImpl(
     val useNullFieldInitialization: Boolean,
+    val enableObserver: Boolean,
+    val shouldGenerateObserverCode: Boolean,
     val className: ClassName,
     val superClassName: ClassName,
     val internalScope: Boolean,
