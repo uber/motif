@@ -1,0 +1,53 @@
+package testcases.T021_objects_interface;
+
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.UnsupportedOperationException;
+import motif.internal.None;
+
+@motif.ScopeImpl(
+    children = {},
+    scope = Scope.class,
+    dependencies = Scope.Dependencies.class
+)
+public class ScopeImpl implements Scope {
+  private final Scope.Objects objects = new Objects();
+
+  private final Scope.Dependencies dependencies;
+
+  private volatile Object dependency = None.NONE;
+
+  public ScopeImpl(Scope.Dependencies dependencies) {
+    this.dependencies = dependencies;
+  }
+
+  public ScopeImpl() {
+    this(new Scope.Dependencies() {});
+  }
+
+  @Override
+  public Dependency dependency() {
+    return dependency2();
+  }
+
+  Scope scope() {
+    return this;
+  }
+
+  Dependency dependency2() {
+    if (dependency == None.NONE) {
+          synchronized (this) {
+            if (dependency == None.NONE) {
+              dependency = new Dependency();}
+          }
+        }
+        return (Dependency) dependency;
+  }
+
+  private static class Objects implements Scope.Objects {
+    @Override
+    public Dependency dependency() {
+      throw new UnsupportedOperationException();
+    }
+  }
+}

@@ -12,7 +12,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath deps.build.gradlePlugins.android
+        classpath 'com.android.tools.build:gradle:8.11.2'
         classpath deps.build.gradlePlugins.intellij
         classpath deps.build.gradlePlugins.kotlin
         classpath deps.build.gradlePlugins.ksp

@@ -12,6 +12,12 @@ kotlin {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
+    options.debug = true
+    options.debugOptions.debugLevel = "source,lines,vars"
+}
+
 dependencies {
     kapt project(':tests-compiler')
     kapt deps.daggerCompiler

@@ -1,0 +1,50 @@
+package testcases.T017_spread
+
+import java.lang.UnsupportedOperationException
+import kotlin.Any
+import kotlin.String
+import kotlin.Suppress
+import kotlin.jvm.Volatile
+import motif.`internal`.None
+
+@Suppress("REDUNDANT_PROJECTION", "UNCHECKED_CAST")
+@motif.ScopeImpl(
+  children = [],
+  scope = Scope::class,
+  dependencies = Scope.Dependencies::class,
+)
+public class ScopeImpl(
+  private val dependencies: Scope.Dependencies,
+) : Scope {
+  private final val objects: Scope.Objects = Objects()
+
+  @Volatile
+  private var spreadable: Any = None.NONE
+
+  public constructor() : this(object : Scope.Dependencies {})
+
+  public override fun a(): String = aString()
+
+  public override fun b(): String = bString()
+
+  public fun scope(): Scope = this
+
+  internal fun spreadable(): Spreadable {
+    if (spreadable == None.NONE) {
+      synchronized (this) {
+        if (spreadable == None.NONE) {
+          spreadable=Spreadable()
+        }
+      }
+    }
+    return ( spreadable as Spreadable )
+  }
+
+  public fun aString(): String = spreadable().a()
+
+  public fun bString(): String = spreadable().b()
+
+  private class Objects : Scope.Objects() {
+    internal override fun spreadable(): Spreadable = throw UnsupportedOperationException()
+  }
+}

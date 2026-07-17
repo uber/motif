@@ -4,3 +4,7 @@
 -keep class **Test {
     public static void run();
 }
+
+# Keep debug information for better error messages
+-keepattributes SourceFile,LineNumberTable
+-dontobfuscate

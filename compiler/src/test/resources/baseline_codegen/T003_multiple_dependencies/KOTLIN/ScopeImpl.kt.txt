@@ -1,0 +1,56 @@
+package testcases.T003_multiple_dependencies
+
+import kotlin.Any
+import kotlin.Int
+import kotlin.String
+import kotlin.Suppress
+import kotlin.jvm.Volatile
+import motif.`internal`.None
+
+@Suppress("REDUNDANT_PROJECTION", "UNCHECKED_CAST")
+@motif.ScopeImpl(
+  children = [],
+  scope = Scope::class,
+  dependencies = Scope.Dependencies::class,
+)
+public class ScopeImpl(
+  private val dependencies: Scope.Dependencies,
+) : Scope {
+  private final val objects: Scope.Objects = Objects()
+
+  @Volatile
+  private var string: Any = None.NONE
+
+  @Volatile
+  private var integer: Any = None.NONE
+
+  public constructor() : this(object : Scope.Dependencies {})
+
+  public override fun string(): String = string2()
+
+  public fun scope(): Scope = this
+
+  internal fun string2(): String {
+    if (string == None.NONE) {
+      synchronized (this) {
+        if (string == None.NONE) {
+          string=objects.string(integer())
+        }
+      }
+    }
+    return ( string as String )
+  }
+
+  internal fun integer(): Int {
+    if (integer == None.NONE) {
+      synchronized (this) {
+        if (integer == None.NONE) {
+          integer=objects.integer()
+        }
+      }
+    }
+    return ( integer as Int )
+  }
+
+  private class Objects : Scope.Objects()
+}

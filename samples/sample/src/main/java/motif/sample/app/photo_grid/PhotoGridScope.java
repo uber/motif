@@ -16,12 +16,13 @@
 package motif.sample.app.photo_grid;
 
 import motif.Scope;
+import motif.CachingStrategy;
 import motif.sample.app.photo_grid_item.PhotoGridItemScope;
 import motif.sample.app.photo_grid_item.PhotoGridItemView;
 import motif.sample.lib.controller.ControllerObjects;
 import motif.sample.lib.db.Photo;
 
-@Scope(useNullFieldInitialization = true)
+@Scope(cachingStrategy = CachingStrategy.SMART_CACHE)
 public interface PhotoGridScope {
 
   PhotoGridView view();

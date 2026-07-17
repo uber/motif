@@ -21,13 +21,14 @@ import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import motif.Expose;
 import motif.Scope;
+import motif.CachingStrategy;
 import motif.sample.app.bottom_sheet.BottomSheetScope;
 import motif.sample.app.photo_grid.PhotoGridScope;
 import motif.sample.lib.controller.ControllerObjects;
 import motif.sample.lib.db.Database;
 import motif.sample.lib.multiselect.MultiSelector;
 
-@Scope(useNullFieldInitialization = true)
+@Scope(cachingStrategy = CachingStrategy.RUNTIME_SELECTABLE)
 public interface RootScope {
 
   RootView view();

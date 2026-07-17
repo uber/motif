@@ -9,6 +9,7 @@ kotlin {
 }
 
 android {
+    namespace 'motif.sample_kotlin'
     compileSdkVersion deps.build.compileSdkVersion
     buildToolsVersion deps.build.buildToolsVersion
 

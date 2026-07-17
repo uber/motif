@@ -29,7 +29,12 @@ sealed class FactoryMethod(val method: IrMethod, val objects: Objects) {
   abstract val parameters: List<Parameter>
 
   val isStatic = method.isStatic()
-  val isCached = !method.hasAnnotation(DoNotCache::class)
+  val hasDoNotCache = method.hasAnnotation(DoNotCache::class)
+  val doNotCacheOnlyForSmartCache: Boolean = run {
+    val annotation = method.annotations.find { it.matchesClass(DoNotCache::class) } ?: return@run false
+    annotation.annotationValueMap["onlyForSmartCacheMode"] as? Boolean ?: false
+  }
+  val isCached = !hasDoNotCache || doNotCacheOnlyForSmartCache
   val isExposed = method.hasAnnotation(Expose::class)
 
   val spread: Spread? =

@@ -1,0 +1,73 @@
+package testcases.T009_dependency_cache;
+
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import motif.internal.None;
+
+@motif.ScopeImpl(
+    children = {},
+    scope = Scope.class,
+    dependencies = Scope.Dependencies.class
+)
+public class ScopeImpl implements Scope {
+  private final Scope.Objects objects = new Objects();
+
+  private final Scope.Dependencies dependencies;
+
+  private volatile Object string = None.NONE;
+
+  private volatile Object aString = None.NONE;
+
+  private volatile Object iString = None.NONE;
+
+  public ScopeImpl(Scope.Dependencies dependencies) {
+    this.dependencies = dependencies;
+  }
+
+  public ScopeImpl() {
+    this(new Scope.Dependencies() {});
+  }
+
+  @Override
+  public String string() {
+    return string2();
+  }
+
+  Scope scope() {
+    return this;
+  }
+
+  String string2() {
+    if (string == None.NONE) {
+          synchronized (this) {
+            if (string == None.NONE) {
+              string = objects.string(aString(), iString());}
+          }
+        }
+        return (String) string;
+  }
+
+  String aString() {
+    if (aString == None.NONE) {
+          synchronized (this) {
+            if (aString == None.NONE) {
+              aString = objects.a(iString(), iString());}
+          }
+        }
+        return (String) aString;
+  }
+
+  String iString() {
+    if (iString == None.NONE) {
+          synchronized (this) {
+            if (iString == None.NONE) {
+              iString = objects.i();}
+          }
+        }
+        return (String) iString;
+  }
+
+  private static class Objects extends Scope.Objects {
+  }
+}
