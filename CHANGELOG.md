@@ -1,3 +1,9 @@
+# 0.4.0-alpha11
+* Add configurable caching strategies (BASELINE, BASELINE_WITH_LOCK_SELECTABLE, SMART_CACHE, RUNTIME_SELECTABLE)
+* Add runtime config surface (MotifRuntimeConfig, MotifLock, CachingStrategy)
+* Add @DoNotCache onlyForSmartCacheMode() for strategy-specific opt-out
+* Add BaselineCodegenTest to guard BASELINE output against drift
+
 # 0.4.0-alpha10
 * Fix hashCode/equals contract violation in XType.hash()
 
