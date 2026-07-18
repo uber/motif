@@ -19,6 +19,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.TextView
 import motif.ScopeFactory
+import motif.sample_kotlin.R
 
 class MainActivity : Activity() {
 

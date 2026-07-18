@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace 'motif.dagger_comparison'
     compileSdkVersion deps.build.compileSdkVersion
     buildToolsVersion deps.build.buildToolsVersion
 

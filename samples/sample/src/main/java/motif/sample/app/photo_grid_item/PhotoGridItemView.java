@@ -23,8 +23,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import androidx.annotation.Nullable;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding3.view.RxView;
 import io.reactivex.Observable;
@@ -34,10 +32,7 @@ import motif.sample.lib.db.Photo;
 
 public class PhotoGridItemView extends FrameLayout {
 
-  @BindView(R.id.image)
   ImageView imageView;
-
-  @BindView(R.id.touch)
   View touchView;
 
   @Nullable private View overlayView;
@@ -57,7 +52,8 @@ public class PhotoGridItemView extends FrameLayout {
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
-    ButterKnife.bind(this);
+    imageView = findViewById(R.id.image);
+    touchView = findViewById(R.id.touch);
   }
 
   Observable<Unit> clicks() {

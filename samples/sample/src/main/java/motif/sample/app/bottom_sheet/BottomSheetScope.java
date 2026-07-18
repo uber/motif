@@ -16,13 +16,14 @@
 package motif.sample.app.bottom_sheet;
 
 import android.view.ViewGroup;
+import motif.CachingStrategy;
 import motif.Scope;
 import motif.sample.app.photo_grid.PhotoGridScope;
 import motif.sample.app.photo_list.PhotoListScope;
 import motif.sample.lib.bottom_header.BottomHeaderScope;
 import motif.sample.lib.controller.ControllerObjects;
 
-@Scope(useNullFieldInitialization = true)
+@Scope(cachingStrategy = CachingStrategy.SMART_CACHE)
 public interface BottomSheetScope {
 
   BottomSheetView view();

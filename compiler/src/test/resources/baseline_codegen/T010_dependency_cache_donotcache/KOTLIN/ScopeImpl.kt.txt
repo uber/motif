@@ -1,0 +1,57 @@
+package testcases.T010_dependency_cache_donotcache
+
+import kotlin.Any
+import kotlin.String
+import kotlin.Suppress
+import kotlin.jvm.Volatile
+import motif.`internal`.None
+
+@Suppress("REDUNDANT_PROJECTION", "UNCHECKED_CAST")
+@motif.ScopeImpl(
+  children = [],
+  scope = Scope::class,
+  dependencies = Scope.Dependencies::class,
+)
+public class ScopeImpl(
+  private val dependencies: Scope.Dependencies,
+) : Scope {
+  private final val objects: Scope.Objects = Objects()
+
+  @Volatile
+  private var string: Any = None.NONE
+
+  @Volatile
+  private var aString: Any = None.NONE
+
+  public constructor() : this(object : Scope.Dependencies {})
+
+  public override fun string(): String = string2()
+
+  public fun scope(): Scope = this
+
+  internal fun string2(): String {
+    if (string == None.NONE) {
+      synchronized (this) {
+        if (string == None.NONE) {
+          string=objects.string(aString(), iString())
+        }
+      }
+    }
+    return ( string as String )
+  }
+
+  internal fun aString(): String {
+    if (aString == None.NONE) {
+      synchronized (this) {
+        if (aString == None.NONE) {
+          aString=objects.a(iString(), iString())
+        }
+      }
+    }
+    return ( aString as String )
+  }
+
+  internal fun iString(): String = objects.i()
+
+  private class Objects : Scope.Objects()
+}

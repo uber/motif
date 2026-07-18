@@ -35,7 +35,7 @@ import motif.ast.compiler.CompilerMethod
  * implementations.
  */
 class ScopeImpl(
-    val useNullFieldInitialization: Boolean,
+    val isBaselineStrategy: Boolean,
     val className: ClassName,
     val superClassName: ClassName,
     val internalScope: Boolean,
@@ -43,6 +43,7 @@ class ScopeImpl(
     val objectsField: ObjectsField?,
     val dependenciesField: DependenciesField,
     val cacheFields: List<CacheField>,
+    val perDependencyLockFields: PerDependencyLockFields?,
     val constructor: Constructor,
     val alternateConstructor: AlternateConstructor?,
     val accessMethodImpls: List<AccessMethodImpl>,
@@ -52,6 +53,18 @@ class ScopeImpl(
     val dependencyProviderMethods: List<DependencyProviderMethod>,
     val objectsImpl: ObjectsImpl?,
     val dependencies: Dependencies?,
+    /**
+     * True if this ScopeImpl represents the runtime wrapper for RUNTIME_SELECTABLE strategy. The
+     * wrapper delegates to variant classes based on MotifRuntimeConfig.cachingStrategy. False for
+     * normal implementations and variant classes.
+     */
+    val isRuntimeSelectableWrapper: Boolean = false,
+    /**
+     * Suffix appended to the class name for variant classes in RUNTIME_SELECTABLE strategy.
+     * Examples: "_BaselineSelectableLock", "_SmartCache" Null for normal implementations and
+     * wrapper classes.
+     */
+    val variantSuffix: String? = null,
 )
 
 /**
@@ -93,6 +106,26 @@ class DependenciesField(val dependenciesClassName: ClassName, val name: String)
  * ```
  */
 class CacheField(val name: String)
+
+/**
+ * Per-dependency lock fields for BASELINE_WITH_LOCK_SELECTABLE strategy.
+ *
+ * ```
+ * private final MotifLock lock_foo;
+ * private final MotifLock lock_bar;
+ * ```
+ *
+ * Maps cache field names to their corresponding lock field names. Lock fields are nullable and
+ * conditionally initialized based on MotifRuntimeConfig.usePerDependencyLock.
+ */
+class PerDependencyLockFields(
+    // Map<cacheFieldName, lockFieldName>
+    val locks: Map<String, String>,
+) {
+  init {
+    require(locks.isNotEmpty()) { "PerDependencyLockFields must have at least one lock entry" }
+  }
+}
 
 /**
  * ```

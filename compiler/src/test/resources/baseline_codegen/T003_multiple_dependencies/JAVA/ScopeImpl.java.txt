@@ -1,0 +1,62 @@
+package testcases.T003_multiple_dependencies;
+
+import java.lang.Integer;
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import motif.internal.None;
+
+@motif.ScopeImpl(
+    children = {},
+    scope = Scope.class,
+    dependencies = Scope.Dependencies.class
+)
+public class ScopeImpl implements Scope {
+  private final Scope.Objects objects = new Objects();
+
+  private final Scope.Dependencies dependencies;
+
+  private volatile Object string = None.NONE;
+
+  private volatile Object integer = None.NONE;
+
+  public ScopeImpl(Scope.Dependencies dependencies) {
+    this.dependencies = dependencies;
+  }
+
+  public ScopeImpl() {
+    this(new Scope.Dependencies() {});
+  }
+
+  @Override
+  public String string() {
+    return string2();
+  }
+
+  Scope scope() {
+    return this;
+  }
+
+  String string2() {
+    if (string == None.NONE) {
+          synchronized (this) {
+            if (string == None.NONE) {
+              string = objects.string(integer());}
+          }
+        }
+        return (String) string;
+  }
+
+  Integer integer() {
+    if (integer == None.NONE) {
+          synchronized (this) {
+            if (integer == None.NONE) {
+              integer = objects.integer();}
+          }
+        }
+        return (Integer) integer;
+  }
+
+  private static class Objects extends Scope.Objects {
+  }
+}

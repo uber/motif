@@ -1,0 +1,67 @@
+package testcases.T017_spread;
+
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import java.lang.UnsupportedOperationException;
+import motif.internal.None;
+
+@motif.ScopeImpl(
+    children = {},
+    scope = Scope.class,
+    dependencies = Scope.Dependencies.class
+)
+public class ScopeImpl implements Scope {
+  private final Scope.Objects objects = new Objects();
+
+  private final Scope.Dependencies dependencies;
+
+  private volatile Object spreadable = None.NONE;
+
+  public ScopeImpl(Scope.Dependencies dependencies) {
+    this.dependencies = dependencies;
+  }
+
+  public ScopeImpl() {
+    this(new Scope.Dependencies() {});
+  }
+
+  @Override
+  public String a() {
+    return aString();
+  }
+
+  @Override
+  public String b() {
+    return bString();
+  }
+
+  Scope scope() {
+    return this;
+  }
+
+  Spreadable spreadable() {
+    if (spreadable == None.NONE) {
+          synchronized (this) {
+            if (spreadable == None.NONE) {
+              spreadable = new Spreadable();}
+          }
+        }
+        return (Spreadable) spreadable;
+  }
+
+  String aString() {
+    return spreadable().a();
+  }
+
+  String bString() {
+    return spreadable().b();
+  }
+
+  private static class Objects extends Scope.Objects {
+    @Override
+    Spreadable spreadable() {
+      throw new UnsupportedOperationException();
+    }
+  }
+}

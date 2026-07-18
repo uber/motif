@@ -1,0 +1,53 @@
+package testcases.T024_child;
+
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import motif.ScopeImpl;
+import motif.internal.None;
+
+@ScopeImpl(
+    children = {},
+    scope = Child.class,
+    dependencies = ChildImpl.Dependencies.class
+)
+public class ChildImpl implements Child {
+  private final Child.Objects objects = new Objects();
+
+  private final Dependencies dependencies;
+
+  private volatile Object string = None.NONE;
+
+  public ChildImpl(Dependencies dependencies) {
+    this.dependencies = dependencies;
+  }
+
+  public ChildImpl() {
+    this(new Dependencies() {});
+  }
+
+  @Override
+  public String string() {
+    return string2();
+  }
+
+  Child child() {
+    return this;
+  }
+
+  String string2() {
+    if (string == None.NONE) {
+          synchronized (this) {
+            if (string == None.NONE) {
+              string = objects.string();}
+          }
+        }
+        return (String) string;
+  }
+
+  public interface Dependencies {
+  }
+
+  private static class Objects extends Child.Objects {
+  }
+}

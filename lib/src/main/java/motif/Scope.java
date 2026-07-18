@@ -17,8 +17,9 @@ package motif;
 
 public @interface Scope {
   /**
-   * @return on false, the field will be initialized with [None.NONE]. Otherwise, null &
-   *     [Initialized.INITIALIZED] will be used to skip the field initialization.
+   * Defines the caching strategy for scoped dependencies.
+   *
+   * @return the caching strategy to use (default: BASELINE)
    */
-  boolean useNullFieldInitialization() default false;
+  CachingStrategy cachingStrategy() default CachingStrategy.BASELINE;
 }

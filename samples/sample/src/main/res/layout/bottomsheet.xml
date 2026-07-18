@@ -2,7 +2,7 @@
 <motif.sample.app.bottom_sheet.BottomSheetView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     app:behavior_peekHeight="@dimen/peek_height"
     android:clickable="true"
     android:orientation="vertical"
