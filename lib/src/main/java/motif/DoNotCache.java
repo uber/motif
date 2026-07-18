@@ -15,4 +15,25 @@
  */
 package motif;
 
-public @interface DoNotCache {}
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Prevents caching of a dependency in Motif scopes.
+ *
+ * <p>Apply to a factory method or type to skip caching. Use onlyForSmartCacheMode = true to skip
+ * caching only in SMART_CACHE mode while still caching in BASELINE mode.
+ */
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.CLASS)
+public @interface DoNotCache {
+  /**
+   * If true, only applies to SMART_CACHE mode. Dependencies will still be cached when using
+   * BASELINE mode.
+   *
+   * <p>Default: false (applies to all caching strategies)
+   */
+  boolean onlyForSmartCacheMode() default false;
+}

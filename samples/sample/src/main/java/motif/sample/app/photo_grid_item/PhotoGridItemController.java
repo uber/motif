@@ -15,7 +15,6 @@
  */
 package motif.sample.app.photo_grid_item;
 
-import butterknife.ButterKnife;
 import motif.sample.lib.controller.Controller;
 import motif.sample.lib.db.Photo;
 import motif.sample.lib.multiselect.MultiSelector;
@@ -32,7 +31,6 @@ public class PhotoGridItemController extends Controller<PhotoGridItemView> {
     this.scope = scope;
     this.multiSelector = multiSelector;
     this.photo = photo;
-    ButterKnife.bind(this, view);
   }
 
   @Override

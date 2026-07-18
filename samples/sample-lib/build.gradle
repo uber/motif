@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    namespace 'motif.sample_lib'
     compileSdkVersion deps.build.compileSdkVersion
     buildToolsVersion deps.build.buildToolsVersion
 

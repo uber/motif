@@ -40,8 +40,28 @@ object KotlinCodeGenerator {
     return FileSpec.get(scopeImpl.className.kt.packageName, typeSpec)
   }
 
-  private fun ScopeImpl.spec(): TypeSpec =
-      TypeSpec.classBuilder(className.kt)
+  // [Caching strategy] Routes to wrapper, variant, or standard spec.
+  private fun ScopeImpl.spec(): TypeSpec {
+    if (isRuntimeSelectableWrapper) {
+      return wrapperSpec()
+    }
+
+    val classNameToUse =
+        if (variantSuffix != null) {
+          com.squareup.kotlinpoet.ClassName(
+              className.kt.packageName,
+              className.kt.simpleName + variantSuffix,
+          )
+        } else {
+          className.kt
+        }
+
+    return spec(classNameToUse)
+  }
+
+  // Builds the class TypeSpec for a ScopeImpl.
+  private fun ScopeImpl.spec(classNameToUse: com.squareup.kotlinpoet.ClassName): TypeSpec =
+      TypeSpec.classBuilder(classNameToUse)
           .apply {
             addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
             addAnnotation(scopeImplAnnotation.spec())
@@ -49,7 +69,8 @@ object KotlinCodeGenerator {
             addSuperinterface(superClassName.kt)
             objectsField?.let { addProperty(it.spec()) }
             addProperty(dependenciesField.spec())
-            cacheFields.forEach { addProperty(it.spec(useNullFieldInitialization)) }
+            cacheFields.forEach { addProperty(it.spec(isBaselineStrategy = isBaselineStrategy)) }
+            addPerDependencyLockFields(perDependencyLockFields)
             primaryConstructor(constructor.spec())
             alternateConstructor?.let { addFunction(it.spec()) }
             accessMethodImpls
@@ -60,12 +81,164 @@ object KotlinCodeGenerator {
                 .forEach { addProperty(it.propSpec()) }
             childMethodImpls.forEach { addFunction(it.spec()) }
             addFunction(scopeProviderMethod.spec())
-            factoryProviderMethods.forEach { addFunctions(it.specs(useNullFieldInitialization)) }
+            factoryProviderMethods.forEach {
+              addFunctions(
+                  it.specs(
+                      isBaselineStrategy = isBaselineStrategy,
+                      perDependencyLockFields = perDependencyLockFields,
+                  ),
+              )
+            }
             dependencyProviderMethods.forEach { addFunction(it.spec()) }
             dependencies?.let { addType(it.spec()) }
-            objectsImpl?.let { addType(it.spec()) }
+            // RUNTIME_SELECTABLE generates sibling variant classes that share Objects, requiring
+            // wider visibility
+            objectsImpl?.let { addType(it.spec(widenObjectsVisibility = variantSuffix != null)) }
           }
           .build()
+
+  // [Caching strategy] Adds MotifLock fields and config cache when per-dependency locking is
+  // enabled.
+  private fun TypeSpec.Builder.addPerDependencyLockFields(lockFields: PerDependencyLockFields?) {
+    lockFields ?: return
+    if (lockFields.locks.isNotEmpty()) {
+      addProperty(
+          PropertySpec.builder("usePerDependencyLocking", Boolean::class)
+              .addModifiers(KModifier.PRIVATE)
+              .initializer(
+                  "%T.usePerDependencyLock",
+                  ClassName.bestGuess("motif.MotifRuntimeConfig"),
+              )
+              .build(),
+      )
+    }
+    lockFields.locks.values.forEach { lockFieldName ->
+      addProperty(
+          PropertySpec.builder(
+                  lockFieldName,
+                  ClassName.bestGuess("motif.MotifLock").copy(nullable = true),
+              )
+              .addModifiers(KModifier.PRIVATE)
+              .mutable(false)
+              .initializer(
+                  "if (usePerDependencyLocking) %T() else null",
+                  ClassName.bestGuess("motif.MotifLock"),
+              )
+              .build(),
+      )
+    }
+  }
+
+  /**
+   * Generates a runtime wrapper class for RUNTIME_SELECTABLE strategy. The wrapper delegates to
+   * variant implementations based on MotifRuntimeConfig.cachingStrategy.
+   */
+  private fun ScopeImpl.wrapperSpec(): TypeSpec {
+    // Creates a condition block to choose between SmartCache and BaselineSelectableLock
+    val wrapperConstructor =
+        FunSpec.constructorBuilder()
+            .addParameter(dependenciesField.name, dependenciesField.dependenciesClassName.kt)
+            .build()
+
+    return TypeSpec.classBuilder(className.kt)
+        .apply {
+          addAnnotation(suppressAnnotationSpec("REDUNDANT_PROJECTION", "UNCHECKED_CAST"))
+          addAnnotation(scopeImplAnnotation.spec())
+          addModifiers(if (internalScope) KModifier.INTERNAL else KModifier.PUBLIC)
+          addSuperinterface(superClassName.kt)
+
+          addProperty(dependenciesField.spec())
+
+          addProperty(
+              PropertySpec.builder("delegate", superClassName.kt, KModifier.PRIVATE)
+                  .initializer(
+                      CodeBlock.builder()
+                          .add(
+                              "when (%T.cachingStrategy) {\n",
+                              ClassName.bestGuess("motif.MotifRuntimeConfig"),
+                          )
+                          .indent()
+                          .add(
+                              "%T.SMART_CACHE -> %T_SmartCache(dependencies)\n",
+                              ClassName.bestGuess("motif.CachingStrategy"),
+                              className.kt,
+                          )
+                          .add("else -> %T_BaselineSelectableLock(dependencies)\n", className.kt)
+                          .unindent()
+                          .add("}")
+                          .build(),
+                  )
+                  .build(),
+          )
+
+          primaryConstructor(wrapperConstructor)
+          alternateConstructor?.let { addFunction(it.spec()) }
+
+          accessMethodImpls
+              .filter { !it.overriddenMethod.isSynthetic }
+              .forEach {
+                addFunction(
+                    XFunSpec.overriding(
+                            it.overriddenMethod.element,
+                            it.overriddenMethod.owner,
+                            it.env,
+                        )
+                        .addStatement("return delegate.%N()", it.overriddenMethod.name)
+                        .build(),
+                )
+              }
+
+          // Delegate synthetic properties
+          accessMethodImpls
+              .filter { it.overriddenMethod.isSynthetic }
+              .forEach {
+                val propName =
+                    with(it.overriddenMethod.name) {
+                      when {
+                        startsWith("get") -> this.substring(3).decapitalize()
+                        startsWith("is") -> this.substring(2).decapitalize()
+                        else -> this
+                      }
+                    }
+                addProperty(
+                    PropertySpec.builder(
+                            propName,
+                            ClassName.bestGuess(it.overriddenMethod.returnType.qualifiedName),
+                        )
+                        .addModifiers(KModifier.OVERRIDE)
+                        .initializer("delegate.%N", propName)
+                        .build(),
+                )
+              }
+
+          // Delegate child methods
+          childMethodImpls.forEach { childMethod ->
+            addFunction(
+                FunSpec.builder(childMethod.childMethodName)
+                    .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
+                    .returns(childMethod.childClassName.kt)
+                    .apply {
+                      childMethod.parameters.forEach { param ->
+                        addParameter(param.name, param.typeName.kt)
+                      }
+                    }
+                    .addStatement(
+                        "return delegate.%N(%L)",
+                        childMethod.childMethodName,
+                        childMethod.parameters.joinToString { it.name },
+                    )
+                    .build(),
+            )
+          }
+
+          // Add Objects nested class if present (for variants to reference)
+          objectsImpl?.let { addType(it.spec(widenObjectsVisibility = true)) }
+
+          // Add Dependencies interface so variant implementations can reference it
+          dependencies?.let { addType(it.spec()) }
+        }
+        .build()
+  }
 
   private fun ScopeImplAnnotation.spec(): AnnotationSpec =
       AnnotationSpec.builder(motif.ScopeImpl::class)
@@ -97,18 +270,20 @@ object KotlinCodeGenerator {
           .initializer(name)
           .build()
 
-  private fun CacheField.spec(useNullFieldInitialization: Boolean): PropertySpec =
-      if (useNullFieldInitialization) {
-        PropertySpec.builder(name, Any::class.asTypeName().copy(true), KModifier.PRIVATE)
-            .mutable(true)
-            .addAnnotation(Volatile::class)
-            .initializer("null")
-            .build()
-      } else {
+  private fun CacheField.spec(isBaselineStrategy: Boolean): PropertySpec =
+      if (isBaselineStrategy) {
+        // BASELINE: Use None.NONE sentinel
         PropertySpec.builder(name, Any::class, KModifier.PRIVATE)
             .mutable(true)
             .addAnnotation(Volatile::class)
             .initializer("%T.NONE", None::class)
+            .build()
+      } else {
+        // SMART_CACHE: Use null initialization
+        PropertySpec.builder(name, Any::class.asTypeName().copy(true), KModifier.PRIVATE)
+            .mutable(true)
+            .addAnnotation(Volatile::class)
+            .initializer("null")
             .build()
       }
 
@@ -158,6 +333,7 @@ object KotlinCodeGenerator {
         .build()
   }
 
+  // Inline anonymous class that wires a child scope's Dependencies to the parent graph.
   private fun ChildDependenciesImpl.spec(): TypeSpec =
       TypeSpec.anonymousClassBuilder()
           .apply {
@@ -203,48 +379,88 @@ object KotlinCodeGenerator {
           .addStatement("return this")
           .build()
 
-  private fun FactoryProviderMethod.specs(useNullFieldInitialization: Boolean): List<FunSpec> {
+  private fun FactoryProviderMethod.specs(
+      isBaselineStrategy: Boolean,
+      perDependencyLockFields: PerDependencyLockFields?,
+  ): List<FunSpec> {
     val primarySpec =
         FunSpec.builder(name)
             .addModifiers(KModifier.INTERNAL)
             .returns(returnTypeName.reloadedForTypeArgs(env))
-            .addCode(body.spec(useNullFieldInitialization))
+            .addCode(body.spec(isBaselineStrategy, perDependencyLockFields))
             .build()
     val spreadSpecs = spreadProviderMethods.map { it.spec() }
     return listOf(primarySpec) + spreadSpecs
   }
 
-  private fun FactoryProviderMethodBody.spec(useNullFieldInitialization: Boolean): CodeBlock =
+  private fun FactoryProviderMethodBody.spec(
+      isBaselineStrategy: Boolean,
+      perDependencyLockFields: PerDependencyLockFields?,
+  ): CodeBlock =
       when (this) {
-        is FactoryProviderMethodBody.Cached -> spec(useNullFieldInitialization)
+        is FactoryProviderMethodBody.Cached -> spec(isBaselineStrategy, perDependencyLockFields)
         is FactoryProviderMethodBody.Uncached -> spec()
       }
 
   private fun FactoryProviderMethodBody.Cached.spec(
-      useNullFieldInitialization: Boolean,
+      isBaselineStrategy: Boolean,
+      perDependencyLockFields: PerDependencyLockFields?,
   ): CodeBlock {
-    if (useNullFieldInitialization) {
+    // SMART_CACHE strategy: Use null initialization instead of None.NONE sentinel
+    // This path is taken when cachingStrategy == SMART_CACHE
+    if (!isBaselineStrategy) {
       val localFieldName = "_$cacheFieldName"
+      // Get the lock field name for this cache field (if per-dependency locks are enabled)
+      val lockFieldName = perDependencyLockFields?.locks?.get(cacheFieldName)
+
       val codeBlockBuilder =
           CodeBlock.builder()
               // Using a local variable reduces atomic read overhead
               .addStatement("var $localFieldName = %N;\n", cacheFieldName)
               .beginControlFlow("if (%N == null)", localFieldName)
-              .beginControlFlow("synchronized (this)")
-              .addStatement("%N = %N", localFieldName, cacheFieldName)
-              .beginControlFlow("if (%N == null)", localFieldName)
-              .addStatement("%N = %L", localFieldName, instantiation.spec())
-              .addStatement("%N = %N", cacheFieldName, localFieldName)
-              .endControlFlow()
-              .endControlFlow()
-              .endControlFlow()
+
+      // Add synchronized block using nullable lock pattern: lock_foo ?: this
+      if (lockFieldName != null) {
+        codeBlockBuilder.beginControlFlow("synchronized(%N ?: this)", lockFieldName)
+      } else {
+        codeBlockBuilder.beginControlFlow("synchronized (this)")
+      }
+
+      codeBlockBuilder
+          .addStatement("%N = %N", localFieldName, cacheFieldName)
+          .beginControlFlow("if (%N == null)", localFieldName)
+          .addStatement("%N = %L", localFieldName, instantiation.spec())
+          .beginControlFlow("if (%N == null)", localFieldName)
+          .addStatement(
+              "throw %T(%S)",
+              NullPointerException::class,
+              "Factory method cannot return null",
+          )
+          .endControlFlow()
+          .addStatement("%N = %N", cacheFieldName, localFieldName)
+          .endControlFlow()
+          .endControlFlow()
+          .endControlFlow()
       return codeBlockBuilder
           .add("return ( %N as %T )", localFieldName, returnTypeName.reloadedForTypeArgs(env))
           .build()
     }
-    return CodeBlock.builder()
-        .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
-        .beginControlFlow("synchronized (this)")
+
+    // BASELINE strategy: Use None.NONE sentinel with synchronized(this) - matches alpha09 exactly
+    // Get the lock field name for this cache field (if per-dependency locks are enabled)
+    val lockFieldName = perDependencyLockFields?.locks?.get(cacheFieldName)
+
+    val codeBuilder =
+        CodeBlock.builder().beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
+
+    // Add synchronized block using nullable lock pattern: lock_foo ?: this
+    if (lockFieldName != null) {
+      codeBuilder.beginControlFlow("synchronized(%N ?: this)", lockFieldName)
+    } else {
+      codeBuilder.beginControlFlow("synchronized (this)")
+    }
+
+    return codeBuilder
         .beginControlFlow("if (%N == %T.NONE)", cacheFieldName, None::class)
         .addStatement("%N=%L", cacheFieldName, instantiation.spec())
         .endControlFlow()
@@ -356,10 +572,16 @@ object KotlinCodeGenerator {
 
   private fun JavaDocMethodLink.spec(): CodeBlock = CodeBlock.of("* [%L.%N]\n", owner, methodName)
 
-  private fun ObjectsImpl.spec(): TypeSpec =
+  private fun ObjectsImpl.spec(widenObjectsVisibility: Boolean): TypeSpec =
       TypeSpec.classBuilder(className.kt)
           .apply {
-            addModifiers(KModifier.PRIVATE)
+            if (widenObjectsVisibility) {
+              // internal so RUNTIME_SELECTABLE variants, which are separate top-level
+              // classes, can access it.
+              addModifiers(KModifier.INTERNAL)
+            } else {
+              addModifiers(KModifier.PRIVATE)
+            }
             if (isInterface) {
               addSuperinterface(superClassName.kt)
             } else {

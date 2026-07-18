@@ -1,0 +1,43 @@
+package testcases.T021_objects_interface
+
+import java.lang.UnsupportedOperationException
+import kotlin.Any
+import kotlin.Suppress
+import kotlin.jvm.Volatile
+import motif.`internal`.None
+
+@Suppress("REDUNDANT_PROJECTION", "UNCHECKED_CAST")
+@motif.ScopeImpl(
+  children = [],
+  scope = Scope::class,
+  dependencies = Scope.Dependencies::class,
+)
+public class ScopeImpl(
+  private val dependencies: Scope.Dependencies,
+) : Scope {
+  private final val objects: Scope.Objects = Objects()
+
+  @Volatile
+  private var dependency: Any = None.NONE
+
+  public constructor() : this(object : Scope.Dependencies {})
+
+  public override fun dependency(): Dependency = dependency2()
+
+  public fun scope(): Scope = this
+
+  internal fun dependency2(): Dependency {
+    if (dependency == None.NONE) {
+      synchronized (this) {
+        if (dependency == None.NONE) {
+          dependency=Dependency()
+        }
+      }
+    }
+    return ( dependency as Dependency )
+  }
+
+  private class Objects : Scope.Objects {
+    public override fun dependency(): Dependency = throw UnsupportedOperationException()
+  }
+}

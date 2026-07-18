@@ -20,7 +20,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import motif.sample.R;
+import motif.dagger_comparison.R;
 
 public class LoggedInView extends FrameLayout {
 

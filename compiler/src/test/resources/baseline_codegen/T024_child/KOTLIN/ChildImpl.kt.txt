@@ -1,0 +1,44 @@
+package testcases.T024_child
+
+import kotlin.Any
+import kotlin.String
+import kotlin.Suppress
+import kotlin.jvm.Volatile
+import motif.ScopeImpl
+import motif.`internal`.None
+
+@Suppress("REDUNDANT_PROJECTION", "UNCHECKED_CAST")
+@ScopeImpl(
+  children = [],
+  scope = Child::class,
+  dependencies = ChildImpl.Dependencies::class,
+)
+public class ChildImpl(
+  private val dependencies: Dependencies,
+) : Child {
+  private final val objects: Child.Objects = Objects()
+
+  @Volatile
+  private var string: Any = None.NONE
+
+  public constructor() : this(object : Dependencies {})
+
+  public override fun string(): String = string2()
+
+  public fun child(): Child = this
+
+  internal fun string2(): String {
+    if (string == None.NONE) {
+      synchronized (this) {
+        if (string == None.NONE) {
+          string=objects.string()
+        }
+      }
+    }
+    return ( string as String )
+  }
+
+  public interface Dependencies
+
+  private class Objects : Child.Objects()
+}

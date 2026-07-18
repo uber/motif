@@ -23,15 +23,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.bumptech.glide.Glide;
 import motif.sample.R;
 import motif.sample.lib.db.Photo;
 
 public class PhotoListItemView extends FrameLayout {
 
-  @BindView(R.id.image)
   ImageView imageView;
 
   public PhotoListItemView(@NonNull Context context) {
@@ -54,7 +51,7 @@ public class PhotoListItemView extends FrameLayout {
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
-    ButterKnife.bind(this);
+    imageView = findViewById(R.id.image);
   }
 
   public static PhotoListItemView create(ViewGroup parent) {
