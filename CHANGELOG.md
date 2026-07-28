@@ -1,3 +1,8 @@
+# 0.4.0-alpha12
+* Add configurable caching strategies for Motif scopes (BASELINE, SMART_CACHE, BASELINE_WITH_LOCK_SELECTABLE, RUNTIME_SELECTABLE)
+* Add @DoNotCache annotation with onlyForSmartCacheMode option
+* Add MotifRuntimeConfig and MotifLock for runtime lock selection
+
 # 0.4.0-alpha10
 * Fix hashCode/equals contract violation in XType.hash()
 
