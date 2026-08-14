@@ -16,6 +16,7 @@
 package motif.compiler
 
 import androidx.room.compiler.processing.XProcessingEnv
+import javax.tools.Diagnostic
 import motif.ast.IrClass
 import motif.ast.IrType
 import motif.ast.compiler.CompilerAnnotation
@@ -71,17 +72,17 @@ private constructor(
 
     // Memoization for dependent lookup: Type -> Set of FactoryMethods
     // Also used for usage count via dependentsCache[type]?.size
+    //
+    // This only counts factory method parameters within this scope's own Objects class.
+    // Every other way a provider gets called is invisible here: @Expose (child scopes),
+    // @Spread (facet accessors), and scope access methods. Each of those therefore needs
+    // its own rule ABOVE the usage count rules in computeShouldCache(). A consumer kind
+    // handled below them reads as zero usage and gets silently left uncached.
     private val dependentsCache by lazy {
       val dependents = mutableMapOf<Type, MutableSet<FactoryMethod>>()
       scope.factoryMethods.forEach { factoryMethod ->
         factoryMethod.parameters.forEach { param ->
           dependents.getOrPut(param.type) { mutableSetOf() }.add(factoryMethod)
-        }
-        // Also count spread method consumers: the spread source type is consumed by the
-        // factory method that produces it, so downstream spread consumers should count
-        // as additional usage of the spread source's return type
-        factoryMethod.spread?.methods?.forEach { spreadMethod ->
-          dependents.getOrPut(spreadMethod.sourceType) { mutableSetOf() }.add(factoryMethod)
         }
       }
       dependents
@@ -155,6 +156,10 @@ private constructor(
           cachingStrategy == motif.CachingStrategy.BASELINE ||
               cachingStrategy == motif.CachingStrategy.BASELINE_WITH_LOCK_SELECTABLE
       val useSelectiveCaching = cachingStrategy == motif.CachingStrategy.SMART_CACHE
+
+      if (useSelectiveCaching) {
+        reportSkippedCaching(variantSuffix)
+      }
 
       return ScopeImpl(
           isBaselineStrategy,
@@ -536,6 +541,66 @@ private constructor(
     // === Selective Caching Logic for SMART_CACHE ===
 
     /**
+     * Reports how many cache fields SMART_CACHE skipped relative to BASELINE, so the memory saving
+     * is visible at build time instead of having to be counted by hand in the generated sources.
+     *
+     * Skips are split into two groups. Most are the optimization working as intended, but a
+     * dependency with no consumer is often an authoring mistake worth surfacing on its own - a
+     * leftover provider, or a factory method stranded by a refactor.
+     *
+     * Opt in with `-Amotif.cacheReport=true` (add `verbose` to also list the skipped dependencies).
+     */
+    private fun reportSkippedCaching(variantSuffix: String?) {
+      val option = env.options[OPTION_CACHE_REPORT] ?: return
+      if (!option.equals("true", ignoreCase = true) &&
+          !option.equals("verbose", ignoreCase = true)) {
+        return
+      }
+
+      val baselineCached = scope.factoryMethods.filter { it.isCached }
+      val skipped =
+          baselineCached.filterNot { factoryMethod ->
+            !shouldSkipCaching(factoryMethod, useSelectiveCaching = true) &&
+                shouldCache(factoryMethod)
+          }
+      if (baselineCached.isEmpty()) return
+
+      // The unused label is only trustworthy because @Expose, @Spread, and scope accessors are
+      // decided above the usage count rules in computeShouldCache(). Those dependencies are
+      // cached before the count is ever consulted, so they cannot land here despite having no
+      // factory method consumer. Moving any of those rules below the usage count rules would
+      // start reporting them as unused.
+      val (unused, otherSkips) = skipped.partition { countInternalUsage(it.returnType.type) == 0 }
+
+      val scopeName = scope.clazz.qualifiedName + (variantSuffix ?: "")
+      val percent = skipped.size * 100 / baselineCached.size
+      val unusedSuffix = if (unused.isEmpty()) "" else ", ${unused.size} unused"
+      val summary =
+          "Motif SMART_CACHE: $scopeName skipped ${skipped.size} of ${baselineCached.size} " +
+              "cache fields ($percent%)$unusedSuffix"
+
+      val detail =
+          if (option.equals("verbose", ignoreCase = true)) {
+            section("Not cached", otherSkips) +
+                section("Unused (nothing in this scope consumes it)", unused)
+          } else {
+            ""
+          }
+      env.messager.printMessage(Diagnostic.Kind.NOTE, summary + detail)
+    }
+
+    private fun section(label: String, factoryMethods: List<FactoryMethod>): String =
+        if (factoryMethods.isEmpty()) {
+          ""
+        } else {
+          factoryMethods.joinToString(
+              separator = "\n",
+              prefix = "\n  $label:\n    ",
+              transform = { it.returnType.type.type.qualifiedName },
+          )
+        }
+
+    /**
      * Determines whether a factory method should be cached based on usage patterns. Used in
      * SMART_CACHE mode to optimize memory usage by skipping caching for single-use, internal-only
      * dependencies.
@@ -581,14 +646,52 @@ private constructor(
         return false
       }
 
-      // Rule 3: Skip cache for abstract passthrough methods
+      // Rule 3: Has @Expose annotation.
+      //
+      // This must be checked before the passthrough and usage count rules below.
+      // countInternalUsage() only sees consumers within this scope's own Objects class, but
+      // @Expose exists precisely to hand a dependency to child scopes. Such a dependency
+      // legitimately has zero internal consumers, so the unused rule would otherwise skip
+      // caching it and every child scope would receive a distinct instance - silently breaking
+      // any @Expose'd type that carries shared state (relays, subjects, stores, caches).
+      if (factoryMethod.isExposed) {
+        return true
+      }
+
+      // Rule 4: Is a @Spread source.
+      //
+      // Each spread method compiles to `return source().getter()`, so every spread accessor is an
+      // independent call path back into this provider. Those paths are invisible to
+      // countInternalUsage(), which only counts factory method parameters. Leaving the source
+      // uncached means each accessor constructs its own instance and the spread facets stop
+      // agreeing with each other.
+      if (factoryMethod.spread != null) {
+        return true
+      }
+
+      // Rule 5: Skip cache for abstract passthrough methods
       // These are abstract methods that just cast/forward a parameter to a different type
-      // with no construction cost
+      // with no construction cost.
+      //
+      // Example: `abstract Foo foo(FooImpl impl);` - abstract, one param, Foo assignable from
+      // FooImpl. Codegen is just `return fooImpl();`, a free upcast, so caching the passthrough
+      // itself buys nothing.
+      //
+      // Ordered after @Expose and @Spread: a passthrough forwards whatever instance its own
+      // provider returns at that call, so if that provider is itself uncached, two independent
+      // calls yield two different instances. Skipping the field would then defeat the identity
+      // contract those annotations exist to guarantee.
       if (isPassthroughMethod(factoryMethod)) {
         return false
       }
 
-      // Rule 4: Check if this dependency has public accessor method
+      // Rule 6: Check if this dependency has public accessor method
+      //
+      // countInternalUsage() only counts consumption inside Objects' own factory methods, so a
+      // type exposed only via a Scope accessor (e.g. `Foo foo();` on the Scope interface, with
+      // no other internal consumer) would otherwise show a usage count of 0 and be wrongly
+      // skipped by Rule 7. External callers invoking scope.foo() repeatedly still expect the
+      // same instance.
       val hasAccessor = scope.accessMethods.any { it.returnType == returnType }
       if (hasAccessor) {
         return true
@@ -597,22 +700,17 @@ private constructor(
       // Count how many times this dependency is used internally
       val usageCount = countInternalUsage(returnType)
 
-      // Rule 5: Dead code - not used at all, never cache
+      // Rule 7: Unused - not used at all, never cache
       if (usageCount == 0) {
         return false
       }
 
-      // Rule 6: Used multiple times internally
+      // Rule 8: Used multiple times internally
       if (usageCount > 1) {
         return true
       }
 
-      // Rule 7: Has @Expose annotation
-      if (factoryMethod.isExposed) {
-        return true
-      }
-
-      // Rule 8: Usage count = 1 and the dependent is cached or used once.
+      // Rule 9: Usage count = 1 and the dependent is cached or used once.
       return !isDependentCreatedOnce(returnType)
     }
 

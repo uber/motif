@@ -13,47 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T080_smart_cache_selective_cache;
+package testcases.T088_smart_cache_spread_source;
 
 import static com.google.common.truth.Truth.assertThat;
-
+import static com.google.common.truth.Truth.assertWithMessage;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class Test {
 
-    public static void run() throws NoSuchFieldException {
+    public static void run() {
+        // given a SMART_CACHE scope whose only @Spread source has no factory method consumer
         Scope scope = new ScopeImpl();
 
-        // Case Dependency with public accessor 2: Cached
-        verifyDeclareFieldVolatile("publicAccessorDep");
+        // then the source is cached
+        verifyDeclareFieldVolatile("spreadable");
 
-        // Case Dependency with @DoNotCache: Not Cached
-        verifyDeclareFieldDoesNotExist("doNotCacheDep");
+        // and a genuinely dead dependency is still not cached
+        verifyDeclareFieldDoesNotExist("plainUnusedDep");
 
-        // Case @Expose with no internal usage: Cached (internal usage count does not apply to exposed deps)
-        verifyDeclareFieldVolatile("exposedUnusedDep");
+        // when both spread facets are requested
+        FacetA facetA = scope.facetA();
+        FacetB facetB = scope.facetB();
 
-        // Case @Exposed: Cached
-        verifyDeclareFieldVolatile("exposedDep");
+        // then they came from the same source instance
+        assertThat(facetA.source).isSameInstanceAs(facetB.source);
 
-        // Case Single Usage: Not Cached
-        verifyDeclareFieldDoesNotExist("singleUseDep");
-
-        // Case Multiple Use: Cached
-        verifyDeclareFieldVolatile("multiUseDep");
+        // and a repeat call to the same spread accessor also comes from that instance
+        assertThat(scope.facetA().source).isSameInstanceAs(facetA.source);
     }
 
     private static void verifyDeclareFieldVolatile(String fieldName) {
-        Field field = null;
+        Field field;
         try {
             field = ScopeImpl.class.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            assertThat("").containsMatch("Field '" + fieldName + "' not found in ScopeImpl");
+            assertWithMessage("Field '" + fieldName + "' should be declared in ScopeImpl").fail();
+            return;
         }
-        boolean isVolatile = Modifier.isVolatile(field.getModifiers());
-        assertThat(isVolatile).isTrue();
+        assertThat(Modifier.isVolatile(field.getModifiers())).isTrue();
     }
 
     private static void verifyDeclareFieldDoesNotExist(String fieldName) {
@@ -62,6 +61,6 @@ public class Test {
         } catch (NoSuchFieldException e) {
             return;
         }
-        assertThat("").contains("Field '" + fieldName + "' should not be declared in ScopeImpl");
+        assertWithMessage("Field '" + fieldName + "' should not be declared in ScopeImpl").fail();
     }
 }

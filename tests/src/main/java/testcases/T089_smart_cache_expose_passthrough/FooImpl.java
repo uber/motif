@@ -13,6 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T080_smart_cache_selective_cache.dependency;
+package testcases.T089_smart_cache_expose_passthrough;
 
-public class DeadCodeDep {}
+public class FooImpl implements Foo {}

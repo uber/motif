@@ -20,61 +20,28 @@
 
   ==== Provides ====
 
-    ---- Integer | Objects.intDep ----
+    ---- String | Objects.consumer ----
       [ Required ]
-        MultiUseDep
+        ExposedAndUsedDep
           [ Provided By ]
-            * Scope | Objects.multiUseDep
-      [ Consumed By ]
-
-    ---- String | Objects.stringDep ----
-      [ Required ]
-        MultiUseDep
-          [ Provided By ]
-            * Scope | Objects.multiUseDep
-        ExposedDep
-          [ Provided By ]
-            * Scope | Objects.exposedDep
-        SingleUseDep
-          [ Provided By ]
-            * Scope | Objects.singleUseDep
+            * Scope | Objects.exposedAndUsedDep
       [ Consumed By ]
 
     ---- Scope | implicit ----
       [ Required ]
       [ Consumed By ]
 
-    ---- DoNotCacheDep | Objects.doNotCacheDep ----
+    ---- ExposedAndUsedDep | Objects.exposedAndUsedDep ----
+      [ Required ]
+      [ Consumed By ]
+        * Scope | Objects.consumer(dep)
+
+    ---- PlainUnusedDep | Objects.plainUnusedDep ----
       [ Required ]
       [ Consumed By ]
 
-    ---- ExposedDep | Objects.exposedDep ----
+    ---- SharedStateDep | Objects.sharedStateDep ----
       [ Required ]
       [ Consumed By ]
-        * Scope | Objects.stringDep(exposedDep)
-
-    ---- ExposedUnusedDep | Objects.exposedUnusedDep ----
-      [ Required ]
-      [ Consumed By ]
-
-    ---- MultiUseDep | Objects.multiUseDep ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.stringDep(multiUseDep)
-        * Scope | Objects.intDep(multiUseDep)
-
-    ---- NotExposedDep | Objects.notExposedDep ----
-      [ Required ]
-      [ Consumed By ]
-
-    ---- PublicAccessorDep | Objects.publicAccessorDep ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Scope.publicAccessorDep()
-
-    ---- SingleUseDep | Objects.singleUseDep ----
-      [ Required ]
-      [ Consumed By ]
-        * Scope | Objects.stringDep(singleUseDep)
 
 

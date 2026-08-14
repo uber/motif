@@ -22,6 +22,7 @@ import motif.core.ResolvedGraph
 
 const val OPTION_KAPT_KOTLIN_GENERATED = "kapt.kotlin.generated"
 const val OPTION_MODE = "motif.mode"
+const val OPTION_CACHE_REPORT = "motif.cacheReport"
 
 class Processor : JavacBasicAnnotationProcessor() {
   lateinit var graph: ResolvedGraph
@@ -31,5 +32,6 @@ class Processor : JavacBasicAnnotationProcessor() {
   override fun processingSteps(): Iterable<XProcessingStep> =
       listOf<XProcessingStep>(MotifProcessingStep(graphSetter = { graph = it }))
 
-  override fun getSupportedOptions(): Set<String> = setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED)
+  override fun getSupportedOptions(): Set<String> =
+      setOf(OPTION_MODE, OPTION_KAPT_KOTLIN_GENERATED, OPTION_CACHE_REPORT)
 }

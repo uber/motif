@@ -17,7 +17,7 @@ package testcases.T080_smart_cache_selective_cache;
 
 import motif.Creatable;
 import testcases.T080_smart_cache_selective_cache.dependency.DoNotCacheDep;
-import testcases.T080_smart_cache_selective_cache.dependency.DeadCodeDep;
+import testcases.T080_smart_cache_selective_cache.dependency.ExposedUnusedDep;
 import testcases.T080_smart_cache_selective_cache.dependency.ExposedDep;
 import testcases.T080_smart_cache_selective_cache.dependency.MultiUseDep;
 import testcases.T080_smart_cache_selective_cache.dependency.NotExposedDep;
@@ -60,8 +60,8 @@ public interface Scope extends Creatable<Scope.Dependencies> {
         }
 
         @motif.Expose
-        DeadCodeDep deadCodeDep() {
-            return new DeadCodeDep();
+        ExposedUnusedDep exposedUnusedDep() {
+            return new ExposedUnusedDep();
         }
         @motif.Expose
         ExposedDep exposedDep() {

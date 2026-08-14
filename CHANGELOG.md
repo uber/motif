@@ -1,3 +1,7 @@
+# 0.4.0-alpha15
+* Fix SMART_CACHE skipping the cache for @Expose'd/@Spread'd dependencies and their passthrough (Binds) methods, so each consumer received a distinct instance
+* Add -Amotif.cacheReport=true|verbose to report skipped cache fields per scope, listing unused dependencies separately
+
 # 0.4.0-alpha12
 * Add configurable caching strategies for Motif scopes (BASELINE, SMART_CACHE, BASELINE_WITH_LOCK_SELECTABLE, RUNTIME_SELECTABLE)
 * Add @DoNotCache annotation with onlyForSmartCacheMode option

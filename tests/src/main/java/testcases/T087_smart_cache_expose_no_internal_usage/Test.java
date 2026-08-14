@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package testcases.T080_smart_cache_selective_cache;
+package testcases.T087_smart_cache_expose_no_internal_usage;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -26,23 +26,15 @@ public class Test {
     public static void run() throws NoSuchFieldException {
         Scope scope = new ScopeImpl();
 
-        // Case Dependency with public accessor 2: Cached
-        verifyDeclareFieldVolatile("publicAccessorDep");
+        // Regression: @Expose with zero internal usage count must still be cached
+        // (usage-count unused rule does not apply to exposed deps).
+        verifyDeclareFieldVolatile("sharedStateDep");
 
-        // Case Dependency with @DoNotCache: Not Cached
-        verifyDeclareFieldDoesNotExist("doNotCacheDep");
+        // Control: @Expose with internal usage must remain cached.
+        verifyDeclareFieldVolatile("exposedAndUsedDep");
 
-        // Case @Expose with no internal usage: Cached (internal usage count does not apply to exposed deps)
-        verifyDeclareFieldVolatile("exposedUnusedDep");
-
-        // Case @Exposed: Cached
-        verifyDeclareFieldVolatile("exposedDep");
-
-        // Case Single Usage: Not Cached
-        verifyDeclareFieldDoesNotExist("singleUseDep");
-
-        // Case Multiple Use: Cached
-        verifyDeclareFieldVolatile("multiUseDep");
+        // Control: not exposed and unused is genuinely unused, must remain uncached.
+        verifyDeclareFieldDoesNotExist("plainUnusedDep");
     }
 
     private static void verifyDeclareFieldVolatile(String fieldName) {
