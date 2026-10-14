@@ -88,6 +88,11 @@ class TestHarness(
           .filterNot { (_, mode, dir) ->
             mode == OutputMode.KOTLIN && (dir as File).resolve("SKIP_KOTLIN").exists()
           }
+          .filterNot { (proc, mode, dir) ->
+            proc == ProcessorType.AP &&
+                mode == OutputMode.KOTLIN &&
+                (dir as File).resolve("SKIP_KAPT_KOTLIN").exists()
+          }
           .map { it + (it.last() as File).name }
           .filterNot { (proc, mode, _, _) ->
             // We don't generate Java from KSP

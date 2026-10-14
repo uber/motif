@@ -15,6 +15,8 @@
  */
 package motif.compiler
 
+import androidx.room.compiler.codegen.toKotlinPoet
+import androidx.room.compiler.processing.XMethodType
 import androidx.room.compiler.processing.XProcessingEnv
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -203,7 +205,7 @@ object KotlinCodeGenerator {
                 addProperty(
                     PropertySpec.builder(
                             propName,
-                            ClassName.bestGuess(it.overriddenMethod.returnType.qualifiedName),
+                            it.propertyTypeName(),
                         )
                         .addModifiers(KModifier.OVERRIDE)
                         .initializer("delegate.%N", propName)
@@ -314,12 +316,15 @@ object KotlinCodeGenerator {
         }
     return PropertySpec.builder(
             propName,
-            ClassName.bestGuess(overriddenMethod.returnType.qualifiedName),
+            propertyTypeName(),
         )
         .addModifiers(KModifier.OVERRIDE)
         .initializer("%N()", providerMethodName)
         .build()
   }
+
+  private fun AccessMethodImpl.propertyTypeName(): TypeName =
+      (overriddenMethod.type as XMethodType).returnType.asTypeName().toKotlinPoet()
 
   private fun ChildMethodImpl.spec(): FunSpec {
     val childMethodParameters = parameters

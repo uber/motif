@@ -19,7 +19,7 @@ jobs:
           java-version: ${{ matrix.java_version }}
           cache: 'gradle'
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/actions/wrapper-validation@v6
       - name: Configure Gradle
         # Gradle configuration install deps 
         run: ./gradlew help

@@ -1,0 +1,4 @@
+Kapt does not classify inherited Kotlin property accessors as synthetic methods.
+Kotlin output currently emits getOptional()/getNested()/getNullableOptional()
+methods that cannot override Kotlin properties. Keep AP Java and KSP Kotlin
+coverage until Javac-backed Kotlin property generation supports these accessors.
