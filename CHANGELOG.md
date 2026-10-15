@@ -1,3 +1,6 @@
+# 0.4.0-alpha16
+* Preserve generic type arguments and nullability in generated Kotlin properties, including inherited properties and runtime-selectable caching wrappers.
+
 # 0.4.0-alpha15
 * Fix SMART_CACHE skipping the cache for @Expose'd/@Spread'd dependencies and their passthrough (Binds) methods, so each consumer received a distinct instance
 * Add -Amotif.cacheReport=true|verbose to report skipped cache fields per scope, listing unused dependencies separately
