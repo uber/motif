@@ -1,0 +1,136 @@
+name: Release to Maven Central
+
+on:
+  push:
+    tags:
+      - '[0-9]*'
+      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to publish (for example, 0.4.0-alpha16)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maven-central-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish Motif libraries
+    if: github.repository == 'uber/motif'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      CI: 'true'
+      MAVEN_MODULES: 'lib ast compiler-ast models core errormessage compiler compiler-ksp'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Resolve release tag
+        id: release-ref
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9][a-zA-Z0-9.-]*)?$ ]]; then
+            echo '::error::Expected a version tag such as 0.4.0-alpha16 or v0.4.0-alpha16.'
+            exit 1
+          fi
+          printf 'tag=%s\n' "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release tag
+        uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ steps.release-ref.outputs.tag }}
+          persist-credentials: false
+
+      - name: Validate release version
+        id: release-version
+        env:
+          RELEASE_TAG: ${{ steps.release-ref.outputs.tag }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          versions = [
+              line.split('=', 1)[1].strip()
+              for line in Path('gradle.properties').read_text().splitlines()
+              if line.startswith('VERSION_NAME=')
+          ]
+          if len(versions) != 1:
+              raise SystemExit('Expected exactly one VERSION_NAME in gradle.properties.')
+          version = versions[0]
+          tag_version = os.environ['RELEASE_TAG'].removeprefix('v')
+          if version.upper().endswith('-SNAPSHOT') or version != tag_version:
+              raise SystemExit('Release tag must match a non-SNAPSHOT VERSION_NAME.')
+          if f'# {version}' not in Path('CHANGELOG.md').read_text().splitlines():
+              raise SystemExit(f'Add a # {version} entry to CHANGELOG.md before releasing.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\n')
+          PY
+
+      - name: Install JDKs
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            8
+            11
+            21
+
+      - name: Set up Gradle and validate wrapper
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Check Maven libraries
+        run: |
+          read -r -a modules <<< "$MAVEN_MODULES"
+          tasks=()
+          for module in "${modules[@]}"; do
+            tasks+=(":${module}:spotlessCheck" ":${module}:check")
+          done
+          ./gradlew --no-daemon --no-parallel --stacktrace \
+            -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64,JAVA_HOME_11_X64,JAVA_HOME_21_X64 \
+            "${tasks[@]}"
+
+      - name: Publish and release to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.PGP_PRIVATE_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
+        run: |
+          for name in ORG_GRADLE_PROJECT_mavenCentralUsername \
+            ORG_GRADLE_PROJECT_mavenCentralPassword ORG_GRADLE_PROJECT_signingInMemoryKey; do
+            if [[ -z "${!name}" ]]; then
+              printf '::error::Missing required publishing credential: %s\n' "$name"
+              exit 1
+            fi
+          done
+          if [[ -z "$ORG_GRADLE_PROJECT_signingInMemoryKeyId" ]]; then
+            unset ORG_GRADLE_PROJECT_signingInMemoryKeyId
+          fi
+          read -r -a modules <<< "$MAVEN_MODULES"
+          tasks=()
+          for module in "${modules[@]}"; do
+            tasks+=(":${module}:publishAndReleaseToMavenCentral")
+          done
+          ./gradlew --no-daemon --no-parallel --stacktrace \
+            -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64,JAVA_HOME_11_X64,JAVA_HOME_21_X64 \
+            -PsignAllPublications=true "${tasks[@]}"
+
+      - name: Summarize release
+        env:
+          RELEASE_VERSION: ${{ steps.release-version.outputs.version }}
+          RELEASE_TAG: ${{ steps.release-ref.outputs.tag }}
+        run: |
+          {
+            printf 'Published Motif **%s** to Maven Central from tag **%s**.\n\n' "$RELEASE_VERSION" "$RELEASE_TAG"
+            printf 'Modules: %s\n' "$MAVEN_MODULES"
+          } >> "$GITHUB_STEP_SUMMARY"
