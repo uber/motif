@@ -11,7 +11,10 @@ releases Motif's Maven libraries to public Maven Central through the Sonatype
 Central Portal. The Gradle Maven Publish plugin's `publishToMavenCentral` task
 handles both upload and release because `mavenCentralAutomaticPublishing=true`
 is set in `gradle.properties`; no manual promotion in Sonatype is required.
-The tagged commit should already have passed CI on `main`.
+After publishing, the workflow creates a GitHub Release for the tag using the
+matching `CHANGELOG.md` section as its release notes. Versions with a prerelease
+suffix, such as `0.4.0-alpha16`, are marked as prereleases on GitHub. The tagged
+commit should already have passed CI on `main`.
 
 ## Prepare and publish a release
 
@@ -30,8 +33,9 @@ The tagged commit should already have passed CI on `main`.
    ```
 
 5. Follow **Release to Maven Central** in GitHub Actions. The workflow validates
-   the tag and version, then publishes signed artifacts. Maven Central may take
-   additional time to make a released version available.
+   the tag, version, and changelog section before publishing signed artifacts,
+   then creates the GitHub Release. Maven Central may take additional time to
+   make a released version available.
 6. Prepare the next development version, such as `0.4.0-alpha17-SNAPSHOT`, in
    `gradle.properties` and submit it in a separate PR with the commit message
    `Prepare next development version.`

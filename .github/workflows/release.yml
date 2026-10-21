@@ -7,7 +7,7 @@ on:
       - 'v[0-9]*'
 
 permissions:
-  contents: read
+  contents: write # Create the GitHub Release.
 
 concurrency:
   group: maven-central-release
@@ -35,6 +35,17 @@ jobs:
             echo 'Release tag must match a non-SNAPSHOT VERSION_NAME.' >&2
             exit 1
           fi
+          printf 'RELEASE_VERSION=%s\n' "$version" >> "$GITHUB_ENV"
+      - name: Extract release notes
+        run: |
+          awk -v ver="$RELEASE_VERSION" '
+            /^# / { if (found) exit; if ($0 == "# " ver) { found=1; next } }
+            found
+          ' CHANGELOG.md > release_notes.md
+          if ! grep -q '[^[:space:]]' release_notes.md; then
+            echo "Add a # $RELEASE_VERSION section with release notes to CHANGELOG.md" >&2
+            exit 1
+          fi
       - name: Install JDKs
         uses: actions/setup-java@v6
         with:
@@ -59,3 +70,15 @@ jobs:
         run: >-
           ./gradlew publishToMavenCentral
           -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64,JAVA_HOME_11_X64
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          prerelease=()
+          if [[ "$RELEASE_VERSION" == *-* ]]; then
+            prerelease=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$RELEASE_VERSION" --notes-file release_notes.md "${prerelease[@]}"
