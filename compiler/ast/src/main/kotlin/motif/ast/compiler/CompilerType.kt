@@ -63,11 +63,11 @@ class CompilerType(private val env: XProcessingEnv, mirror: XType) : IrType {
       return env.typeUtils.isAssignable(mirror, baseMirror)
     }
 
-    val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
-
     if (baseMirror.typeArguments.isEmpty()) {
       return true
     }
+
+    val matchingType = getMatchingSuperType(baseMirror, mirror) ?: return false
 
     if (matchingType.typeArguments.size != baseMirror.typeArguments.size) {
       return false
